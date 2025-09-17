@@ -1,0 +1,103 @@
+body {
+    background: var(--standard-black-black-5) !important;
+    font-family: var(--font-font-1), serif !important;
+}
+.card {
+    border-radius: var(--border-radius-m) !important;
+    background-color: var(--background-paper) !important;
+}
+input.form-control {
+    font-size: var(--typography-body-size-medium) !important;
+    font-family: var(--font-font-1), serif !important;
+
+}
+.mt-spacing-l {
+    margin-top: var(--spacing-l) !important;
+}
+
+.custom-input-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.custom-input {
+    padding-left: 3rem !important;
+}
+
+.custom-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    z-index: 1;
+}
+
+.btn-primary {
+    border-radius: var(--button-border-radius, 8px) !important;
+    border: var(--default-borderwidth, 0) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00)) !important;
+    background: var(--orange-orange-6) !important;
+}
+
+a {
+    font-family: var(--font-font-1), serif !important;
+    color: var(--orange-orange-6) !important;
+    text-decoration: none !important;
+}
+a.text-small {
+    font-size: var(--typography-body-size-small) !important;
+    font-style: normal !important;
+    font-weight: var(--typography-body-weight-small) !important;
+    line-height: var(--typography-body-lineheight-small) !important;
+}
+.login-card {
+    width: 415px;
+}
+.supporting-text {
+    font-family: var(--font-font-1), serif;
+    font-size: var(--typography-body-size-small);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-small);
+    line-height: var(--typography-body-lineheight-small);
+}
+.supporting-text.success {
+    color: var(--success-brand);
+}
+.supporting-text.warning {
+    color: var(--warning-brand);
+}
+.supporting-text.danger {
+    color: var(--error-brand);
+}
+.swal-modal {
+    border-radius: var(--border-radius-s);
+    background: var(--background-paper);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.10);
+}
+
+.swal-modal .swal-button {
+    border-radius: var(--button-border-radius, 8px);
+    border: var(--default-borderwidth) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
+    background: var(--primary-brandlight);
+    padding: 0;
+    box-shadow: none;
+}
+
+.swal-modal .swal-button.swal-button--confirm {
+    color: var(--primary-brand) !important;
+    padding: var(--button-paddingtop, 12px) var(--button-paddingright, 16px) var(--button-paddingbottom, 12px) var(--button-paddingtopleft, 16px);
+
+}
+.swal-button:not([disabled]):hover {
+    background: var(--primary-brandlight);
+}
+.swal-modal .swal-text {
+
+    color: var(--text-secondary);
+    /* bodyMedium */
+    font-family: var(--font-font-1), serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+}

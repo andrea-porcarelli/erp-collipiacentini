@@ -7,7 +7,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ asset('/assets/css/miticko.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ asset('/assets/css/custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/miticko.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/device.css') }}">
         @livewireStyles
     </head>

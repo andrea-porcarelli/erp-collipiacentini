@@ -94,7 +94,7 @@
   --card-border-radius: var(--border-radius-m);
 }
 
-[data-mode="dark mode"] {
+[data-color="dark mode"] {
   --font-font-1: "DM Sans";
   --font-font-2: "DM Sans";
   --neutral-black: var(--standard-black-black-100);
