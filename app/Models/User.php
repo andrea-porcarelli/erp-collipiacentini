@@ -46,4 +46,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+
+    public function canBeImpersonated() : bool
+    {
+        return $this->role != 'god';
+    }
+
+
+    public function canImpersonate() : bool
+    {
+        return $this->role == 'god';
+    }
 }

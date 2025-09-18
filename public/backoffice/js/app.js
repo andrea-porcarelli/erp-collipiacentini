@@ -128,8 +128,14 @@ const clearForm = (form, disable, responseDiv) => {
 const renderErrors = (errors, form) => {
     if (errors.responseJSON.error === undefined) {
         let items = errors.responseJSON.errors;
-        if ( items !== undefined && items.length === 0 && (errors.responseJSON.error || errors.responseJSON.message)) {
-            sweet(errors.responseJSON.error ?? errors.responseJSON.message);
+        if ( items === undefined && (errors.responseJSON.error || errors.responseJSON.message)) {
+            form.find("input:last")
+                .parent()
+                .parent()
+                .find(".supporting-text")
+                .addClass("danger")
+                .show()
+                .html((errors.responseJSON.error || errors.responseJSON.message));
         } else {
             for (let item in items) {
                 if (item.length > 0) {
@@ -150,24 +156,19 @@ const renderErrors = (errors, form) => {
                             item = `${items[0]}[${items[1]}]`;
                         }
                     }
-                    $(document).find(`input[name='${item}']`)
-                        .addClass("is-invalid")
-                        .parent()
-                        .find(".invalid-feedback")
-                        .show()
-                        .html(message);
-                    $(document).find(`select[name='${item}']`)
-                        .addClass("is-invalid")
-                        .parent()
-                        .find(".invalid-feedback")
-                        .show()
-                        .html(message);
-                    $(document).find(`textarea[name='${item}']`)
-                        .addClass("is-invalid")
-                        .parent()
-                        .find(".invalid-feedback")
-                        .show()
-                        .html(message);
+                    const inputs = ['input', 'select', 'textarea'];
+                    inputs.forEach((el) => {
+                        const element = $(document).find(`${el}[name='${item}']`);
+                            element
+                                .closest('.text-field-container')
+                                .addClass("is-invalid")
+                                .parent()
+                                .find(".supporting-text")
+                                .show()
+                                .html(message);
+                            element.parent().parent().find('.supporting-text')
+                                .addClass("danger")
+                    })
                 }
             }
         }
@@ -175,8 +176,8 @@ const renderErrors = (errors, form) => {
         sweet(errors.responseJSON.error ?? errors.responseJSON.message);
     }
     setTimeout(() => {
-        $(document).find('.invalid-feedback').html('')
-        $(document).find('.invalid-feedback').parent().find("input, select, textarea").removeClass("is-invalid");
+        $(document).find('.supporting-text').removeClass('danger').html('')
+        $(document).find('.text-field-container').parent().find("input, select, textarea").removeClass("is-invalid");
     }, 10000)
 };
 

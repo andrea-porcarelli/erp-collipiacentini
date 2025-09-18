@@ -15,30 +15,6 @@ input.form-control {
     margin-top: var(--spacing-l) !important;
 }
 
-.custom-input-container {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.custom-input {
-    padding-left: 3rem !important;
-}
-
-.custom-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
-    z-index: 1;
-}
-
-.btn-primary {
-    border-radius: var(--button-border-radius, 8px) !important;
-    border: var(--default-borderwidth, 0) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00)) !important;
-    background: var(--orange-orange-6) !important;
-}
-
 a {
     font-family: var(--font-font-1), serif !important;
     color: var(--orange-orange-6) !important;
@@ -53,7 +29,132 @@ a.text-small {
 .login-card {
     width: 415px;
 }
+
+.sidebar {
+    width: 200px;
+    height: 100vh;
+}
+
+.bt-miticko {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-m);
+    padding: var(--spacing-m) var(--spacing-l) var(--spacing-m) var(--spacing-l);
+    border: 0 solid var(--primary-brand, rgba(255, 255, 255, 0.00));
+    border-radius: var(--border-radius-s);
+    font-size: var(--typography-button-size-small);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: none;
+    font-family: inherit;
+    min-height: 36px;
+}
+
+
+.bt-miticko.bt-m-brand {
+    background: var(--primary-brand);
+    color: var(--primary-onbrand);
+}
+
+.bt-miticko.bt-m-brand:hover {
+    background: var(--primary-brandhover);
+    color: var(--primary-onbrand);
+}
+
+.bt-miticko.bt-m-large {
+    padding: var(--spacing-l) var(--spacing-xl) var(--spacing-l) var(--spacing-xl);
+}
+
+.bt-miticko.bt-m-small {
+    padding: var(--spacing-s) var(--spacing-m) var(--spacing-s) var(--spacing-m);
+}
+
+.bt-miticko.bt-m-light {
+    background: var(--primary-brandlight);
+    color: var(--primary-brand);
+}
+.bt-miticko.bt-m-light:hover {
+    background: var(--primary-brandlighthover);
+    color: var(--primary-brand);
+}
+.bt-miticko.bt-m-outlined {
+    background: var(--neutral-transparent);
+    color: var(--primary-brand);
+    border: 1px solid var(--primary-brand);
+}
+.bt-miticko.bt-m-outlined:hover {
+    background: var(--primary-brandlight);
+    color: var(--primary-brandhover);
+}
+.bt-miticko.bt-m-text-only {
+    background: var(--neutral-transparent);
+    color: var(--primary-brand);
+    border: none;
+}
+.bt-miticko.bt-m-text-only:hover {
+    background: var(--neutral-transparent);
+    color: var(--primary-brandhover);
+}
+
+.bt-miticko.bt-m-medium .icon {
+    width: var(--typography-button-size-medium);
+}
+
+.text-field {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--spacing-s);
+}
+.text-field .text-field-container {
+    display: flex;
+    padding: var(--spacing-m) var(--spacing-l);
+    align-items: center;
+    gap: var(--spacing-m);
+    align-self: stretch;
+    border-radius: var(--border-radius-s);
+    border: 1px solid var(--border-default);
+    background: var(--background-paper);
+}
+.text-field .text-field-container input {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    align-self: stretch;
+    overflow: hidden;
+    color: var(--text-main);
+    text-overflow: ellipsis;
+    font-family: var(--font-font-1), serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+    width: 100%;
+    border: none;
+}
+.text-field .text-field-container input:focus,
+.text-field .text-field-container input:active {
+    border: none;
+    outline: none; /* rimuove l’outline standard del browser */
+    box-shadow: 0 0 5px rgba(0,0,0,0);
+}
+.text-field .text-field-container input::placeholder {
+    color: var(--text-secondary);
+}
+
+.text-field .text-field-container.is-invalid {
+    border: 1px solid var(--border-error);
+}
+
 .supporting-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
     font-family: var(--font-font-1), serif;
     font-size: var(--typography-body-size-small);
     font-style: normal;
@@ -69,35 +170,15 @@ a.text-small {
 .supporting-text.danger {
     color: var(--error-brand);
 }
-.swal-modal {
-    border-radius: var(--border-radius-s);
-    background: var(--background-paper);
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.10);
+.supporting-text.danger:before {
+    font-family: "Font Awesome 6 Free"; /* Font Awesome */
+    font-weight: 400;                   /* regular */
+    content: "\f057";                   /* fa-circle-xmark */
+    color: var(--error-brand);
 }
-
-.swal-modal .swal-button {
-    border-radius: var(--button-border-radius, 8px);
-    border: var(--default-borderwidth) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
-    background: var(--primary-brandlight);
-    padding: 0;
-    box-shadow: none;
-}
-
-.swal-modal .swal-button.swal-button--confirm {
-    color: var(--primary-brand) !important;
-    padding: var(--button-paddingtop, 12px) var(--button-paddingright, 16px) var(--button-paddingbottom, 12px) var(--button-paddingtopleft, 16px);
-
-}
-.swal-button:not([disabled]):hover {
-    background: var(--primary-brandlight);
-}
-.swal-modal .swal-text {
-
-    color: var(--text-secondary);
-    /* bodyMedium */
-    font-family: var(--font-font-1), serif;
-    font-size: var(--typography-body-size-medium);
-    font-style: normal;
-    font-weight: var(--typography-body-weight-medium);
-    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+.supporting-text.success:before {
+    font-family: "Font Awesome 6 Free"; /* Font Awesome */
+    font-weight: 600;                   /* regular */
+    content: "\f00c";                   /* fa-check */
+    color: var(--success-brand);
 }

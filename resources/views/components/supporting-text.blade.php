@@ -1,8 +1,12 @@
-@props(['icon' => 'fa-solid fa-circle-info', 'alert' => 'default', 'message' => ''])
+@props([
+    'icon' => null,
+    'alert' => 'default',
+    'message' => ''
+])
 
 <div class="supporting-text {{ $alert }}">
-    @if($icon)
+    @isset($icon)
         <i class="{{ $icon }}"></i>
-    @endif
+    @endisset
     {{ $message }}
 </div>

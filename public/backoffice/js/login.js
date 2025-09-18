@@ -3,13 +3,18 @@ import App from "./app.js";
 const login = () => {
     const serialized = App.serialize('.form-login');
     App.ajax({path: `/backoffice/login`, method: 'post', data: serialized.data}).then(response => {
-        App.sweet('Login effettuato', 'Ok!', 'success')
+        $('.form-login').find("input:last")
+            .parent()
+            .parent()
+            .find(".supporting-text")
+            .addClass("success")
+            .show()
+            .html('Login effettuato con successo');
         setTimeout(() => {
             location.href = response.url
         }, 1000)
     }).catch(errors => {
-        App.sweet(errors.responseJSON.message ?? '')
-        App.renderErrors(errors, form)
+        App.renderErrors(errors, $('.form-login'))
     })
 }
 const logout = () => {

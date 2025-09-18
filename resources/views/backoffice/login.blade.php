@@ -1,4 +1,4 @@
-@extends('backoffice.layout', ['title' => 'Login'])
+@extends('backoffice.layout-login', ['title' => 'Login'])
 
 @section('main-content')
     <div class="container">
@@ -7,7 +7,7 @@
                 <div class="d-flex justify-content-center align-items-center min-vh-100">
                     <div class="d-flex flex-column">
                         <div class="logo text-center mb-5">
-                            <img src="{{ asset('assets/images/logo-miticko.png') }}">
+                            <img src="{{ asset('assets/images/logo-miticko.png') }}" style="width: 25%">
                         </div>
                         <x-card class="max-w-sm mx-auto">
                             <form class="form-login">
@@ -16,33 +16,14 @@
                                         Accedi a Miticko
                                     </div>
                                     <div class="col-12">
-                                        <div class="custom-input-container">
-                                            <input
-                                                type="email"
-                                                class="form-control custom-input"
-                                                id="email"
-                                                placeholder="Email"
-                                                autocomplete="email"
-                                                name="email"
-                                            >
-                                            <i class="fa-regular fa-envelope custom-icon"></i>
-                                        </div>
+                                        <x-input leading="fa-envelope" leading_style="regular" name="email" placeholder="Email" />
                                     </div>
                                     <div class="col-12 mt-spacing-l">
-                                        <div class="custom-input-container">
-                                            <input
-                                                type="password"
-                                                class="form-control custom-input"
-                                                id="password"
-                                                placeholder="Password"
-                                                autocomplete="password"
-                                                name="password"
-                                            >
-                                            <i class="fa-solid fa-lock custom-icon"></i>
-                                        </div>
+                                        <x-input leading="fa-lock"  name="password" type="password" placeholder="Password" />
                                     </div>
                                     <div class="col-12 mt-spacing-l">
-                                        <button type="button" class="btn btn-primary w-100 btn-login">Login</button>
+
+                                        <x-button label="Login" class="w-100 btn-login"  />
                                     </div>
                                     <div class="col-12 mt-spacing-l text-center">
                                         <a href="" class="text-small">Password dimenticata</a>
