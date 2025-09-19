@@ -146,6 +146,14 @@ a.text-small {
 .text-field .text-field-container input::placeholder {
     color: var(--text-secondary);
 }
+.text-field .text-field-container input:-webkit-autofill,
+.text-field .text-field-container input:-webkit-autofill:hover,
+.text-field .text-field-container input:-webkit-autofill:focus,
+.text-field .text-field-container input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #000 !important;
+    background-color: white !important;
+}
 
 .text-field .text-field-container.is-invalid {
     border: 1px solid var(--border-error);

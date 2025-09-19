@@ -1,11 +1,7 @@
 <nav class="d-flex flex-column flex-shrink-0 text-bg-dark sidebar" style="width: 280px;">
-    <a href="/"
-       class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <svg class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
-            <use xlink:href="#bootstrap"></use>
-        </svg>
-        <span class="fs-4">Sidebar</span> </a>
-    <hr>
+    <div class="p-4">
+        <img src="{{ asset('assets/images/logo-negativo.png') }}" style="width: 80%;">
+    </div>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">
                 <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
