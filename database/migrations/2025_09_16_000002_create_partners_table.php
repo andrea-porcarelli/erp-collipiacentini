@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('partner_name');
             $table->string('partner_code');
             $table->string('has_notify');
-            $table->string('notify_email');
+            $table->string('email_notify');
             $table->boolean('is_active')->index()->default(1);
             $table->timestamps();
         });

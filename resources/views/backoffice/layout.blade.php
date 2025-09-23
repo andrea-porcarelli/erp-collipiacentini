@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     @include('backoffice.components.header')
-    <body data-color="light mode" data-mode="desktop (l)">
+    <body data-mode="light mode desktop (l)">
         <x-sidebar />
         <div class="container">
             <div class="row"></div>

@@ -14,5 +14,7 @@ Route::group(['prefix' => '/backoffice'], function() {
     Route::group(['middleware' => ['auth']], function() {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::resource('companies', UserController::class);
     });
 });

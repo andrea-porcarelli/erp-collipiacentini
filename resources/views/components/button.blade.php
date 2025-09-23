@@ -1,16 +1,16 @@
 @props([
     'leading' => null,
-    'leading_style' => 'solid',
+    'leading_style' => 'regular',
     'trailing' => null,
-    'trailing_style' => 'solid',
-    'style' => 'brand',
+    'trailing_style' => 'regular',
     'emphasis' => 'default',
+    'status' => 'primary',
     'size' => 'medium',
     'label' => '',
     'class' => '',
     'type' => 'button',
     ])
-<button type="{{ $type }}" class="bt-miticko bt-m-{{ $style }} bt-m-{{ $emphasis }} bt-m-{{ $size }} {{ $class }}">
+<button data-mode="{{ $size }} {{ $status }}" type="{{ $type }}" class="bt-miticko {{ $class }} bt-m-{{ $emphasis }}">
     @isset($leading)
         <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>
     @endisset

@@ -30,55 +30,38 @@ a.text-small {
     width: 415px;
 }
 
-.sidebar {
-    width: 200px;
-    height: 100vh;
-}
-
 .bt-miticko {
     display: inline-flex;
     justify-content: center;
     align-items: center;
     gap: var(--spacing-m);
-    padding: var(--spacing-m) var(--spacing-l) var(--spacing-m) var(--spacing-l);
-    border: 0 solid var(--primary-brand, rgba(255, 255, 255, 0.00));
-    border-radius: var(--border-radius-s);
+    padding: var(--button-paddingtop) var(--button-paddingright) var(--button-paddingbottom) var(--button-paddingleft);
+    border: var(--default-borderwidth) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
+    border-radius: var(--button-border-radius);
     font-size: var(--typography-button-size-small);
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.15s ease;
-    background: none;
+    background: var(--default-background);
     font-family: inherit;
     min-height: 36px;
+    color: var(--default-foreground);
 }
 
-
-.bt-miticko.bt-m-brand {
-    background: var(--primary-brand);
-    color: var(--primary-onbrand);
+.bt-miticko:hover {
+    background: var(--default-backgroundhover);
+    color: var(--default-foregroundhover);
 }
 
-.bt-miticko.bt-m-brand:hover {
-    background: var(--primary-brandhover);
-    color: var(--primary-onbrand);
-}
-
-.bt-miticko.bt-m-large {
-    padding: var(--spacing-l) var(--spacing-xl) var(--spacing-l) var(--spacing-xl);
-}
-
-.bt-miticko.bt-m-small {
-    padding: var(--spacing-s) var(--spacing-m) var(--spacing-s) var(--spacing-m);
-}
 
 .bt-miticko.bt-m-light {
-    background: var(--primary-brandlight);
-    color: var(--primary-brand);
+    background: var(--light-background);
+    color: var(--light-foreground);
 }
 .bt-miticko.bt-m-light:hover {
-    background: var(--primary-brandlighthover);
-    color: var(--primary-brand);
+    background: var(--light-backgroundhover);
+    color: var(--light-foregroundhover);
 }
 .bt-miticko.bt-m-outlined {
     background: var(--neutral-transparent);
@@ -86,7 +69,7 @@ a.text-small {
     border: 1px solid var(--primary-brand);
 }
 .bt-miticko.bt-m-outlined:hover {
-    background: var(--primary-brandlight);
+    background: var(--light-background);
     color: var(--primary-brandhover);
 }
 .bt-miticko.bt-m-text-only {
@@ -113,20 +96,19 @@ a.text-small {
 }
 .text-field .text-field-container {
     display: flex;
-    padding: var(--spacing-m) var(--spacing-l);
+    padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
     align-items: center;
-    gap: var(--spacing-m);
+    gap: var(--text-field-spacing);
     align-self: stretch;
-    border-radius: var(--border-radius-s);
-    border: 1px solid var(--border-default);
-    background: var(--background-paper);
+    border-radius: var(--text-field-borderradius);
+    border: var(--text-field-borderwidth) solid var(--text-field-borderresting);
+    background: var(--text-field-background);
 }
 .text-field .text-field-container input {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--text-field-spacing, 8px);
     align-self: stretch;
-    overflow: hidden;
     color: var(--text-main);
     text-overflow: ellipsis;
     font-family: var(--font-font-1), serif;
@@ -189,4 +171,56 @@ a.text-small {
     font-weight: 600;                   /* regular */
     content: "\f00c";                   /* fa-check */
     color: var(--success-brand);
+}
+
+
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    padding: var(--spacing-l, 16px);
+    align-items: flex-start;
+    gap: var(--spacing-xl, 24px);
+    background: var(--neutral-black, #000);
+}
+.sidebar .logo {
+    display: flex;
+    width: 130px;
+}
+.sidebar .navigation-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+.sidebar .navigation-bar .nav-item {
+    display: flex;
+    height: 40px;
+    padding: 12px;
+    align-items: center;
+    gap: 4px;
+    align-self: stretch;
+    color: #FFF;
+    font-family: var(--font-font-1), serif;
+    font-size: var(--typography-title-size-small, 14px);
+    font-style: normal;
+}
+
+.sidebar .navigation-bar .nav-item a {
+    color: #FFF !important;
+    font-weight: var(--typography-title-weight-medium);
+    line-height: var(--typography-title-lineheight-medium); /* 100% */
+}
+
+.sidebar .navigation-bar .nav-item.active a {
+    font-weight: var(--typography-title-weight-small);
+    line-height: var(--typography-title-lineheight-small); /* 100% */
+}
+
+.sidebar .navigation-bar .nav-item.active {
+    border-radius: var(--border-radius-s);
+    background: var(--neutral-grey-80);
+}
+.sidebar .navigation-bar .nav-item:hover {
+    border-radius: var(--border-radius-s);
+    background: var(--neutral-grey-80);
 }

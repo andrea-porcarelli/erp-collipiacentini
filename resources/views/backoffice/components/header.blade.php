@@ -8,7 +8,6 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/miticko.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/custom.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/device.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />        <link rel="preconnect" href="https://fonts.googleapis.com">
-
+        <script src="https://kit.fontawesome.com/0708d92bf1.js" crossorigin="anonymous"></script>
         @livewireStyles
     </head>

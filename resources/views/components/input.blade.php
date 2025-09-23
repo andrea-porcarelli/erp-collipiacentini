@@ -10,8 +10,9 @@
     'name' => '',
     'placeholder' => null,
     'type' => 'text',
+    'size' => 'medium',
 ])
-<div class="text-field">
+<div class="text-field" data-mode="{{ $size }}">
     @isset($label)
         <label>{!! $label !!}</label>
     @endisset

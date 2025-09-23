@@ -22,8 +22,7 @@
                                         <x-input leading="fa-lock"  name="password" type="password" placeholder="Password" />
                                     </div>
                                     <div class="col-12 mt-spacing-l">
-
-                                        <x-button label="Login" class="w-100 btn-login"  />
+                                        <x-button label="Login" class="w-100 btn-login"/>
                                     </div>
                                     <div class="col-12 mt-spacing-l text-center">
                                         <a href="" class="text-small">Password dimenticata</a>
