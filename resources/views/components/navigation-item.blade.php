@@ -4,8 +4,8 @@
     'label' => '',
     'route' => '',
 ])
-<div class="nav-item @if($is_active) active @endif">
-    <a href="@if(filled($route)){{ route($route) }}@endif">
+<div class="item">
+    <a href="@if(filled($route)){{ route($route) }}@endif" class="nav-item @if($is_active) active @endif">
         <span class="{{ $icon }}"></span>
         {{ $label }}
     </a>

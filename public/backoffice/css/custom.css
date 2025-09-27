@@ -2,10 +2,6 @@ body {
     background: var(--standard-black-black-5) !important;
     font-family: var(--font-font-1), serif !important;
 }
-.card {
-    border-radius: var(--border-radius-m) !important;
-    background-color: var(--background-paper) !important;
-}
 input.form-control {
     font-size: var(--typography-body-size-medium) !important;
     font-family: var(--font-font-1), serif !important;
@@ -160,6 +156,7 @@ a.text-small {
 .supporting-text.danger {
     color: var(--error-brand);
 }
+
 .supporting-text.danger:before {
     font-family: "Font Awesome 6 Free"; /* Font Awesome */
     font-weight: 400;                   /* regular */
@@ -173,14 +170,17 @@ a.text-small {
     color: var(--success-brand);
 }
 
-
 .sidebar {
     width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
     padding: var(--spacing-l, 16px);
     align-items: flex-start;
     gap: var(--spacing-xl, 24px);
     background: var(--neutral-black, #000);
+    z-index: 100;
 }
 .sidebar .logo {
     display: flex;
@@ -192,7 +192,11 @@ a.text-small {
     align-items: flex-start;
     align-self: stretch;
 }
-.sidebar .navigation-bar .nav-item {
+.sidebar .navigation-bar .item  {
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+}
+.sidebar .navigation-bar .item .nav-item {
     display: flex;
     height: 40px;
     padding: 12px;
@@ -203,24 +207,149 @@ a.text-small {
     font-family: var(--font-font-1), serif;
     font-size: var(--typography-title-size-small, 14px);
     font-style: normal;
+    width: 100%;
 }
 
-.sidebar .navigation-bar .nav-item a {
+.sidebar .navigation-bar .item .nav-item{
     color: #FFF !important;
     font-weight: var(--typography-title-weight-medium);
     line-height: var(--typography-title-lineheight-medium); /* 100% */
 }
 
-.sidebar .navigation-bar .nav-item.active a {
+.sidebar .navigation-bar .item .nav-item.active {
     font-weight: var(--typography-title-weight-small);
     line-height: var(--typography-title-lineheight-small); /* 100% */
 }
 
-.sidebar .navigation-bar .nav-item.active {
+.sidebar .navigation-bar .item .nav-item.active {
+    border-radius: var(--border-radius-s);
+    background: var(--neutral-grey-80);
+    width: 100%;
+}
+.sidebar .navigation-bar .item .nav-item:hover {
     border-radius: var(--border-radius-s);
     background: var(--neutral-grey-80);
 }
-.sidebar .navigation-bar .nav-item:hover {
+.main-content {
+    margin-left: 200px;
+    min-height: 100vh;
+    background-color: #FFF;
+    padding: var(--layout-backend-main-column-padding-top) var(--layout-backend-main-column-padding-right) var(--layout-backend-main-column-padding-bottom) var(--layout-backend-main-column-padding-left);
+    width: calc(100vw - 200px);
+}
+.page-container {
+    display: flex;
+    height: 982px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--layout-backend-main-column-spacing);
+    flex-shrink: 0;
+}
+.content-container h1{
+    color: #000;
+
+    /* headingMedium */
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-heading-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-heading-weight-medium);
+    line-height: var(--typography-heading-lineheight-medium); /* 100% */
+}
+
+
+.card-miticko {
+    display: flex;
+    padding: var(--card-padding);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--card-spacing);
+    align-self: stretch;
+    border-radius: var(--card-border-radius);
+    border: var(--card-border-width) solid var(--card-border);
+    background: var(--card-background);
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.20);
+}
+.card-miticko .card-header {
+    width: 100%;
+    text-align: left;
+}
+.card-miticko .card-header h2 {
+    color: var(--card-title);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-medium);
+    line-height: var(--typography-title-lineheight-medium); /* 133.333% */
+}
+.card-miticko .card-header p {
+    color: var(--card-subtitle);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+    margin: 0;
+}
+
+.card-miticko .card-body {
+    width: 100%;
+}
+.table-header {
+    display: flex;
+    padding-bottom: var(--spacing-s);
+    align-items: center;
+    gap: var(--spacing-l);
+    align-self: stretch;
+}
+.filters-miticko {
+    display: flex;
+    flex-direction: row;
+    align-self: stretch;
+    gap: var(--spacing-s);
+    align-items: center;
+}
+.filters-miticko .filter {
+    display: inline-flex;
+    padding: var(--spacing-xs) var(--spacing-s) var(--spacing-xs) var(--spacing-xs);
+    align-items: center;
+    gap: var(--spacing-xs);
     border-radius: var(--border-radius-s);
-    background: var(--neutral-grey-80);
+    border: 1px dashed var(--primary-brandlighthover);
+    width: auto;
+    color: var(--primary-brand);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-label-size-large);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-large);
+    line-height: var(--typography-label-lineheight-large);
+    max-width: max-content;
+}
+.filters-miticko .filter:hover {
+    background: var(--primary-brandlight);
+    cursor: pointer;
+}
+.table-header .table-header-total {
+    color: var(--text-secondary);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-label-size-large);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-large);
+    line-height: var(--typography-label-lineheight-large);
+}
+
+.table-miticko {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.table-miticko thead tr {
+    border-radius: var(--border-radius-xs) var(--border-radius-xs) 0 0;
+    background: var(--secondary-brandlight);
+}
+
+.table-miticko thead tr th {
+
+    padding: var(--spacing-l) var(--spacing-m);
 }

@@ -1,8 +1,15 @@
-@props(['title' => null, 'class' => ''])
+@props(['title' => null, 'sub_title' => null, 'size' => 'medium', 'mode' => 'white'])
 
-<div {{ $attributes->merge(['class' => 'card '.$class]) }}>
-    @if($title)
-        <div class="card-header"><h3 class="mb-0">{{ $title }}</h3></div>
+<div class="card-miticko" data-mode="{{ $size }} {{ $mode }} light mode">
+    @if(isset($title) or isset($sub_title))
+        <div class="card-header">
+            @isset($title)
+            <h2 class="mb-0">{{ $title }}</h2>
+            @endisset
+            @isset($sub_title)
+                <p>{!! $sub_title !!}</p>
+            @endisset
+        </div>
     @endif
 
     <div class="card-body">
