@@ -294,6 +294,7 @@ a.text-small {
 
 .card-miticko .card-body {
     width: 100%;
+    position: relative;
 }
 .table-header {
     display: flex;
@@ -301,6 +302,9 @@ a.text-small {
     align-items: center;
     gap: var(--spacing-l);
     align-self: stretch;
+    position: absolute;
+    top: 10px;
+    z-index: 1000;
 }
 .filters-miticko {
     display: flex;
@@ -329,6 +333,13 @@ a.text-small {
     background: var(--primary-brandlight);
     cursor: pointer;
 }
+
+.filters-miticko .filter.filled{
+    border-radius: var(--border-radius-s);
+    border: 1px solid var(--primary-brand);
+    background: var(--primary-brand);
+    color: var(--primary-onbrand);
+}
 .table-header .table-header-total {
     color: var(--text-secondary);
     font-family: var(--font-font-1), sans-serif;
@@ -336,6 +347,14 @@ a.text-small {
     font-style: normal;
     font-weight: var(--typography-label-weight-large);
     line-height: var(--typography-label-lineheight-large);
+}
+.table-header .table-options {
+    color: var(--primary-brand);
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium);
 }
 
 .table-miticko {
@@ -345,11 +364,263 @@ a.text-small {
 }
 
 .table-miticko thead tr {
-    border-radius: var(--border-radius-xs) var(--border-radius-xs) 0 0;
-    background: var(--secondary-brandlight);
+    border-radius: var(--border-radius-xs) var(--border-radius-xs) 0 0 !important;
+    background: var(--secondary-brandlight) !important;
 }
 
 .table-miticko thead tr th {
+    padding: var(--spacing-l) var(--spacing-m) !important;
+    color: var(--text-secondary);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-small);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-small) !important;
+    line-height: var(--typography-title-lineheight-small); /* 128.571% */
+}
+.table-miticko > tbody > tr > th, .table-miticko > tbody > tr > td {
+    padding: var(--spacing-l) var(--spacing-m) !important;
+}
+.table-miticko > tbody > tr > td {
+    color: var(--text-main);
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium);
+}
 
-    padding: var(--spacing-l) var(--spacing-m);
+/* Dalla prima alla seconda colonna */
+.table-miticko > tbody > tr > td:nth-child(-n+2) {
+    color: var(--text-main);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-small);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-small);
+    line-height: var(--typography-title-lineheight-small); /* 128.571% */
+}
+/* Dalla prima alla seconda colonna */
+.table-miticko > tbody > tr > td:nth-child(n+5) {
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium);
+}
+.dt-length {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary) !important;
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-label-size-large);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-large);
+    line-height: var(--typography-label-lineheight-large); /* 91.667% */
+    text-transform: uppercase;
+}
+.dt-length .dt-input {
+    border-radius: var(--border-radius-s) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--text-main);
+
+    /* labelLarge */
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-label-size-large);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-large);
+    line-height: var(--typography-label-lineheight-large); /* 91.667% */
+    text-transform: uppercase;
+}
+.dt-info {
+    color: var(--text-secondary) !important;
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+}
+div.dt-container div.dt-layout-row {
+    margin: 0.25em 0;
+}
+div.dt-container .dt-paging .dt-paging-button {
+    padding: var(--spacing-xs) var(--spacing-s) !important;
+    color: var(--primary-brand) !important;
+    border: none !important;
+}
+div.dt-container .dt-paging .dt-paging-button:hover,
+div.dt-container .dt-paging .dt-paging-button:active {
+    padding: var(--spacing-xs) var(--spacing-s) !important;
+    background: none !important;
+    color: var(--primary-brandhover) !important;
+    border: none !important;
+}
+.label-miticko {
+    display: flex;
+    padding: var(--spacing-xs);
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-xs);
+    max-width: max-content;
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-label-size-small);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-small);
+    line-height: var(--typography-label-lineheight-small); /* 70% */
+    text-transform: uppercase;
+}
+
+.label-miticko.success {
+    border-radius: 4px;
+    background: var(--success-brandlight);
+    color: var(--success-onbrandlight);
+}
+
+.label-miticko.warning {
+    border-radius: 4px;
+    background: var(--warning-brandlight);
+    color: var(--warning-onbrandlight);
+}
+
+.label-miticko.error {
+    border-radius: 4px;
+    background: var(--error-brandlight);
+    color: var(--error-onbrandlight);
+}
+
+.label-miticko.error {
+    border-radius: 4px;
+    background: var(--error-brandlight);
+    color: var(--error-onbrandlight);
+}
+.modal-miticko {
+    align-self: stretch;
+    color: var(--text-main) !important;
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-medium);
+    line-height: var(--typography-title-lineheight-medium);
+    padding: var(--spacing-xl);
+    flex-direction: column !important;
+    align-items: flex-start;
+    gap: var(--spacing-2xl);
+    border-radius: var(--border-radius-m) !important;
+    background: var(--page-paper);
+}
+.modal-miticko .modal-header {
+    border-bottom:none;
+    position:relative;
+    width: 100%;
+}
+.modal-miticko .modal-header .close {
+    position:absolute;
+    right: 0;
+    border:none;
+    background: none;
+}
+.modal-miticko .modal-header .modal-title {
+    color: var(--text-main);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-medium);
+    line-height: var(--typography-title-lineheight-medium);
+}
+.modal-miticko .modal-body {
+    padding: var(--spacing-0);
+}
+.modal-miticko .modal-footer {
+    border:none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--spacing-xs);
+    align-self: stretch;
+    padding: var(--spacing-0);
+}
+.flatpickr-calendar.inline {
+    box-shadow:none !important;
+}
+.flatpickr-calendar .flatpickr-current-month .cur-month,
+.flatpickr-calendar .flatpickr-current-month .cur-year {
+    color: #000;
+    text-align: center;
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-small);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-small);
+    line-height: var(--typography-title-lineheight-small); /* 70% */
+}
+.flatpickr-calendar .flatpickr-prev-month,
+.flatpickr-calendar .flatpickr-next-month {
+    padding: 5px;
+}
+
+.flatpickr-day.today {
+    border-color: var(--primary-brand);
+    border-radius: 0;
+    background: var(--light-backgroundhover);
+    color: var(--primary-onbrandlight);
+}
+
+.flatpickr-day:hover {
+    border-radius: 0;
+    background: var(--primary-onbrand);
+}
+.flatpickr-day.selected.startRange, .flatpickr-day.startRange.startRange, .flatpickr-day.endRange.startRange {
+    border-radius: var(--border-radius-s) 0 0 var(--border-radius-s);
+    background: var(--primary-brand);
+    border-color: var(--primary-onbrandlight);
+}
+.flatpickr-day.selected.endRange, .flatpickr-day.startRange.endRange, .flatpickr-day.endRange.endRange {
+    border-radius: 0 var(--border-radius-s) var(--border-radius-s) 0;
+    background: var(--primary-brand);
+    border-color: var(--primary-onbrandlight);
+}
+span.flatpickr-weekday{
+    color: var(--text-secondary);
+    text-align: center;
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-small);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-small);
+    line-height: var(--typography-body-lineheight-small);
+}
+.order-statuses {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-s);
+    align-self: stretch;
+
+}
+.order-statuses li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    align-self: stretch;
+    color: var(--text-main);
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium);
+}
+.checkbox-miticko {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-main);
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium);
+}
+.checkbox-miticko.disabled {
+    color: var(--text-disabled);
 }

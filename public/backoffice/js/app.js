@@ -205,224 +205,7 @@ const translate = (string, args) => {
     return value;
 };
 
-const getTag = (html, selector) => {
-    let parser = new DOMParser();
-    let dom = parser.parseFromString(html, "text/html");
-    let elems = dom.querySelectorAll(selector);
-    return Array.prototype.map.call(elems, function (e) {
-        return e.outerHTML.replace(/<\/?[^>]+(>|$)/g, "");
-    });
-};
-
-const removeHtml = (text) => {
-    let values = getTag(text, ".hidden-value");
-    if (values) {
-        return values[0];
-    }
-    return "";
-};
-
-const actionDatatable = (dt, button, type) => {
-    let tableId;
-    dt.one("preXhr", function (e, s, data) {
-        tableId = s.sTableId;
-        $(`#${tableId}`).prepend(
-            '<div class="overlay"><span>Attendi...</span></div>'
-        );
-        data.length = -1;
-    })
-        .one("draw", function (e) {
-            let buttonConfig = $.fn.DataTable.ext.buttons[type];
-            $.extend(true, buttonConfig, {});
-            buttonConfig.action(e, dt, button, buttonConfig);
-            dt.one("xhr", function (e, s, data) {
-                data.length = 50;
-            }).draw();
-            $(`#${tableId}`).find(".overlay").remove();
-        })
-        .draw();
-};
-
-const datatable = (params) => {
-    let datatable_table = [];
-    let datatables = [];
-    let name =
-        typeof params.name !== "undefined" ? params.name : "datatable_table";
-    datatable_table[name] = $(`.${name}`);
-    if (datatable_table[name].length) {
-        let exportRules = {
-            exportOptions: {
-                columns: ":not(:last-child)",
-                format: {
-                    body: function (text, column) {
-                        return column >= 8 ? removeHtml(text) : text;
-                    },
-                },
-                modifier: {
-                    order: "current",
-                    page: "all",
-                },
-            },
-        };
-        let exportExtend = [];
-        if (params.export) {
-            params.export.forEach((item) => {
-                if (item === "csv") {
-                    exportExtend.push(
-                        $.extend(true, {}, exportRules, {
-                            extend: "csvHtml5",
-                            action: function (e, dt, button, config) {
-                                actionDatatable(dt, button, "csvHtml5");
-                            },
-                        })
-                    );
-                }
-                if (item === "excel") {
-                    exportExtend.push(
-                        $.extend(true, {}, exportRules, {
-                            extend: "excelHtml5",
-                            text: '<span class="fa fa-file-excel-o"></span> Excel Export',
-                            action: function (e, dt, button) {
-                                actionDatatable(dt, button, "excelHtml5");
-                            },
-                        })
-                    );
-                }
-            });
-        }
-        datatables[name] = datatable_table[name].DataTable({
-            ajax: {
-                url: params.url,
-                data: function (d) {
-                    let filters = {};
-                    if (typeof params.dataForm !== "undefined") {
-                        if (params.dataForm.length > 0) {
-                            params.dataForm.forEach((item) => {
-                                let element = $(`${params.search_class === undefined ? '.advanced-search' : params.search_class } .${item}`);
-                                let val = element.val();
-                                if (element.attr("type") === "checkbox") {
-                                    if (element.is(":checked")) {
-                                        val = "1";
-                                    } else {
-                                        val = "";
-                                    }
-                                }
-                                filters[item] = val;
-                            });
-                            if (params.saveFilters !== 'undefined' && params.saveFilters) {
-                                Cookies.set('filters', filters);
-                            }
-                        }
-                    }
-                    d.filters = filters;
-                },
-            },
-            processing: true,
-            serverSide: true,
-            columns: params.columns,
-            lengthMenu: [
-                [10, 25, 50, 100, -1],
-                [10, 25, 50, 100, "All"],
-            ],
-            iDisplayLength:
-                typeof params.iDisplayLength !== "undefined"
-                    ? params.iDisplayLength
-                    : 50,
-            order:
-                typeof params.order !== "undefined"
-                    ? params.order
-                    : [[0, "desc"]],
-            bStateSave:
-                typeof params.stateSave !== "undefined"
-                    ? params.stateSave
-                    : false,
-            dom:
-                '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"' + ">>t" +
-                (typeof params.export !== "undefined" ? "B" : "") +
-                '<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-            buttons: [exportExtend],
-            rowGroup:
-                typeof params.grouping !== "undefined"
-                    ? { dataSrc: params.grouping }
-                    : null,
-            orderCellsTop: true,
-            responsive: true,
-            language: {
-                loadingRecords: "&nbsp;",
-                processing:
-                    '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ',
-                search: translate("javascript.datatable.search"),
-                emptyTable: translate("javascript.datatable.emptyTable"),
-                info: translate("javascript.datatable.info"),
-                infoEmpty: translate("javascript.datatable.infoEmpty"),
-                lengthMenu: translate("javascript.datatable.lengthMenu"),
-                infoFiltered: translate("javascript.datatable.search"),
-                paginate: {
-                    // remove previous & next text from pagination
-                    previous: "&nbsp;",
-                    next: "&nbsp;",
-                },
-            }
-        });
-    }
-
-    $("input.dt-input").on("keyup", function () {
-        filterColumn($(this).attr("data-column"), $(this).val());
-    });
-};
-
-const filterColumn = (i, val) => {
-    if (i === 5) {
-        var startDate = $(".start_date").val(),
-            endDate = $(".end_date").val();
-        if (startDate !== "" && endDate !== "") {
-            filterByDate(i, startDate, endDate); // We call our filter function
-        }
-        $(".dt-advanced-search").dataTable().fnDraw();
-    } else {
-        $(".dt-advanced-search")
-            .DataTable()
-            .column(i)
-            .search(val, false, true)
-            .draw();
-    }
-};
-
-const filterByDate = (column, startDate, endDate) => {
-    $.fn.dataTableExt.afnFiltering.push(function (
-        oSettings,
-        aData,
-        iDataIndex
-    ) {
-        var rowDate = normalizeDate(aData[column]),
-            start = normalizeDate(startDate),
-            end = normalizeDate(endDate);
-
-        // If our date from the row is between the start and end
-        if (start <= rowDate && rowDate <= end) {
-            return true;
-        } else if (rowDate >= start && end === "" && start !== "") {
-            return true;
-        } else if (rowDate <= end && start === "" && end !== "") {
-            return true;
-        } else {
-            return false;
-        }
-    });
-};
-
-const normalizeDate = function (dateString) {
-    let date = new Date(dateString);
-    return (
-        date.getFullYear() +
-        "" +
-        ("0" + (date.getMonth() + 1)).slice(-2) +
-        "" +
-        ("0" + date.getDate()).slice(-2)
-    );
-};
-
-const reloadTable = (name = '.datatable_table') => {
+const reloadTable = (name = '.datatable') => {
     const table = $(name).DataTable();
     table.clear();
     table.ajax.reload();
@@ -444,42 +227,6 @@ const debounce = (func, wait, immediate) => {
     };
 };
 
-const loadSelect2 = (parameters) => {
-    setTimeout(() => {
-        $(`${parameters.element}`).select2({
-            placeholder: "Cerca",
-            closeOnSelect: parameters.closeOnSelect !== undefined ? parameters.closeOnSelect : false,
-            ajax: {
-                url: `/${parameters.route}`,
-                dataType: "json",
-                delay: 250,
-                method:
-                    parameters.method !== undefined ? parameters.method : "get",
-                data: (params) => {
-                    return {
-                        search: params.term,
-                        role: (parameters.role !== undefined) ? parameters.role : '',
-                        fields: (parameters.fields !== undefined) ? parameters.fields : '',
-                        is_active: (parameters.is_active !== undefined) ? parameters.is_active : '',
-                        brand_id: (parameters.brand_id !== undefined) ? parameters.brand_id : '',
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: $.map(data.results, function (item) {
-                            return {
-                                text: item.text,
-                                id: item.id,
-                            };
-                        }),
-                    };
-                },
-                cache: false,
-            },
-        });
-    }, 350);
-};
-
 const removeDropzone = () => {
     if (Dropzone.instances.length > 0) {
         Dropzone.instances.forEach((e) => {
@@ -489,11 +236,6 @@ const removeDropzone = () => {
     }
 };
 
-const logs = () => {
-    ajax({ path: "logs/get", method: "get" }).then((response) => {
-        $(".logs").html(response);
-    });
-};
 
 const loadSwitch = (container) => {
     let elems = Array.prototype.slice.call(
@@ -506,36 +248,6 @@ const loadSwitch = (container) => {
         }
     });
 };
-
-const changeStatusObject = (el) => {
-    const elementId = el.data("id");
-    const model = el.data("model");
-    ajax({ path: `/backoffice/${model}/${elementId}/status`, method: "post" }).then(
-        () => {
-            reloadTable();
-        }
-    );
-};
-
-const dashboard = () => {
-    const data = App.serialize('.load-dashboard');
-    console.log(data)
-    App.ajax({path: `/dashboard_ajax`, method: 'post', data: { ...data.data }}).then(response => {
-        $('.dashboard-report').html(response.html)
-    });
-}
-
-const success = (clean = false) => {
-    const div = $(`.btn-execute`).parent().parent();
-    if (clean) {
-        div.find(`.alert`).remove();
-    } else {
-        div.append(`<div class="mt-2 alert alert-arrow-right alert-icon-right alert-light-success alert-dismissible fade show mb-4" role="alert">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>
-            <strong>${translate('javascript.operation-done')}</strong>
-        </div>`)
-    }
-}
 
 const update_or_create = (method, form_name, endpoint, redirect, callback) => {
     const data = App.serialize(form_name);
@@ -590,70 +302,6 @@ const upload = (parameters) => {
     }, parameters.acceptedFiles, parameters.multiple, parameters.maxFiles)
 }
 
-const preview_image = (parameters) => {
-    $(parameters.container).parent().parent().append(`<div class="col-xs-12 upload-preview"><img src="${parameters.file}" /></div>`);
-}
-
-const preview_images = (parameters) => {
-    const object = parameters.images;
-    let execute = 0;
-    let preview = '<div class="media-library">';
-    for (const k in object) {
-        const image = object[k]
-        if ($(`.form-element`).find(`input.media_${image.media_id}`).length === 0) {
-            $(`.form-element`).append(`<input type="hidden" class="media_${image.media_id}" name="image[]" value="${image.media_id}" />`);
-            preview += `<div class="media-item"><img src="${image.url}"></div>`;
-            execute++;
-        }
-    }
-    preview += "</div>";
-    if (execute > 0) {
-        $(parameters.container).append(preview);
-    }
-}
-
-const append_form = (parameters) => {
-    $(`.form-element`).append(`<input type="hidden" name="image" value="${parameters.file}" />`);
-}
-
-const filter_elements = (query, container, element) => {
-    $(container).find(element).each(function () {
-        if ($(this).text().toLowerCase().trim().indexOf(query.toLowerCase()) === -1) {
-            $(this).hide();
-        } else {
-            $(this).show();
-        }
-    });
-}
-
-const delete_model_image = (e) => {
-    App.sweetConfirm("Sei sicuro di voler rimuovere l'immagine?", () => {
-        const model = e.data('model');
-        const id = e.data('id');
-        App.ajax({ path: `/backoffice/${model}/${id}/image`, method: 'delete'}).then(() => {
-            $(`.model_image`).remove();
-        })
-    })
-}
-
-const store_category = (e) => {
-    const data = App.serialize(`.store-category`);
-
-    App.sweetConfirm("Sei sicuro di voler creare la categoria?", () => {
-        App.ajax({ path: `/backoffice/categories/create`, method: 'post', data: { ...data.data }}).then(response => {
-            list_categories(type, response.id);
-        }).catch(errors => {
-            App.sweet('Il nome della categoria è obbligatoria!')
-        })
-    }, undefined)
-}
-
-const list_categories = (category_type, category_id) => {
-    App.ajax({ path: `/backoffice/categories`, method: 'get', data: {category_type, category_id}}).then(response => {
-        $(`.list-categories`).html(response.html)
-    })
-}
-
 const date = (parameters) => {
     const currentDate = moment().format("DD-MM-YYYY");
     const input = $(`#${parameters.date}`);
@@ -693,26 +341,6 @@ const date_range = (parameters) => {
         from.data('daterangepicker').setStartDate(selectedStartDate)
         from.data('daterangepicker').setEndDate(selectedEndDate)
     });
-}
-
-const plus_minus = (e) =>  {
-    const $button = e;
-    const $input = $button.parent().find("input.quantity-input");
-    $input.val((i, v) => {
-        const newVal = (+v || 0) + (+$button.data('multi') || 0);
-        const maxVal = +$button.data('max');
-        return Math.max(0, maxVal ? Math.min(newVal, maxVal) : newVal);
-    });
-}
-
-const delete_element = (e) =>  {
-    const url = e.data('url');
-    App.sweetConfirm('Sei sicuro di voler cancellare questo elemento?', () => {
-        App.ajax({ path: url, method: 'delete'}).then(() => {
-            toastr.success('Ottimo!', 'Elemento cancellato con successo!');
-            App.reloadTable()
-        })
-    })
 }
 
 const selectChoice = (parameters) => {
@@ -776,19 +404,128 @@ const selectChoice = (parameters) => {
     }
 }
 
+const datatable = (parameters) => {
+    const filters = function(d) {
+        const filterData = {};
+        $('.filters-miticko input, .filters-miticko select').each(function() {
+            if ($(this).attr('name')) {
+                filterData[$(this).attr('name')] = $(this).val();
+            }
+        });
+        d.filters = filterData;
+        return d;
+    };
+    let table = new DataTable('.datatable', {
+        responsive: true,
+        searching: false,
+        ordering:  false,
+        processing: true,
+        serverSide: true,
+        pagingType: 'simple',
+        layout: {
+            topStart: '',
+            bottomEnd: 'pageLength',
+            bottomStart: '',
+            topEnd: {
+                info: {},
+                paging: {}
+            }
+        },
+        language: {
+            lengthMenu: "ELEMENTI PER PAGINA _MENU_",
+            paginate: {
+                previous: '<',
+                next: '>'
+            },
+            info: '_START_-_END_ di _TOTAL_',
+            infoEmpty: '0-0 di 0'
+        },
+        columns: parameters.columns,
+        ajax: {
+            url: parameters.path,
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data:  filters
+        },
+    });
+}
+
+const fill_filters = (type, input, value, name) => {
+    if (type === 'daterange') {
+        input.val(`${value.start.toLocaleDateString('it-IT').split('T')[0]}|${value.end.toLocaleDateString('it-IT').split('T')[0]}`);
+        const filter = input.parent();
+        const container = filter.find(`.label-container`);
+        container.html(`<span class="fa-regular fa-xmark remove-filter" data-name="${name}"></span><span class="filter-filled">${date_long_ita(value.start)} - ${date_long_ita(value.end)}</span>`);
+        filter.addClass('filled')
+    }
+}
+
+const date_long_ita = (date) => {
+    const mesi = ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'];
+    const day = date.getDate();
+    const month = mesi[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+}
+
+const filter_date_range = (type, modal, name) => {
+    let output;
+    const btn_success = modal.find(`.btn-success`);
+    const btn_cancel = modal.find(`.btn-cancel`);
+    const filter = $("#calendar-container").data('filter');
+    const input = $(`.filters-miticko input[name='${filter}']`)
+    flatpickr("#calendar-container", {
+        inline: true,
+        mode: "range",
+        locale: "it",
+        monthSelectorType: "static",
+        dateFormat: "d/m/Y",
+        onChange: function(dates) {
+            if (input && dates.length === 2) {
+                const [startDate, endDate] = dates;
+                const json_date = {
+                    start: startDate,
+                    end: endDate
+                };
+                output = {
+                    type,
+                    input,
+                    json_date
+                }
+            }
+        },
+        onReady: function(selectedDates, dateStr, instance) {
+            const yearInput = instance.calendarContainer.querySelector(".numInputWrapper");
+            if (yearInput) {
+                const currentYear = instance.currentYear;
+                const yearSpan = document.createElement("span");
+                yearSpan.className = "cur-year";
+                yearSpan.textContent = ` ${currentYear}`;
+                yearInput.parentNode.replaceChild(yearSpan, yearInput);
+            }
+        },
+        onMonthChange: function(selectedDates, dateStr, instance) {
+            const yearSpan = instance.calendarContainer.querySelector(".cur-year");
+            if (yearSpan) {
+                yearSpan.textContent =  ` ${instance.currentYear}`;
+            }
+        }
+
+    });
+    modal.modal('show');
+    btn_success.on('click', function () {
+        fill_filters(output.type, output.input, output.json_date, name);
+        modal.modal('hide');
+        App.reloadTable()
+    })
+    btn_cancel.on('click', function () {
+        modal.modal('hide');
+    })
+}
+
 const init = () => {
-
-    $(document).on("click", ".btn-status", function () {
-        changeStatusObject($(this));
-    });
-
-    $(document).on("datatable", function (e, parameters) {
-        datatable(parameters);
-    });
-
-    $(document).on("startSelect2", function (e, parameters) {
-        loadSelect2(parameters);
-    });
 
     $(document).on("loadSwitchTrigger", function (e, parameters) {
         loadSwitch(parameters.container)
@@ -798,11 +535,15 @@ const init = () => {
         reloadTable()
     });
 
+    $(document).on("datatable", function (e, parameters) {
+        datatable(parameters)
+    });
+
     $(document).on("click", ".btn-find", function () {
         reloadTable();
     });
 
-    $(document).on("blur keyup", ".advanced-search input",
+    $(document).on("blur keyup", ".filters-miticko input",
         debounce(function () {
             if ($(this).val().length === 0 || $(this).val().length > 2) {
                 reloadTable();
@@ -810,76 +551,20 @@ const init = () => {
         }, 500)
     );
 
-    $(document).on(
-        "change",
-        ".advanced-search select, .advanced-search input",
-        function () {
+    $(document).on("change", ".filters-miticko select, .filters-miticko input", function () {
             reloadTable();
         }
     );
-
-    if ($(".logs").length > 0) {
-        logs();
-        $(".reload-logs").on("click", function () {
-            logs();
-        });
-    }
-
-    if ($(".dashboard-report").length > 0) {
-        dashboard();
-        $(".load-dashboard-ajax").on("click", function () {
-            dashboard();
-        });
-    }
 
     $(document).on("keyup blur", ".is_number", function () {
         const text = $(this);
         text.val(text.val().toString().replace(/,/g, "."));
     });
 
-    $(document).on('click', '.quantity-right-plus', function() {
-        const input = $(this).parent().parent().find('.input-number');
-        const max = input.data('max');
-        const quantity = parseInt(input.val());
-        if (quantity < max) {
-            $(this).parent().parent().find('.input-number').val(quantity + 1);
-        }
-    });
-
-    $(document).on('click', '.quantity-left-minus', function(e){
-        const input = $(this).parent().parent().find('.input-number');
-        const quantity = parseInt(input.val());
-        if(quantity > 0){
-            $(this).parent().parent().find('.input-number').val(quantity - 1);
-        }
-    });
-
-    $(document).on("filter_elements",  function (e, parameters) {
-        filter_elements(parameters.query, parameters.container, parameters.element)
-    });
-
     $(document).on("upload",  function (e, parameters) {
         upload(parameters)
     });
 
-    $(document).on("preview_image",  function (e, parameters) {
-        preview_image(parameters)
-    });
-    $(document).on("preview_images",  function (e, parameters) {
-        preview_images(parameters)
-    });
-
-    $(document).on("append_form",  function (e, parameters) {
-        append_form(parameters)
-    });
-
-    $(document).on("click", ".btn-delete-model-image", function () {
-        delete_model_image($(this))
-    });
-
-    $(document).on("click", ".btn-store-category", function () {
-        store_category($(this))
-    });
 
     $(document).on("date_range",  function (e, parameters) {
         date_range(parameters)
@@ -896,17 +581,80 @@ const init = () => {
         });
     });
 
-    $(document).on('click', '.plus-minus-button', function () {
-        plus_minus($(this))
-    })
-
-    $(document).on('click', '.btn-delete-element', function () {
-        delete_element($(this))
-    })
-
     $(document).on("selectChoice", function (e, parameters) {
         selectChoice(parameters)
     });
+
+    $(document).on('click', '.filters-miticko .filter', function () {
+        const filter = $(this);
+        const filter_type = filter.data('type');
+        const modal = $(`#filter-${filter_type}`);
+        const name = filter.data('name');
+        const label = filter.data('label');
+        const close = filter.data('close');
+        if (filter_type === 'daterange') {
+            if (!close) {
+                filter_date_range(filter_type, modal, name, label)
+            }
+        }
+        if (filter_type === 'status') {
+            modal.modal('show');
+            const btn_success = modal.find(`.btn-success`);
+            const btn_cancel = modal.find(`.btn-cancel`);
+            btn_success.on('click', function () {
+                const inputs = JSON.stringify(modal.find('input').filter((i, el) => $(el).val() !== '0')
+                    .map(function() {
+                        return {
+                            name: $(this).attr('name'),
+                            value: $(this).val()
+                        };
+                    }).get());
+                filter.find('input').val(inputs)
+
+                modal.modal('hide');
+                App.reloadTable()
+            });
+            btn_cancel.on('click', function () {
+                modal.modal('hide');
+                filter.find('input').val('')
+
+                modal.modal('hide');
+                App.reloadTable()
+            })
+        }
+    });
+
+    $(document).on('click', '.remove-filter', function () {
+        const name = $(this).data('name');
+        const input = $(`.filters-miticko input[name='${name}']`);
+        const filter = input.parent();
+        const label = filter.data('label');
+        const container = filter.find(`.label-container`);
+        container.html(`<span class="fa fa-square-plus"></span><span class="label">${label}</span>`);
+        filter.removeClass('filled')
+        filter.data('close', true)
+        setTimeout(() => {
+            filter.data('close', false)
+        }, 250)
+        input.val('');
+        App.reloadTable()
+    });
+
+    $(document).on('click', '.checkbox-miticko', function () {
+        const input = $(this).find('input');
+        const icon = $(this).find('.fa-regular');
+        if (input.val() === '0') {
+            icon.removeClass('fa-square');
+            icon.addClass('fa-square-check');
+            input.val('1')
+        } else {
+            icon.removeClass('fa-square-check');
+            icon.addClass('fa-square');
+            input.val('0')
+        }
+    });
+
+
 };
 
 
@@ -923,7 +671,6 @@ const App = {
     reloadTable,
     loadSwitch,
     initDropzone,
-    success,
     debounce,
     clearForm,
     update_or_create,

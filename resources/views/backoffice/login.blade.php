@@ -5,13 +5,13 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-center align-items-center min-vh-100">
-                    <div class="d-flex flex-column">
+                    <div class="d-flex flex-column" style="width:380px">
                         <div class="logo text-center mb-5">
                             <img src="{{ asset('assets/images/logo-miticko.png') }}" style="width: 25%">
                         </div>
                         <x-card class="max-w-sm mx-auto">
                             <form class="form-login">
-                                <div class="row login-card">
+                                <div class="row">
                                     <div class="col-12 text-center mb-3">
                                         Accedi a Miticko
                                     </div>

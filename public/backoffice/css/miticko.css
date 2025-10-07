@@ -169,7 +169,7 @@
     --spacing-8xl: 200px;
     --border-radius-0: 0px;
     --typography-heading-size-medium: 48px;
-    --typography-heading-weight-medium: 500px;
+    --typography-heading-weight-medium: 500;
     --typography-heading-lineheight-medium: 48px;
     --typography-title-size-small: 14px;
     --typography-title-size-medium: 18px;
@@ -183,9 +183,9 @@
     --typography-body-size-small: 12px;
     --typography-body-size-medium: 14px;
     --typography-body-size-large: 18px;
-    --typography-body-weight-small: 300px;
-    --typography-body-weight-medium: 400px;
-    --typography-body-weight-large: 400px;
+    --typography-body-weight-small: 300;
+    --typography-body-weight-medium: 400;
+    --typography-body-weight-large: 400;
     --typography-body-lineheight-small: 14px;
     --typography-body-lineheight-medium: 16px;
     --typography-body-lineheight-large: 20px;
@@ -468,11 +468,11 @@
     --typography-button-size-small: 14px;
     --typography-button-size-medium: 16px;
     --typography-button-size-large: 18px;
-    --typography-button-weight-small: 600px;
+    --typography-button-weight-small: 600;
     --layout-backend-main-column-padding-top: var(--spacing-xl);
-    --typography-button-weight-medium: 600px;
+    --typography-button-weight-medium: 600;
     --layout-backend-main-column-padding-left: var(--spacing-xl);
-    --typography-button-weight-large: 600px;
+    --typography-button-weight-large: 600;
     --typography-button-lineheight-small: 12px;
     --layout-backend-main-column-padding-right: var(--spacing-xl);
     --layout-backend-main-column-padding-bottom: var(--spacing-0);
