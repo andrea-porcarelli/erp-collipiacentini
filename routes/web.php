@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Controllers\Backoffice\CompanyController;
+use App\Http\Controllers\Backoffice\CustomerController;
 use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\LoginController;
-use App\Http\Controllers\Backoffice\OrdersController;
+use App\Http\Controllers\Backoffice\OrderController;
+use App\Http\Controllers\Backoffice\PartnerController;
+use App\Http\Controllers\Backoffice\ProductController;
+use App\Http\Controllers\Backoffice\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,6 +21,11 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::resource('orders', OrdersController::class);
+        Route::resource('orders', OrderController::class);
+        Route::resource('products', ProductController::class);
+        Route::resource('partners', PartnerController::class);
+        Route::resource('companies', CompanyController::class);
+        Route::resource('users', UserController::class);
+        Route::resource('customers', CustomerController::class);
     });
 });

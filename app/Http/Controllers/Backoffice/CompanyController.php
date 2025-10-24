@@ -13,7 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class OrdersController extends Controller
+class CompanyController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
