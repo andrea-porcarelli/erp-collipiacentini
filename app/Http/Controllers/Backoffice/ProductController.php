@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
+use App\Interfaces\ProductInterface;
 use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -17,17 +18,19 @@ class ProductController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public OrderInterface $interface;
+    public ProductInterface $interface;
+    public string $path;
 
-    public function __construct(OrderInterface $interface)
+    public function __construct(ProductInterface $interface)
     {
         $this->interface = $interface;
+        $this->path = 'products';
     }
 
     public function index(): View
     {
-        $statuses = OrderStatus::statuses();
-        return view('backoffice.orders.index', compact('statuses'));
+        return view('backoffice.' . $this->path . '.index')
+            ->with('path', $this->path);
     }
 
     public function data(Request $request) : JsonResponse {
@@ -39,23 +42,17 @@ class ProductController extends Controller
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
                 })
-                ->addColumn('order_number', function ($item) {
-                    return '#' . $item->order_number;
+                ->addColumn('product_code', function ($item) {
+                    return '#' . $item->product_code;
                 })
-                ->addColumn('customer', function ($item) {
-                    return $item->customer->full_name;
+                ->addColumn('partner', function ($item) {
+                    return $item->partner->partner_name;
                 })
-                ->addColumn('timing', function ($item) {
-                    return "10:00";
+                ->addColumn('category', function ($item) {
+                    return $item->category->label;
                 })
-                ->addColumn('details', function ($item) {
-                    return "Visita guidata";
-                })
-                ->addColumn('type', function ($item) {
-                    return "2 completi + 1 ridotto";
-                })
-                ->addColumn('status', function ($item) {
-                    return view('backoffice.orders.components.status', ['item' => $item])->render();
+                ->addColumn('pricing', function ($item) {
+                    return "0 0 0";
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';

@@ -26,4 +26,9 @@ class Product extends LogsModel
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function getProductCodeAttribute() : string
+    {
+        return sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 3, '0', STR_PAD_LEFT));
+    }
 }

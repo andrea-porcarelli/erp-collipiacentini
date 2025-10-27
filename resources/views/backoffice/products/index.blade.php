@@ -1,31 +1,26 @@
 @extends('backoffice.layout', ['title' => 'Dashboard', 'active' => $path])
 
 @section('main-content')
-    <x-header-page title="Ordini" />
+    <x-header-page title="Prodotti" />
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto">
+                <x-card title="Lista prodotti" sub_title="I prodotti dei tuoi Partners">
                     <x-table-header>
                         <div class="filters-miticko">
-                            <x-filter label="Data" type="daterange" name="dates" />
-                            <x-filter label="Tipo di acquisto" name="types" type="status" />
-                            <x-filter label="Stato" name="status" />
+                            <x-filter label="Partner" type="daterange" name="dates" />
                         </div>
-                        <span class="table-header-total"> - </span>
-                        <span class="table-options">Esporta</span>
+                        <span class="table-header-total" > - </span>
                     </x-table-header>
                     <div class="table-responsive">
                         <table class="table-miticko datatable">
                             <thead>
                             <tr>
-                                <th style="width: 7%">#ordine</th>
-                                <th>Cliente</th>
-                                <th>Data</th>
-                                <th>Orario</th>
-                                <th>Acquisto</th>
-                                <th>Tipologia</th>
-                                <th>Stato</th>
+                                <th style="width: 10%">#codice</th>
+                                <th>Partner</th>
+                                <th>Categoria</th>
+                                <th>Prodotto</th>
+                                <th>Prezzi</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -39,15 +34,6 @@
         <div class="d-flex align-items-center justify-content-center">
             <div id="calendar-container" data-filter="dates"></div>
         </div>
-    </x-modal>
-    <x-modal id="filter-status" title="Filtra stato dell'ordine" primary="Salva" secondary="annulla" width="350px">
-        <ul class="order-statuses">
-        @foreach($statuses as $status => $label)
-            <li>
-                <x-checkbox :label="$label" :name="$status" />
-            </li>
-        @endforeach
-        </ul>
     </x-modal>
 @endsection
 
@@ -63,20 +49,18 @@
             setTimeout(() => {
                 $(document).trigger('datatable', [{
                     columns: [
-                        {data: 'order_number'},
-                        {data: 'customer'},
-                        {data: 'created_at'},
-                        {data: 'timing'},
-                        {data: 'details'},
-                        {data: 'type'},
-                        {data: 'status'},
+                        {data: 'product_code'},
+                        {data: 'partner'},
+                        {data: 'category'},
+                        {data: 'label'},
+                        {data: 'pricing'},
                         {data: 'options', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',
                     drawCallback: function(api) {
                         var realApi = api.api; // l'API vera è qui
                         var info = realApi.page.info();
-                        $('.table-header-total').html(`${info.recordsDisplay} ordin${info.recordsDisplay === 1 ? 'e' : 'i'}`);
+                        $('.table-header-total').html(`${info.recordsDisplay} prodott${info.recordsDisplay === 1 ? 'o' : 'i'}`);
                     }
                 }])
             })

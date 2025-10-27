@@ -1,31 +1,25 @@
-@extends('backoffice.layout', ['title' => 'Dashboard', 'active' => $path])
+@extends('backoffice.layout', ['title' => 'Dashboard', 'active' => 'categories'])
 
 @section('main-content')
-    <x-header-page title="Ordini" />
+    <x-header-page title="Categorie prodotti" />
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto">
+                <x-card title="Categorie prodotti" sub_title="Gestisci le categorie dei prodotti">
                     <x-table-header>
                         <div class="filters-miticko">
-                            <x-filter label="Data" type="daterange" name="dates" />
-                            <x-filter label="Tipo di acquisto" name="types" type="status" />
-                            <x-filter label="Stato" name="status" />
+                            <x-filter label="Partner" type="daterange" name="dates" />
                         </div>
-                        <span class="table-header-total"> - </span>
-                        <span class="table-options">Esporta</span>
+                        <span class="table-header-total" > - </span>
                     </x-table-header>
                     <div class="table-responsive">
                         <table class="table-miticko datatable">
                             <thead>
                             <tr>
-                                <th style="width: 7%">#ordine</th>
-                                <th>Cliente</th>
-                                <th>Data</th>
-                                <th>Orario</th>
-                                <th>Acquisto</th>
-                                <th>Tipologia</th>
-                                <th>Stato</th>
+                                <th style="width: 10%">#codice</th>
+                                <th>Partner</th>
+                                <th>Categoria</th>
+                                <th class="text-center">Prodotti</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -63,20 +57,17 @@
             setTimeout(() => {
                 $(document).trigger('datatable', [{
                     columns: [
-                        {data: 'order_number'},
-                        {data: 'customer'},
-                        {data: 'created_at'},
-                        {data: 'timing'},
-                        {data: 'details'},
-                        {data: 'type'},
-                        {data: 'status'},
+                        {data: 'category_code'},
+                        {data: 'partner'},
+                        {data: 'category'},
+                        {data: 'products', class: 'text-center'},
                         {data: 'options', class: 'text-end'},
                     ],
-                    path: '{{ route($path . '.data') }}',
+                    path: '{{ route('categories.data') }}',
                     drawCallback: function(api) {
                         var realApi = api.api; // l'API vera è qui
                         var info = realApi.page.info();
-                        $('.table-header-total').html(`${info.recordsDisplay} ordin${info.recordsDisplay === 1 ? 'e' : 'i'}`);
+                        $('.table-header-total').html(`${info.recordsDisplay} categori${info.recordsDisplay === 1 ? 'a' : 'e'}`);
                     }
                 }])
             })

@@ -449,6 +449,11 @@ const datatable = (parameters) => {
             },
             data:  filters
         },
+        drawCallback: function (api) {
+            if (parameters.drawCallback !== undefined) {
+                parameters.drawCallback(api);
+            }
+        }
     });
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
 use App\Http\Controllers\Backoffice\DashboardController;
@@ -23,6 +24,7 @@ Route::group(['prefix' => '/backoffice'], function() {
 
         Route::resource('orders', OrderController::class);
         Route::resource('products', ProductController::class);
+        Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
         Route::resource('companies', CompanyController::class);
         Route::resource('users', UserController::class);
