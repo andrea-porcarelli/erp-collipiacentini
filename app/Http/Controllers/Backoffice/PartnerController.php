@@ -15,7 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class PartnerController extends Controller
+class PartnerController extends CrudController
 {
     use AuthorizesRequests, ValidatesRequests;
 
@@ -45,9 +45,6 @@ class PartnerController extends Controller
                 })
                 ->addColumn('company', function ($item) {
                     return $item->company->company_name;
-                })
-                ->addColumn('options', function ($item) {
-                    return ' > ';
                 })
                 ->rawColumns(['status'])
                 ->toJson();

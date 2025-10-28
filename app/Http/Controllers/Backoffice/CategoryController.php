@@ -15,7 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class CategoryController extends Controller
+class CategoryController extends CrudController
 {
     use AuthorizesRequests, ValidatesRequests;
 

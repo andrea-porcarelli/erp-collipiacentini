@@ -39,10 +39,10 @@
             setTimeout(() => {
                 $(document).trigger('datatable', [{
                     columns: [
-                        {data: 'partner_code'},
+                        {data: 'partner_code', type: 'string'},
                         {data: 'partner_name'},
                         {data: 'company'},
-                        {data: 'options', class: 'text-end'},
+                        {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',
                     drawCallback: function(api) {

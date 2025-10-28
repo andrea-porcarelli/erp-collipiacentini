@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class CompanyController extends Controller
+class CompanyController extends CrudController
 {
     use AuthorizesRequests, ValidatesRequests;
 
@@ -39,8 +39,11 @@ class CompanyController extends Controller
 
             $elements = $this->interface->filters($filters);
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
-                ->addColumn('options', function ($item) {
-                    return ' > ';
+                ->addColumn('has_whitelabel', function ($item) {
+                    return view('backoffice.components.label', [
+                        'icon' => $item->has_whitelabel ? 'check' : 'times',
+                        'status' => $item->has_whitelabel ? 'success' : 'error',
+                        'label' => $item->has_whitelabel ? 'Attivo' : 'Non attivo']);
                 })
                 ->rawColumns(['status'])
                 ->toJson();

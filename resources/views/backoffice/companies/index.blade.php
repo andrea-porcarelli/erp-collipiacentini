@@ -18,6 +18,7 @@
                                 <th>Telefono</th>
                                 <th>Email</th>
                                 <th>Partita IVA</th>
+                                <th>WhiteLabel</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -51,7 +52,8 @@
                         {data: 'phone'},
                         {data: 'email'},
                         {data: 'vat_number'},
-                        {data: 'options', class: 'text-end'},
+                        {data: 'has_whitelabel'},
+                        {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path.'.data') }}',
                     drawCallback: function(api) {

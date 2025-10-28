@@ -50,7 +50,6 @@ a.text-small {
     color: var(--default-foregroundhover);
 }
 
-
 .bt-miticko.bt-m-light {
     background: var(--light-background);
     color: var(--light-foreground);
@@ -60,13 +59,13 @@ a.text-small {
     color: var(--light-foregroundhover);
 }
 .bt-miticko.bt-m-outlined {
-    background: var(--neutral-transparent);
-    color: var(--primary-brand);
-    border: 1px solid var(--primary-brand);
+    background: var(--outlined-background);
+    color: var(--outlined-foreground);
+    border: var(--outlined-borderwidth) solid var(--outlined-bordercolor);
 }
 .bt-miticko.bt-m-outlined:hover {
-    background: var(--light-background);
-    color: var(--primary-brandhover);
+    background: var(--outlined-backgroundhover);
+    color: var(--outlined-foregroundhover);
 }
 .bt-miticko.bt-m-text-only {
     background: var(--neutral-transparent);
@@ -77,7 +76,6 @@ a.text-small {
     background: var(--neutral-transparent);
     color: var(--primary-brandhover);
 }
-
 .bt-miticko.bt-m-medium .icon {
     width: var(--typography-button-size-medium);
 }
@@ -623,4 +621,51 @@ span.flatpickr-weekday{
 }
 .checkbox-miticko.disabled {
     color: var(--text-disabled);
+}
+.swal-modal {
+    border-radius: var(--border-radius-m);
+    padding: var(--spacing-xl);
+    text-align: left;
+}
+.swal-modal .swal-icon{
+    display: none;
+}
+.swal-modal .swal-title {
+    color: var(--text-main);
+    font-family: var(--font-font-1), sans-serif;
+    font-size: var(--typography-title-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-medium);
+    line-height: var(--typography-title-lineheight-medium); /* 133.333% */
+    text-align: left;
+    padding: 0;
+}
+.swal-modal .swal-text {
+    color: var(--text-secondary);
+    font-family: var(--font-font-2), sans-serif;
+    font-size: var(--typography-body-size-medium);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-medium);
+    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+    padding: 0;
+}
+.swal-modal .swal-button--confirm {
+    border-radius: var(--button-border-radius);
+    background: var(--light-background);
+    display: flex;
+    padding: var(--button-paddingtop) var(--button-paddingright) var(--button-paddingbottom) var(--button-paddingleft);
+    justify-content: center;
+    align-items: center;
+    gap: var(--button-spacing);
+    color: var(--light-foreground);
+    font-family: var(--button-font), sans-serif;
+    font-size: var(--button-font-size);
+    font-style: normal;
+    font-weight: var(--button-font-weight);
+    line-height: var(--button-font-line-height); /* 100% */
+    box-shadow: none;
+}
+.swal-modal .swal-button--confirm:hover {
+    background: var(--light-backgroundhover);
+    color: var(--light-foregroundhover);
 }

@@ -62,13 +62,12 @@ abstract class Controller
         return Str::plural(Str::snake(str_replace('Controller', '', class_basename($controller))));
     }
 
-    public function editColumns($datatableModel, $model, array $options = [], $modal = null) {
-        return $datatableModel->addColumn('action', function ($item) use($model, $options, $modal) {
+    public function editColumns($datatableModel, $route, array $options = [], $modal = null) {
+        return $datatableModel->addColumn('action', function ($item) use($route, $options, $modal) {
             return view('backoffice.components.datatable', [
                 'item' => $item,
-                'model' => $model,
+                'route' => $route,
                 'options' => $options,
-                'modal' => $modal ?? '',
             ]);
         });
     }

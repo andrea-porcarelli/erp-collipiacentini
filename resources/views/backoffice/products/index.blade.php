@@ -54,7 +54,7 @@
                         {data: 'category'},
                         {data: 'label'},
                         {data: 'pricing'},
-                        {data: 'options', class: 'text-end'},
+                        {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',
                     drawCallback: function(api) {

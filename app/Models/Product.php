@@ -1,14 +1,14 @@
 <?php
 namespace App\Models;
-
-use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends LogsModel
 {
     public $fillable = [
         'partner_id',
         'category_id',
+        'is_active',
         'label',
         'description',
         'meta_title',
@@ -25,6 +25,16 @@ class Product extends LogsModel
     public function category() : BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function availabilities() : HasMany
+    {
+        return $this->hasMany(ProductAvailability::class);
+    }
+
+    public function prices() : HasMany
+    {
+        return $this->hasMany(ProductPrice::class);
     }
 
     public function getProductCodeAttribute() : string

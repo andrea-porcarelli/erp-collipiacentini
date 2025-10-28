@@ -1,7 +1,7 @@
-const sweetConfirm = (text, callback, willClose) => {
+const sweetConfirm = (text, callback, willClose, title) => {
     swal(
         {
-            title: translate("javascript.swal.confirm.title"),
+            title: title ?? translate("javascript.swal.confirm.title"),
             text: text,
             html: true,
             icon: "warning",
@@ -16,12 +16,7 @@ const sweetConfirm = (text, callback, willClose) => {
                 confirmButton: "btn btn-success",
                 cancelButton: "btn btn-outline-danger ms-1",
             },
-            buttonsStyling: false,
-            willClose: () => {
-                if (willClose !== undefined) {
-                    willClose();
-                }
-            },
+            buttonsStyling: false
         }).then((result) => {
         if (result) {
             swal.close();
@@ -32,6 +27,12 @@ const sweetConfirm = (text, callback, willClose) => {
             }
         }
     });
+    setTimeout(() => {
+        const confirmButton = document.querySelector('.swal-button--confirm');
+        if (confirmButton) {
+            confirmButton.setAttribute('data-mode', 'primary medium');
+        }
+    }, 100);
 };
 
 const sweetInput = (title, text, callback, label) => {
@@ -530,6 +531,17 @@ const filter_date_range = (type, modal, name) => {
     })
 }
 
+const change_status_element = (btn) => {
+    const is_active = btn.data("is-active");
+    App.sweetConfirm(`Confermi?`, () => {
+        const id = btn.data("id");
+        const route = btn.data("route");
+        ajax({ path: `/backoffice/${route}/${id}/status`, method: "post" }).then(() => {
+            reloadTable();
+        });
+    }, null,  `Stai per ${is_active === 1 ? 'disattivare' : 'attivare'} questo elemento`)
+}
+
 const init = () => {
 
     $(document).on("loadSwitchTrigger", function (e, parameters) {
@@ -546,6 +558,10 @@ const init = () => {
 
     $(document).on("click", ".btn-find", function () {
         reloadTable();
+    });
+
+    $(document).on("click", ".btn-status", function () {
+        change_status_element($(this));
     });
 
     $(document).on("blur keyup", ".filters-miticko input",

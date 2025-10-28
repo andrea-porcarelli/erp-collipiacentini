@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backoffice\BookingController;
 use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
@@ -13,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+Route::group(['prefix' => '/booking', 'middleware' => ['token']], function() {
+    Route::get('/',[BookingController::class, 'index']);
 });
 Route::group(['prefix' => '/backoffice'], function() {
     Route::get('/login',[LoginController::class, 'index'])->name('login');

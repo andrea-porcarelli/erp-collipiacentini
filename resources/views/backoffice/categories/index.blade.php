@@ -61,7 +61,7 @@
                         {data: 'partner'},
                         {data: 'category'},
                         {data: 'products', class: 'text-center'},
-                        {data: 'options', class: 'text-end'},
+                        {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route('categories.data') }}',
                     drawCallback: function(api) {

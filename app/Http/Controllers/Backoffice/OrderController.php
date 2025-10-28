@@ -58,7 +58,8 @@ class OrderController extends Controller
                     return "2 completi + 1 ridotto";
                 })
                 ->addColumn('status', function ($item) {
-                    return view('backoffice.orders.components.status', ['item' => $item])->render();
+                    $order_status = $item->order_status;
+                    return view('backoffice.components.label', ['icon' => $order_status->icon(), 'status' => $order_status->status(), 'label' => $order_status->label()])->render();
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';

@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Partner extends LogsModel
 {
@@ -17,5 +18,15 @@ class Partner extends LogsModel
     public function company() : BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function products() : HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function active_products() : HasMany
+    {
+        return $this->products()->where('is_active', 1);
     }
 }
