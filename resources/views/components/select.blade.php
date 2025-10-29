@@ -10,6 +10,7 @@
     'name' => '',
     'placeholder' => null,
     'value' => null,
+    'options' => [],
     'type' => 'text',
     'size' => 'medium',
 ])
@@ -21,18 +22,16 @@
         @isset($leading)
             <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>
         @endisset
-        <input
+        <select
             class="input-miticko {{ $class }}"
             name="{{ $name }}"
             id="{{ $name }}"
-            type="{{ $type }}"
-            @isset($placeholder)
-                placeholder="{{ $placeholder }}"
-            @endisset
-            @isset($value)
-                value="{{ $value }}"
-            @endisset
-        />
+        >
+            <option value="">Scegli</option>
+            @foreach($options as $key => $value)
+                <option value="{{ $key }}">{{ $value }}</option>
+            @endforeach
+        </select>
         @isset($trailing)
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>
         @endisset

@@ -17,4 +17,11 @@ class CrudController extends Controller
             return $this->exception($e, null);
         }
     }
+
+    public function show(int $id)
+    {
+        $model = $this->interface->find($id);
+        return view('backoffice.' . $this->path . '.show', compact('model'))
+            ->with('path', $this->path);
+    }
 }
