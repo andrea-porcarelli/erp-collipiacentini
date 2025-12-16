@@ -1,0 +1,87 @@
+
+@media (max-width: 425px) {
+    .container {
+        width: 100%;
+        padding: 0;
+    }
+    .hero h1 {
+        font-size: var(--typography-title-size-large, 24px);
+        font-weight: var(--typography-title-weight-large, 600);
+        line-height: var(--typography-title-lineheight-large, 30px); /* 125% */
+    }
+    .hero h5 {
+        font-size: var(--typography-body-size-medium);
+        font-weight: var(--typography-body-weight-medium);
+        line-height: var(--typography-body-lineheight-medium);
+    }
+    .container-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+    }
+
+    .sidebar .card-spacing{
+        flex-shrink: 0;
+        white-space: nowrap;
+        width: auto;
+    }
+
+    .bt-chip {
+        display: flex;
+        padding: var(--Chip-paddingTop, 12px) var(--Chip-paddingRight, 16px) var(--Chip-paddingBottom, 12px) var(--Chip-paddingLeft, 16px);
+        justify-content: center;
+        align-items: center;
+        gap: var(--Chip-spacing, 4px);
+        border-radius: var(--Chip-borderRadius, 36px);
+        border: var(--Chip-borderWidth, 1px) solid var(--Secondary-Brand, #2A3493);
+        flex-shrink: 0;
+        white-space: nowrap;
+        width: auto;
+        box-shadow: var(--X, 0) var(--Y, 0) var(--Blur, 0) var(--Spread, 0) var(--Color, rgba(255, 255, 255, 0.00));
+    }
+    .card-product-container {
+         display: flex;
+         gap: var(--spacing-m, 8px);
+     }
+
+    .card-product figure {
+        width: 100px;
+        height: 100px;
+    }
+    .card-product .card-body section h3 {
+        color: var(--text-main, #0D0D0D);
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: var(--typography-title-size-medium, 16px);
+        font-style: normal;
+        font-weight: var(--typography-title-weight-medium, 600);
+        line-height: var(--typography-title-lineheight-medium, 20px);
+    }
+    .details-price {
+        display: flex;
+        padding: var(--spacing-m, 8px) 0 0 0;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-l, 12px);
+        align-self: stretch;
+        border-top: 1px dashed var(--primary-brandlighthover, #FFD9CF);
+        margin-top: var(--spacing-l);
+        width: 100%;
+    }
+    .card-product .card-body .price {
+        min-width: auto;
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        flex: none;
+        text-align: right;
+    }
+    .card-product .card-body .price b{
+        /* bodyMedium */
+        font-size: var(--typography-body-size-medium, 16px);
+        font-style: normal;
+        font-weight: var(--typography-body-weight-medium, 400);
+        line-height: var(--typography-body-lineheight-medium, 22px); /* 137.5% */
+    }
+}

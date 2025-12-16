@@ -2,6 +2,7 @@
 
 use App\Facades\Utils;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Session;
 
 return [
 
@@ -127,5 +128,6 @@ return [
     ],
     'aliases' => Facade::defaultAliases()->merge([
         'Utils' => Utils::class,
+        'Session' => Session::class,
     ])->toArray(),
 ];

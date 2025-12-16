@@ -488,11 +488,6 @@ div.dt-container .dt-paging .dt-paging-button:active {
     color: var(--error-onbrandlight);
 }
 
-.label-miticko.error {
-    border-radius: 4px;
-    background: var(--error-brandlight);
-    color: var(--error-onbrandlight);
-}
 .modal-miticko {
     align-self: stretch;
     color: var(--text-main) !important;

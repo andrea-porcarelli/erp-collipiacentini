@@ -2,11 +2,10 @@
 
 namespace App\Facades;
 
-use App\Models\Language;
-use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class Utils
 {
@@ -43,15 +42,6 @@ class Utils
     public static function price(float $price = null) : string
     {
         return isset($price) ? number_format($price, '2', ',', '.') . ' €' : '0,00 €';
-    }
-
-    public static function setting(string $name) : string {
-        $settings = Setting::where('company_id', Session::get('company_id'))
-            ->get()
-            ->mapWithKeys(function ($setting) {
-                return [$setting->parameter => $setting->content];
-            })->toArray();
-        return $settings[$name] ?? '';
     }
 
     public static function data(string $data = null) : string {
@@ -104,17 +94,11 @@ class Utils
         })->toArray();
     }
 
-    public static function default_language() : string
-    {
-        $lang = Language::where('is_default', 1)->first();
-        if (!isset($lang->id)) {
-            $lang = Language::where('iso_code', 'it')->first();
+    public static function company_slug(): string {
+        $company = Session::get('company');
+        if (empty($company)) {
+            return '';
         }
-        return $lang->iso_code;
-    }
-
-
-    public static function languages() {
-        return Language::where('is_active', 1)->get();
+        return Str::slug($company->company_name);
     }
 }

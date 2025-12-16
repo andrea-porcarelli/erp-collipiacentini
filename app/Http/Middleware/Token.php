@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Company;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class Token
 {
@@ -27,7 +28,8 @@ class Token
                 'message' => 'Nessuna azienda trovata con questo token'
             ], 401);
         }
-
+        Session::put('company', $company);
+        Session::put('token', $token);
         $request->merge(['company' => $company]);
 
         return $next($request);

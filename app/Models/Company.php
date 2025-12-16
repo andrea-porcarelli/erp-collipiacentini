@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Company extends LogsModel
 {
@@ -24,5 +25,10 @@ class Company extends LogsModel
 
     public function active_partners(): HasMany {
         return $this->partners()->where('is_active', 1);
+    }
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
     }
 }

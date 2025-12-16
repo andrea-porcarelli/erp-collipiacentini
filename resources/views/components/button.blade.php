@@ -9,12 +9,14 @@
     'label' => '',
     'class' => '',
     'type' => 'button',
+    'disabled' => null,
     'dataset' => []
 ])
 <button
     data-mode="{{ $size }} {{ $status }}"
     type="{{ $type }}"
     class="bt-miticko {{ $class }} bt-m-{{ $emphasis }}"
+    @if(isset($disabled)) disabled @endif
     @if(!empty($dataset))
         @foreach($dataset as $attribute => $value)
             data-{{ $attribute }}="{{ $value }}"

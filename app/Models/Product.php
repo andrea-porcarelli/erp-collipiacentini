@@ -11,9 +11,12 @@ class Product extends LogsModel
         'is_active',
         'label',
         'description',
+        'intro',
         'meta_title',
         'meta_description',
         'meta_key',
+        'duration',
+        'product_type'
     ];
 
 
@@ -40,5 +43,21 @@ class Product extends LogsModel
     public function getProductCodeAttribute() : string
     {
         return sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 3, '0', STR_PAD_LEFT));
+    }
+
+    public function getLowestPriceAttribute() : string {
+        return $this->prices()->orderBy('price', 'ASC')->first()->price ?? 0;
+    }
+
+    public function getIsAvailableAttribute() : bool {
+        return $this->is_active && $this->availabilities()->whereDate('date', '>', date('Y-m-d'))->where('availability', '>', 0)->count();
+    }
+
+    public function getButtonAttribute() : string {
+        return $this->is_available ? 'primary' : 'disabled';
+    }
+
+    public function getTypeAttribute() : string {
+        return __('products.types.' . $this->product_type);
     }
 }

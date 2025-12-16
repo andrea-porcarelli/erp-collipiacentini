@@ -5,7 +5,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - '802:8000'
+      - '803:8000'
     volumes:
       - ./:/app
     #      - ./app:/app
@@ -24,7 +24,7 @@ services:
     image: mysql:8
     container_name: erp_db
     ports:
-      - "0.0.0.0:3309:3306"
+      - "0.0.0.0:3312:3306"
     environment:
       MYSQL_DATABASE: erp
       MYSQL_ROOT_PASSWORD: root
