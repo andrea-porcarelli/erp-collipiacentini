@@ -46,7 +46,7 @@ class ProductController extends CrudController
                     return '#' . $item->product_code;
                 })
                 ->addColumn('partner', function ($item) {
-                    return $item->partner->partner_name;
+                    return $item->partner->company->company_name . ' > ' . $item->partner->partner_name;
                 })
                 ->addColumn('category', function ($item) {
                     return $item->category->label;

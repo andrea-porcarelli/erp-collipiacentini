@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::group(['prefix' => '/booking', 'middleware' => ['token']], function() {
-    Route::get('/',[BookingController::class, 'index']);
-    Route::get('/filter-products',[BookingController::class, 'filterProducts']);
+Route::group(['prefix' => '/shop'], function() {
+    Route::get('/',[BookingController::class, 'index'])->middleware('token');
+    Route::get('/filter-products',[BookingController::class, 'filterProducts'])->middleware('token');
+    Route::get('/product/{productId}/available-times',[BookingController::class, 'getAvailableTimes']);
+    Route::get('/{slugPartner}/{slugProduct}-{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
 });
 Route::group(['prefix' => '/backoffice'], function() {
     Route::get('/login',[LoginController::class, 'index'])->name('login');

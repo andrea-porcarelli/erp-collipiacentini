@@ -8,6 +8,7 @@ class ProductAvailability extends LogsModel
     public $fillable = [
         'product_id',
         'date',
+        'time',
         'availability',
     ];
 

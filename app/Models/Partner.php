@@ -3,6 +3,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Partner extends LogsModel
 {
@@ -28,5 +30,25 @@ class Partner extends LogsModel
     public function active_products() : HasMany
     {
         return $this->products()->where('is_active', 1);
+    }
+
+    public function media() : MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+    public function logo() : MorphOne
+    {
+        return $this->morphOne(Media::class, 'mediable')->where('media_type', 'logo');
+    }
+
+    public function cover() : MorphOne
+    {
+        return $this->morphOne(Media::class, 'mediable')->where('media_type', 'cover');
+    }
+
+    public function gallery() : MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery');
     }
 }

@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_prices', function (Blueprint $table) {
+        Schema::create('languages', function (Blueprint $table) {
             $table->id();
-            $table->integer('product_id');
-            $table->float('price');
-            $table->integer('reduced');
-            $table->integer('free');
-            $table->float('fee_number');
-            $table->float('fee_percent');
+            $table->boolean('is_active')->default(true);
+            $table->text('label');
+            $table->text('iso_code');
             $table->timestamps();
         });
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_prices');
+        Schema::dropIfExists('languages');
     }
 };

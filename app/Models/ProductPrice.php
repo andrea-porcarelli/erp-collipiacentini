@@ -8,8 +8,8 @@ class ProductPrice extends LogsModel
     public $fillable = [
         'product_id',
         'price',
-        'adults',
-        'guys',
+        'reduced',
+        'free',
         'fee_number',
         'fee_percent',
     ];

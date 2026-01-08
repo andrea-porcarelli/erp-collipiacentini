@@ -26,7 +26,13 @@
         <div class="d-none d-sm-block">
             <div class="price">
                 <b>{{ Utils::price($product->lowest_price) }}</b>
-                <x-button label="Acquista" trailing="fa-ticket-perforated" :status="$product->button" :disabled="!$product->is_available"/>
+                <x-button
+                    label="Acquista"
+                    trailing="fa-ticket-perforated"
+                    :status="$product->button"
+                    :disabled="!$product->is_available"
+                    :href="$product->route"
+                />
             </div>
         </div>
     </div>
@@ -38,7 +44,14 @@
             </div>
             <div class="price">
                 <b>{{ Utils::price($product->lowest_price) }}</b>
-                <x-button label="Acquista" trailing="fa-ticket-perforated" status="primary" size="small"/>
+                <x-button
+                    label="Acquista"
+                    trailing="fa-ticket-perforated"
+                    status="primary"
+                    size="small"
+                    :disabled="!$product->is_available"
+                    :href="$product->route"
+                />
             </div>
         </div>
     </div>
