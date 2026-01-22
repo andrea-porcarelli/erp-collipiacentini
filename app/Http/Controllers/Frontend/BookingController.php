@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Product;
+use App\Models\ProductAvailability;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Dflydev\DotAccessData\Data;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -118,4 +124,183 @@ class BookingController extends Controller
         return response()->json(['times' => $times]);
     }
 
+    public function addToCart(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'availability_id' => 'required|exists:product_availabilities,id',
+            'quantity_full' => 'required|integer|min:0',
+            'quantity_reduced' => 'required|integer|min:0',
+            'quantity_free' => 'required|integer|min:0',
+        ]);
+
+        $totalQuantity = $validated['quantity_full'] + $validated['quantity_reduced'] + $validated['quantity_free'];
+        if ($totalQuantity <= 0) {
+            return response()->json(['error' => 'Seleziona almeno un biglietto'], 400);
+        }
+
+        $product = Product::with('prices')->find($validated['product_id']);
+        $availability = ProductAvailability::find($validated['availability_id']);
+
+        if (!$product || !$availability) {
+            return response()->json(['error' => 'Prodotto o disponibilità non trovati'], 404);
+        }
+
+        if ($availability->availability < $totalQuantity) {
+            return response()->json(['error' => 'Disponibilità insufficiente'], 400);
+        }
+
+        $prices = $product->prices->first();
+        $priceFull = $prices->price ?? 0;
+        $priceReduced = $prices->reduced ?? 0;
+        $priceFree = $prices->free ?? 0;
+
+        $total = ($validated['quantity_full'] * $priceFull) +
+                 ($validated['quantity_reduced'] * $priceReduced) +
+                 ($validated['quantity_free'] * $priceFree);
+
+        $sessionId = session()->getId();
+
+        DB::beginTransaction();
+        try {
+            // Rimuovi il carrello esistente per questa sessione (mono-prodotto)
+            Cart::where('session_id', $sessionId)->delete();
+
+            // Crea il nuovo carrello
+            $cart = Cart::create([
+                'session_id' => $sessionId,
+                'company_id' => $product->partner->company_id,
+                'product_id' => $product->id,
+                'product_availability_id' => $availability->id,
+                'date' => $availability->date,
+                'time' => $availability->time,
+                'quantity_full' => $validated['quantity_full'],
+                'quantity_reduced' => $validated['quantity_reduced'],
+                'quantity_free' => $validated['quantity_free'],
+                'price_full' => $priceFull,
+                'price_reduced' => $priceReduced,
+                'price_free' => $priceFree,
+                'total' => $total,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'cart_id' => $cart->id,
+                'redirect_url' => route('booking.cart'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Errore durante l\'aggiunta al carrello'], 500);
+        }
+    }
+
+    public function cart(Request $request): View
+    {
+        $sessionId = session()->getId();
+        $cart = Cart::with(['product.partner.company', 'product.prices', 'productAvailability'])
+            ->where('session_id', $sessionId)
+            ->first();
+
+        $company = $cart?->product?->partner?->company ?? $request->company;
+
+        return view('whitelabel.cart', compact('cart', 'company'));
+    }
+
+    public function removeCart(Request $request): JsonResponse
+    {
+        $sessionId = session()->getId();
+        $cart = Cart::where('session_id', $sessionId)->first();
+
+        if (!$cart) {
+            return response()->json(['error' => 'Carrello non trovato'], 404);
+        }
+
+        $cart->delete();
+
+        return response()->json([
+            'success' => true,
+            'redirect_url' => url('/shop'),
+        ]);
+    }
+
+    public function saveCustomer(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'address' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:10',
+            'city' => 'required|string|max:255',
+            'country' => 'required|string|size:2',
+            'phone' => 'required|string|max:20',
+            'fiscal_code' => 'nullable|string|max:16',
+            'birth_date' => 'nullable|date',
+            'privacy' => 'required|accepted',
+            'newsletter' => 'nullable|boolean',
+        ]);
+
+        $sessionId = session()->getId();
+        $cart = Cart::with('product.partner')->where('session_id', $sessionId)->first();
+
+        if (!$cart) {
+            return response()->json(['error' => 'Carrello non trovato'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Cerca utente esistente per email o crea nuovo
+            $user = User::where('email', $validated['email'])->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'surname' => $validated['surname'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make(Str::random(16)),
+                    'role' => 'customer',
+                    'company_id' => $cart->company_id,
+                    'partner_id' => $cart->product->partner_id,
+                    'address' => $validated['address'],
+                    'zip_code' => $validated['zip_code'],
+                    'city' => $validated['city'],
+                    'country' => $validated['country'],
+                    'phone' => $validated['phone'],
+                    'fiscal_code' => $validated['fiscal_code'] ?? null,
+                    'birth_date' => $validated['birth_date'] ?? null,
+                    'privacy_accepted' => true,
+                    'newsletter' => $validated['newsletter'] ?? false,
+                ]);
+            } else {
+                // Aggiorna i dati dell'utente esistente
+                $user->update([
+                    'name' => $validated['name'],
+                    'surname' => $validated['surname'],
+                    'address' => $validated['address'],
+                    'zip_code' => $validated['zip_code'],
+                    'city' => $validated['city'],
+                    'country' => $validated['country'],
+                    'phone' => $validated['phone'],
+                    'fiscal_code' => $validated['fiscal_code'] ?? $user->fiscal_code,
+                    'birth_date' => $validated['birth_date'] ?? $user->birth_date,
+                    'newsletter' => $validated['newsletter'] ?? $user->newsletter,
+                ]);
+            }
+
+            // Associa l'utente al carrello
+            $cart->update(['customer_id' => $user->id]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'user_id' => $user->id,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Errore durante il salvataggio dei dati: ' . $e->getMessage()], 500);
+        }
+    }
 }

@@ -12,10 +12,11 @@
     'value' => null,
     'type' => 'text',
     'size' => 'medium',
+    'required' => false
 ])
 <div class="text-field" data-mode="{{ $size }}">
     @isset($label)
-        <label>{!! $label !!}</label>
+        <label>{!! $label !!} @if($required)* @endif</label>
     @endisset
     <div class="text-field-container">
         @isset($leading)
@@ -32,6 +33,9 @@
             @isset($value)
                 value="{{ $value }}"
             @endisset
+            @if($required)
+                required
+            @endif
         />
         @isset($trailing)
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>

@@ -560,7 +560,9 @@ body {
     font-size: var(--typography-body-size-medium, 16px);
     margin: 0;
 }
-
+.input-miticko {
+    width: 100%;
+}
 /* Animazione per il cambio immagine */
 @keyframes fadeIn {
     from {

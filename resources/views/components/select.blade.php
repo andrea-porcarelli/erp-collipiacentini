@@ -12,7 +12,8 @@
     'value' => null,
     'options' => [],
     'type' => 'text',
-    'size' => 'medium',
+    'size' => 'medium',,
+    'required' => false
 ])
 <div class="text-field" data-mode="{{ $size }}">
     @isset($label)

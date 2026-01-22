@@ -2,7 +2,7 @@
 
 return [
     'types' => [
-        'free' => 'Libera',
-        'guided' => 'Guidata',
+        'free' => 'Visita Libera',
+        'guided' => 'Visita Guidata',
     ],
 ];

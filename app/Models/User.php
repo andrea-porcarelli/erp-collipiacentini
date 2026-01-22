@@ -19,9 +19,21 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'surname',
         'email',
         'password',
-        'role'
+        'role',
+        'company_id',
+        'partner_id',
+        'address',
+        'zip_code',
+        'city',
+        'country',
+        'phone',
+        'fiscal_code',
+        'birth_date',
+        'privacy_accepted',
+        'newsletter',
     ];
 
     /**
@@ -44,7 +56,25 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
+            'privacy_accepted' => 'boolean',
+            'newsletter' => 'boolean',
         ];
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim($this->name . ' ' . $this->surname);
     }
 
 

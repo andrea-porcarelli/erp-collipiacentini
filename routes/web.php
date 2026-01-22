@@ -19,6 +19,10 @@ Route::group(['prefix' => '/shop'], function() {
     Route::get('/',[BookingController::class, 'index'])->middleware('token');
     Route::get('/filter-products',[BookingController::class, 'filterProducts'])->middleware('token');
     Route::get('/product/{productId}/available-times',[BookingController::class, 'getAvailableTimes']);
+    Route::post('/cart/add',[BookingController::class, 'addToCart'])->name('booking.cart.add');
+    Route::delete('/cart/remove',[BookingController::class, 'removeCart'])->name('booking.cart.remove');
+    Route::post('/cart/customer',[BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
+    Route::get('/cart',[BookingController::class, 'cart'])->name('booking.cart');
     Route::get('/{slugPartner}/{slugProduct}-{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
 });
 Route::group(['prefix' => '/backoffice'], function() {

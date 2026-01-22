@@ -841,6 +841,47 @@
                 }
             });
 
+            // Event listener per il bottone Acquista
+            document.getElementById('btn-purchase').addEventListener('click', function() {
+                if (this.disabled) return;
+
+                const btn = this;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Caricamento...';
+
+                fetch('/shop/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        availability_id: selectedAvailabilityId,
+                        quantity_full: ticketQuantities.full,
+                        quantity_reduced: ticketQuantities.reduced,
+                        quantity_free: ticketQuantities.free
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.error || 'Errore durante l\'aggiunta al carrello');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Acquista';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Errore durante l\'aggiunta al carrello');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Acquista';
+                });
+            });
+
             updateAllButtons();
         }
     });
