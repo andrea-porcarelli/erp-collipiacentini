@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Enums\ProductStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -18,6 +19,7 @@ class Product extends LogsModel
     ];
 
     protected $casts = [
+        'is_active' => ProductStatus::class,
         'linked_product_ids' => 'array',
     ];
 
@@ -89,7 +91,8 @@ class Product extends LogsModel
 
     public function getProductCodeAttribute() : string
     {
-        return sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT));
+
+        return isset($this->partner) ? sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
     }
 
     public function getLowestPriceAttribute() : string {

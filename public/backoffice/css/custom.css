@@ -88,6 +88,16 @@ a.text-small {
     align-items: flex-start;
     gap: var(--spacing-s);
 }
+
+.text-field label{
+    color: var(--text-main, #0D0D0D);
+    /* titleSmall */
+    font-family: var(--font-font-1, "DM Sans"), sans-serif;
+    font-size: var(--typography-title-size-small, 14px);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-small, 700);
+    line-height: var(--typography-title-lineHeight-small, 18px);
+}
 .text-field .text-field-container {
     display: flex;
     padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
@@ -98,7 +108,9 @@ a.text-small {
     border: var(--text-field-borderwidth) solid var(--text-field-borderresting);
     background: var(--text-field-background);
 }
-.text-field .text-field-container input {
+.text-field .text-field-container input,
+.text-field .text-field-container textarea,
+.text-field .text-field-container select  {
     display: flex;
     align-items: center;
     gap: var(--text-field-spacing, 8px);
@@ -133,6 +145,17 @@ a.text-small {
 
 .text-field .text-field-container.is-invalid {
     border: 1px solid var(--border-error);
+}
+.text-field .text-field-container:has(input:disabled) {
+    background: var(--text-field-backgrounddisabled, #F2F2F2);
+}
+.text-field .text-field-container select {
+    background: #FFF;
+}
+.text-field .text-field-container select:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
 }
 
 .supporting-text {
@@ -507,6 +530,7 @@ div.dt-container .dt-paging .dt-paging-button:active {
     border-bottom:none;
     position:relative;
     width: 100%;
+    padding: 0;
 }
 .modal-miticko .modal-header .close {
     position:absolute;
@@ -663,4 +687,47 @@ span.flatpickr-weekday{
 .swal-modal .swal-button--confirm:hover {
     background: var(--light-backgroundhover);
     color: var(--light-foregroundhover);
+}
+.breadcrumb  {
+    overflow: hidden;
+    color: var(--text-main, #0D0D0D);
+    text-overflow: ellipsis;
+
+    /* bodySmall */
+    font-family: var(--font-font-2, "DM Sans"), sans-serif;
+    font-size: var(--typography-body-size-small, 14px);
+    font-style: normal;
+    font-weight: var(--typography-body-weight-small, 300);
+    line-height: var(--typography-body-lineheight-small, 16px); /* 114.286% */
+    display: flex;
+    gap: 4px;
+    margin-bottom: var(--spacing-s, 8px) !important;
+}
+.breadcrumb .anchor a {
+    color: var(--text-secondary, #666) !important;
+}
+.product-status {
+    /* labelSmall */
+    font-family: var(--font-font-2, "DM Sans"), sans-serif;
+    font-size: var(--typography-label-size-small, 10px);
+    font-style: normal;
+    font-weight: var(--typography-label-weight-small, 500);
+    line-height: var(--typography-label-lineheight-small, 7px); /* 70% */
+    text-transform: uppercase;
+}
+.product-status .small-icon {
+    width: 9.6px;
+    height: 9.6px;
+    border-radius: 50%;
+}
+.product-status .small-icon.active {
+    background: #29670E;
+}
+.product-status .small-icon.inactive {
+    background: #666;
+}
+.nav-tabs {
+    border-bottom: none !important;
+    margin-bottom: 24px !important;
+    margin-top: 24px !important;
 }

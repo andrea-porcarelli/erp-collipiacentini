@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="{{ asset('whitelabel/whitelabel.css') }}" rel="stylesheet">
     <link href="{{ asset('whitelabel/responsive.css') }}" rel="stylesheet">
+    <!-- Stripe JS -->
+    <script src="https://js.stripe.com/v3/"></script>
     @livewireStyles
 </head>
 

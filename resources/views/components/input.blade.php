@@ -5,15 +5,28 @@
     'trailing' => null,
     'trailing_style' => 'solid',
     'label' => null,
-    'class' => '',
+    'class' => null,
     'supporting_text' => '',
     'name' => '',
     'placeholder' => null,
     'value' => null,
     'type' => 'text',
     'size' => 'medium',
-    'required' => false
+    'required' => false,
+    'disabled' => false,
+    'message' => null,
+    'icon' => null,
+    'model' => null
 ])
+@php
+    $default = null;
+    if (isset($value)){
+        $default = $value;
+    }
+    if (isset($model->{$name})){
+        $default = $model->{$name};
+    }
+@endphp
 <div class="text-field" data-mode="{{ $size }}">
     @isset($label)
         <label>{!! $label !!} @if($required)* @endif</label>
@@ -30,16 +43,19 @@
             @isset($placeholder)
                 placeholder="{{ $placeholder }}"
             @endisset
-            @isset($value)
-                value="{{ $value }}"
+            @isset($default)
+                value="{{ $default }}"
             @endisset
             @if($required)
                 required
+            @endif
+            @if($disabled)
+                disabled
             @endif
         />
         @isset($trailing)
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>
         @endisset
     </div>
-    <x-supporting-text />
+    <x-supporting-text :message="$message" :icon="$icon"/>
 </div>

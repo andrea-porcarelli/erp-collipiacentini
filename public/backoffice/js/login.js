@@ -7,6 +7,7 @@ const login = () => {
             .parent()
             .parent()
             .find(".supporting-text")
+            .removeClass('danger')
             .addClass("success")
             .show()
             .html('Login effettuato con successo');

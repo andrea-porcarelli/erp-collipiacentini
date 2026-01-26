@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -25,6 +27,15 @@ class Partner extends LogsModel
     public function products() : HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public static function active() : Builder {
+        return self::where('is_active', true);
+    }
+
+    public function getLabelAttribute() : string
+    {
+        return $this->partner_name ?? '';
     }
 
     public function active_products() : HasMany

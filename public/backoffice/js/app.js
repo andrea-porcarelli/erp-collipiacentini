@@ -606,6 +606,14 @@ const init = () => {
         selectChoice(parameters)
     });
 
+    $(document).on("fetch", function (e, parameters) {
+        ajax(parameters).then((response) => {
+            parameters.then(response);
+        }).catch((response) => {
+            parameters.catch(response);
+        })
+    });
+
     $(document).on('click', '.filters-miticko .filter', function () {
         const filter = $(this);
         const filter_type = filter.data('type');
@@ -674,7 +682,6 @@ const init = () => {
             input.val('0')
         }
     });
-
 
 };
 

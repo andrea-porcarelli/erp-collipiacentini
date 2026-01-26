@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends LogsModel
 {
@@ -16,6 +17,10 @@ class Customer extends LogsModel
         'address',
         'city',
         'zip_code',
+        'fiscal_code',
+        'birth_date',
+        'privacy_accepted',
+        'newsletter',
     ];
 
     public function country() : BelongsTo
@@ -23,8 +28,17 @@ class Customer extends LogsModel
         return $this->belongsTo(Country::class);
     }
 
+    public function orders() : HasMany {
+        return $this->hasMany(Order::class);
+    }
+
     public function getFullNameAttribute() : string
     {
-        return $this->name . ' ' . $this->surname;
+        return sprintf('%s %s',$this->name, $this->surname);
+    }
+
+    public function getFullAddressAttribute() : string
+    {
+        return sprintf('%s, %s %s', $this->address, $this->zip_code, $this->city);
     }
 }

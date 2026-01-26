@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
+use App\Interfaces\CustomerInterface;
 use App\Interfaces\OrderInterface;
 use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -17,17 +18,19 @@ class CustomerController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public OrderInterface $interface;
+    public CustomerInterface $interface;
+    public string $path;
 
-    public function __construct(OrderInterface $interface)
+    public function __construct(CustomerInterface $interface)
     {
         $this->interface = $interface;
+        $this->path = 'customers';
     }
 
     public function index(): View
     {
-        $statuses = OrderStatus::statuses();
-        return view('backoffice.orders.index', compact('statuses'));
+        return view('backoffice.' . $this->path . '.index')
+            ->with('path', $this->path);
     }
 
     public function data(Request $request) : JsonResponse {
@@ -39,28 +42,25 @@ class CustomerController extends Controller
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
                 })
-                ->addColumn('order_number', function ($item) {
-                    return '#' . $item->order_number;
+                ->addColumn('orders', function ($item) {
+                    return $item->orders()->count();
                 })
-                ->addColumn('customer', function ($item) {
-                    return $item->customer->full_name;
+                ->addColumn('full_name', function ($item) {
+                    return $item->full_name;
                 })
-                ->addColumn('timing', function ($item) {
-                    return "10:00";
+                ->addColumn('contacts', function ($item) {
+                    return "
+                        <span class='fa fa-phone'></span> " . $item->phone . "<br />
+                        <span class='fa fa-envelope'></span> " . $item->email . "<br />
+                        ";
                 })
-                ->addColumn('details', function ($item) {
-                    return "Visita guidata";
-                })
-                ->addColumn('type', function ($item) {
-                    return "2 completi + 1 ridotto";
-                })
-                ->addColumn('status', function ($item) {
-                    return view('backoffice.orders.components.status', ['item' => $item])->render();
+                ->addColumn('address', function ($item) {
+                    return $item->full_address;
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';
                 })
-                ->rawColumns(['status'])
+                ->rawColumns(['options', 'contacts'])
                 ->toJson();
         } catch (\Exception $e) {
             return $this->exception($e);

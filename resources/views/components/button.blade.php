@@ -11,7 +11,10 @@
     'type' => 'button',
     'disabled' => null,
     'dataset' => [],
-    'href' => null
+    'href' => null,
+    'id' => null,
+    'role' => null,
+    'ariaset' => [],
 ])
 
 @if($href)
@@ -20,6 +23,7 @@
         data-mode="{{ $size }} {{ $status }}"
         class="bt-miticko {{ $class }} bt-m-{{ $emphasis }} {{ $disabled ? 'disabled' : '' }}"
         @if($disabled) aria-disabled="true" onclick="return false;" @endif
+        @isset($id) id="{{ $id }}" @endisset
         @if(!empty($dataset))
             @foreach($dataset as $attribute => $value)
                 data-{{ $attribute }}="{{ $value }}"
@@ -39,10 +43,17 @@
         data-mode="{{ $size }} {{ $status }}"
         type="{{ $type }}"
         class="bt-miticko {{ $class }} bt-m-{{ $emphasis }}"
+        @isset($id) id="{{ $id }}" @endisset
+        @isset($role) role="{{ $role }}" @endisset
         @if($disabled) disabled @endif
         @if(!empty($dataset))
             @foreach($dataset as $attribute => $value)
                 data-{{ $attribute }}="{{ $value }}"
+            @endforeach
+        @endif
+        @if(!empty($aria))
+            @foreach($aria as $attribute => $value)
+                aria-{{ $attribute }}="{{ $value }}"
             @endforeach
         @endif
     >

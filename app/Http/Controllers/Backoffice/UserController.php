@@ -18,16 +18,19 @@ class UserController extends Controller
     use AuthorizesRequests, ValidatesRequests;
 
     public OrderInterface $interface;
+    public string $path;
 
     public function __construct(OrderInterface $interface)
     {
         $this->interface = $interface;
+        $this->path = 'users';
     }
 
     public function index(): View
     {
         $statuses = OrderStatus::statuses();
-        return view('backoffice.orders.index', compact('statuses'));
+        return view('backoffice.' . $this->path . '.index', compact('statuses'))
+            ->with('path', $this->path);
     }
 
     public function data(Request $request) : JsonResponse {
@@ -39,7 +42,7 @@ class UserController extends Controller
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
                 })
-                ->addColumn('order_number', function ($item) {
+                ->addColumn('orders', function ($item) {
                     return '#' . $item->order_number;
                 })
                 ->addColumn('customer', function ($item) {

@@ -563,6 +563,44 @@ body {
 .input-miticko {
     width: 100%;
 }
+
+#toast-container {
+    position: fixed;
+    z-index: 999999;
+    pointer-events: none;
+}
+
+.toast-top-right {
+    top: 12px;
+    right: 12px;
+}
+
+.toast {
+    position: relative;
+    overflow: hidden;
+    margin: 0 0 6px;
+    padding: 15px 15px 15px 50px;
+    width: 300px;
+    border-radius: 3px 3px 3px 3px;
+    background-position: 15px center;
+    background-repeat: no-repeat;
+    color: #FFFFFF;
+    opacity: 0.9;
+    pointer-events: auto;
+}
+
+
+
+.toast-message {
+    display: block;
+    color: #FFFFFF;
+}
+
+.toast-title {
+    font-weight: bold;
+    display: block;
+}
+
 /* Animazione per il cambio immagine */
 @keyframes fadeIn {
     from {

@@ -25,15 +25,6 @@ class User extends Authenticatable
         'role',
         'company_id',
         'partner_id',
-        'address',
-        'zip_code',
-        'city',
-        'country',
-        'phone',
-        'fiscal_code',
-        'birth_date',
-        'privacy_accepted',
-        'newsletter',
     ];
 
     /**

@@ -37,10 +37,10 @@ class OrderController extends Controller
         try {
             $filters = $request->get('filters') ?? [];
 
-            $elements = $this->interface->filters($filters);
+            $elements = $this->interface->filters($filters)->orderBy('created_at', 'desc');
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('created_at', function ($item) {
-                    return Utils::data_long($item->created_at);
+                    return Utils::data($item->product_data);
                 })
                 ->addColumn('order_number', function ($item) {
                     return '#' . $item->order_number;
@@ -49,10 +49,10 @@ class OrderController extends Controller
                     return $item->customer->full_name;
                 })
                 ->addColumn('timing', function ($item) {
-                    return "10:00";
+                    return $item->product_time;
                 })
                 ->addColumn('details', function ($item) {
-                    return "Visita guidata";
+                    return $item->product_label;
                 })
                 ->addColumn('type', function ($item) {
                     return "2 completi + 1 ridotto";

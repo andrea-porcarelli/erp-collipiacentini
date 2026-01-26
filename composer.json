@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6",
         "spatie/laravel-activitylog": "^4.10",
+        "stripe/stripe-php": "^19.2",
         "yajra/laravel-datatables-oracle": "^12.5"
     },
     "require-dev": {

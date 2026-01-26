@@ -12,7 +12,7 @@
     'value' => null,
     'options' => [],
     'type' => 'text',
-    'size' => 'medium',,
+    'size' => 'medium',
     'required' => false
 ])
 <div class="text-field" data-mode="{{ $size }}">
@@ -29,8 +29,8 @@
             id="{{ $name }}"
         >
             <option value="">Scegli</option>
-            @foreach($options as $key => $value)
-                <option value="{{ $key }}">{{ $value }}</option>
+            @foreach($options as $option)
+                <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
             @endforeach
         </select>
         @isset($trailing)

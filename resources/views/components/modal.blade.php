@@ -17,7 +17,7 @@
                     <span class="fa-regular fa-times"></span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body w-100">
                 {{ $slot }}
             </div>
             <div class="modal-footer">

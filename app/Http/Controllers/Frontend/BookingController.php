@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductAvailability;
 use App\Models\User;
@@ -252,10 +253,10 @@ class BookingController extends Controller
         DB::beginTransaction();
         try {
             // Cerca utente esistente per email o crea nuovo
-            $user = User::where('email', $validated['email'])->first();
+            $user = Customer::where('email', $validated['email'])->first();
 
             if (!$user) {
-                $user = User::create([
+                $user = Customer::create([
                     'name' => $validated['name'],
                     'surname' => $validated['surname'],
                     'email' => $validated['email'],

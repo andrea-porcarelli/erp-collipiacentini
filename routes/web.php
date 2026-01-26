@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Frontend\BookingController;
+use App\Http\Controllers\Frontend\PaymentController;
+use App\Http\Controllers\Frontend\StripeWebhookController;
 use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
@@ -24,7 +26,15 @@ Route::group(['prefix' => '/shop'], function() {
     Route::post('/cart/customer',[BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
     Route::get('/cart',[BookingController::class, 'cart'])->name('booking.cart');
     Route::get('/{slugPartner}/{slugProduct}-{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
+
+    // Payment routes
+    Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
+    Route::post('/payment/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
+    Route::get('/order/success/{orderNumber}', [PaymentController::class, 'success_payment'])->name('order.success');
 });
+
+// Stripe Webhook (fuori dal middleware CSRF)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 Route::group(['prefix' => '/backoffice'], function() {
     Route::get('/login',[LoginController::class, 'index'])->name('login');
     Route::post('/login',[LoginController::class, 'login']);

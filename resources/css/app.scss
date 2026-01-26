@@ -1,1 +1,24 @@
 @import 'bootstrap';
+@import 'toastr/toastr';
+
+// Personalizzazione colori Toastr
+.toast-success {
+    background-color: var(--background-color, #29670E) !important;
+}
+
+.toast-error {
+    background-color: var(--background-color, #C00) !important;
+}
+
+.toast-info {
+    background-color: #2F96B4 !important;
+}
+
+.toast-warning {
+    background-color: var(--background-color, #EED202) !important;
+}
+
+.toast {
+    border-radius: var(--border-radius, 16px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}

@@ -1,11 +1,11 @@
 @extends('backoffice.layout', ['title' => 'Dashboard', 'active' => $path])
 
 @section('main-content')
-    <x-header-page title="Ordini" />
+    <x-header-page title="CLienti" />
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto">
+                <x-card title="Lista clienti" sub_title="visualizza i clienti">
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Data" type="daterange" name="dates" />
@@ -19,7 +19,7 @@
                         <table class="table-miticko datatable">
                             <thead>
                             <tr>
-                                <th style="width: 10%">#ordine</th>
+                                <th style="width: 7%">#ordine</th>
                                 <th>Cliente</th>
                                 <th>Data</th>
                                 <th>Orario</th>
@@ -63,7 +63,7 @@
             setTimeout(() => {
                 $(document).trigger('datatable', [{
                     columns: [
-                        {data: 'order_number', width: '200px'},
+                        {data: 'order_number'},
                         {data: 'customer'},
                         {data: 'created_at'},
                         {data: 'timing'},

@@ -207,41 +207,22 @@
 
                     {{-- Step 3: Pagamento --}}
                     <div id="step3-card" style="display: none;">
-                    <x-card class="cart-card step-card" title="Scegli il metodo di pagamento" sub_title="in base al metodo selezionato potresti essere reindirizzato ad una pagina esterna per completare il pagamento">
+                    <x-card class="cart-card step-card" title="Completa il pagamento" sub_title="inserisci i dati della carta per completare l'acquisto">
                         <div class="cart-item">
+                            <div class="payment-summary-compact">
+                                <div class="summary-row">
+                                    <span>Totale da pagare</span>
+                                    <span class="summary-total">{{ Utils::price($cart->total) }}</span>
+                                </div>
+                            </div>
 
-                            <div class="payment-methods">
-                                <h4>Metodo di pagamento</h4>
-                                <div class="payment-option">
-                                    <label class="payment-label">
-                                        <input type="radio" name="payment_method" value="card" checked>
-                                        <span class="payment-text">Carta di credito/debito</span>
-                                    </label>
+                            <div id="stripe-payment-container">
+                                <div id="stripe-loading" class="stripe-loading">
+                                    <i class="fa-solid fa-spinner fa-spin"></i>
+                                    <span>Caricamento metodi di pagamento...</span>
                                 </div>
-                                <div class="payment-option">
-                                    <label class="payment-label">
-                                        <input type="radio" name="payment_method" value="paypal">
-                                        <span class="payment-text">PayPal</span>
-                                    </label>
-                                </div>
-                                <div class="payment-option">
-                                    <label class="payment-label">
-                                        <input type="radio" name="payment_method" value="paypal">
-                                        <span class="payment-text">Apple Pay</span>
-                                    </label>
-                                </div>
-                                <div class="payment-option">
-                                    <label class="payment-label">
-                                        <input type="radio" name="payment_method" value="paypal">
-                                        <span class="payment-text">Google Pay</span>
-                                    </label>
-                                </div>
-                                <div class="payment-option">
-                                    <label class="payment-label">
-                                        <input type="radio" name="payment_method" value="paypal">
-                                        <span class="payment-text">Satispay</span>
-                                    </label>
-                                </div>
+                                <div id="payment-element"></div>
+                                <div id="payment-message" class="payment-message" style="display: none;"></div>
                             </div>
                         </div>
                     </x-card>
@@ -718,17 +699,44 @@
     }
 
     .payment-label:hover {
-        border-color: var(--secondary-brand, #2A3493);
+        border-color: var(--primary-brand);
     }
 
     .payment-label input[type="radio"] {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: 2px solid var(--neutral-grey-10, #E6E6E6);
+        border-radius: 50%;
+        outline: none;
+        transition: all 0.2s ease;
+        position: relative;
+        flex-shrink: 0;
     }
 
-    .payment-label input[type="radio"]:checked + .payment-icon {
-        color: var(--secondary-brand, #2A3493);
+    .payment-label input[type="radio"]:checked {
+        border-color:  var(--primary-brand);
+        background-color: white;
+    }
+
+    .payment-label input[type="radio"]:checked::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 10px;
+        background-color: var(--primary-brand);
+        border-radius: 50%;
+    }
+
+    .payment-label:has(input[type="radio"]:checked) {
+        border-color:  var(--primary-brand);
+        background-color:  var(--light-background);
     }
 
     .payment-icon {
@@ -762,6 +770,81 @@
         .cart-item-actions {
             justify-content: center;
         }
+    }
+
+    /* Stripe Payment Element styles */
+    #stripe-payment-container {
+        margin-top: 16px;
+    }
+
+    .stripe-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 32px;
+        color: var(--text-secondary, #666);
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: var(--typography-body-size-medium, 16px);
+    }
+
+    .stripe-loading i {
+        font-size: 24px;
+        color: var(--primary-brand);
+    }
+
+    #payment-element {
+        padding: 16px;
+        background-color: var(--neutral-grey-2, #F5F5F5);
+        border-radius: var(--border-radius-m, 8px);
+    }
+
+    .payment-message {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border-radius: var(--border-radius-s, 8px);
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: var(--typography-body-size-small, 14px);
+    }
+
+    .payment-message.error {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--error, #DC3545);
+        border: 1px solid var(--error, #DC3545);
+    }
+
+    .payment-message.success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--success, #28a745);
+        border: 1px solid var(--success, #28a745);
+    }
+
+    .payment-summary-compact {
+        background-color: var(--neutral-grey-2, #F5F5F5);
+        border-radius: var(--border-radius-m, 8px);
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .payment-summary-compact .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: var(--typography-body-size-medium, 16px);
+        color: var(--text-main, #0D0D0D);
+    }
+
+    .payment-summary-compact .summary-total {
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: var(--typography-title-size-medium, 20px);
+        font-weight: var(--typography-title-weight-medium, 700);
+        color: var(--secondary-brand, #2A3493);
+    }
+
+    .btn-pay-loading {
+        pointer-events: none;
+        opacity: 0.7;
     }
 </style>
 <script>
@@ -1095,6 +1178,184 @@
                 });
             });
         }
+
+        // Stripe Payment Element
+        let stripe = null;
+        let elements = null;
+        let paymentElement = null;
+        let clientSecret = null;
+        let stripeInitialized = false;
+
+        // Inizializza Stripe quando si arriva allo step 3
+        async function initializeStripe() {
+            if (stripeInitialized) return;
+
+            const stripeLoading = document.getElementById('stripe-loading');
+            const paymentElementContainer = document.getElementById('payment-element');
+            const paymentMessage = document.getElementById('payment-message');
+
+            try {
+                // Crea PaymentIntent sul server
+                const response = await fetch('/shop/payment/create-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Errore nella creazione del pagamento');
+                }
+
+                clientSecret = data.clientSecret;
+
+                // Inizializza Stripe
+                stripe = Stripe('{{ config('services.stripe.key') }}');
+
+                // Crea Elements
+                elements = stripe.elements({
+                    clientSecret: clientSecret,
+                    appearance: {
+                        theme: 'stripe',
+                        variables: {
+                            colorPrimary: getComputedStyle(document.documentElement).getPropertyValue('--primary-brand').trim() || '#2A3493',
+                            colorBackground: '#ffffff',
+                            colorText: '#0D0D0D',
+                            colorDanger: '#DC3545',
+                            fontFamily: '"DM Sans", sans-serif',
+                            borderRadius: '8px',
+                        },
+                    },
+                    locale: 'it'
+                });
+
+                // Monta il Payment Element
+                paymentElement = elements.create('payment', {
+                    layout: 'tabs'
+                });
+
+                // Nascondi loading e mostra payment element
+                if (stripeLoading) stripeLoading.style.display = 'none';
+                paymentElement.mount('#payment-element');
+
+                stripeInitialized = true;
+
+            } catch (error) {
+                console.error('Errore inizializzazione Stripe:', error);
+                if (stripeLoading) stripeLoading.style.display = 'none';
+                showPaymentMessage(error.message || 'Errore nel caricamento dei metodi di pagamento', 'error');
+            }
+        }
+
+        // Mostra messaggio di errore/successo
+        function showPaymentMessage(message, type = 'error') {
+            const paymentMessage = document.getElementById('payment-message');
+            if (paymentMessage) {
+                paymentMessage.textContent = message;
+                paymentMessage.className = 'payment-message ' + type;
+                paymentMessage.style.display = 'block';
+            }
+        }
+
+        // Nascondi messaggio
+        function hidePaymentMessage() {
+            const paymentMessage = document.getElementById('payment-message');
+            if (paymentMessage) {
+                paymentMessage.style.display = 'none';
+            }
+        }
+
+        // Gestisci click sul bottone Paga
+        if (btnPay) {
+            btnPay.addEventListener('click', async function() {
+                if (!stripe || !elements) {
+                    showPaymentMessage('Sistema di pagamento non inizializzato. Riprova.', 'error');
+                    return;
+                }
+
+                hidePaymentMessage();
+
+                // Disabilita il bottone
+                btnPay.disabled = true;
+                btnPay.classList.add('btn-pay-loading');
+                btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Elaborazione...';
+
+                try {
+                    // Conferma il pagamento con Stripe
+                    const { error, paymentIntent } = await stripe.confirmPayment({
+                        elements,
+                        confirmParams: {
+                            return_url: window.location.origin + '/shop/cart',
+                        },
+                        redirect: 'if_required'
+                    });
+
+                    if (error) {
+                        // Errore di pagamento
+                        let errorMessage = 'Si è verificato un errore durante il pagamento.';
+
+                        if (error.type === 'card_error' || error.type === 'validation_error') {
+                            errorMessage = error.message;
+                        }
+
+                        showPaymentMessage(errorMessage, 'error');
+                        btnPay.disabled = false;
+                        btnPay.classList.remove('btn-pay-loading');
+                        btnPay.innerHTML = 'Paga {{ Utils::price($cart->total) }}';
+                        return;
+                    }
+
+                    // Pagamento riuscito o in elaborazione
+                    if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+                        // Conferma l'ordine sul server
+                        const confirmResponse = await fetch('/shop/payment/confirm', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                payment_intent_id: paymentIntent.id
+                            })
+                        });
+
+                        const confirmData = await confirmResponse.json();
+
+                        if (confirmData.success && confirmData.redirect_url) {
+                            showPaymentMessage('Pagamento completato! Reindirizzamento...', 'success');
+                            window.location.href = confirmData.redirect_url;
+                        } else {
+                            throw new Error(confirmData.error || 'Errore nella conferma dell\'ordine');
+                        }
+                    } else {
+                        showPaymentMessage('Stato del pagamento: ' + (paymentIntent?.status || 'sconosciuto'), 'error');
+                        btnPay.disabled = false;
+                        btnPay.classList.remove('btn-pay-loading');
+                        btnPay.innerHTML = 'Paga {{ Utils::price($cart->total) }}';
+                    }
+
+                } catch (error) {
+                    console.error('Errore pagamento:', error);
+                    showPaymentMessage(error.message || 'Errore durante il pagamento', 'error');
+                    btnPay.disabled = false;
+                    btnPay.classList.remove('btn-pay-loading');
+                    btnPay.innerHTML = 'Paga {{ Utils::price($cart->total) }}';
+                }
+            });
+        }
+
+        // Modifica la funzione goToStep3 per inizializzare Stripe
+        const originalGoToStep3 = goToStep3;
+        goToStep3 = function() {
+            originalGoToStep3();
+            // Inizializza Stripe quando si arriva allo step 3
+            initializeStripe();
+        };
     });
 </script>
 @endpush

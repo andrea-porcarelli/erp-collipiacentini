@@ -12,6 +12,9 @@ use Illuminate\Support\ServiceProvider;
 
 #namespace here
 
+use App\Interfaces\CustomerInterface;
+use App\Repositories\CustomerRepository;
+
 use App\Interfaces\PartnerInterface;
 use App\Repositories\PartnerRepository;
 
@@ -30,6 +33,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register() : void
     {
         #register here
+        $this->app->bind(CustomerInterface::class, CustomerRepository::class);
         $this->app->bind(PartnerInterface::class, PartnerRepository::class);
         $this->app->bind(CompanyInterface::class, CompanyRepository::class);
         $this->app->bind(CategoryInterface::class, CategoryRepository::class);
