@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\Backoffice;
 
-use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreProductRequest;
-use App\Http\Controllers\Controller;
-use App\Interfaces\OrderInterface;
 use App\Interfaces\ProductInterface;
-use App\Models\Order;
 use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -32,19 +28,34 @@ class ProductController extends CrudController
 
     public function index(): View
     {
+        $user = Auth::user();
         $partners = null;
-        if (Auth::user()->role === 'god') {
+
+        if (in_array($user->role, ['god', 'admin'])) {
             $partners = Utils::map_collection(Partner::active());
+        } elseif ($user->role === 'company') {
+            $partners = Utils::map_collection(Partner::active()->where('company_id', $user->company_id));
         }
+
         return view('backoffice.' . $this->path . '.index', compact('partners'))
             ->with('path', $this->path);
     }
 
     public function data(Request $request) : JsonResponse {
         try {
+            $user = Auth::user();
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters);
+
+            if ($user->role === 'partner') {
+                $elements->where('partner_id', $user->partner_id);
+            } elseif ($user->role === 'company') {
+                $elements->whereHas('partner', function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
+                });
+            }
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
@@ -53,9 +64,9 @@ class ProductController extends CrudController
                     return '#' . $item->product_code;
                 })
                 ->addColumn('partner', function ($item) {
-//                    if (isset($item->company)) {
-//                        return $item->partner->company->company_name . ' > ' . $item->partner->partner_name;
-//                    }
+                    if (isset($item->partner)) {
+                        return $item->partner->partner_name;
+                    }
                     return ' -- ';
                 })
                 ->addColumn('category', function ($item) {
@@ -76,19 +87,47 @@ class ProductController extends CrudController
 
     public function store(StoreProductRequest $request): JsonResponse
     {
-        $request->validate([
-            'label' => 'required|unique:products,label',
-        ], [
-            'label.required' => 'Il nome del prodotto è obbligatorio',
-            'label.unique' => 'Il nome del prodotto scelto è già stato usato',
-        ]);
+        $user = Auth::user();
 
-
-        $product = $this->interface->store([
+        $data = [
             'label' => $request->get('label'),
-            'is_active' => 0
-        ]);
+            'is_active' => 0,
+        ];
+
+        if ($user->role === 'partner') {
+            $data['partner_id'] = $user->partner_id;
+        } elseif ($request->has('partner_id')) {
+            $data['partner_id'] = $request->get('partner_id');
+        }
+
+        $product = $this->interface->store($data);
 
         return $this->success(['redirect' => route($this->path . '.show', $product->id)]);
+    }
+
+    public function show(int $id)
+    {
+        $model = $this->interface->find($id);
+        $this->authorizeAccess($model);
+
+        return view('backoffice.' . $this->path . '.show', compact('model'))
+            ->with('path', $this->path);
+    }
+
+    private function authorizeAccess($product): void
+    {
+        $user = Auth::user();
+
+        if (in_array($user->role, ['god', 'admin'])) {
+            return;
+        }
+
+        if ($user->role === 'partner' && $product->partner_id !== $user->partner_id) {
+            abort(403);
+        }
+
+        if ($user->role === 'company' && (!$product->partner || $product->partner->company_id !== $user->company_id)) {
+            abort(403);
+        }
     }
 }

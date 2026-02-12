@@ -5,7 +5,10 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Aziende" sub_title="Le aziende">
+                <x-card title="Aziende" class="position-relative" sub_title="Le aziende">
+                    <div class="position-absolute" style="top: -70px; right: 0">
+                        <x-button label="Aggiungi azienda" status="primary" emphasis="light" class="btn-create-company" size="small" leading="fa-plus" />
+                    </div>
                     <x-table-header>
                         <span class="table-header-total" > - </span>
                     </x-table-header>
@@ -28,9 +31,14 @@
             </div>
         </div>
     </div>
-    <x-modal id="filter-daterange" title="Seleziona periodo" primary="Salva" secondary="annulla" width="350px">
-        <div class="d-flex align-items-center justify-content-center">
-            <div id="calendar-container" data-filter="dates"></div>
+    <x-modal title="Aggiungi nuova azienda" primary="Crea azienda" secondary="annulla" width="650px" id="create-company">
+        <div class="row">
+            <form id="create-company-form" class="w-100">
+                <div class="col-12">
+                    <x-input name="company_name" label="Nome azienda" placeholder="Inserisci nome azienda" required />
+                    <x-input name="vat_number" label="Partita IVA" placeholder="Inserisci partita IVA" required />
+                </div>
+            </form>
         </div>
     </x-modal>
 @endsection
@@ -63,6 +71,43 @@
                     }
                 }])
             })
+
+            $(document).on('click', '.btn-create-company', function () {
+                const modal = $(`#create-company`);
+                modal.modal('show');
+            });
+
+            $(document).on('click', '#create-company .btn-cancel', function () {
+                $(`#create-company-form`).find('input').val('');
+                $(`#create-company`).modal('hide');
+            });
+
+            $(document).on('click', '#create-company .btn-success', function () {
+                $(document).trigger('fetch', [{
+                    path: `/backoffice/companies/create`,
+                    method: "post",
+                    data: {
+                        company_name: $(`#create-company input[name='company_name']`).val(),
+                        vat_number: $(`#create-company input[name='vat_number']`).val(),
+                    },
+                    then: (response) => {
+                        setTimeout(() => {
+                           location.href = response.redirect
+                        }, 1500)
+                        toastr.success('Azienda creata con successo');
+                    },
+                    catch: (response) => {
+                        $(`#create-company input[name='company_name']`)
+                            .parent()
+                            .parent()
+                            .find(".supporting-text")
+                            .addClass("danger")
+                            .show()
+                            .html(response.responseJSON.message);
+                    },
+                }])
+            });
+
         })
     </script>
 @endsection

@@ -29,6 +29,11 @@ class Partner extends LogsModel
         return $this->hasMany(Product::class);
     }
 
+    public function users() : HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
     public static function active() : Builder {
         return self::where('is_active', true);
     }

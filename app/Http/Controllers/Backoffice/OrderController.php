@@ -6,11 +6,11 @@ use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
-use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -35,9 +35,19 @@ class OrderController extends Controller
 
     public function data(Request $request) : JsonResponse {
         try {
+            $user = Auth::user();
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters)->orderBy('created_at', 'desc');
+
+            if ($user->role === 'company') {
+                $elements->where('company_id', $user->company_id);
+            } elseif ($user->role === 'partner') {
+                $elements->whereHas('orderProducts.product', function ($q) use ($user) {
+                    $q->where('partner_id', $user->partner_id);
+                });
+            }
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data($item->product_data);

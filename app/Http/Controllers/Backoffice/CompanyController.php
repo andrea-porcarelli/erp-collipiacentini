@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Enums\OrderStatus;
 use App\Facades\Utils;
+use App\Http\Controllers\Backoffice\Requests\StoreCompanyRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CompanyInterface;
 use App\Interfaces\OrderInterface;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CompanyController extends CrudController
@@ -31,6 +33,18 @@ class CompanyController extends CrudController
     {
         return view('backoffice.' . $this->path . '.index')
             ->with('path', $this->path);
+    }
+
+    public function store(StoreCompanyRequest $request): JsonResponse
+    {
+        $company = $this->interface->store([
+            'company_name' => $request->get('company_name'),
+            'company_code' => Str::upper(Str::substr(Str::slug($request->get('company_name')), 0, 5)),
+            'vat_number' => $request->get('vat_number'),
+            'is_active' => 0,
+        ]);
+
+        return $this->success(['redirect' => route($this->path . '.show', $company->id)]);
     }
 
     public function data(Request $request) : JsonResponse {

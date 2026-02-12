@@ -27,6 +27,10 @@ class Company extends LogsModel
         return $this->partners()->where('is_active', 1);
     }
 
+    public function users(): HasMany {
+        return $this->hasMany(User::class);
+    }
+
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');

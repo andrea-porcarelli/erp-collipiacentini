@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Backoffice;
 
-use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CustomerInterface;
-use App\Interfaces\OrderInterface;
-use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CustomerController extends Controller
@@ -35,9 +33,20 @@ class CustomerController extends Controller
 
     public function data(Request $request) : JsonResponse {
         try {
+            $user = Auth::user();
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters);
+
+            if ($user->role === 'company') {
+                $elements->where('company_id', $user->company_id);
+            } elseif ($user->role === 'partner') {
+                $partnerId = $user->partner_id;
+                $elements->whereHas('orders.orderProducts.product', function ($q) use ($partnerId) {
+                    $q->where('partner_id', $partnerId);
+                });
+            }
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);

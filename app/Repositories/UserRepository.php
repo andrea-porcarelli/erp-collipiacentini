@@ -18,13 +18,9 @@ class UserRepository extends CrudRepository implements UserInterface
     public function filters(array $filters): Builder
     {
         return $this->builder()
-            ->when(isset($filters['label']), function($q) use($filters) {
-                $q->whereHas('languages', function($q)  use($filters) {
-                    $q->where('label', 'like', '%' . $filters['label']. '%')
-                        ->whereHas('language', function($q) {
-                            $q->where('iso_code', Utils::default_language());
-                        });
-                });
+            ->where('role', '!=', 'customer')
+            ->when(isset($filters['name']), function($q) use($filters) {
+                $q->where('name', 'like', '%' . $filters['name'] . '%');
             });
     }
 }
