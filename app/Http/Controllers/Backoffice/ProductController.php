@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreProductRequest;
 use App\Interfaces\ProductInterface;
+use App\Models\Company;
 use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -29,16 +30,28 @@ class ProductController extends CrudController
     public function index(): View
     {
         $user = Auth::user();
-        $partners = null;
+        $companies = [];
+        $partners = [];
 
         if (in_array($user->role, ['god', 'admin'])) {
-            $partners = Utils::map_collection(Partner::active());
+            $companies = Company::where('is_active', 1)->get()->map(function ($item) {
+                return ['id' => $item->id, 'label' => $item->company_name];
+            })->values()->toArray();
         } elseif ($user->role === 'company') {
             $partners = Utils::map_collection(Partner::active()->where('company_id', $user->company_id));
         }
 
-        return view('backoffice.' . $this->path . '.index', compact('partners'))
+        return view('backoffice.' . $this->path . '.index', compact('companies', 'partners'))
             ->with('path', $this->path);
+    }
+
+    public function partnersByCompany(int $companyId): JsonResponse
+    {
+        $partners = Partner::active()->where('company_id', $companyId)->get()->map(function ($item) {
+            return ['id' => $item->id, 'label' => $item->partner_name];
+        })->values()->toArray();
+
+        return response()->json($partners);
     }
 
     public function data(Request $request) : JsonResponse {

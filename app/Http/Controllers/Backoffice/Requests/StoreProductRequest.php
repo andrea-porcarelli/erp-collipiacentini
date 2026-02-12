@@ -13,10 +13,11 @@ class StoreProductRequest extends FormRequest
 
     public function rules() : array {
         $rules['label'] = ['required', 'unique:products,label'];
-        if (Auth::user()->role === 'god') {
-            $rules['partner_id'] = ['required', 'exists:partners,id'];
 
+        if (in_array(Auth::user()->role, ['god', 'admin', 'company'])) {
+            $rules['partner_id'] = ['required', 'exists:partners,id'];
         }
+
         return $rules;
     }
 

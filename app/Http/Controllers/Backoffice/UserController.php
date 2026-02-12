@@ -73,7 +73,7 @@ class UserController extends CrudController
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters);
-            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
+            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
                 ->addColumn('role', function ($item) {
                     return ucfirst($item->role);
                 })

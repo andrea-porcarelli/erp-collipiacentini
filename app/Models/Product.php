@@ -91,7 +91,9 @@ class Product extends LogsModel
 
     public function getProductCodeAttribute() : string
     {
-
+        if (!isset($this->category)) {
+            return ' #---- ';
+        }
         return isset($this->partner) ? sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
     }
 

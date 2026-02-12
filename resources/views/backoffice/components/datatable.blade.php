@@ -1,4 +1,9 @@
 <div class="actions">
+    @if (in_array('impersonate', $options) && Auth::user()->canImpersonate() && $item->canBeImpersonated())
+        <a href="{{ route('impersonate', $item->id) }}" title="Impersona">
+            <x-button label="Impersona" size="small" leading="fa-user-secret" emphasis="outlined" status="warning"/>
+        </a>
+    @endif
     @if (in_array('edit', $options))
         <a href="{{ route( $route . '.show', $item->id) }}" title="Modifica">
             <x-button label="Modifica" size="small" leading="fa-edit" emphasis="outlined"/>
