@@ -1,0 +1,953 @@
+/* Collection name: Device */
+/* Mode: Desktop (L) */
+:root {
+  --spacing-0: 0;
+  --border-radius-0: 0;
+  --border-radius-xs: 4;
+  --border-radius-m: 16;
+  --border-radius-l: 24;
+  --border-radius-xl: 32;
+  --border-radius-2xl: 40;
+  --border-radius-s: 8;
+  --typography-body-size-medium: 16;
+  --typography-body-size-small: 14;
+  --typography-body-size-large: 18;
+  --typography-body-weight-medium: 400;
+  --typography-body-weight-small: 300;
+  --typography-body-weight-large: 400;
+  --typography-body-lineheight-small: 16;
+  --typography-body-lineheight-medium: 22;
+  --typography-body-lineheight-large: 24;
+  --typography-button-size-small: 14;
+  --typography-button-size-medium: 16;
+  --typography-button-size-large: 20;
+  --typography-button-weight-small: 600;
+  --typography-button-weight-medium: 600;
+  --typography-button-weight-large: 600;
+  --typography-button-lineheight-small: 12;
+  --typography-button-lineheight-medium: 16;
+  --typography-button-lineheight-large: 18;
+  --typography-label-size-small: 10;
+  --typography-label-size-medium: 12;
+  --typography-label-size-large: 12;
+  --typography-label-weight-medium: 400;
+  --typography-label-lineheight-small: 7;
+  --typography-label-lineheight-medium: 12;
+  --typography-label-lineheight-large: 11;
+  --typography-title-size-medium: 18;
+  --typography-title-size-large: 28;
+  --typography-title-weight-small: 700;
+  --typography-title-weight-medium: 700;
+  --typography-title-weight-large: 600;
+  --typography-title-lineheight-small: 18;
+  --typography-title-lineheight-medium: 24;
+  --typography-title-lineheight-large: 34;
+  --device: Desktop (L);
+  --typography-title-size-small: 14;
+  --typography-heading-size-medium: 48;
+  --typography-heading-weight-medium: 500;
+  --typography-heading-lineheight-medium: 48;
+  --spacing-3xl: 48;
+  --spacing-l: 16;
+  --spacing-5xl: 80;
+  --spacing-m: 12;
+  --spacing-4xl: 64;
+  --spacing-7xl: 120;
+  --spacing-xl: 24;
+  --spacing-6xl: 96;
+  --spacing-s: 8;
+  --spacing-8xl: 200;
+  --spacing-2xl: 32;
+  --spacing-xs: 4;
+  --typography-label-weight-large: 400;
+  --typography-label-weight-small: 500;
+  --filter-paddingtop: var(--spacing-xs);
+  --filter-paddingright: var(--spacing-s);
+  --filter-paddingbottom: var(--spacing-xs);
+  --filter-paddingleft: var(--spacing-s);
+  --filter-spacing: var(--spacing-xs);
+  --filter-borderradius: var(--border-radius-s);
+  --filter-borderwidth: 1;
+  --chip-paddingtop: var(--spacing-m);
+  --chip-paddingright: var(--spacing-xl);
+  --chip-paddingbottom: var(--spacing-m);
+  --chip-paddingleft: var(--spacing-xl);
+  --chip-spacing: var(--spacing-xs);
+  --chip-borderradius: var(--border-radius-2xl);
+  --chip-borderwidth: 1;
+  --border-radius-2xs: 2;
+  --dropdown-item-borderradius: var(--border-radius-s);
+  --dropdown-item-paddingright: var(--spacing-s);
+  --dropdown-item-paddingleft: var(--spacing-s);
+  --dropdown-item-paddingbottom: var(--spacing-s);
+  --dropdown-item-spacing: var(--spacing-s);
+  --dropdown-item-paddingtop: var(--spacing-s);
+  --dropdown-list-padding: var(--spacing-s);
+  --dropdown-list-spacing: var(--spacing-xs);
+  --dropdown-list-borderradius: var(--border-radius-m);
+  --filter-icon: var(--typography-body-size-small);
+  --dropdown-item-font: var(--font-font-2);
+  --dropdown-item-font-size: var(--typography-body-size-medium);
+  --dropdown-item-font-line-height: var(--typography-body-size-medium);
+  --dropdown-item-font-weight: var(--typography-body-weight-medium);
+  --dropdown-item-icon: var(--typography-body-size-medium);
+}
+
+/* Collection name: Device */
+/* Mode: Mobile (S) */
+:root {
+  --spacing-0: 0;
+  --border-radius-0: 0;
+  --border-radius-xs: 4;
+  --border-radius-m: 16;
+  --border-radius-l: 24;
+  --border-radius-xl: 32;
+  --border-radius-2xl: 36;
+  --border-radius-s: 8;
+  --typography-body-size-medium: 16;
+  --typography-body-size-small: 14;
+  --typography-body-size-large: 18;
+  --typography-body-weight-medium: 400;
+  --typography-body-weight-small: 300;
+  --typography-body-weight-large: 400;
+  --typography-body-lineheight-small: 16;
+  --typography-body-lineheight-medium: 22;
+  --typography-body-lineheight-large: 24;
+  --typography-button-size-small: 14;
+  --typography-button-size-medium: 16;
+  --typography-button-size-large: 18;
+  --typography-button-weight-small: 600;
+  --typography-button-weight-medium: 600;
+  --typography-button-weight-large: 600;
+  --typography-button-lineheight-small: 14;
+  --typography-button-lineheight-medium: 16;
+  --typography-button-lineheight-large: 18;
+  --typography-label-size-small: 10;
+  --typography-label-size-medium: 12;
+  --typography-label-size-large: 12;
+  --typography-label-weight-medium: 400;
+  --typography-label-lineheight-small: 7;
+  --typography-label-lineheight-medium: 12;
+  --typography-label-lineheight-large: 11;
+  --typography-title-size-medium: 16;
+  --typography-title-size-large: 24;
+  --typography-title-weight-small: 600;
+  --typography-title-weight-medium: 600;
+  --typography-title-weight-large: 600;
+  --typography-title-lineheight-small: 18;
+  --typography-title-lineheight-medium: 20;
+  --typography-title-lineheight-large: 30;
+  --device: Mobile (S);
+  --typography-title-size-small: 14;
+  --typography-heading-size-medium: 32;
+  --typography-heading-weight-medium: 500;
+  --typography-heading-lineheight-medium: 32;
+  --spacing-3xl: 32;
+  --spacing-l: 12;
+  --spacing-5xl: 64;
+  --spacing-m: 8;
+  --spacing-4xl: 40;
+  --spacing-7xl: 96;
+  --spacing-xl: 16;
+  --spacing-6xl: 80;
+  --spacing-s: 4;
+  --spacing-8xl: 120;
+  --spacing-2xl: 24;
+  --spacing-xs: 4;
+  --typography-label-weight-large: 400;
+  --typography-label-weight-small: 500;
+  --filter-paddingtop: var(--spacing-m);
+  --filter-paddingright: var(--spacing-l);
+  --filter-paddingbottom: var(--spacing-m);
+  --filter-paddingleft: var(--spacing-l);
+  --filter-spacing: var(--spacing-xs);
+  --filter-borderradius: var(--border-radius-s);
+  --filter-borderwidth: 1;
+  --chip-paddingtop: var(--spacing-l);
+  --chip-paddingright: var(--spacing-xl);
+  --chip-paddingbottom: var(--spacing-l);
+  --chip-paddingleft: var(--spacing-xl);
+  --chip-spacing: var(--spacing-xs);
+  --chip-borderradius: var(--border-radius-2xl);
+  --chip-borderwidth: 1;
+  --border-radius-2xs: 2;
+  --dropdown-item-borderradius: var(--border-radius-s);
+  --dropdown-item-paddingright: var(--spacing-m);
+  --dropdown-item-paddingleft: var(--spacing-m);
+  --dropdown-item-paddingbottom: var(--spacing-m);
+  --dropdown-item-spacing: var(--spacing-m);
+  --dropdown-item-paddingtop: var(--spacing-m);
+  --dropdown-list-padding: var(--spacing-m);
+  --dropdown-list-spacing: var(--spacing-s);
+  --dropdown-list-borderradius: var(--border-radius-m);
+  --filter-icon: var(--typography-body-size-small);
+  --dropdown-item-font: var(--font-font-2);
+  --dropdown-item-font-size: var(--typography-body-size-medium);
+  --dropdown-item-font-line-height: var(--typography-body-size-medium);
+  --dropdown-item-font-weight: var(--typography-body-weight-medium);
+  --dropdown-item-icon: var(--typography-body-size-medium);
+}
+
+/* Collection name: Text Field / Appearance */
+/* Mode: Default */
+:root {
+  --text-field-labeldisabled: var(--text-disabled);
+  --text-field-labelresting: var(--text-secondary);
+  --text-field-labelactive: var(--text-main);
+  --text-field-borderresting: var(--border-default);
+  --text-field-borderactive: var(--border-active);
+  --text-field-borderdisabled: var(--border-disabled);
+  --text-field-bordererror: var(--border-error);
+  --text-field-background: var(--background-paper);
+  --text-field-backgrounddisabled: var(--background-disabled);
+  --text-field-labelreadonly: var(--text-secondary);
+  --text-field-borderreadonly: var(--border-default);
+  --text-field-backgroundreadonly: var(--background-disabled);
+}
+
+/* Collection name: Primitives */
+/* Mode: Default */
+:root {
+  --orange-orange-1: #ffefeb;
+  --orange-orange-2: #ffd9cf;
+  --orange-orange-3: #ffbba8;
+  --orange-orange-4: #ff9b80;
+  --orange-orange-5: #ff7d59;
+  --orange-orange-6: #ff6035;
+  --orange-orange-7: #d9522d;
+  --orange-orange-8: #b54426;
+  --orange-orange-9: #91371e;
+  --orange-orange-10: #732b18;
+  --blue-blue-1: #eaebf4;
+  --blue-blue-2: #cccee5;
+  --blue-blue-3: #a3a8d1;
+  --blue-blue-4: #797fbb;
+  --blue-blue-5: #5059a6;
+  --blue-blue-6: #2a3493;
+  --blue-blue-7: #242c7d;
+  --blue-blue-8: #1e2568;
+  --blue-blue-9: #181e54;
+  --blue-blue-10: #131742;
+  --green-green-1: #f2f5f2;
+  --green-green-2: #dee5dd;
+  --red-red-3: #e99191;
+  --green-green-4: #66a659;
+  --red-red-5: #d52e2e;
+  --red-red-1: #fae6e6;
+  --red-red-4: #df5e5e;
+  --red-red-7: #ad0000;
+  --green-green-3: #b2cfae;
+  --green-green-7: #29670e;
+  --yellow-yellow-8: #a99501;
+  --green-green-5: #55913c;
+  --green-green-8: #22560c;
+  --yellow-yellow-5: #f1da30;
+  --yellow-yellow-6: #eed202;
+  --red-red-8: #910000;
+  --red-red-6: #cc0000;
+  --yellow-yellow-1: #fdfbe6;
+  --yellow-yellow-2: #fbf4c2;
+  --green-green-6: #307911;
+  --red-red-2: #f3c2c2;
+  --yellow-yellow-3: #f8ec92;
+  --yellow-yellow-4: #f4e360;
+  --yellow-yellow-7: #cab302;
+  --green-green-9: #1b450a;
+  --green-green-10: #163608;
+  --yellow-yellow-9: #887801;
+  --yellow-yellow-10: #6b5e01;
+  --red-red-9: #740000;
+  --red-red-10: #5c0000;
+  --standard-black-black-40: #999999;
+  --standard-black-black-45: #8c8c8c;
+  --standard-black-black-70: #4d4d4d;
+  --standard-black-black-5: #f2f2f2;
+  --standard-black-black-60: #666666;
+  --standard-black-black-80: #333333;
+  --standard-black-black-90: #1a1a1a;
+  --standard-black-black-50: #808080;
+  --standard-black-black-2: #fafafa;
+  --standard-black-black-10: #e6e6e6;
+  --standard-black-black-20: #cccccc;
+  --standard-black-black-30: #b2b2b2;
+  --standard-black-black-95: #0d0d0d;
+  --standard-black-black-0: #ffffff;
+  --standard-black-black-100: #000000;
+  --standard-black-transparent: rgba(255, 255, 255, 0.00);
+}
+
+/* Collection name: Mode */
+/* Mode: Light mode */
+:root {
+  --neutral-grey-70: var(--standard-black-black-70);
+  --neutral-grey-80: var(--standard-black-black-80);
+  --neutral-grey-60: var(--standard-black-black-60);
+  --neutral-grey-90: var(--standard-black-black-90);
+  --neutral-grey-40: var(--standard-black-black-40);
+  --neutral-grey-50: var(--standard-black-black-50);
+  --neutral-grey-95: var(--standard-black-black-95);
+  --neutral-grey-5: var(--standard-black-black-5);
+  --neutral-grey-45: var(--standard-black-black-45);
+  --neutral-grey-30: var(--standard-black-black-30);
+  --neutral-grey-10: var(--standard-black-black-10);
+  --neutral-black: var(--standard-black-black-100);
+  --neutral-white: var(--standard-black-black-0);
+  --neutral-grey-20: var(--standard-black-black-20);
+  --neutral-grey-2: var(--standard-black-black-2);
+  --neutral-transparent: var(--standard-black-transparent);
+  --primary-brand: var(--orange-orange-6);
+  --primary-brandlight: var(--orange-orange-1);
+  --primary-brandlighthover: var(--orange-orange-2);
+  --primary-brandhover: var(--orange-orange-7);
+  --primary-onbrand: var(--standard-black-black-0);
+  --primary-onbrandlight: var(--orange-orange-6);
+  --secondary-brand: var(--blue-blue-6);
+  --secondary-brandhover: var(--blue-blue-7);
+  --secondary-brandlight: var(--blue-blue-1);
+  --secondary-brandlighthover: var(--blue-blue-2);
+  --secondary-onbrand: var(--standard-black-black-0);
+  --secondary-onbrandlight: var(--blue-blue-6);
+  --success-brand: var(--green-green-7);
+  --success-brandhover: var(--green-green-8);
+  --success-brandlight: var(--green-green-1);
+  --success-brandlighthover: var(--green-green-2);
+  --success-onbrand: var(--standard-black-black-0);
+  --success-onbrandlight: var(--green-green-7);
+  --warning-brand: var(--yellow-yellow-6);
+  --warning-brandhover: var(--yellow-yellow-7);
+  --warning-brandlight: var(--yellow-yellow-1);
+  --warning-brandlighthover: var(--yellow-yellow-2);
+  --warning-onbrand: var(--standard-black-black-0);
+  --warning-onbrandlight: var(--yellow-yellow-7);
+  --error-brand: var(--red-red-6);
+  --error-brandhover: var(--red-red-7);
+  --error-brandlight: var(--red-red-1);
+  --error-brandlighthover: var(--red-red-2);
+  --error-onbrand: var(--standard-black-black-0);
+  --error-onbrandlight: var(--red-red-7);
+  --text-main: var(--neutral-grey-95);
+  --text-secondary: var(--neutral-grey-60);
+  --text-disabled: var(--neutral-grey-40);
+  --border-default: var(--neutral-grey-20);
+  --border-defaultondark: var(--neutral-grey-70);
+  --border-error: var(--error-brand);
+  --border-disabled: var(--neutral-grey-20);
+  --border-disabledondark: var(--neutral-grey-50);
+  --border-active: var(--neutral-grey-95);
+  --border-activeondark: var(--neutral-white);
+  --background-default: #f2f3f7;
+  --background-paper: var(--standard-black-black-0);
+  --background-disabled: var(--standard-black-black-5);
+  --disabled-foreground: var(--standard-black-black-45);
+  --disabled-background: var(--standard-black-black-10);
+  --disabled-foreground-light: var(--standard-black-black-30);
+  --disabled-background-light: var(--standard-black-black-5);
+  --font-font-2: DM Sans;
+  --font-font-1: DM Sans;
+  --background-overlay: rgba(0, 0, 0, 0.60);
+}
+
+/* Collection name: Mode */
+/* Mode: Dark mode */
+:root {
+  --neutral-grey-70: var(--standard-black-black-70);
+  --neutral-grey-80: var(--standard-black-black-80);
+  --neutral-grey-60: var(--standard-black-black-60);
+  --neutral-grey-90: var(--standard-black-black-90);
+  --neutral-grey-40: var(--standard-black-black-40);
+  --neutral-grey-50: var(--standard-black-black-50);
+  --neutral-grey-95: var(--standard-black-black-95);
+  --neutral-grey-5: var(--standard-black-black-5);
+  --neutral-grey-45: var(--standard-black-black-45);
+  --neutral-grey-30: var(--standard-black-black-30);
+  --neutral-grey-10: var(--standard-black-black-10);
+  --neutral-black: var(--standard-black-black-100);
+  --neutral-white: var(--standard-black-black-0);
+  --neutral-grey-20: var(--standard-black-black-20);
+  --neutral-grey-2: var(--standard-black-black-2);
+  --neutral-transparent: var(--standard-black-transparent);
+  --primary-brand: var(--orange-orange-6);
+  --primary-brandlight: var(--orange-orange-1);
+  --primary-brandlighthover: var(--orange-orange-2);
+  --primary-brandhover: var(--orange-orange-7);
+  --primary-onbrand: var(--standard-black-black-0);
+  --primary-onbrandlight: var(--orange-orange-6);
+  --secondary-brand: var(--blue-blue-6);
+  --secondary-brandhover: var(--blue-blue-7);
+  --secondary-brandlight: var(--blue-blue-1);
+  --secondary-brandlighthover: var(--blue-blue-2);
+  --secondary-onbrand: var(--standard-black-black-0);
+  --secondary-onbrandlight: var(--blue-blue-6);
+  --success-brand: var(--green-green-4);
+  --success-brandhover: var(--green-green-3);
+  --success-brandlight: var(--green-green-6);
+  --success-brandlighthover: var(--green-green-7);
+  --success-onbrand: var(--standard-black-black-0);
+  --success-onbrandlight: var(--green-green-1);
+  --warning-brand: var(--yellow-yellow-6);
+  --warning-brandhover: var(--yellow-yellow-7);
+  --warning-brandlight: var(--yellow-yellow-1);
+  --warning-brandlighthover: var(--yellow-yellow-2);
+  --warning-onbrand: var(--standard-black-black-0);
+  --warning-onbrandlight: var(--yellow-yellow-7);
+  --error-brand: var(--red-red-6);
+  --error-brandhover: var(--red-red-7);
+  --error-brandlight: var(--red-red-1);
+  --error-brandlighthover: var(--red-red-2);
+  --error-onbrand: var(--standard-black-black-0);
+  --error-onbrandlight: var(--red-red-7);
+  --text-main: var(--neutral-grey-95);
+  --text-secondary: var(--neutral-grey-60);
+  --text-disabled: var(--neutral-grey-40);
+  --border-default: var(--neutral-grey-20);
+  --border-defaultondark: var(--neutral-grey-70);
+  --border-error: var(--error-brand);
+  --border-disabled: var(--neutral-grey-20);
+  --border-disabledondark: var(--neutral-grey-50);
+  --border-active: var(--neutral-grey-95);
+  --border-activeondark: var(--neutral-white);
+  --background-default: var(--standard-black-black-90);
+  --background-paper: var(--standard-black-black-60);
+  --background-disabled: var(--standard-black-black-60);
+  --disabled-foreground: var(--neutral-grey-95);
+  --disabled-background: var(--neutral-grey-60);
+  --disabled-foreground-light: var(--neutral-grey-95);
+  --disabled-background-light: var(--neutral-grey-60);
+  --font-font-2: DM Sans;
+  --font-font-1: DM Sans;
+  --background-overlay: rgba(0, 0, 0, 0.60);
+}
+
+/* Collection name: Text Field / Size */
+/* Mode: Medium */
+:root {
+  --text-field-paddingvertical: var(--spacing-m);
+  --text-field-paddinghorizontal: var(--spacing-l);
+  --text-field-spacing: var(--spacing-s);
+  --text-field-borderwidth: 1;
+  --text-field-borderradius: var(--border-radius-s);
+}
+
+/* Collection name: Button / Brand */
+/* Mode: Primary */
+:root {
+  --light-background: var(--primary-brandlight);
+  --default-bordercolor: var(--neutral-transparent);
+  --light-foreground: var(--primary-brand);
+  --outlined-foreground: var(--primary-brand);
+  --default-backgroundhover: var(--primary-brandhover);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foregroundhover: var(--primary-onbrand);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-foreground: var(--primary-brand);
+  --outlined-bordercolor: var(--primary-brandlighthover);
+  --default-background: var(--primary-brand);
+  --default-borderwidth: 0;
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foregroundhover: var(--primary-brandhover);
+  --light-borderwidth: 0;
+  --light-foregroundhover: var(--primary-brandhover);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --light-backgroundhover: var(--primary-brandlighthover);
+  --text-only-foregroundhover: var(--primary-brandhover);
+  --light-bordercolor: var(--neutral-transparent);
+  --text-only-borderwidth: 0;
+  --outlined-borderwidth: 1;
+  --outlined-backgroundhover: var(--primary-brandlight);
+  --default-foreground: var(--primary-onbrand);
+}
+
+/* Collection name: Button / Brand */
+/* Mode: Secondary */
+:root {
+  --light-background: var(--secondary-brandlight);
+  --default-bordercolor: var(--neutral-transparent);
+  --light-foreground: var(--secondary-brand);
+  --outlined-foreground: var(--secondary-brand);
+  --default-backgroundhover: var(--secondary-brandhover);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foregroundhover: var(--secondary-onbrand);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-foreground: var(--secondary-brand);
+  --outlined-bordercolor: var(--secondary-brandlighthover);
+  --default-background: var(--secondary-brand);
+  --default-borderwidth: 0;
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foregroundhover: var(--secondary-brandhover);
+  --light-borderwidth: 0;
+  --light-foregroundhover: var(--secondary-brandhover);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --light-backgroundhover: var(--secondary-brandlighthover);
+  --text-only-foregroundhover: var(--secondary-brandhover);
+  --light-bordercolor: var(--neutral-transparent);
+  --text-only-borderwidth: 0;
+  --outlined-borderwidth: 1;
+  --outlined-backgroundhover: var(--secondary-brandlight);
+  --default-foreground: var(--secondary-onbrand);
+}
+
+/* Collection name: Button / Brand */
+/* Mode: Disabled */
+:root {
+  --light-background: var(--disabled-background-light);
+  --default-bordercolor: var(--neutral-transparent);
+  --light-foreground: var(--disabled-foreground-light);
+  --outlined-foreground: var(--disabled-foreground);
+  --default-backgroundhover: var(--disabled-background);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foregroundhover: var(--disabled-foreground);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-foreground: var(--disabled-foreground);
+  --outlined-bordercolor: var(--disabled-foreground-light);
+  --default-background: var(--disabled-background);
+  --default-borderwidth: 0;
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foregroundhover: var(--disabled-foreground);
+  --light-borderwidth: 0;
+  --light-foregroundhover: var(--disabled-foreground-light);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --light-backgroundhover: var(--disabled-background-light);
+  --text-only-foregroundhover: var(--disabled-foreground);
+  --light-bordercolor: var(--neutral-transparent);
+  --text-only-borderwidth: 0;
+  --outlined-borderwidth: 1;
+  --outlined-backgroundhover: var(--disabled-background-light);
+  --default-foreground: var(--disabled-foreground);
+}
+
+/* Collection name: Button / Messages */
+/* Mode: Success */
+:root {
+  --light-background: var(--success-brandlight);
+  --light-foreground: var(--success-brand);
+  --default-borderwidth: 0;
+  --default-bordercolor: var(--neutral-transparent);
+  --outlined-backgroundhover: var(--success-brandlight);
+  --light-borderwidth: 0;
+  --default-backgroundhover: var(--success-brandhover);
+  --text-only-foregroundhover: var(--success-brandhover);
+  --light-foregroundhover: var(--success-brandhover);
+  --default-foregroundhover: var(--success-onbrand);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --text-only-foreground: var(--success-brand);
+  --text-only-borderwidth: 0;
+  --light-backgroundhover: var(--success-brandlighthover);
+  --outlined-borderwidth: 1;
+  --default-background: var(--success-brand);
+  --outlined-bordercolor: var(--success-brand);
+  --outlined-foregroundhover: var(--success-brandhover);
+  --light-bordercolor: var(--neutral-transparent);
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foreground: var(--success-brand);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--success-onbrand);
+}
+
+/* Collection name: Button / Messages */
+/* Mode: Warning */
+:root {
+  --light-background: var(--warning-brandlight);
+  --light-foreground: var(--warning-brand);
+  --default-borderwidth: 0;
+  --default-bordercolor: var(--neutral-transparent);
+  --outlined-backgroundhover: var(--warning-brandlight);
+  --light-borderwidth: 0;
+  --default-backgroundhover: var(--warning-brandhover);
+  --text-only-foregroundhover: var(--warning-brandhover);
+  --light-foregroundhover: var(--warning-brandhover);
+  --default-foregroundhover: var(--warning-onbrand);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --text-only-foreground: var(--warning-brand);
+  --text-only-borderwidth: 0;
+  --light-backgroundhover: var(--warning-brandlighthover);
+  --outlined-borderwidth: 1;
+  --default-background: var(--warning-brand);
+  --outlined-bordercolor: var(--warning-brand);
+  --outlined-foregroundhover: var(--warning-brandhover);
+  --light-bordercolor: var(--neutral-transparent);
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foreground: var(--warning-brand);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--warning-onbrand);
+}
+
+/* Collection name: Button / Messages */
+/* Mode: Error */
+:root {
+  --light-background: var(--error-brandlight);
+  --light-foreground: var(--error-brand);
+  --default-borderwidth: 0;
+  --default-bordercolor: var(--neutral-transparent);
+  --outlined-backgroundhover: var(--error-brandlight);
+  --light-borderwidth: 0;
+  --default-backgroundhover: var(--error-brandhover);
+  --text-only-foregroundhover: var(--error-brandhover);
+  --light-foregroundhover: var(--error-brandhover);
+  --default-foregroundhover: var(--error-onbrand);
+  --text-only-background: var(--neutral-transparent);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --text-only-foreground: var(--error-brand);
+  --text-only-borderwidth: 0;
+  --light-backgroundhover: var(--error-brandlighthover);
+  --outlined-borderwidth: 1;
+  --default-background: var(--error-brand);
+  --outlined-bordercolor: var(--error-brand);
+  --outlined-foregroundhover: var(--error-brandhover);
+  --light-bordercolor: var(--neutral-transparent);
+  --outlined-background: var(--neutral-transparent);
+  --outlined-foreground: var(--error-brand);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--error-onbrand);
+}
+
+/* Collection name: Card / Size */
+/* Mode: Compact */
+:root {
+  --card-padding: var(--spacing-0);
+  --card-spacing: var(--spacing-m);
+  --card-border-radius: var(--border-radius-m);
+}
+
+/* Collection name: Card / Size */
+/* Mode: Small */
+:root {
+  --card-padding: var(--spacing-l);
+  --card-spacing: var(--spacing-l);
+  --card-border-radius: var(--border-radius-m);
+}
+
+/* Collection name: Card / Size */
+/* Mode: Medium */
+:root {
+  --card-padding: var(--spacing-xl);
+  --card-spacing: var(--spacing-xl);
+  --card-border-radius: var(--border-radius-m);
+}
+
+/* Collection name: Card / Appearance */
+/* Mode: Transparent */
+:root {
+  --card-background: var(--neutral-transparent);
+  --card-border: var(--border-default);
+  --card-title: var(--text-main);
+  --card-subtitle: var(--text-secondary);
+  --card-width: 1;
+}
+
+/* Collection name: Card / Appearance */
+/* Mode: White */
+:root {
+  --card-background: var(--be---page-paper);
+  --card-border: var(--neutral-grey-5);
+  --card-title: var(--text-main);
+  --card-subtitle: var(--text-secondary);
+  --card-width: 1;
+}
+
+/* Collection name: Card / Appearance */
+/* Mode: Important */
+:root {
+  --card-background: var(--secondary-brandlight);
+  --card-border: var(--secondary-brandlighthover);
+  --card-title: var(--text-main);
+  --card-subtitle: var(--text-secondary);
+  --card-width: 1;
+}
+
+/* Collection name: Button / Size */
+/* Mode: Small */
+:root {
+  --button-icon: var(--typography-button-size-small);
+  --button-font-weight: var(--typography-button-weight-small);
+  --button-font: var(--font-font-2);
+  --button-spacing: var(--spacing-s);
+  --button-font-size: var(--typography-button-size-small);
+  --button-paddingright: var(--spacing-m);
+  --button-paddingleft: var(--spacing-m);
+  --button-font-line-height: var(--typography-button-lineheight-small);
+  --button-paddingbottom: var(--spacing-s);
+  --button-border-radius: var(--border-radius-s);
+  --button-paddingtop: var(--spacing-s);
+}
+
+/* Collection name: Button / Size */
+/* Mode: Medium */
+:root {
+  --button-icon: var(--typography-button-size-medium);
+  --button-font-weight: var(--typography-button-weight-medium);
+  --button-font: var(--font-font-2);
+  --button-spacing: var(--spacing-s);
+  --button-font-size: var(--typography-button-size-medium);
+  --button-paddingright: var(--spacing-l);
+  --button-paddingleft: var(--spacing-l);
+  --button-font-line-height: var(--typography-button-lineheight-medium);
+  --button-paddingbottom: var(--spacing-m);
+  --button-border-radius: var(--border-radius-s);
+  --button-paddingtop: var(--spacing-m);
+}
+
+/* Collection name: Button / Size */
+/* Mode: Large */
+:root {
+  --button-icon: var(--typography-button-size-large);
+  --button-font-weight: var(--typography-button-weight-large);
+  --button-font: var(--font-font-2);
+  --button-spacing: var(--spacing-m);
+  --button-font-size: var(--typography-button-size-large);
+  --button-paddingright: var(--spacing-xl);
+  --button-paddingleft: var(--spacing-xl);
+  --button-font-line-height: var(--typography-button-lineheight-large);
+  --button-paddingbottom: var(--spacing-l);
+  --button-border-radius: var(--border-radius-s);
+  --button-paddingtop: var(--spacing-l);
+}
+
+/* Collection name: Supporting Text */
+/* Mode: Default */
+:root {
+  --supporting-text-error: var(--error-brand);
+  --supporting-text-success: var(--success-brand);
+  --supporting-text-disabled: var(--text-disabled);
+  --supporting-text-warning: var(--warning-brand);
+  --supporting-text-default: var(--text-secondary);
+}
+
+/* Collection name: Page */
+/* Mode: Desktop (L) */
+:root {
+  --be---page-background: var(--background-default);
+  --be---page-paper: var(--background-paper);
+  --wl---page-padding-top: var(--spacing-l);
+  --wl---page-padding-bottom: var(--spacing-2xl);
+  --wl---page-padding-left: var(--spacing-0);
+  --wl---page-padding-right: var(--spacing-0);
+  --wl---page-background: var(--background-default);
+  --wl---page-paper: var(--standard-black-black-0);
+  --wl---page-overlay: var(--background-overlay);
+  --wl---page-page-container: 1200;
+  --wl---page-sidebar-maxwidth: 283;
+  --wl---page-vertical-gap: var(--spacing-l);
+  --wl---page-horizontal-gap: var(--spacing-l);
+  --be---page-padding-right: var(--spacing-2xl);
+  --be---page-padding-left: var(--spacing-2xl);
+  --be---page-padding-bottom: var(--spacing-0);
+  --be---page-padding-top: var(--spacing-2xl);
+  --be---page-navigation-width: 200;
+  --be---page-overlay: var(--background-overlay);
+}
+
+/* Collection name: Page */
+/* Mode: Mobile (S) */
+:root {
+  --be---page-background: var(--background-default);
+  --be---page-paper: var(--background-paper);
+  --wl---page-padding-top: var(--spacing-l);
+  --wl---page-padding-bottom: var(--spacing-l);
+  --wl---page-padding-left: var(--spacing-l);
+  --wl---page-padding-right: var(--spacing-l);
+  --wl---page-background: var(--background-default);
+  --wl---page-paper: var(--standard-black-black-0);
+  --wl---page-overlay: var(--background-overlay);
+  --wl---page-page-container: 0;
+  --wl---page-sidebar-maxwidth: 0;
+  --wl---page-vertical-gap: 0;
+  --wl---page-horizontal-gap: var(--spacing-l);
+  --be---page-padding-right: var(--spacing-l);
+  --be---page-padding-left: var(--spacing-l);
+  --be---page-padding-bottom: var(--spacing-0);
+  --be---page-padding-top: var(--spacing-l);
+  --be---page-navigation-width: 0;
+  --be---page-overlay: var(--background-overlay);
+}
+
+/* Collection name: Elevation */
+/* Mode: 0 */
+:root {
+  --x: 0;
+  --y: 0;
+  --blur: 0;
+  --color: rgba(255, 255, 255, 0.00);
+  --spread: 0;
+}
+
+/* Collection name: Elevation */
+/* Mode: 1 */
+:root {
+  --x: 0;
+  --y: 0;
+  --blur: 10;
+  --color: rgba(0, 0, 0, 0.10);
+  --spread: 0;
+}
+
+/* Collection name: Elevation */
+/* Mode: 2 */
+:root {
+  --x: 0;
+  --y: 4;
+  --blur: 10;
+  --color: rgba(0, 0, 0, 0.05);
+  --spread: 0;
+}
+
+/* Collection name: Elevation */
+/* Mode: 3 */
+:root {
+  --x: 0;
+  --y: 0;
+  --blur: 20;
+  --color: rgba(0, 0, 0, 0.10);
+  --spread: 0;
+}
+
+/* Collection name: Icon button / Size */
+/* Mode: Small */
+:root {
+  --border-radius: var(--border-radius-s);
+  --icon: 16;
+  --padding: var(--spacing-m);
+  --borderon: 1;
+  --borderoff: 0;
+}
+
+/* Collection name: Icon button / Size */
+/* Mode: Medium */
+:root {
+  --border-radius: var(--border-radius-s);
+  --icon: 20;
+  --padding: var(--spacing-m);
+  --borderon: 1;
+  --borderoff: 0;
+}
+
+/* Collection name: Icon button / Size */
+/* Mode: Large */
+:root {
+  --border-radius: var(--border-radius-s);
+  --icon: 20;
+  --padding: var(--spacing-l);
+  --borderon: 1;
+  --borderoff: 0;
+}
+
+/* Collection name: Icon Button / Brand */
+/* Mode: Primary */
+:root {
+  --light-background: var(--primary-brandlight);
+  --default-borderwidth: 0;
+  --text-only-borderwidth: 0;
+  --default-foregroundhover: var(--primary-onbrand);
+  --default-bordercolor: var(--neutral-transparent);
+  --default-backgroundhover: var(--primary-brandhover);
+  --text-only-foregroundhover: var(--primary-brandhover);
+  --text-only-background: var(--neutral-transparent);
+  --outlined-borderwidth: 1;
+  --text-only-foreground: var(--primary-brand);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--primary-onbrand);
+  --outlined-foreground: var(--primary-brand);
+  --outlined-background: var(--neutral-transparent);
+  --light-borderwidth: 0;
+  --outlined-foregroundhover: var(--primary-brandhover);
+  --outlined-bordercolor: var(--primary-brand);
+  --default-background: var(--primary-brand);
+  --light-foreground: var(--primary-brand);
+  --outlined-backgroundhover: var(--primary-brandlight);
+  --light-backgroundhover: var(--primary-brandlighthover);
+  --text-only-backgroundhover: var(--primary-brandlight);
+  --light-bordercolor: var(--neutral-transparent);
+  --light-foregroundhover: var(--primary-brandhover);
+}
+
+/* Collection name: Icon Button / Brand */
+/* Mode: Secondary */
+:root {
+  --light-background: var(--secondary-brandlight);
+  --default-borderwidth: 0;
+  --text-only-borderwidth: 0;
+  --default-foregroundhover: var(--secondary-onbrand);
+  --default-bordercolor: var(--neutral-transparent);
+  --default-backgroundhover: var(--secondary-brandhover);
+  --text-only-foregroundhover: var(--secondary-brandhover);
+  --text-only-background: var(--neutral-transparent);
+  --outlined-borderwidth: 1;
+  --text-only-foreground: var(--secondary-brand);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--secondary-onbrand);
+  --outlined-foreground: var(--secondary-brand);
+  --outlined-background: var(--neutral-transparent);
+  --light-borderwidth: 0;
+  --outlined-foregroundhover: var(--secondary-brandhover);
+  --outlined-bordercolor: var(--secondary-brand);
+  --default-background: var(--secondary-brand);
+  --light-foreground: var(--secondary-brand);
+  --outlined-backgroundhover: var(--secondary-brandlight);
+  --light-backgroundhover: var(--secondary-brandlighthover);
+  --text-only-backgroundhover: var(--secondary-brandlight);
+  --light-bordercolor: var(--neutral-transparent);
+  --light-foregroundhover: var(--secondary-brandhover);
+}
+
+/* Collection name: Icon Button / Brand */
+/* Mode: Disabled */
+:root {
+  --light-background: var(--disabled-background-light);
+  --default-borderwidth: 0;
+  --text-only-borderwidth: 0;
+  --default-foregroundhover: var(--disabled-foreground);
+  --default-bordercolor: var(--neutral-transparent);
+  --default-backgroundhover: var(--disabled-background);
+  --text-only-foregroundhover: var(--disabled-foreground);
+  --text-only-background: var(--neutral-transparent);
+  --outlined-borderwidth: 1;
+  --text-only-foreground: var(--disabled-foreground);
+  --text-only-bordercolor: var(--neutral-transparent);
+  --default-foreground: var(--disabled-foreground);
+  --outlined-foreground: var(--disabled-foreground);
+  --outlined-background: var(--neutral-transparent);
+  --light-borderwidth: 0;
+  --outlined-foregroundhover: var(--disabled-foreground);
+  --outlined-bordercolor: var(--disabled-foreground);
+  --default-background: var(--disabled-background);
+  --light-foreground: var(--disabled-foreground-light);
+  --outlined-backgroundhover: var(--disabled-background-light);
+  --light-backgroundhover: var(--disabled-background-light);
+  --text-only-backgroundhover: var(--neutral-transparent);
+  --light-bordercolor: var(--neutral-transparent);
+  --light-foregroundhover: var(--disabled-foreground-light);
+}
+
+/* Collection name: Divider */
+/* Mode: Default */
+:root {
+  --bordercolor: var(--standard-black-black-5);
+  --borderwidth: 1;
+}
+
+/* Collection name: Card / Title */
+/* Mode: Medium */
+:root {
+  --title-font-size: var(--typography-title-size-medium);
+  --title-font-weight: var(--typography-title-weight-medium);
+  --title-font-line-height: var(--typography-title-lineheight-medium);
+  --title-font-type: var(--font-font-1);
+  --subtitle-font-type: var(--font-font-2);
+  --subtitle-font-size: var(--typography-body-size-medium);
+  --subtitle-font-weight: var(--typography-body-weight-medium);
+  --subtitle-font-line-height: var(--typography-body-lineheight-medium);
+}
+
+/* Collection name: Card / Title */
+/* Mode: Large */
+:root {
+  --title-font-size: var(--typography-title-size-large);
+  --title-font-weight: var(--typography-title-weight-large);
+  --title-font-line-height: var(--typography-title-lineheight-large);
+  --title-font-type: var(--font-font-1);
+  --subtitle-font-type: var(--font-font-2);
+  --subtitle-font-size: var(--typography-body-size-medium);
+  --subtitle-font-weight: var(--typography-body-weight-medium);
+  --subtitle-font-line-height: var(--typography-body-lineheight-medium);
+}
