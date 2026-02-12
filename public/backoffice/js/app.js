@@ -614,6 +614,10 @@ const init = () => {
         })
     });
 
+    $(document).on("sweetConfirmTrigger", function (e, parameters) {
+        sweetConfirm(parameters.text, parameters.callback ?? null, parameters.willClose ?? null, parameters.title ?? null);
+    });
+
     $(document).on('click', '.filters-miticko .filter', function () {
         const filter = $(this);
         const filter_type = filter.data('type');

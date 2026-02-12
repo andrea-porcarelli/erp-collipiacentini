@@ -47,6 +47,19 @@ class CompanyController extends CrudController
         return $this->success(['redirect' => route($this->path . '.show', $company->id)]);
     }
 
+    public function generateToken(int $id): JsonResponse
+    {
+        try {
+            $company = $this->interface->find($id);
+            $token = Str::random(64);
+            $this->interface->edit($company, ['token' => $token]);
+
+            return $this->success(['token' => $token]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
     public function data(Request $request) : JsonResponse {
         try {
             $filters = $request->get('filters') ?? [];

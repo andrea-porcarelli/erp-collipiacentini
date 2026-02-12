@@ -35,6 +35,18 @@
                     class=""
                     status="secondary"
                     emphasis="outlined"
+                    id="token-tab"
+                    role="tab"
+                    label="Token"
+                    :dataset="['bs-target' => '#token-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'token-panel', 'selected' => 'false']"
+                />
+            </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
                     id="users-tab"
                     role="tab"
                     label="Utenti"
@@ -81,7 +93,31 @@
                 </form>
             </div>
 
-            {{-- Tab 2: Utenti --}}
+            {{-- Tab 2: Token --}}
+            <div class="tab-pane fade" id="token-panel" role="tabpanel" aria-labelledby="token-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <x-card title="Token di accesso" sub_title="Il token viene utilizzato per autenticare le richieste dallo shop">
+                            <label>Token</label>
+                            <div class="d-flex align-items-center gap-3 mt-2">
+                                <div class="flex-grow-1">
+                                    <x-input name="token" :value="$model->token" disabled />
+                                </div>
+                                <div>
+                                    <x-button label="Genera nuovo token" status="primary" emphasis="outlined" size="small" leading="fa-rotate" class="btn-generate-token" />
+                                </div>
+                            </div>
+                            @if($model->token)
+                                <x-supporting-text icon="fa-regular fa-circle-info" message="Attenzione: generare un nuovo token invaliderà quello attuale" />
+                            @else
+                                <x-supporting-text icon="fa-regular fa-circle-info" message="Nessun token generato. Clicca il pulsante per crearne uno." />
+                            @endif
+                        </x-card>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tab 3: Utenti --}}
             <div class="tab-pane fade" id="users-panel" role="tabpanel" aria-labelledby="users-tab">
                 <div class="row">
                     <div class="col-12">
@@ -161,4 +197,30 @@
         padding-top: 8px;
     }
 </style>
+@endsection
+
+@section('custom-script')
+    <script>
+        $(document).ready(function(){
+            $(document).on('click', '.btn-generate-token', function () {
+                $(document).trigger('sweetConfirmTrigger', [{
+                    text: 'Confermi la generazione di un nuovo token?',
+                    title: 'Il token attuale verrà sostituito',
+                    callback: () => {
+                        $(document).trigger('fetch', [{
+                            path: `/backoffice/companies/{{ $model->id }}/generate-token`,
+                            method: "post",
+                            then: (response) => {
+                                $(`input[name='token']`).val(response.token);
+                                toastr.success('Token generato con successo');
+                            },
+                            catch: () => {
+                                toastr.error('Errore durante la generazione del token');
+                            },
+                        }]);
+                    }
+                }])
+            });
+        })
+    </script>
 @endsection

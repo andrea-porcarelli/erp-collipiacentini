@@ -49,6 +49,7 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
         Route::resource('companies', CompanyController::class);
+        Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
         Route::resource('users', UserController::class);
         Route::resource('customers', CustomerController::class);
     });
