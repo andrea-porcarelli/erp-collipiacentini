@@ -1,0 +1,47 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.908Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  --buttonFont: "";
+  --buttonFontLineHeight: 0;
+  --buttonFontSize: 0;
+  --buttonFontWeight: 0;
+  --subtitleFontLineHeight: 0;
+  --subtitleFontSize: 0;
+  --subtitleFontType: "";
+  --subtitleFontWeight: 0;
+  --titleFontLineHeight: 0;
+  --titleFontSize: 0;
+  --titleFontType: "";
+  --titleFontWeight: 0;
+  /* Measures */
+  --borderOff: 0rem;
+  --borderOn: 0.0625rem;
+  --borderRadius: 0;
+  --buttonBorderRadius: 0;
+  --buttonIcon: 0;
+  --buttonPaddingBottom: 0;
+  --buttonPaddingLeft: 0;
+  --buttonPaddingRight: 0;
+  --buttonPaddingTop: 0;
+  --buttonSpacing: 0;
+  --cardBorderRadius: 0;
+  --cardPadding: 0;
+  --cardSpacing: 0;
+  --dropdownBorderRadius: 0;
+  --dropdownPaddingHorizontal: 0;
+  --dropdownPaddingVertical: 0;
+  --dropdownSpacing: 0;
+  --icon: 1.25rem;
+  --minHeight: 2rem;
+  --minWidth: 2rem;
+  --padding: 0;
+  --textFieldBorderRadius: 0;
+  --textFieldPaddingHorizontal: 0;
+  --textFieldPaddingVertical: 0;
+  --textFieldSpacing: 0;
+}

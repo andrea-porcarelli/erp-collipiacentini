@@ -1,0 +1,21 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.910Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  --buttonFont: "";
+  --buttonFontLineHeight: 0;
+  --buttonFontSize: 0;
+  --buttonFontWeight: 0;
+  /* Measures */
+  --buttonBorderRadius: 0;
+  --buttonIcon: 0;
+  --buttonPaddingBottom: 0;
+  --buttonPaddingLeft: 0;
+  --buttonPaddingRight: 0;
+  --buttonPaddingTop: 0;
+  --buttonSpacing: 0;
+}

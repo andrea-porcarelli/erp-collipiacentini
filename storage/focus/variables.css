@@ -1,0 +1,30 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.907Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Measures */
+  --dropdownEmptyBackground: oklch(0 0 0);
+  --dropdownEmptyBorder: oklch(0 0 0);
+  --dropdownEmptyBorderWidth: 0.125rem;
+  --dropdownEmptyIconAction: oklch(0 0 0);
+  --dropdownEmptyLabel: oklch(0 0 0);
+  --dropdownFilledBackground: oklch(0 0 0);
+  --dropdownFilledBorder: oklch(0 0 0);
+  --dropdownFilledBorderWidth: 0.125rem;
+  --dropdownFilledIconAction: oklch(0 0 0);
+  --dropdownFilledLabel: oklch(0 0 0);
+  --textFieldEmptyBackground: oklch(0 0 0);
+  --textFieldEmptyBorder: oklch(0 0 0);
+  --textFieldEmptyBorderWidth: 0.125rem;
+  --textFieldEmptyIcon: oklch(0 0 0);
+  --textFieldEmptyLabel: oklch(0 0 0);
+  --textFieldFilledBackground: oklch(0 0 0);
+  --textFieldFilledBorder: oklch(0 0 0);
+  --textFieldFilledBorderWidth: 0.125rem;
+  --textFieldFilledIcon: oklch(0 0 0);
+  --textFieldFilledLabel: oklch(0 0 0);
+}

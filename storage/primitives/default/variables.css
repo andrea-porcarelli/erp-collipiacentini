@@ -1,0 +1,76 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.909Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Measures */
+  --blueBlue1: oklch(0.949 0.019 279.532);
+  --blueBlue10: oklch(0.272 0.105 272.783);
+  --blueBlue2: oklch(0.838 0.06 280.839);
+  --blueBlue3: oklch(0.759 0.092 279.131);
+  --blueBlue4: oklch(0.647 0.14 277.148);
+  --blueBlue5: oklch(0.582 0.168 275.27);
+  --blueBlue6: oklch(0.484 0.211 271.061);
+  --blueBlue7: oklch(0.454 0.195 271.143);
+  --blueBlue8: oklch(0.381 0.16 271.407);
+  --blueBlue9: oklch(0.323 0.129 271.74);
+  --greenGreen1: oklch(0.967 0.005 145.526);
+  --greenGreen10: oklch(0.297 0.081 137.96);
+  --greenGreen2: oklch(0.914 0.013 141.806);
+  --greenGreen3: oklch(0.824 0.055 141.746);
+  --greenGreen4: oklch(0.663 0.127 140.293);
+  --greenGreen5: oklch(0.596 0.134 137.487);
+  --greenGreen6: oklch(0.51 0.151 138.789);
+  --greenGreen7: oklch(0.455 0.134 138.61);
+  --greenGreen8: oklch(0.402 0.116 138.579);
+  --greenGreen9: oklch(0.347 0.098 138.568);
+  --orangeOrange1: oklch(0.955 0.018 48.51);
+  --orangeOrange10: oklch(0.319 0.095 42.704);
+  --orangeOrange2: oklch(0.858 0.058 48.59);
+  --orangeOrange3: oklch(0.791 0.088 47.58);
+  --orangeOrange4: oklch(0.702 0.131 46.387);
+  --orangeOrange5: oklch(0.652 0.156 44.762);
+  --orangeOrange6: oklch(0.606 0.169 42.673);
+  --orangeOrange7: oklch(0.586 0.187 39.263);
+  --orangeOrange8: oklch(0.488 0.152 40.29);
+  --orangeOrange9: oklch(0.385 0.117 41.612);
+  --redRed1: oklch(0.941 0.022 17.541);
+  --redRed10: oklch(0.298 0.122 29.234);
+  --redRed2: oklch(0.857 0.056 18.309);
+  --redRed3: oklch(0.747 0.107 19.904);
+  --redRed4: oklch(0.645 0.162 22.732);
+  --redRed5: oklch(0.571 0.203 26.54);
+  --redRed6: oklch(0.531 0.218 29.234);
+  --redRed7: oklch(0.469 0.193 29.235);
+  --redRed8: oklch(0.412 0.169 29.234);
+  --redRed9: oklch(0.351 0.144 29.233);
+  --standardBlackBlack0: oklch(1 0 0);
+  --standardBlackBlack10: oklch(0.925 0 0);
+  --standardBlackBlack100: oklch(0 0 0);
+  --standardBlackBlack2: oklch(0.985 0 0);
+  --standardBlackBlack20: oklch(0.845 0 0);
+  --standardBlackBlack30: oklch(0.764 0 0);
+  --standardBlackBlack40: oklch(0.683 0 0);
+  --standardBlackBlack45: oklch(0.64 0 0);
+  --standardBlackBlack5: oklch(0.961 0 0);
+  --standardBlackBlack50: oklch(0.6 0 0);
+  --standardBlackBlack60: oklch(0.51 0 0);
+  --standardBlackBlack70: oklch(0.42 0 0);
+  --standardBlackBlack80: oklch(0.321 0 0);
+  --standardBlackBlack90: oklch(0.218 0 0);
+  --standardBlackBlack95: oklch(0.159 0 0);
+  --standardBlackTransparent: oklch(1 0 0 / 0);
+  --yellowYellow1: oklch(0.984 0.028 102.457);
+  --yellowYellow10: oklch(0.48 0.099 99.856);
+  --yellowYellow2: oklch(0.96 0.065 100.874);
+  --yellowYellow3: oklch(0.933 0.112 101.679);
+  --yellowYellow4: oklch(0.905 0.151 101.944);
+  --yellowYellow5: oklch(0.881 0.173 100.989);
+  --yellowYellow6: oklch(0.861 0.178 99.497);
+  --yellowYellow7: oklch(0.763 0.158 99.981);
+  --yellowYellow8: oklch(0.667 0.138 99.69);
+  --yellowYellow9: oklch(0.57 0.118 99.958);
+}

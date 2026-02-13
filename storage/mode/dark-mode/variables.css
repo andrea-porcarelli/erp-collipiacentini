@@ -1,0 +1,77 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.909Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  --fontFont1: DM Sans;
+  --fontFont2: DM Sans;
+  /* Measures */
+  --backgroundDefault: oklch(0 0 0);
+  --backgroundDisabled: oklch(0 0 0);
+  --backgroundOverlay: oklch(0 0 0 / 0.6);
+  --backgroundPaper: oklch(0 0 0);
+  --borderActive: oklch(0 0 0);
+  --borderActiveOnDark: oklch(0 0 0);
+  --borderDefault: oklch(0 0 0);
+  --borderDefaultOnDark: oklch(0 0 0);
+  --borderDisabled: oklch(0 0 0);
+  --borderDisabledOnDark: oklch(0 0 0);
+  --borderError: oklch(0 0 0);
+  --borderLight: oklch(0 0 0);
+  --disabledBackground: oklch(0 0 0);
+  --disabledBackgroundLight: oklch(0 0 0);
+  --disabledForeground: oklch(0 0 0);
+  --disabledForegroundLight: oklch(0 0 0);
+  --errorBrand: oklch(0 0 0);
+  --errorBrandHover: oklch(0 0 0);
+  --errorBrandLight: oklch(0 0 0);
+  --errorBrandLightHover: oklch(0 0 0);
+  --errorOnBrand: oklch(0 0 0);
+  --errorOnBrandLight: oklch(0 0 0);
+  --neutralBlack: oklch(0 0 0);
+  --neutralGrey10: oklch(0 0 0);
+  --neutralGrey2: oklch(0 0 0);
+  --neutralGrey20: oklch(0 0 0);
+  --neutralGrey30: oklch(0 0 0);
+  --neutralGrey40: oklch(0 0 0);
+  --neutralGrey45: oklch(0 0 0);
+  --neutralGrey5: oklch(0 0 0);
+  --neutralGrey50: oklch(0 0 0);
+  --neutralGrey60: oklch(0 0 0);
+  --neutralGrey70: oklch(0 0 0);
+  --neutralGrey80: oklch(0 0 0);
+  --neutralGrey90: oklch(0 0 0);
+  --neutralGrey95: oklch(0 0 0);
+  --neutralTransparent: oklch(0 0 0);
+  --neutralWhite: oklch(0 0 0);
+  --primaryBrand: oklch(0 0 0);
+  --primaryBrandHover: oklch(0 0 0);
+  --primaryBrandLight: oklch(0 0 0);
+  --primaryBrandLightHover: oklch(0 0 0);
+  --primaryOnBrand: oklch(0 0 0);
+  --primaryOnBrandLight: oklch(0 0 0);
+  --secondaryBrand: oklch(0 0 0);
+  --secondaryBrandHover: oklch(0 0 0);
+  --secondaryBrandLight: oklch(0 0 0);
+  --secondaryBrandLightHover: oklch(0 0 0);
+  --secondaryOnBrand: oklch(0 0 0);
+  --secondaryOnBrandLight: oklch(0 0 0);
+  --successBrand: oklch(0 0 0);
+  --successBrandHover: oklch(0 0 0);
+  --successBrandLight: oklch(0 0 0);
+  --successBrandLightHover: oklch(0 0 0);
+  --successOnBrand: oklch(0 0 0);
+  --successOnBrandLight: oklch(0 0 0);
+  --textDisabled: oklch(0 0 0);
+  --textMain: oklch(0 0 0);
+  --textSecondary: oklch(0 0 0);
+  --warningBrand: oklch(0 0 0);
+  --warningBrandHover: oklch(0 0 0);
+  --warningBrandLight: oklch(0 0 0);
+  --warningBrandLightHover: oklch(0 0 0);
+  --warningOnBrand: oklch(0 0 0);
+  --warningOnBrandLight: oklch(0 0 0);
+}

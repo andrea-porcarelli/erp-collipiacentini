@@ -1,0 +1,31 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.911Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  --contentBackgroundColor: oklch(0 0 0);
+  --contentBorderColor: oklch(0 0 0);
+  --footerBackgroundColor: oklch(0 0 0);
+  --headingBackgroundColor: oklch(0 0 0);
+  --headingTextColor: oklch(0 0 0);
+  /* Fonts */
+  --headingFontLineHeight: 0;
+  --headingFontSize: 0;
+  --headingFontType: "";
+  --headingFontWeight: 0;
+  /* Measures */
+  --contentBorderWidth: 0.0625rem;
+  --contentPaddingHorizontal: 0;
+  --contentPaddingVertical: 0;
+  --contentSpacing: 0;
+  --footerBorderRadius: 0;
+  --footerPaddingHorizontal: 0;
+  --footerPaddingVertical: 0;
+  --footerSpacing: 0;
+  --headingBorderRadius: 0;
+  --headingPaddingHorizontal: 0;
+  --headingPaddingVertical: 0;
+  --headingSpacing: 0;
+}

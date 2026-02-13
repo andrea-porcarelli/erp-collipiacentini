@@ -1,0 +1,17 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.909Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Measures */
+  --buttonBorderRadius: 0;
+  --buttonBorderWidth: 0;
+  --buttonPrimaryBackground: oklch(0 0 0);
+  --buttonPrimaryText: oklch(0 0 0);
+  --cardBackground: oklch(0 0 0);
+  --cardBorderRadius: 0;
+  --cardPadding: 0;
+}

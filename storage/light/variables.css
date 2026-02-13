@@ -1,0 +1,20 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.909Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Measures */
+  --accentBg: oklch(0 0 0);
+  --accentDefault: oklch(0 0 0);
+  --accentOnAccent: oklch(0 0 0);
+  --bgDefault: oklch(0 0 0);
+  --bgMuted: oklch(0 0 0);
+  --bgSubtle: oklch(0 0 0);
+  --fgDefault: oklch(0 0 0);
+  --fgMuted: oklch(0 0 0);
+  --fgSubtle: oklch(0 0 0);
+  --shadowsDefault: oklch(0 0 0);
+}

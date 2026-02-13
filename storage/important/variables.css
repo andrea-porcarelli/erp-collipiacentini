@@ -1,0 +1,15 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.909Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  /* Fonts */
+  /* Measures */
+  --cardBackground: oklch(0 0 0);
+  --cardBorder: oklch(0 0 0);
+  --cardSubtitle: oklch(0 0 0);
+  --cardTitle: oklch(0 0 0);
+  --cardWidth: 0.0625rem;
+}

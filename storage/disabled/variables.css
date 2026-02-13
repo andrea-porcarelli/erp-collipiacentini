@@ -1,0 +1,79 @@
+/*
+ * Design tokens exported from Figma
+ * Exported at: 2026-02-13T14:53:19.907Z
+ * Format: Raw CSS variables grouped by kind
+ */
+:root {
+  /* Colors */
+  --defaultBorderColor: oklch(0 0 0);
+  --defaultBorderColor: oklch(0 0 0);
+  --lightBorderColor: oklch(0 0 0);
+  --lightBorderColor: oklch(0 0 0);
+  --outlinedBorderColor: oklch(0 0 0);
+  --outlinedBorderColor: oklch(0 0 0);
+  --textOnlyBorderColor: oklch(0 0 0);
+  --textOnlyBorderColor: oklch(0 0 0);
+  /* Fonts */
+  /* Measures */
+  --defaultBackground: oklch(0 0 0);
+  --defaultBackground: oklch(0 0 0);
+  --defaultBackgroundHover: oklch(0 0 0);
+  --defaultBackgroundHover: oklch(0 0 0);
+  --defaultBorderWidth: 0rem;
+  --defaultBorderWidth: 0rem;
+  --defaultForeground: oklch(0 0 0);
+  --defaultForeground: oklch(0 0 0);
+  --defaultForegroundHover: oklch(0 0 0);
+  --defaultForegroundHover: oklch(0 0 0);
+  --dropdownEmptyBackground: oklch(0 0 0);
+  --dropdownEmptyBorder: oklch(0 0 0);
+  --dropdownEmptyBorderWidth: 0.0625rem;
+  --dropdownEmptyIconAction: oklch(0 0 0);
+  --dropdownEmptyLabel: oklch(0 0 0);
+  --dropdownFilledBackground: oklch(0 0 0);
+  --dropdownFilledBorder: oklch(0 0 0);
+  --dropdownFilledBorderWidth: 0.0625rem;
+  --dropdownFilledIconAction: oklch(0 0 0);
+  --dropdownFilledLabel: oklch(0 0 0);
+  --lightBackground: oklch(0 0 0);
+  --lightBackground: oklch(0 0 0);
+  --lightBackgroundHover: oklch(0 0 0);
+  --lightBackgroundHover: oklch(0 0 0);
+  --lightBorderWidth: 0rem;
+  --lightBorderWidth: 0rem;
+  --lightForeground: oklch(0 0 0);
+  --lightForeground: oklch(0 0 0);
+  --lightForegroundHover: oklch(0 0 0);
+  --lightForegroundHover: oklch(0 0 0);
+  --outlinedBackground: oklch(0 0 0);
+  --outlinedBackground: oklch(0 0 0);
+  --outlinedBackgroundHover: oklch(0 0 0);
+  --outlinedBackgroundHover: oklch(0 0 0);
+  --outlinedBorderWidth: 0.0625rem;
+  --outlinedBorderWidth: 0.0625rem;
+  --outlinedForeground: oklch(0 0 0);
+  --outlinedForeground: oklch(0 0 0);
+  --outlinedForegroundHover: oklch(0 0 0);
+  --outlinedForegroundHover: oklch(0 0 0);
+  --supportingTextDefault: oklch(0 0 0);
+  --textFieldEmptyBackground: oklch(0 0 0);
+  --textFieldEmptyBorder: oklch(0 0 0);
+  --textFieldEmptyBorderWidth: 0.0625rem;
+  --textFieldEmptyIcon: oklch(0 0 0);
+  --textFieldEmptyLabel: oklch(0 0 0);
+  --textFieldFilledBackground: oklch(0 0 0);
+  --textFieldFilledBorder: oklch(0 0 0);
+  --textFieldFilledBorderWidth: 0.0625rem;
+  --textFieldFilledIcon: oklch(0 0 0);
+  --textFieldFilledLabel: oklch(0 0 0);
+  --textOnlyBackground: oklch(0 0 0);
+  --textOnlyBackground: oklch(0 0 0);
+  --textOnlyBackgroundHover: oklch(0 0 0);
+  --textOnlyBackgroundHover: oklch(0 0 0);
+  --textOnlyBorderWidth: 0rem;
+  --textOnlyBorderWidth: 0rem;
+  --textOnlyForeground: oklch(0 0 0);
+  --textOnlyForeground: oklch(0 0 0);
+  --textOnlyForegroundHover: oklch(0 0 0);
+  --textOnlyForegroundHover: oklch(0 0 0);
+}
