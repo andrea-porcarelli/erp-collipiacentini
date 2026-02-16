@@ -47,6 +47,21 @@ class CompanyController extends CrudController
         return $this->success(['redirect' => route($this->path . '.show', $company->id)]);
     }
 
+    public function update(int $id, Request $request): JsonResponse
+    {
+        try {
+            $company = $this->interface->find($id);
+            $this->interface->edit($company, $request->only([
+                'company_name', 'company_code', 'vat_number', 'phone', 'email', 'email_notify',
+                'has_whitelabel', 'has_woocommerce', 'endpoint_woocommerce'
+            ]));
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
     public function generateToken(int $id): JsonResponse
     {
         try {

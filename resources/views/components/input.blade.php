@@ -27,7 +27,7 @@
         $default = $model->{$name};
     }
 @endphp
-<div class="text-field" data-mode="{{ $size }}">
+<div class="text-field" data-mode="{{ ucfirst($size) }}">
     @isset($label)
         <label>{!! $label !!} @if($required)* @endif</label>
     @endisset

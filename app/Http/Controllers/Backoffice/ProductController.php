@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreProductRequest;
 use App\Interfaces\ProductInterface;
+use App\Jobs\SyncProductToWooCommerce;
 use App\Models\Company;
 use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -125,6 +126,30 @@ class ProductController extends CrudController
 
         return view('backoffice.' . $this->path . '.show', compact('model'))
             ->with('path', $this->path);
+    }
+
+    public function syncWooCommerce(int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $company = $product->partner?->company;
+
+            if (!$company || !$company->has_woocommerce) {
+                return $this->error(['message' => 'L\'azienda non ha il plugin WooCommerce attivo']);
+            }
+
+            if (!$company->endpoint_woocommerce) {
+                return $this->error(['message' => 'Endpoint WooCommerce non configurato per questa azienda']);
+            }
+
+            SyncProductToWooCommerce::dispatch($product, $company);
+
+            return $this->success(['message' => 'Sincronizzazione avviata']);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
     }
 
     private function authorizeAccess($product): void

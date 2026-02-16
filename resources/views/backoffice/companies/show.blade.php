@@ -13,7 +13,7 @@
         </div>
         <div class="d-flex gap-3 align-items-center">
             <div>
-                <x-button  class="btn-success" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                <x-button  class="btn-success btn-save" emphasis="primary" label="Salva modifiche" leading="fa-save" />
             </div>
         </div>
     </div>
@@ -85,6 +85,38 @@
                                     </div>
                                     <div class="col-12 col-sm-6">
                                         <x-input :model="$model" name="email_notify" label="Email notifiche" />
+                                    </div>
+                                </div>
+                            </x-card>
+                            <x-card title="Plugin e integrazioni" class="mt-4" sub_title="Gestione dei plugin attivi per questa azienda">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6">
+                                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                            <div>
+                                                <strong>WhiteLabel</strong>
+                                                <div class="text-muted small">Abilita il servizio WhiteLabel e le API</div>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input switch-input" type="checkbox" name="has_whitelabel" id="has_whitelabel" {{ $model->has_whitelabel ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                                            <div>
+                                                <strong>WooCommerce</strong>
+                                                <div class="text-muted small">Abilita l'integrazione con WooCommerce</div>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input switch-input" type="checkbox" name="has_woocommerce" id="has_woocommerce" {{ $model->has_woocommerce ? 'checked' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3" id="endpoint-woocommerce-container" style="{{ $model->has_woocommerce ? '' : 'display: none;' }}">
+                                    <div class="col-12 col-sm-6">
+                                        <x-input :model="$model" name="endpoint_woocommerce" label="Endpoint WooCommerce" placeholder="https://esempio.com/wp-json/wc/v3" />
+                                        <x-supporting-text icon="fa-regular fa-circle-info" message="L'URL dell'endpoint WooCommerce per la sincronizzazione dei prodotti" />
                                     </div>
                                 </div>
                             </x-card>
@@ -202,6 +234,37 @@
 @section('custom-script')
     <script>
         $(document).ready(function(){
+            $(document).on('change', '#has_woocommerce', function () {
+                const isChecked = $(this).is(':checked');
+                $(`#endpoint-woocommerce-container`).toggle(isChecked);
+            });
+
+            $(document).on('click', '.btn-save', function () {
+                const form = $('#update-company-form');
+                let data = form.serializeArray();
+
+                form.find('input.switch-input:not(:checked)').each(function () {
+                    data.push({ name: this.name, value: '0' });
+                });
+
+                let obj = {};
+                data.forEach(item => {
+                    obj[item.name] = item.value === 'on' ? '1' : item.value;
+                });
+
+                $(document).trigger('fetch', [{
+                    path: `/backoffice/companies/{{ $model->id }}`,
+                    method: "put",
+                    data: obj,
+                    then: (response) => {
+                        toastr.success('Modifiche salvate con successo');
+                    },
+                    catch: (error) => {
+                        toastr.error(error?.responseJSON?.message || 'Errore durante il salvataggio');
+                    },
+                }]);
+            });
+
             $(document).on('click', '.btn-generate-token', function () {
                 $(document).trigger('sweetConfirmTrigger', [{
                     text: 'Confermi la generazione di un nuovo token?',

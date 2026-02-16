@@ -32,8 +32,9 @@ a.text-small {
     align-items: center;
     gap: var(--spacing-m);
     padding: var(--button-paddingtop) var(--button-paddingright) var(--button-paddingbottom) var(--button-paddingleft);
-    border: var(--default-borderwidth) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
-    border-radius: var(--button-border-radius);
+    border-radius: var(--button-border-radius, 12px);
+    border: var(--button-color-primary-default-borderwidth, 0) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
+    background: var(--default-background, #D24600);
     font-size: var(--typography-button-size-small);
     font-weight: 500;
     text-decoration: none;
@@ -48,6 +49,11 @@ a.text-small {
 .bt-miticko:hover {
     background: var(--default-backgroundhover);
     color: var(--default-foregroundhover);
+}
+
+.bt-miticko.bt-m-default {
+    background: var(--light-background);
+    color: var(--light-foreground);
 }
 
 .bt-miticko.bt-m-light {
@@ -96,7 +102,7 @@ a.text-small {
     font-size: var(--typography-title-size-small, 14px);
     font-style: normal;
     font-weight: var(--typography-title-weight-small, 700);
-    line-height: var(--typography-title-lineHeight-small, 18px);
+    line-height: var(--typography-title-lineheight-small, 18px);
 }
 .text-field .text-field-container {
     display: flex;
@@ -105,8 +111,8 @@ a.text-small {
     gap: var(--text-field-spacing);
     align-self: stretch;
     border-radius: var(--text-field-borderradius);
-    border: var(--text-field-borderwidth) solid var(--text-field-borderresting);
-    background: var(--text-field-background);
+    border: var(--text-field-empty-borderwidth, 1px) solid var(--text-field-empty-border, #E6E6E6);
+    background: var(--text-field-empty-background, #FFF);
 }
 .text-field .text-field-container input,
 .text-field .text-field-container textarea,
@@ -255,8 +261,11 @@ a.text-small {
     margin-left: 200px;
     min-height: 100vh;
     background-color: #FFF;
-    padding: var(--layout-backend-main-column-padding-top) var(--layout-backend-main-column-padding-right) var(--layout-backend-main-column-padding-bottom) var(--layout-backend-main-column-padding-left);
+    padding: var(--be---page-padding-top, 32px) var(--be---page-padding-right, 32px) var(--be---page-padding-bottom, 0) var(--be---page-padding-left, 32px);
     width: calc(100vw - 200px);
+}
+.main-content h1 {
+    margin-bottom: var(--layout-backend-main-column-spacing, 24px) !important;
 }
 .page-container {
     display: flex;
@@ -287,7 +296,7 @@ a.text-small {
     gap: var(--card-spacing);
     align-self: stretch;
     border-radius: var(--card-border-radius);
-    border: var(--card-border-width) solid var(--card-border);
+    border: var(--card-width) solid var(--card-border);
     background: var(--card-background);
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.20);
 }

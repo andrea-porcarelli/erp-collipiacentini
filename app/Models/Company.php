@@ -17,6 +17,8 @@ class Company extends LogsModel
         'is_active',
         'token',
         'has_whitelabel',
+        'has_woocommerce',
+        'endpoint_woocommerce',
     ];
 
     public function partners(): HasMany {

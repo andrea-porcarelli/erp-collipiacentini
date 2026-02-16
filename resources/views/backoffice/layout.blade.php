@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     @include('backoffice.components.header')
-    <body data-mode="light mode desktop (l)">
+    <body data-mode="Light mode Default Desktop (L)">
         @impersonating
             <div class="impersonate-bar" style="background: #fff3cd; border-bottom: 1px solid #ffc107; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 9999; position: relative;">
                 <span><i class="fa fa-user-secret"></i> Stai impersonando <strong>{{ Auth::user()->name }}</strong> ({{ ucfirst(Auth::user()->role) }})</span>

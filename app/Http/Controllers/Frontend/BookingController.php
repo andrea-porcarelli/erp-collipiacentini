@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductAvailability;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Dflydev\DotAccessData\Data;
@@ -99,14 +100,8 @@ class BookingController extends Controller
             return response()->json(['error' => 'Prodotto non trovato'], 404);
         }
 
-        // Ottieni gli ID dei prodotti collegati (incluso questo prodotto)
-        $productIds = array_merge(
-            [$product->id],
-            $product->linked_product_ids ?? []
-        );
-
         // Recupera tutte le availabilities per la data selezionata (anche quelle con availability = 0)
-        $availabilities = \App\Models\ProductAvailability::whereIn('product_id', $productIds)
+        $availabilities = \App\Models\ProductAvailability::where('product_id', $product->id)
             ->where('date', $date)
             ->whereNotNull('time')
             ->orderBy('time', 'ASC')
@@ -117,7 +112,7 @@ class BookingController extends Controller
                 'id' => $availability->id,
                 'time' => $availability->time,
                 'availability' => $availability->availability,
-                'formatted_time' => \Carbon\Carbon::parse($availability->time)->format('H:i'),
+                'formatted_time' => Carbon::parse($availability->time)->format('H:i'),
                 'is_available' => $availability->availability > 0
             ];
         });

@@ -46,6 +46,7 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::resource('orders', OrderController::class);
         Route::resource('products', ProductController::class);
         Route::get('products/partners-by-company/{companyId}', [ProductController::class, 'partnersByCompany'])->name('products.partners-by-company');
+        Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
         Route::resource('companies', CompanyController::class);

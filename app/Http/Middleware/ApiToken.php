@@ -5,13 +5,12 @@ namespace App\Http\Middleware;
 use App\Models\Company;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 
-class Token
+class ApiToken
 {
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->input('token') ?? $request->header('token') ?? $request->bearerToken();
+        $token = $request->header('token') ?? $request->bearerToken();
 
         if (!$token) {
             return response()->json([
@@ -29,8 +28,13 @@ class Token
             ], 401);
         }
 
-        Session::put('company', $company);
-        Session::put('token', $token);
+        if (!$company->has_whitelabel) {
+            return response()->json([
+                'error' => 'Accesso non consentito',
+                'message' => 'L\'azienda non ha il servizio WhiteLabel attivo'
+            ], 403);
+        }
+
         $request->merge(['company' => $company]);
 
         return $next($request);

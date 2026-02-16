@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ApiToken;
 use App\Http\Middleware\CartExists;
 use App\Http\Middleware\Token;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'token' => Token::class,
+            'api.token' => ApiToken::class,
             'cart.exists' => CartExists::class,
         ]);
 

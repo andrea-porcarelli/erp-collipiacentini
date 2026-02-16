@@ -30,7 +30,7 @@ const sweetConfirm = (text, callback, willClose, title) => {
     setTimeout(() => {
         const confirmButton = document.querySelector('.swal-button--confirm');
         if (confirmButton) {
-            confirmButton.setAttribute('data-mode', 'primary medium');
+            confirmButton.setAttribute('data-mode', 'Primary Medium');
         }
     }, 100);
 };

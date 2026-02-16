@@ -16,6 +16,11 @@
                 <span class="small-icon {{ $model->is_active->class() }}"></span>
                 {{ $model->is_active->label() }}
             </div>
+            @if($model->partner?->company?->has_woocommerce && $model->partner?->company?->endpoint_woocommerce)
+                <div>
+                    <x-button label="Sincronizza WooCommerce" status="warning" emphasis="outlined" size="small" leading="fa-rotate" class="btn-sync-woocommerce" />
+                </div>
+            @endif
             <div>
                 <x-button  class="btn-success" emphasis="primary" label="Salva modifiche" leading="fa-save" />
             </div>
@@ -222,4 +227,29 @@
         padding-top: 8px;
     }
 </style>
+@endsection
+
+@section('custom-script')
+    <script>
+        $(document).ready(function(){
+            $(document).on('click', '.btn-sync-woocommerce', function () {
+                $(document).trigger('sweetConfirmTrigger', [{
+                    text: 'Vuoi avviare la sincronizzazione del prodotto con WooCommerce?',
+                    title: 'Sincronizzazione WooCommerce',
+                    callback: () => {
+                        $(document).trigger('fetch', [{
+                            path: `/backoffice/products/{{ $model->id }}/sync-woocommerce`,
+                            method: "post",
+                            then: (response) => {
+                                toastr.success('Sincronizzazione avviata con successo');
+                            },
+                            catch: (error) => {
+                                toastr.error(error?.message || 'Errore durante la sincronizzazione');
+                            },
+                        }]);
+                    }
+                }]);
+            });
+        });
+    </script>
 @endsection
