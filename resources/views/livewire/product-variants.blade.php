@@ -10,7 +10,7 @@
 
                     {{-- Drag handle --}}
                     <span class="drag-handle text-secondary me-1" style="cursor:grab;touch-action:none">
-                        <i class="fa-regular fa-grip-dots-vertical"></i>
+                        <i class="fa-regular fa-bars"></i>
                     </span>
 
                     @if($editingVariantId === $variant->id)
