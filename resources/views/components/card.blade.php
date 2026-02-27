@@ -1,6 +1,6 @@
-@props(['title' => null, 'sub_title' => null, 'pre_title' => null, 'size' => 'Medium', 'mode' => 'White', 'class' => null, 'h1' => null, 'leading' => null])
+@props(['title' => null, 'sub_title' => null, 'pre_title' => null, 'size' => 'medium', 'mode' => 'white', 'class' => null, 'h1' => null, 'leading' => null])
 
-<div class="card-miticko {{ $class }}" data-mode="{{ $size }} {{ $mode }} light mode">
+<div class="card-miticko {{ $class }}" data-mode="{{ $size }} {{ $mode }}">
     @if(isset($title) or isset($sub_title) or isset($pre_title))
         <div class="card-header">
             @isset($pre_title)

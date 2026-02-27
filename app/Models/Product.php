@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 use App\Enums\ProductStatus;
+use App\Traits\HasLanguageContent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -8,19 +9,25 @@ use Illuminate\Support\Str;
 
 class Product extends LogsModel
 {
+    use HasLanguageContent;
     public $fillable = [
         'partner_id',
         'category_id',
         'is_active',
         'label',
         'duration',
+        'duration_days',
+        'duration_hours',
+        'duration_minutes',
+        'sub_category_id',
         'product_type',
-        'linked_product_ids'
+        'occupancy',
+        'occupancy_for_price',
+        'free_occupancy_rule',
     ];
 
     protected $casts = [
         'is_active' => ProductStatus::class,
-        'linked_product_ids' => 'array',
     ];
 
 
@@ -41,14 +48,8 @@ class Product extends LogsModel
 
     public function getSharedAvailabilities()
     {
-        // Ottieni gli ID dei prodotti collegati (incluso questo prodotto)
-        $productIds = array_merge(
-            [$this->id],
-            $this->linked_product_ids ?? []
-        );
-
         // Restituisci tutte le availabilities di questi prodotti
-        return ProductAvailability::whereIn('product_id', $productIds)
+        return ProductAvailability::where('product_id', $this->id)
             ->where('availability', '>', 0)
             ->whereDate('date', '>=', date('Y-m-d'))
             ->orderBy('date', 'ASC')
@@ -60,18 +61,29 @@ class Product extends LogsModel
         return $this->hasMany(ProductPrice::class);
     }
 
-    public function contents() : MorphMany
+    public function links() : HasMany
     {
-        return $this->morphMany(LanguageContent::class, 'entity');
+        return $this->hasMany(ProductLink::class);
     }
 
-    public function content()
+    public function faqs() : HasMany
     {
-        return $this->contents()
-            ->whereHas('language', function($query) {
-                $query->where('iso_code', app()->getLocale());
-            })
-            ->first();
+        return $this->hasMany(ProductFaq::class);
+    }
+
+    public function relatedProducts() : HasMany
+    {
+        return $this->hasMany(ProductRelated::class);
+    }
+
+    public function customerFields() : HasMany
+    {
+        return $this->hasMany(ProductCustomerField::class);
+    }
+
+    public function variants() : HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
     }
 
     public function media() : MorphMany
@@ -114,23 +126,23 @@ class Product extends LogsModel
     }
 
     public function getIntroAttribute() : ?string {
-        return $this->content()?->intro;
+        return $this->contentField('intro');
     }
 
     public function getDescriptionAttribute() : ?string {
-        return $this->content()?->description;
+        return $this->contentField('description');
     }
 
     public function getMetaTitleAttribute() : ?string {
-        return $this->content()?->meta_title ?? $this->label;
+        return $this->contentField('meta_title') ?? $this->label;
     }
 
     public function getMetaDescriptionAttribute() : ?string {
-        return $this->content()?->meta_description;
+        return $this->contentField('meta_description');
     }
 
     public function getMetaKeywordsAttribute() : ?string {
-        return $this->content()?->meta_keywords;
+        return $this->contentField('meta_keywords');
     }
 
     public function getRouteAttribute() : string {

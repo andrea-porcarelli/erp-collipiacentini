@@ -11,11 +11,8 @@ class LanguageContent extends LogsModel
         'language_id',
         'entity_id',
         'entity_type',
-        'intro',
-        'description',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
+        'field',
+        'value',
     ];
 
     public function language() : BelongsTo {

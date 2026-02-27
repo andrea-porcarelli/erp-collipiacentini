@@ -13,7 +13,9 @@
     'options' => [],
     'type' => 'text',
     'size' => 'medium',
-    'required' => false
+    'required' => false,
+    'message' => null,
+    'icon' => null,
 ])
 <div class="text-field" data-mode="{{ $size }}">
     @isset($label)
@@ -37,5 +39,7 @@
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>
         @endisset
     </div>
-    <x-supporting-text />
+    @isset($message)
+        <x-supporting-text :message="$message" :icon="$icon"/>
+    @endisset
 </div>

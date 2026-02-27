@@ -1,6 +1,7 @@
 import './bootstrap';
 import 'bootstrap';
 import toastr from 'toastr';
+import Sortable from 'sortablejs';
 
 // Configura toastr globalmente
 toastr.options = {
@@ -15,5 +16,6 @@ toastr.options = {
     hideMethod: 'fadeOut'
 };
 
-// Rendi toastr disponibile globalmente
+// Rendi disponibili globalmente
 window.toastr = toastr;
+window.Sortable = Sortable;

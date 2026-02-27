@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'god',
             'password' => bcrypt('123456'),
         ]);
+
+        $this->call([
+            CustomerFieldTypeSeeder::class,
+        ]);
     }
 }

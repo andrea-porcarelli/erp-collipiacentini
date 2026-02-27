@@ -6,7 +6,6 @@
     'trailing_style' => 'solid',
     'label' => null,
     'class' => null,
-    'supporting_text' => '',
     'name' => '',
     'placeholder' => null,
     'value' => null,
@@ -16,7 +15,8 @@
     'disabled' => false,
     'message' => null,
     'icon' => null,
-    'model' => null
+    'model' => null,
+    'maxlength' => null,
 ])
 @php
     $default = null;
@@ -26,8 +26,11 @@
     if (isset($model->{$name})){
         $default = $model->{$name};
     }
+    $charCountMessage = $maxlength
+        ? ($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'
+        : null;
 @endphp
-<div class="text-field" data-mode="{{ ucfirst($size) }}">
+<div class="text-field" data-mode="{{ $size }}">
     @isset($label)
         <label>{!! $label !!} @if($required)* @endif</label>
     @endisset
@@ -52,10 +55,25 @@
             @if($disabled)
                 disabled
             @endif
+            @if($maxlength)
+                maxlength="{{ $maxlength }}"
+                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - this.value.length) + ' / {{ $maxlength }} caratteri rimanenti'"
+            @endif
         />
         @isset($trailing)
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>
         @endisset
     </div>
-    <x-supporting-text :message="$message" :icon="$icon"/>
+    @if($maxlength)
+        <div class="supporting-text-row">
+            @isset($message)
+            <x-supporting-text :message="$message" :icon="$icon"/>
+            @endisset
+            <x-supporting-text :message="($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'" extra_class="char-count"/>
+        </div>
+    @else
+        @isset($message)
+        <x-supporting-text :message="$message" :icon="$icon"/>
+        @endisset
+    @endif
 </div>

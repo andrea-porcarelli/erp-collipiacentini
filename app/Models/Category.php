@@ -9,6 +9,7 @@ class Category extends LogsModel
 {
     public $fillable = [
         'partner_id',
+        'category_id',
         'is_active',
         'iva',
         'category_code',

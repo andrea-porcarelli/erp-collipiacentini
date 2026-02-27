@@ -15,12 +15,13 @@
     'id' => null,
     'role' => null,
     'ariaset' => [],
+    'w_click' => null,
 ])
 
 @if($href)
     <a
         href="{{ $disabled ? '#' : $href }}"
-        data-mode="{{ ucfirst($size) }} {{ ucfirst($status) }}"
+        data-mode="{{ $size }} {{ $status }}"
         class="bt-miticko {{ $class }} bt-m-{{ $emphasis }} {{ $disabled ? 'disabled' : '' }}"
         @if($disabled) aria-disabled="true" onclick="return false;" @endif
         @isset($id) id="{{ $id }}" @endisset
@@ -40,7 +41,7 @@
     </a>
 @else
     <button
-        data-mode="{{ ucfirst($size) }} {{ ucfirst($status) }}"
+        data-mode="{{ $size }} {{ $status }}"
         type="{{ $type }}"
         class="bt-miticko {{ $class }} bt-m-{{ $emphasis }}"
         @isset($id) id="{{ $id }}" @endisset
@@ -56,6 +57,9 @@
                 aria-{{ $attribute }}="{{ $value }}"
             @endforeach
         @endif
+        @isset($w_click)
+            wire:click="{{ $w_click }}"
+        @endisset
     >
         @isset($leading)
             <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>

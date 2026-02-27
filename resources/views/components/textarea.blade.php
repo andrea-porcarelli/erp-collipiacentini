@@ -11,7 +11,9 @@
     'disabled' => false,
     'message' => null,
     'icon' => null,
-    'model' => null
+    'model' => null,
+    'rows' => null,
+    'maxlength' => null,
 ])
 @php
 $default = null;
@@ -21,6 +23,9 @@ if (isset($value)){
 if (isset($model->{$name})){
     $default = $model->{$name};
 }
+$charCountMessage = $maxlength
+    ? ($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'
+    : null;
 @endphp
 <div class="text-field {{ $class_container }}" data-mode="{{ $size }}">
     @isset($label)
@@ -37,7 +42,21 @@ if (isset($model->{$name})){
             @if($disabled)
                 disabled
             @endif
+            @if($rows)
+                rows="{{ $rows }}"
+            @endif
+            @if($maxlength)
+                maxlength="{{ $maxlength }}"
+                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - this.value.length) + ' / {{ $maxlength }} caratteri rimanenti'"
+            @endif
         >{{ $default }}</textarea>
     </div>
-    <x-supporting-text :message="$message" :icon="$icon"/>
+    @if($maxlength)
+        <div class="supporting-text-row">
+            <x-supporting-text :message="$message" :icon="$icon"/>
+            <x-supporting-text :message="$charCountMessage" extra_class="char-count"/>
+        </div>
+    @else
+        <x-supporting-text :message="$message" :icon="$icon"/>
+    @endif
 </div>

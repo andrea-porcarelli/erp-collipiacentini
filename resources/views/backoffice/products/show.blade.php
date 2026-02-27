@@ -21,9 +21,6 @@
                     <x-button label="Sincronizza WooCommerce" status="warning" emphasis="outlined" size="small" leading="fa-rotate" class="btn-sync-woocommerce" />
                 </div>
             @endif
-            <div>
-                <x-button  class="btn-success" emphasis="primary" label="Salva modifiche" leading="fa-save" />
-            </div>
         </div>
     </div>
     <div class="w-100">
@@ -81,6 +78,18 @@
                     class=""
                     status="secondary"
                     emphasis="outlined"
+                    id="closed-period-tab"
+                    role="tab"
+                    label="Periodi di chiusura"
+                    :dataset="['bs-target' => '#closed-period-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'closed-period-panel', 'selected' => 'false']"
+                />
+            </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
                     id="media-tab"
                     role="tab"
                     label="Foto e descrizione"
@@ -88,109 +97,72 @@
                     :ariaset="['controls' => 'media-panel', 'selected' => 'false']"
                 />
             </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
+                    id="links-tab"
+                    role="tab"
+                    label="Link Utili"
+                    :dataset="['bs-target' => '#links-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'links-panel', 'selected' => 'false']"
+                />
+            </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
+                    id="faqs-tab"
+                    role="tab"
+                    label="FAQ"
+                    :dataset="['bs-target' => '#faqs-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'faqs-panel', 'selected' => 'false']"
+                />
+            </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
+                    id="related-tab"
+                    role="tab"
+                    label="Prodotti correlati"
+                    :dataset="['bs-target' => '#related-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'related-panel', 'selected' => 'false']"
+                />
+            </li>
         </ul>
-
-        <form id="update-product-form">
-            {{-- Tabs Content --}}
-            <div class="tab-content" id="productTabsContent">
-                {{-- Tab 1: Informazioni --}}
-                <div class="tab-pane fade show active" id="info-panel" role="tabpanel" aria-labelledby="info-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-card title="Impostazioni prodotto interne" sub_title="nome interno, codice e visibilità online">
-                                <div class="row">
-                                    <div class="col-12 col-sm-6">
-                                        <x-input :model="$model" name="label" label="Nome prodotto interno" required message="Questo campo è solo per uso interno e non visibile al pubblico" icon="fa-regular fa-circle-info"/>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <x-input name="name" label="Codice prodotto" disabled required message="Il codice prodotto è assegnato automaticamente dal sistema." icon="fa-regular fa-circle-info" />
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-12 col-sm-6">
-                                        <x-input name="name" label="Stato prodotto" required message="Questo campo è solo per uso interno e non visibile al pubblico" icon="fa-regular fa-circle-info"/>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <x-input name="name" label="URL" disabled required message="Non è possibile modificare l’URL" icon="fa-regular fa-circle-info" />
-                                    </div>
-                                </div>
-                            </x-card>
-                            <x-card title="Durata e tipologia" class="mt-4">
-                                <div class="row">
-                                    <div class="col-12 col-sm-6">
-                                        <x-input :model="$model" name="duration" label="Durata (minuti)" required message="inserisci il valore in minuti" icon="fa-regular fa-circle-info"/>
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <x-input name="name" label="Tipologia" required  />
-                                    </div>
-                                </div>
-                            </x-card>
-                            <x-card title="Impostazioni prodotto pubbliche" class="mt-4 mb-5" sub_title="titolo e descrizione che vedranno gli utenti su Google e sul sito">
-                                <div class="row">
-                                    <div class="col-12 col-sm-6">
-                                        <x-input :model="$model" name="meta_title" label="Nome prodotto pubblico" required />
-                                        <x-textarea :model="$model" name="meta_title" label="Descrizione breve" required class_container="mt-4" />
-                                    </div>
-                                    <div class="col-12 col-sm-6">
-                                        <div class="text-field">
-                                            <label>Come apparirà su Google</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </x-card>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Tab 2: Varianti e prezzi --}}
-                <div class="tab-pane fade" id="variants-panel" role="tabpanel" aria-labelledby="variants-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-card title="Varianti e prezzi">
-                                {{-- Contenuto tab varianti --}}
-                            </x-card>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Tab 3: Date e orari --}}
-                <div class="tab-pane fade" id="schedule-panel" role="tabpanel" aria-labelledby="schedule-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-card title="Date e orari">
-                                {{-- Contenuto tab date e orari --}}
-                            </x-card>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Tab 4: Date e orari speciali --}}
-                <div class="tab-pane fade" id="special-schedule-panel" role="tabpanel" aria-labelledby="special-schedule-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-card title="Date e orari speciali">
-                                {{-- Contenuto tab date e orari speciali --}}
-                            </x-card>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Tab 5: Foto e descrizione --}}
-                <div class="tab-pane fade" id="media-panel" role="tabpanel" aria-labelledby="media-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-card title="Foto e descrizione">
-                                {{-- Contenuto tab foto e descrizione --}}
-                            </x-card>
-                        </div>
-                    </div>
-                </div>
+        {{-- Tabs Content --}}
+        <div class="tab-content" id="productTabsContent">
+            <x-backoffice.product.tab-info :model="$model" :categories="$categories" :languages="$languages" :fieldTypes="$fieldTypes" />
+            <x-backoffice.product.tab-variants :model="$model" />
+            <x-backoffice.product.tab-schedule :model="$model" />
+            <x-backoffice.product.tab-special-schedule :model="$model" />
+            <x-backoffice.product.tab-closed-period :model="$model" />
+            <x-backoffice.product.tab-media :model="$model" />
+            <div class="tab-pane fade" id="links-panel" role="tabpanel">
+                <x-card title="Link Utili" :saveable="false">
+                    <x-backoffice.product.links :model="$model" :languages="$languages" />
+                </x-card>
             </div>
-        </form>
+            <div class="tab-pane fade" id="faqs-panel" role="tabpanel">
+                <x-card title="FAQ" :saveable="false">
+                    <x-backoffice.product.faqs :model="$model" :languages="$languages" />
+                </x-card>
+            </div>
+            <div class="tab-pane fade" id="related-panel" role="tabpanel">
+                <x-card title="Prodotti correlati" :saveable="false">
+                    <x-backoffice.product.related :model="$model" />
+                </x-card>
+            </div>
+        </div>
     </div>
 @endsection
 
 @section('custom-css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/switchery/0.8.2/switchery.min.css" integrity="sha512-uyGg6dZr3cE1PxtKOCGqKGTiZybe5iSq3LsqOolABqAWlIRLo/HKyrMMD8drX+gls3twJdpYX0gDKEdtf2dpmw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     .product-tabs {
         border-bottom: 2px solid #e9ecef;
@@ -226,12 +198,95 @@
     .tab-content {
         padding-top: 8px;
     }
+
+    .google-preview-box {
+        border-radius: 8px;
+        padding: 16px;
+        background: #fff;
+        font-family: arial, sans-serif;
+        max-width: 600px;
+    }
+
+    .google-preview-site {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .google-preview-favicon {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+    }
+
+    .google-preview-sitename {
+        font-size: 13px;
+        color: #4d5156;
+    }
+
+    .google-preview-url {
+        font-size: 12px;
+        color: #4d5156;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .google-preview-title {
+        font-size: 18px;
+        color: #1a0dab;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+    }
+
+    .google-preview-title:hover {
+        text-decoration: underline;
+    }
+
+    .google-preview-description {
+        font-size: 13px;
+        color: #4d5156;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 @endsection
 
 @section('custom-script')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/switchery/0.8.2/switchery.min.js" integrity="sha512-lC8vSUSlXWqh7A/F+EUS3l77bdlj+rGMN4NB5XFAHnTR3jQtg4ibZccWpuSSIdPoPUlUxtnGktLyrWcDhG8RvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+        window.PRODUCT_ID = {{ $model->id }};
+        window.PRODUCT_CATEGORY_ID = {{ $model->category_id ?? 'null' }};
+        window.PRODUCT_SUB_CATEGORY_ID = {{ $model->sub_category_id ?? 'null' }};
+    </script>
+    <script src="{{ asset('backoffice/js/products.js') }}?v=1.0" type="module"></script>
+    <script>
+        document.addEventListener('variants-notify', (e) => {
+            toastr[e.detail.type]?.(e.detail.message);
+        });
+    </script>
+    <script>
+        $(document).on('input', '#form-info-public [name="meta_title"]', function () {
+            const val = $(this).val().trim();
+            $('#preview-meta-title').text(val || '{{ $model->label }}');
+        });
+
+        $(document).on('input', '#form-info-public [name="meta_description"]', function () {
+            $('#preview-meta-description').text($(this).val());
+        });
+
         $(document).ready(function(){
+            setTimeout(() => {
+                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: '#E87722'}}])
+            }, 250)
             $(document).on('click', '.btn-sync-woocommerce', function () {
                 $(document).trigger('sweetConfirmTrigger', [{
                     text: 'Vuoi avviare la sincronizzazione del prodotto con WooCommerce?',

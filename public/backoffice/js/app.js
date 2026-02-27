@@ -237,15 +237,15 @@ const removeDropzone = () => {
     }
 };
 
-
-const loadSwitch = (container) => {
+const loadSwitch = (container, options = {}) => {
     let elems = Array.prototype.slice.call(
         document.querySelectorAll(`${container} .js-switch`)
     );
     elems.forEach(function (html, number) {
         let el = $(`${container} .js-switch`).eq(number);
         if (el.parent().find("span.switchery").length === 0) {
-            Switchery(html);
+            console.log(options)
+            Switchery(html, options);
         }
     });
 };
@@ -545,7 +545,7 @@ const change_status_element = (btn) => {
 const init = () => {
 
     $(document).on("loadSwitchTrigger", function (e, parameters) {
-        loadSwitch(parameters.container)
+        loadSwitch(parameters.container, parameters.options)
     });
 
     $(document).on("reloadDatatable", function (e, parameters) {

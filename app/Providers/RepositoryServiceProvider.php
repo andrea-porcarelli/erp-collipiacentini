@@ -23,6 +23,19 @@ use App\Repositories\CompanyRepository;
 
 use App\Interfaces\CategoryInterface;
 use App\Repositories\CategoryRepository;
+
+use App\Interfaces\ProductFaqInterface;
+use App\Repositories\ProductFaqRepository;
+
+use App\Interfaces\ProductLinkInterface;
+use App\Repositories\ProductLinkRepository;
+
+use App\Interfaces\ProductRelatedInterface;
+use App\Repositories\ProductRelatedRepository;
+
+use App\Interfaces\ProductCustomerFieldInterface;
+use App\Repositories\ProductCustomerFieldRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -40,6 +53,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductInterface::class, ProductRepository::class);
         $this->app->bind(UserInterface::class, UserRepository::class);
         $this->app->bind(OrderInterface::class, OrderRepository::class);
+        $this->app->bind(ProductFaqInterface::class, ProductFaqRepository::class);
+        $this->app->bind(ProductLinkInterface::class, ProductLinkRepository::class);
+        $this->app->bind(ProductRelatedInterface::class, ProductRelatedRepository::class);
+        $this->app->bind(ProductCustomerFieldInterface::class, ProductCustomerFieldRepository::class);
 
     }
 

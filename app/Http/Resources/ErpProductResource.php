@@ -11,7 +11,7 @@ class ErpProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         $price = $this->prices->first();
-        $content = $this->content();
+        $content = $this->content(); // Collection keyed by field
 
         // Determine booking mode and time slots from availabilities
         $availabilities = $this->availabilities;
@@ -59,8 +59,8 @@ class ErpProductResource extends JsonResource
             'sku' => $this->product_code,
             'name' => $this->label,
             'slug' => Str::slug($this->label),
-            'description' => $content?->description,
-            'short_description' => $content?->intro,
+            'description' => $content->get('description'),
+            'short_description' => $content->get('intro'),
             'type' => 'simple',
             'status' => $this->is_active->value === '1' ? 'active' : 'inactive',
             'regular_price' => $price ? (float) $price->price : 0,

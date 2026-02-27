@@ -4,15 +4,28 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreProductRequest;
+use App\Http\Controllers\Backoffice\Requests\UpdateProductRequest;
 use App\Interfaces\ProductInterface;
+use App\Models\Category;
+use App\Models\CustomerFieldType;
+use App\Models\Language;
+use App\Models\Product;
 use App\Jobs\SyncProductToWooCommerce;
 use App\Models\Company;
+use App\Models\LanguageContent;
+use App\Models\Media;
+use App\Models\OrderProduct;
 use App\Models\Partner;
+use App\Models\ProductCustomerField;
+use App\Models\ProductFaq;
+use App\Models\ProductLink;
+use App\Models\ProductRelated;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class ProductController extends CrudController
@@ -44,6 +57,18 @@ class ProductController extends CrudController
 
         return view('backoffice.' . $this->path . '.index', compact('companies', 'partners'))
             ->with('path', $this->path);
+    }
+
+    public function subCategoriesByCategory(int $categoryId): JsonResponse
+    {
+        $subCategories = Category::where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->get()
+            ->map(fn($c) => ['id' => $c->id, 'label' => $c->label])
+            ->values()
+            ->toArray();
+
+        return response()->json($subCategories);
     }
 
     public function partnersByCompany(int $companyId): JsonResponse
@@ -123,9 +148,111 @@ class ProductController extends CrudController
     {
         $model = $this->interface->find($id);
         $this->authorizeAccess($model);
+        $categories = Utils::map_collection(Category::where('partner_id', $model->partner_id)
+            ->whereNull('category_id')
+            ->where('is_active', 1));
+        $languages = Utils::map_collection(Language::where('is_active', 1));
+        $fieldTypes = CustomerFieldType::orderBy('sort_order')->get();
 
-        return view('backoffice.' . $this->path . '.show', compact('model'))
+        return view('backoffice.' . $this->path . '.show', compact('model', 'categories', 'languages', 'fieldTypes'))
             ->with('path', $this->path);
+    }
+
+    public function update(UpdateProductRequest $request, int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            match ($request->input('section')) {
+                'settings'   => $this->updateSettings($product, $request),
+                'duration'   => $this->updateDuration($product, $request),
+                'categories' => $this->updateCategories($product, $request),
+                'public'     => $this->updatePublic($product, $request),
+                default      => throw new \Exception('Sezione non valida'),
+            };
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    private function updateSettings(Product $product, UpdateProductRequest $request): void
+    {
+        $data = ['label' => $request->label];
+        if ($request->has('is_active')) {
+            $data['is_active'] = $request->input('is_active', '0');
+        }
+        $this->interface->edit($product, $data);
+    }
+
+    private function updateDuration(Product $product, UpdateProductRequest $request): void
+    {
+        $days    = (int) $request->input('duration_days', 0);
+        $hours   = (int) $request->input('duration_hours', 0);
+        $minutes = (int) $request->input('duration_minutes', 0);
+
+        $duration = ($days * 1440) + ($hours * 60) + $minutes;
+
+        $this->interface->edit($product, [
+            'duration'         => $duration,
+            'duration_days'    => $days,
+            'duration_hours'   => $hours,
+            'duration_minutes' => $minutes,
+        ]);
+    }
+
+    private function updateCategories(Product $product, UpdateProductRequest $request): void
+    {
+        $data = [];
+        if ($request->has('category_id')) {
+            $data['category_id'] = $request->category_id ?: null;
+        }
+        if ($request->has('sub_category_id')) {
+            $data['sub_category_id'] = $request->sub_category_id ?: null;
+        }
+        if (!empty($data)) {
+            $this->interface->edit($product, $data);
+        }
+    }
+
+    private function updatePublic(Product $product, UpdateProductRequest $request): void
+    {
+        $product->setContentFields([
+            'meta_title'       => $request->meta_title,
+            'meta_description' => $request->input('meta_description'),
+        ]);
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $hasOrders = OrderProduct::where('product_id', $id)->exists();
+            if ($hasOrders) {
+                return $this->error(['message' => 'Non è possibile eliminare il prodotto perché sono presenti prenotazioni associate.']);
+            }
+
+            // Relazioni morph (nessun FK cascade — eliminazione esplicita)
+            LanguageContent::where('entity_type', Product::class)->where('entity_id', $id)->delete();
+            Media::where('mediable_type', Product::class)->where('mediable_id', $id)->delete();
+
+            // Relazioni dirette (eliminazione esplicita come garanzia, indipendentemente dal cascade FK)
+            ProductLink::where('product_id', $id)->delete();
+            ProductFaq::where('product_id', $id)->delete();
+            ProductRelated::where('product_id', $id)->orWhere('related_product_id', $id)->delete();
+            ProductCustomerField::where('product_id', $id)->delete();
+
+            // Elimina il prodotto (cascade FK gestisce eventuali altre tabelle collegate)
+            $this->interface->remove($id);
+
+            return $this->success(['redirect' => route($this->path . '.index')]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
     }
 
     public function syncWooCommerce(int $id): JsonResponse

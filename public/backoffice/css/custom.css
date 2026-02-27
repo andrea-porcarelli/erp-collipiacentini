@@ -183,6 +183,11 @@ a.text-small {
 .supporting-text.danger {
     color: var(--error-brand);
 }
+.supporting-text-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 .supporting-text.danger:before {
     font-family: "Font Awesome 6 Free"; /* Font Awesome */
@@ -739,4 +744,38 @@ span.flatpickr-weekday{
     border-bottom: none !important;
     margin-bottom: 24px !important;
     margin-top: 24px !important;
+}
+.button-card-absolute {
+    position: absolute;
+    top: -70px;
+    right: -6px;
+}
+.form-customer-fields {
+    font-size: var(--size, 16px);
+}
+
+/* Customer field item — checked state */
+.customer-field-item:has(.customer-field-enabled:checked) label {
+    color: #E87722;
+}
+.customer-field-item .customer-field-enabled:checked,
+.customer-field-item .customer-field-required:checked {
+    background-color: #E87722;
+    border-color: #E87722;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+.customer-field-item .customer-field-enabled:focus,
+.customer-field-item .customer-field-required:focus {
+    box-shadow: 0 0 0 0.25rem rgba(232, 119, 34, 0.25);
+}
+.switchery {
+    position: absolute !important;
+    right: 0;
+}
+.sub-title {
+    font-family: var(--font-font-1, "DM Sans"), sans-serif;
+    font-size: var(--typography-title-size-medium, 18px);
+    font-style: normal;
+    font-weight: var(--typography-title-weight-medium, 700);
+    line-height: var(--typography-title-line-height-medium, 24px); /* 133.333% */
 }
