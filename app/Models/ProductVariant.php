@@ -24,4 +24,9 @@ class ProductVariant extends LogsModel
     {
         return $this->hasMany(ProductVariantPrice::class);
     }
+
+    public function getFullPriceAttribute(): float
+    {
+        return $this->prices()->sum('price');
+    }
 }

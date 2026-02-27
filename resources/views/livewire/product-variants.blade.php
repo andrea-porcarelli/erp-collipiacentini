@@ -46,29 +46,20 @@
                         {{-- Display --}}
                         <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
                             <span class="fw-semibold">{{ $variant->label }}</span>
-                            @if($variant->description)
-                                <span class="text-secondary small text-truncate">{{ $variant->description }}</span>
-                            @endif
-                            <span class="badge bg-light text-secondary border small ms-1" style="white-space:nowrap">
-                                {{ $variant->prices->count() }} {{ Str::plural('componente', $variant->prices->count()) }}
-                            </span>
-                            @if($variant->max_quantity)
-                                <span class="badge bg-secondary text-white small" style="white-space:nowrap">
-                                    Max {{ $variant->max_quantity }}
-                                </span>
-                            @endif
+                            <span class="text-secondary">{{ Utils::price($variant->full_price) }}</span>
                         </div>
-                        <div class="d-flex gap-1 flex-shrink-0">
-                            <button wire:click="startEditVariant({{ $variant->id }})" class="btn-miticko outlined secondary small">
-                                <i class="fa-regular fa-pen icon"></i>
-                            </button>
+                        <div class="d-flex gap-3 flex-shrink-0">
+                            @if($variant->max_quantity)
+                               <x-supporting-text :message="$variant->max_quantity . ' max'" icon="fa-regular fa-users"/>
+                            @endif
+                            <x-supporting-text :message="$variant->prices->count() . ' ' . Str::plural('componente IVA', $variant->prices->count())"/>
                             <button wire:click="deleteVariant({{ $variant->id }})"
                                     wire:confirm="Eliminare la variante '{{ $variant->label }}' e tutte le sue componenti IVA?"
-                                    class="btn-miticko outlined danger small">
+                                    class="bt-miticko outlined danger small">
                                 <i class="fa-regular fa-trash icon"></i>
                             </button>
                             {{-- Toggle collapse --}}
-                            <button class="btn-miticko outlined secondary small"
+                            <button class="bt-miticko outlined secondary small"
                                     type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#collapse-variant-{{ $variant->id }}"
