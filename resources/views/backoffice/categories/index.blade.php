@@ -5,7 +5,10 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Categorie prodotti" sub_title="Gestisci le categorie dei prodotti">
+                <x-card title="Categorie prodotti" class="position-relative" sub_title="Gestisci le categorie dei prodotti">
+                    <div class="position-absolute" style="top: -70px; right: 0">
+                        <x-button label="Aggiungi categoria" status="primary" emphasis="light" class="btn-create-category" size="small" leading="fa-plus" />
+                    </div>
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Partner" type="daterange" name="dates" />
@@ -29,6 +32,19 @@
             </div>
         </div>
     </div>
+    <x-modal title="Aggiungi nuova categoria" primary="Crea categoria" secondary="annulla" width="650px" id="create-category">
+        <div class="row">
+            <form id="create-category-form" class="w-100">
+                <div class="col-12">
+                    <x-select name="partner_id" label="Partner" placeholder="Seleziona il partner" required :options="$partners" />
+                    <x-input name="label" label="Nome categoria" placeholder="Inserisci il nome della categoria" required />
+                    <x-input name="category_code" label="Codice categoria" placeholder="Inserisci il codice categoria" required />
+                    <x-input name="iva" type="number" label="IVA (%)" placeholder="Inserisci l'aliquota IVA" />
+                    <x-select name="category_id" label="Categoria padre" placeholder="Seleziona la categoria padre (opzionale)" :options="$categories" />
+                </div>
+            </form>
+        </div>
+    </x-modal>
     <x-modal id="filter-daterange" title="Seleziona periodo" primary="Salva" secondary="annulla" width="350px">
         <div class="d-flex align-items-center justify-content-center">
             <div id="calendar-container" data-filter="dates"></div>
@@ -71,6 +87,47 @@
                     }
                 }])
             })
+
+            $(document).on('click', '.btn-create-category', function () {
+                $(`#create-category`).modal('show');
+            });
+
+            $(document).on('click', '#create-category .btn-cancel', function () {
+                $(`#create-category-form`).find('input').val('');
+                $(`#create-category-form`).find('select').val('');
+                $(`#create-category`).modal('hide');
+            });
+
+            $(document).on('click', '#create-category .btn-success', function () {
+                const data = {
+                    partner_id:    $(`#create-category select[name='partner_id']`).val(),
+                    label:         $(`#create-category input[name='label']`).val(),
+                    category_code: $(`#create-category input[name='category_code']`).val(),
+                    iva:           $(`#create-category input[name='iva']`).val(),
+                    category_id:   $(`#create-category select[name='category_id']`).val(),
+                };
+
+                $(document).trigger('fetch', [{
+                    path: `/backoffice/categories/create`,
+                    method: "post",
+                    data: data,
+                    then: (response) => {
+                        setTimeout(() => {
+                            location.href = response.redirect;
+                        }, 1500)
+                        toastr.success('Categoria creata con successo');
+                    },
+                    catch: (response) => {
+                        $(`#create-category-form`)
+                            .find(".supporting-text")
+                            .first()
+                            .addClass("danger")
+                            .show()
+                            .html(response.responseJSON.message);
+                    },
+                }])
+            });
+
         })
     </script>
 @endsection
