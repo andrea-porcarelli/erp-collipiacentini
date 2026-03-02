@@ -97,42 +97,6 @@
                     :ariaset="['controls' => 'media-panel', 'selected' => 'false']"
                 />
             </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="links-tab"
-                    role="tab"
-                    label="Link Utili"
-                    :dataset="['bs-target' => '#links-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'links-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="faqs-tab"
-                    role="tab"
-                    label="FAQ"
-                    :dataset="['bs-target' => '#faqs-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'faqs-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="related-tab"
-                    role="tab"
-                    label="Prodotti correlati"
-                    :dataset="['bs-target' => '#related-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'related-panel', 'selected' => 'false']"
-                />
-            </li>
         </ul>
         {{-- Tabs Content --}}
         <div class="tab-content" id="productTabsContent">
