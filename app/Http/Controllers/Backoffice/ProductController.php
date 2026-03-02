@@ -59,18 +59,6 @@ class ProductController extends CrudController
             ->with('path', $this->path);
     }
 
-    public function subCategoriesByCategory(int $categoryId): JsonResponse
-    {
-        $subCategories = Category::where('category_id', $categoryId)
-            ->where('is_active', 1)
-            ->get()
-            ->map(fn($c) => ['id' => $c->id, 'label' => $c->label])
-            ->values()
-            ->toArray();
-
-        return response()->json($subCategories);
-    }
-
     public function partnersByCompany(int $companyId): JsonResponse
     {
         $partners = Partner::active()->where('company_id', $companyId)->get()->map(function ($item) {
@@ -148,9 +136,7 @@ class ProductController extends CrudController
     {
         $model = $this->interface->find($id);
         $this->authorizeAccess($model);
-        $categories = Utils::map_collection(Category::where('partner_id', $model->partner_id)
-            ->whereNull('category_id')
-            ->where('is_active', 1));
+        $categories = Utils::map_collection(Category::where('is_active', 1));
         $languages = Utils::map_collection(Language::where('is_active', 1));
         $fieldTypes = CustomerFieldType::orderBy('sort_order')->get();
 
@@ -208,9 +194,6 @@ class ProductController extends CrudController
         $data = [];
         if ($request->has('category_id')) {
             $data['category_id'] = $request->category_id ?: null;
-        }
-        if ($request->has('sub_category_id')) {
-            $data['sub_category_id'] = $request->sub_category_id ?: null;
         }
         if (!empty($data)) {
             $this->interface->edit($product, $data);

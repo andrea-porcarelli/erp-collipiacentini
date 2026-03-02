@@ -19,7 +19,6 @@ class Product extends LogsModel
         'duration_days',
         'duration_hours',
         'duration_minutes',
-        'sub_category_id',
         'product_type',
         'occupancy',
         'occupancy_for_price',

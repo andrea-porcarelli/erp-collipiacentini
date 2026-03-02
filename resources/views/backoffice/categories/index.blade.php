@@ -20,7 +20,6 @@
                             <thead>
                             <tr>
                                 <th style="width: 10%">#codice</th>
-                                <th>Partner</th>
                                 <th>Categoria</th>
                                 <th class="text-center">Prodotti</th>
                                 <th></th>
@@ -36,11 +35,9 @@
         <div class="row">
             <form id="create-category-form" class="w-100">
                 <div class="col-12">
-                    <x-select name="partner_id" label="Partner" placeholder="Seleziona il partner" required :options="$partners" />
                     <x-input name="label" label="Nome categoria" placeholder="Inserisci il nome della categoria" required />
                     <x-input name="category_code" label="Codice categoria" placeholder="Inserisci il codice categoria" required />
                     <x-input name="iva" type="number" label="IVA (%)" placeholder="Inserisci l'aliquota IVA" />
-                    <x-select name="category_id" label="Categoria padre" placeholder="Seleziona la categoria padre (opzionale)" :options="$categories" />
                 </div>
             </form>
         </div>
@@ -74,7 +71,6 @@
                 $(document).trigger('datatable', [{
                     columns: [
                         {data: 'category_code'},
-                        {data: 'partner'},
                         {data: 'category'},
                         {data: 'products', class: 'text-center'},
                         {data: 'action', class: 'text-end'},
@@ -100,11 +96,9 @@
 
             $(document).on('click', '#create-category .btn-success', function () {
                 const data = {
-                    partner_id:    $(`#create-category select[name='partner_id']`).val(),
                     label:         $(`#create-category input[name='label']`).val(),
                     category_code: $(`#create-category input[name='category_code']`).val(),
                     iva:           $(`#create-category input[name='iva']`).val(),
-                    category_id:   $(`#create-category select[name='category_id']`).val(),
                 };
 
                 $(document).trigger('fetch', [{

@@ -214,7 +214,6 @@
     <script>
         window.PRODUCT_ID = {{ $model->id }};
         window.PRODUCT_CATEGORY_ID = {{ $model->category_id ?? 'null' }};
-        window.PRODUCT_SUB_CATEGORY_ID = {{ $model->sub_category_id ?? 'null' }};
     </script>
     <script src="{{ asset('backoffice/js/products.js') }}?v=1.0" type="module"></script>
     <script>

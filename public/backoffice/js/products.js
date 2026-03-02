@@ -1,5 +1,8 @@
 import App from "./app.js";
 
+// ---------------------------------------------------------------------------
+// Form save configs (impostazioni, durata, categorie, pubblico)
+// ---------------------------------------------------------------------------
 const formConfigs = {
     'form-info-settings': {
         endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
@@ -52,6 +55,36 @@ const formConfigs = {
     },
 };
 
+// ---------------------------------------------------------------------------
+// Configurazione campi per le traduzioni (estendibile ad altri elementi)
+// ---------------------------------------------------------------------------
+const translationFields = {
+    link: [
+        { name: 'label', label: 'Label', type: 'input', placeholder: 'es. Prenota ora' },
+        { name: 'link',  label: 'URL',   type: 'input', placeholder: 'https://...' },
+    ],
+    faq: [
+        { name: 'question', label: 'Domanda',  type: 'input',    placeholder: 'es. Come posso prenotare?' },
+        { name: 'answer',   label: 'Risposta', type: 'textarea', placeholder: 'Inserisci la risposta...' },
+    ],
+};
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+const langFlag = (isoCode) => {
+    const flags = { it: '🇮🇹', en: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', es: '🇪🇸', pt: '🇵🇹', nl: '🇳🇱', ru: '🇷🇺', zh: '🇨🇳', ja: '🇯🇵', ar: '🇸🇦' };
+    return flags[isoCode.toLowerCase()] || '🏳';
+};
+
+const escapeHtml = (text) =>
+    String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
 const showClientErrors = (formId, errors) => {
     for (const [field, messages] of Object.entries(errors)) {
         const message = Array.isArray(messages) ? messages[0] : messages;
@@ -80,9 +113,7 @@ const setLoading = (btn, loading) => {
     } else {
         btn.prop('disabled', false);
         const originalClass = icon.data('original-class');
-        if (originalClass) {
-            icon.attr('class', originalClass);
-        }
+        if (originalClass) icon.attr('class', originalClass);
     }
 };
 
@@ -120,111 +151,204 @@ const saveForm = (formId, btn) => {
     });
 };
 
-const loadSubCategories = (categoryId, selectedId = null) => {
-    const $subSelect = $('#sub_category_id');
-    if (!categoryId) {
-        $subSelect.html('<option value="">Scegli</option>');
-        return;
-    }
-    App.ajax({
-        path: `/backoffice/products/sub-categories/${categoryId}`,
-        method: 'get',
-    }).then((data) => {
-        let options = '<option value="">Scegli</option>';
-        data.forEach(sub => {
-            const selected = selectedId && sub.id == selectedId ? ' selected' : '';
-            options += `<option value="${sub.id}"${selected}>${sub.label}</option>`;
-        });
-        $subSelect.html(options);
-    }).catch(() => {
-        $subSelect.html('<option value="">Scegli</option>');
-    });
-};
+// ---------------------------------------------------------------------------
+// Modale traduzioni condivisa
+// ---------------------------------------------------------------------------
+const renderTranslationBody = (data, entityType) => {
+    const fields = translationFields[entityType];
 
-const initCategorySelect = () => {
-    const initialCategoryId = window.PRODUCT_CATEGORY_ID;
-    if (initialCategoryId) {
-        $('#category_id').val(initialCategoryId);
-        loadSubCategories(initialCategoryId, window.PRODUCT_SUB_CATEGORY_ID);
+    if (!data || data.length === 0) {
+        return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
     }
 
-    $(document).on('change', '#category_id', function () {
-        loadSubCategories($(this).val());
-    });
-};
 
-const renderLinkRow = (link) => `
-    <div class="link-item" data-id="${link.id}">
-        <div class="link-display d-flex align-items-center gap-3 py-2 border-bottom">
-            <span class="link-col-lang text-secondary small">${link.language ?? '—'}</span>
-            <span class="link-col-label fw-semibold flex-grow-1">${link.label}</span>
-            <span class="link-col-url text-secondary small text-truncate" style="max-width:220px">${link.link}</span>
-            <div class="d-flex gap-2">
-                <button class="btn-link-edit btn-miticko outlined secondary small"><i class="fa-regular fa-pen icon"></i></button>
-                <button class="btn-link-delete btn-miticko outlined danger small"><i class="fa-regular fa-trash icon"></i></button>
+    const headerRow = `<div class="row g-2 align-items-center mb-1">
+        <div class="col-auto" style="width:64px"></div>
+        <div class="col"><span class="small fw-semibold">Nome variante *</span></div>
+        <div class="col"><span class="small fw-semibold">URL</span></div>
+    </div>`;
+
+    const rowsHtml = data.map(lang => {
+        const fieldsHtml = fields.map(f => {
+            const value = escapeHtml(lang[f.name] || '');
+            if (f.type === 'textarea') {
+                return `<div class="col">
+                    <div class="text-field" data-mode="medium">
+                        <div class="text-field-container">
+                            <textarea class="input-miticko" name="${f.name}" rows="2" placeholder="${f.placeholder || ''}">${value}</textarea>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            return `<div class="col">
+                <div class="text-field" data-mode="medium">
+                    <div class="text-field-container">
+                        <input class="input-miticko" name="${f.name}" value="${value}" placeholder="${f.placeholder || ''}">
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        return `<div class="translation-lang row g-2 align-items-center mb-2" data-language-id="${lang.language_id}">
+            <div class="col-auto d-flex align-items-center gap-1" style="width:64px">
+                <span>${langFlag(lang.iso_code)}</span>
+                <span class="fw-semibold small">${escapeHtml(lang.iso_code.toUpperCase())}</span>
             </div>
-        </div>
-        <div class="link-edit d-none py-2 border-bottom">
-            <div class="row g-2 align-items-end">
-                <div class="col-12 col-sm-3">
-                    <select name="language_id" class="input-miticko">${$('#form-link-new select[name="language_id"]').html()}</select>
+            ${fieldsHtml}
+        </div>`;
+    }).join('');
+
+    return headerRow + rowsHtml;
+};
+
+const openTranslationsModal = (entityType, id) => {
+    const $modal = $('#modal-translations');
+    const path = entityType === 'link'
+        ? `/backoffice/products/${window.PRODUCT_ID}/links/${id}/translations`
+        : `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}/translations`;
+
+    $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
+    $modal.data('save-path', path).data('entity-type', entityType);
+    $modal.modal('show');
+
+    App.ajax({ path, method: 'get' })
+        .then((res) => {
+            $('#modal-trans-body').html(renderTranslationBody(res.data, entityType));
+        })
+        .catch(() => {
+            $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
+        });
+};
+
+const saveTranslations = () => {
+    const $modal = $('#modal-translations');
+    const savePath = $modal.data('save-path');
+    const entityType = $modal.data('entity-type');
+    const fields = translationFields[entityType];
+
+    const translations = [];
+    $modal.find('.translation-lang').each(function () {
+        const langId = parseInt($(this).data('language-id'));
+        const translation = { language_id: langId };
+        fields.forEach(f => {
+            translation[f.name] = $(this).find(`[name="${f.name}"]`).val() || '';
+        });
+        translations.push(translation);
+    });
+
+    App.ajax({ path: savePath, method: 'put', data: { translations } })
+        .then(() => {
+            toastr.success('Traduzioni salvate con successo');
+            $modal.modal('hide');
+        })
+        .catch(() => toastr.error('Errore durante il salvataggio delle traduzioni'));
+};
+
+// ---------------------------------------------------------------------------
+// Links
+// ---------------------------------------------------------------------------
+const renderLinkRow = (link) => {
+    const label = escapeHtml(link.label);
+    const url   = escapeHtml(link.link);
+    return `
+    <div class="link-item py-1" data-id="${link.id}">
+        <div class="row g-2 align-items-center">
+            <div class="col-12 col-sm-4">
+                <div class="text-field" data-mode="medium">
+                    <div class="text-field-container">
+                        <input class="input-miticko" name="label" value="${label}">
+                    </div>
                 </div>
-                <div class="col-12 col-sm-3">
-                    <input name="label" class="input-miticko" value="${link.label}">
+            </div>
+            <div class="col-12 col-sm-7">
+                <div class="text-field" data-mode="medium">
+                    <div class="text-field-container">
+                        <input class="input-miticko" name="link" value="${url}">
+                    </div>
                 </div>
-                <div class="col-12 col-sm-4">
-                    <input name="link" class="input-miticko" value="${link.link}">
-                </div>
-                <div class="col-12 col-sm-2 d-flex gap-2">
-                    <button class="btn-link-save btn-miticko primary success small"><i class="fa-regular fa-check icon"></i></button>
-                    <button class="btn-link-cancel btn-miticko outlined secondary small"><i class="fa-regular fa-xmark icon"></i></button>
-                </div>
+            </div>
+            <div class="col-12 col-sm-1 d-flex gap-1 align-items-end justify-content-end pb-1">
+                <button type="button" data-mode="medium primary" class="bt-miticko btn-link-translations bt-m-light"><i class="fa-regular fa-language icon"></i></button>
+                <button type="button" data-mode="medium primary" class="bt-miticko btn-link-delete bt-m-text-only"><i class="fa-regular fa-trash icon"></i></button>
             </div>
         </div>
     </div>`;
+};
+
+const updateSaveLinksButton = () => {
+    const hasDirty = $('#links-list .link-item[data-dirty]').length > 0;
+    $('.btn-save-links').attr('data-mode', hasDirty ? 'medium primary' : 'medium disabled');
+    if (hasDirty) {
+        $('.btn-save-links').attr('data-mode', 'medium primary').removeClass('btn-m-primary').addClass('btn-m-default');
+    } else {
+        $('.btn-save-links').attr('data-mode', 'medium disabled').removeClass('btn-m-default').addClass('btn-m-primary');
+    }
+};
+
+const addLink = () => {
+    const $form = $('#form-link-new');
+    const data = {
+        label: $form.find('input[name="label"]').val(),
+        link:  $form.find('input[name="link"]').val(),
+    };
+    if (!data.label || !data.link) {
+        toastr.warning('Label e URL sono obbligatori');
+        return;
+    }
+    App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links`, method: 'post', data })
+        .then((link) => {
+            $('#links-empty').remove();
+            $('#links-list').append(renderLinkRow(link));
+            $form[0].reset();
+            toastr.success('Link aggiunto');
+        })
+        .catch(() => toastr.error('Errore durante il salvataggio'));
+};
 
 const initLinks = () => {
-    // Seleziona valore lingua nella riga di edit dopo il render
-    const syncLangSelect = ($item, langId) => {
-        $item.find('.link-edit select[name="language_id"]').val(langId);
-    };
-
-    // Mostra form di modifica
-    $(document).on('click', '.btn-link-edit', function () {
-        const $item = $(this).closest('.link-item');
-        $item.find('.link-display').addClass('d-none');
-        $item.find('.link-edit').removeClass('d-none');
-        syncLangSelect($item, $item.data('lang-id'));
+    // Modifica input → segna la riga come dirty e attiva "Salva modifiche"
+    $(document).on('input', '.link-item input', function () {
+        $(this).closest('.link-item').attr('data-dirty', '1');
+        updateSaveLinksButton();
     });
 
-    // Annulla modifica
-    $(document).on('click', '.btn-link-cancel', function () {
-        const $item = $(this).closest('.link-item');
-        $item.find('.link-edit').addClass('d-none');
-        $item.find('.link-display').removeClass('d-none');
+    // Salva tutte le righe modificate
+    $(document).on('click', '.btn-save-links', function () {
+        const $btn = $(this);
+        const $dirtyItems = $('#links-list .link-item[data-dirty]');
+        if ($dirtyItems.length === 0) return;
+
+        setLoading($btn, true);
+        let pending = $dirtyItems.length;
+        let hasError = false;
+
+        $dirtyItems.each(function () {
+            const $item = $(this);
+            const id = $item.data('id');
+            const data = {
+                label: $item.find('input[name="label"]').val(),
+                link:  $item.find('input[name="link"]').val(),
+            };
+            App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links/${id}`, method: 'put', data })
+                .then(() => {
+                    $item.removeAttr('data-dirty');
+                })
+                .catch(() => { hasError = true; })
+                .finally(() => {
+                    pending--;
+                    if (pending === 0) {
+                        setLoading($btn, false);
+                        if (hasError) {
+                            toastr.error('Alcuni link non sono stati salvati. Riprova.');
+                        } else {
+                            toastr.success('Link aggiornati con successo');
+                        }
+                        updateSaveLinksButton();
+                    }
+                });
+        });
     });
 
-    // Salva modifica
-    $(document).on('click', '.btn-link-save', function () {
-        const $item = $(this).closest('.link-item');
-        const id = $item.data('id');
-        const data = {
-            language_id: $item.find('.link-edit select[name="language_id"]').val(),
-            label:       $item.find('.link-edit input[name="label"]').val(),
-            link:        $item.find('.link-edit input[name="link"]').val(),
-        };
-        App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links/${id}`, method: 'put', data })
-            .then((link) => {
-                const $new = $(renderLinkRow(link));
-                $new.data('lang-id', link.language_id);
-                $item.replaceWith($new);
-                toastr.success('Link aggiornato');
-                $('#links-empty').remove();
-            })
-            .catch(() => toastr.error('Errore durante il salvataggio'));
-    });
-
-    // Elimina
     $(document).on('click', '.btn-link-delete', function () {
         const $item = $(this).closest('.link-item');
         const id = $item.data('id');
@@ -241,96 +365,101 @@ const initLinks = () => {
         }, null, 'Elimina link');
     });
 
-    // Aggiungi nuovo
-    $(document).on('click', '#btn-link-add', function () {
-        const $form = $('#form-link-new');
-        const data = {
-            language_id: $form.find('select[name="language_id"]').val(),
-            label:       $form.find('input[name="label"]').val(),
-            link:        $form.find('input[name="link"]').val(),
-        };
-        if (!data.label || !data.link) {
-            toastr.warning('Label e URL sono obbligatori');
-            return;
-        }
-        App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links`, method: 'post', data })
-            .then((link) => {
-                $('#links-empty').remove();
-                const $row = $(renderLinkRow(link));
-                $row.data('lang-id', link.language_id);
-                $('#links-list').append($row);
-                $form[0].reset();
-                toastr.success('Link aggiunto');
-            })
-            .catch(() => toastr.error('Errore durante il salvataggio'));
+    $(document).on('click', '.btn-link-translations', function () {
+        const $item = $(this).closest('.link-item');
+        const id = $item.data('id');
+        openTranslationsModal('link', id);
     });
+
+    $(document).on('click', '.btn-link-add', addLink);
 };
 
-const renderFaqRow = (faq) => `
-    <div class="faq-item" data-id="${faq.id}">
-        <div class="faq-display py-3 border-bottom">
-            <div class="d-flex align-items-start gap-3">
-                <span class="badge bg-secondary mt-1" style="font-size:11px;white-space:nowrap">${faq.language ?? '—'}</span>
-                <div class="flex-grow-1">
-                    <p class="fw-semibold mb-1">${faq.question}</p>
-                    <p class="text-secondary small mb-0">${faq.answer}</p>
+// ---------------------------------------------------------------------------
+// FAQ
+// ---------------------------------------------------------------------------
+const renderFaqRow = (faq) => {
+    const question = escapeHtml(faq.question);
+    const answer   = escapeHtml(faq.answer);
+    return `
+    <div class="faq-item py-3 border-bottom" data-id="${faq.id}">
+        <div class="faq-view">
+            <div class="row g-2 align-items-start">
+                <div class="col-12 col-sm-10">
+                    <div class="text-field" data-mode="medium">
+                        <label>Domanda</label>
+                        <div class="text-field-container">
+                            <input class="input-miticko" name="question" value="${question}" disabled>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex gap-2 flex-shrink-0">
-                    <button class="btn-faq-edit btn-miticko outlined secondary small"><i class="fa-regular fa-pen icon"></i></button>
-                    <button class="btn-faq-delete btn-miticko outlined danger small"><i class="fa-regular fa-trash icon"></i></button>
+                <div class="col-12 col-sm-2 d-flex gap-1 align-items-start justify-content-end pt-4">
+                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-edit bt-m-outlined"><i class="fa-regular fa-pen icon"></i></button>
+                    <button type="button" data-mode="small danger" class="bt-miticko btn-faq-delete bt-m-outlined"><i class="fa-regular fa-trash icon"></i></button>
+                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-translations bt-m-outlined"><i class="fa-regular fa-globe icon"></i></button>
+                </div>
+                <div class="col-12">
+                    <div class="text-field" data-mode="medium">
+                        <label>Risposta</label>
+                        <div class="text-field-container">
+                            <textarea class="input-miticko" name="answer" rows="3" disabled>${answer}</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="faq-edit d-none py-3 border-bottom">
+        <div class="faq-edit d-none">
             <div class="row g-2">
-                <div class="col-12 col-sm-3">
-                    <select name="language_id" class="input-miticko">${$('#form-faq-new select[name="language_id"]').html()}</select>
+                <div class="col-12">
+                    <div class="text-field" data-mode="medium">
+                        <label>Domanda</label>
+                        <div class="text-field-container">
+                            <input class="input-miticko" name="question" value="${question}" placeholder="es. Come posso prenotare?">
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12">
-                    <input name="question" class="input-miticko" value="${faq.question}">
+                    <div class="text-field" data-mode="medium">
+                        <label>Risposta</label>
+                        <div class="text-field-container">
+                            <textarea class="input-miticko" name="answer" rows="3" placeholder="Inserisci la risposta...">${answer}</textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-12">
-                    <textarea name="answer" class="input-miticko" rows="3">${faq.answer}</textarea>
-                </div>
-                <div class="col-12 d-flex gap-2">
-                    <button class="btn-faq-save btn-miticko primary success small"><i class="fa-regular fa-check icon"></i> Salva</button>
-                    <button class="btn-faq-cancel btn-miticko outlined secondary small"><i class="fa-regular fa-xmark icon"></i> Annulla</button>
+                <div class="col-12 d-flex gap-1 justify-content-end">
+                    <button type="button" data-mode="small success" class="bt-miticko btn-faq-save bt-m-primary"><i class="fa-regular fa-check icon"></i> Salva</button>
+                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-cancel bt-m-outlined"><i class="fa-regular fa-xmark icon"></i> Annulla</button>
                 </div>
             </div>
         </div>
     </div>`;
+};
 
 const initFaqs = () => {
-    const syncLangSelect = ($item, langId) => {
-        $item.find('.faq-edit select[name="language_id"]').val(langId);
-    };
-
     $(document).on('click', '.btn-faq-edit', function () {
         const $item = $(this).closest('.faq-item');
-        $item.find('.faq-display').addClass('d-none');
+        $item.find('.faq-view').addClass('d-none');
         $item.find('.faq-edit').removeClass('d-none');
-        syncLangSelect($item, $item.data('lang-id'));
     });
 
     $(document).on('click', '.btn-faq-cancel', function () {
         const $item = $(this).closest('.faq-item');
         $item.find('.faq-edit').addClass('d-none');
-        $item.find('.faq-display').removeClass('d-none');
+        $item.find('.faq-view').removeClass('d-none');
     });
 
     $(document).on('click', '.btn-faq-save', function () {
         const $item = $(this).closest('.faq-item');
         const id = $item.data('id');
         const data = {
-            language_id: $item.find('.faq-edit select[name="language_id"]').val(),
-            question:    $item.find('.faq-edit input[name="question"]').val(),
-            answer:      $item.find('.faq-edit textarea[name="answer"]').val(),
+            question: $item.find('.faq-edit input[name="question"]').val(),
+            answer:   $item.find('.faq-edit textarea[name="answer"]').val(),
         };
         App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`, method: 'put', data })
-            .then((faq) => {
-                const $new = $(renderFaqRow(faq));
-                $new.data('lang-id', faq.language_id);
-                $item.replaceWith($new);
+            .then((res) => {
+                $item.find('.faq-view input[name="question"]').val(res.question);
+                $item.find('.faq-view textarea[name="answer"]').val(res.answer);
+                $item.find('.faq-edit').addClass('d-none');
+                $item.find('.faq-view').removeClass('d-none');
                 toastr.success('FAQ aggiornata');
             })
             .catch(() => toastr.error('Errore durante il salvataggio'));
@@ -352,12 +481,17 @@ const initFaqs = () => {
         }, null, 'Elimina FAQ');
     });
 
+    $(document).on('click', '.btn-faq-translations', function () {
+        const $item = $(this).closest('.faq-item');
+        const id = $item.data('id');
+        openTranslationsModal('faq', id);
+    });
+
     $(document).on('click', '#btn-faq-add', function () {
         const $form = $('#form-faq-new');
         const data = {
-            language_id: $form.find('select[name="language_id"]').val(),
-            question:    $form.find('input[name="question"]').val(),
-            answer:      $form.find('textarea[name="answer"]').val(),
+            question: $form.find('input[name="question"]').val(),
+            answer:   $form.find('textarea[name="answer"]').val(),
         };
         if (!data.question || !data.answer) {
             toastr.warning('Domanda e risposta sono obbligatorie');
@@ -366,9 +500,7 @@ const initFaqs = () => {
         App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
             .then((faq) => {
                 $('#faqs-empty').remove();
-                const $row = $(renderFaqRow(faq));
-                $row.data('lang-id', faq.language_id);
-                $('#faqs-list').append($row);
+                $('#faqs-list').append(renderFaqRow(faq));
                 $form[0].reset();
                 toastr.success('FAQ aggiunta');
             })
@@ -376,8 +508,10 @@ const initFaqs = () => {
     });
 };
 
+// ---------------------------------------------------------------------------
+// Campi cliente
+// ---------------------------------------------------------------------------
 const initCustomerFields = () => {
-    // Abilita/disabilita il toggle "Obbligatorio" in base alla spunta principale
     $(document).on('change', '.customer-field-enabled', function () {
         const $wrap = $(this).closest('.customer-field-item').find('.customer-field-required-wrap');
         if ($(this).is(':checked')) {
@@ -388,7 +522,6 @@ const initCustomerFields = () => {
         }
     });
 
-    // Salva la configurazione
     $(document).on('click', '.btn-save-customer-fields', function () {
         const btn = $(this);
         const fields = [];
@@ -420,12 +553,15 @@ const initCustomerFields = () => {
     });
 };
 
+// ---------------------------------------------------------------------------
+// Prodotti correlati
+// ---------------------------------------------------------------------------
 const MAX_RELATED = 5;
 
 const renderRelatedRow = (related) => `
     <div class="related-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="${related.id}">
-        <span class="fw-semibold flex-grow-1">${related.label}</span>
-        <span class="text-secondary small">${related.product_code ?? ''}</span>
+        <span class="fw-semibold flex-grow-1">${escapeHtml(related.label)}</span>
+        <span class="text-secondary small">${escapeHtml(related.product_code ?? '')}</span>
         <button class="btn-related-delete btn-miticko outlined danger small"><i class="fa-regular fa-trash icon"></i></button>
     </div>`;
 
@@ -433,7 +569,6 @@ const initRelated = () => {
     let searchTimeout = null;
     let selectedProduct = null;
 
-    // Ricerca prodotti al typing
     $(document).on('input', '#related-search-input', function () {
         const q = $(this).val().trim();
         clearTimeout(searchTimeout);
@@ -454,9 +589,9 @@ const initRelated = () => {
                 } else {
                     res.data.forEach(p => {
                         $results.append(
-                            `<button type="button" class="list-group-item list-group-item-action btn-related-pick" data-id="${p.id}" data-label="${p.label}" data-code="${p.product_code ?? ''}">
-                                <span class="fw-semibold">${p.label}</span>
-                                <span class="text-secondary small ms-2">${p.product_code ?? ''}</span>
+                            `<button type="button" class="list-group-item list-group-item-action btn-related-pick" data-id="${p.id}" data-label="${escapeHtml(p.label)}" data-code="${escapeHtml(p.product_code ?? '')}">
+                                <span class="fw-semibold">${escapeHtml(p.label)}</span>
+                                <span class="text-secondary small ms-2">${escapeHtml(p.product_code ?? '')}</span>
                             </button>`
                         );
                     });
@@ -466,7 +601,6 @@ const initRelated = () => {
         }, 300);
     });
 
-    // Selezione da dropdown
     $(document).on('click', '.btn-related-pick', function () {
         selectedProduct = {
             id:    $(this).data('id'),
@@ -477,14 +611,12 @@ const initRelated = () => {
         $('#related-search-results').hide().empty();
     });
 
-    // Chiudi dropdown cliccando fuori
     $(document).on('click', function (e) {
         if (!$(e.target).closest('#related-search-input, #related-search-results').length) {
             $('#related-search-results').hide();
         }
     });
 
-    // Aggiungi prodotto correlato
     $(document).on('click', '#btn-related-add', function () {
         if (!selectedProduct) {
             toastr.warning('Seleziona un prodotto dalla lista');
@@ -509,12 +641,10 @@ const initRelated = () => {
             }
             toastr.success('Prodotto correlato aggiunto');
         }).catch((err) => {
-            const msg = err?.responseJSON?.message || 'Errore durante il salvataggio';
-            toastr.error(msg);
+            toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
         });
     });
 
-    // Elimina prodotto correlato
     $(document).on('click', '.btn-related-delete', function () {
         const $item = $(this).closest('.related-item');
         const id = $item.data('id');
@@ -535,6 +665,19 @@ const initRelated = () => {
     });
 };
 
+// ---------------------------------------------------------------------------
+// Categoria
+// ---------------------------------------------------------------------------
+const initCategorySelect = () => {
+    const initialCategoryId = window.PRODUCT_CATEGORY_ID;
+    if (initialCategoryId) {
+        $('#category_id').val(initialCategoryId);
+    }
+};
+
+// ---------------------------------------------------------------------------
+// Elimina prodotto
+// ---------------------------------------------------------------------------
 const initDeleteProduct = () => {
     $(document).on('click', '.btn-delete-product', function () {
         App.sweetConfirm(
@@ -549,8 +692,7 @@ const initDeleteProduct = () => {
                         window.location.href = res.redirect ?? '/backoffice/products';
                     }, 800);
                 }).catch((err) => {
-                    const msg = err?.responseJSON?.message || 'Errore durante l\'eliminazione';
-                    toastr.error(msg);
+                    toastr.error(err?.responseJSON?.message || 'Errore durante l\'eliminazione');
                 });
             },
             null,
@@ -559,12 +701,19 @@ const initDeleteProduct = () => {
     });
 };
 
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
 const init = () => {
     $(document).on('click', '.btn-save-card', function () {
         const card = $(this).closest('.card-miticko');
         const form = card.find('form');
         if (!form.length) return;
         saveForm(form.attr('id'), $(this));
+    });
+
+    $(document).on('click', '.btn-save-translations', function () {
+        saveTranslations();
     });
 
     initCategorySelect();

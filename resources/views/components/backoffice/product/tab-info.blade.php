@@ -40,14 +40,11 @@
                     <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
                 </div>
             </x-card>
-            <x-card title="Categoria e Sottocategoria" class="mt-4 position-relative">
+            <x-card title="Categoria" class="mt-4 position-relative">
                 <form id="form-info-categories">
                     <div class="row">
                         <div class="col-12 col-sm-6">
                             <x-select name="category_id" label="Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio &quot;visite&quot; e &quot;degustazioni&quot;" required :options="$categories" icon="fa-regular fa-circle-info" />
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <x-select name="sub_category_id" label="Sottocategoria" message="La sottocategoria indica le diverse tipologie disponibili sotto alla categoria principale, ad esempio sotto &quot;visite&quot; si ha &quot;visita libera&quot; e &quot;visita guidata&quot;" required :options="$categories" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
@@ -98,6 +95,10 @@
 
             <x-card title="Link Utili" class="mt-4 mb-5 position-relative" sub_title="Inserisci solamente i link che potrebbero essere utili agli utenti o obbligatori per legge, verranno mostrati nella barra laterale (sidebar) della pagina prodotto.">
                 <x-backoffice.product.links :model="$model" :languages="$languages" />
+                <div class="button-card-absolute">
+                    <x-button class="btn-link-add" emphasis="light" label="Aggiungi link" leading="fa-plus" />
+                    <x-button class="btn-save-links" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                </div>
             </x-card>
 
             <x-card title="Domande frequenti (FAQ)" class="mt-4 mb-5 position-relative" sub_title="Inserisci fino a 5 FAQ con le risposte alle domande più frequenti che solitamente ricevi per questo prodotto">
@@ -118,6 +119,29 @@
             <x-card title="Elimina il prodotto" class="mt-4 mb-5 position-relative" sub_title="Se elimini il prodotto, tutti i suoi dati verranno eliminati e non saranno recuperabili in alcun modo.<br />Le vendite rimarranno comunque nello storico e potrai consultarle ugualmente.">
                 <x-button emphasis="outlined" status="danger" label="Elimina il prodotto e tutti i dati correlati" leading="fa-trash" class="btn-delete-product" />
             </x-card>
+        </div>
+    </div>
+</div>
+
+{{-- Modale traduzioni condivisa (link, faq, e futuri elementi) --}}
+<div class="modal" tabindex="-1" id="modal-translations">
+    <div class="modal-dialog" style="max-width: 750px">
+        <div class="modal-content modal-miticko">
+            <div class="modal-header">
+                <h1 class="modal-title">Traduci</h1>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="fa-regular fa-times"></span>
+                </button>
+            </div>
+            <div class="modal-body w-100" id="modal-trans-body">
+                <div class="text-center py-3">
+                    <i class="fa-regular fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <x-button size="small" emphasis="text-only" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
+                <x-button size="small" emphasis="primary" class="btn-save-translations" label="Salva"  />
+            </div>
         </div>
     </div>
 </div>

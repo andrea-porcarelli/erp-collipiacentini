@@ -85,6 +85,11 @@ a.text-small {
 .bt-miticko.bt-m-medium .icon {
     width: var(--typography-button-size-medium);
 }
+.bt-miticko.bt-m-text-only-disabled {
+    background: var(--neutral-transparent);
+    color: var(--primary-brand);
+    border: none;
+}
 
 .text-field {
     display: flex;
@@ -106,7 +111,6 @@ a.text-small {
 }
 .text-field .text-field-container {
     display: flex;
-    padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
     align-items: center;
     gap: var(--text-field-spacing);
     align-self: stretch;
@@ -130,6 +134,8 @@ a.text-small {
     line-height: var(--typography-body-lineheight-medium); /* 114.286% */
     width: 100%;
     border: none;
+    border-radius: var(--text-field-borderradius);
+    padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
 }
 .text-field .text-field-container input:focus,
 .text-field .text-field-container input:active {

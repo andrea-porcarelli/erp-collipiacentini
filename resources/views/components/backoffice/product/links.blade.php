@@ -1,60 +1,58 @@
 @props(['model', 'languages'])
 
-{{-- Lista link --}}
-<div id="links-list" class="mb-4">
-    @forelse($model->links()->with('language')->get() as $link)
-        <div class="link-item" data-id="{{ $link->id }}">
-            {{-- Riga display --}}
-            <div class="link-display d-flex align-items-center gap-3 py-2 border-bottom">
-                <span class="badge bg-secondary mt-1" style="font-size:11px;white-space:nowrap">{{ $link->language?->label ?? '—' }}</span>
-                <span class="link-col-label fw-semibold flex-grow-1">{{ $link->label }}</span>
-                <span class="link-col-url text-secondary small text-truncate" style="max-width: 220px">{{ $link->link }}</span>
-                <div class="d-flex gap-2">
-                    <x-button emphasis="outlined" status="secondary" size="small" leading="fa-pen" class="btn-link-edit" />
-                    <x-button emphasis="outlined" status="danger" size="small" leading="fa-trash" class="btn-link-delete" />
-                </div>
-            </div>
-            {{-- Riga edit (nascosta) --}}
-            <div class="link-edit d-none py-2 border-bottom">
-                <div class="row g-2 align-items-end">
-                    <div class="col-12 col-sm-3">
-                        <x-select name="language_id" label="Lingua" :options="$languages" :value="$link->language_id" />
-                    </div>
-                    <div class="col-12 col-sm-3">
-                        <x-input name="label" label="Label" :value="$link->label" />
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <x-input name="link" label="URL" :value="$link->link" />
-                    </div>
-                    <div class="col-12 col-sm-2 d-flex gap-2">
-                        <x-button emphasis="primary" status="success" size="small" leading="fa-check" class="btn-link-save" />
-                        <x-button emphasis="outlined" status="secondary" size="small" leading="fa-xmark" class="btn-link-cancel" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    @empty
-        <p class="text-secondary small mb-0" id="links-empty">Nessun link aggiunto.</p>
-    @endforelse
-</div>
-
 {{-- Form nuovo link --}}
-<div class="border-top pt-3">
-    <p class="fw-semibold small mb-3">Aggiungi link</p>
+<div class="pt-3 pb-1">
+    <div class="row g-2 align-items-center d-flex justify-content-between mb-1">
+        <div class="col-12 col-sm-4 text-field">
+            <label>Nome a menu (50 caratteri max)</label>
+        </div>
+        <div class="col-12 col-sm-7 text-field">
+            <label>URL</label>
+        </div>
+        <div class="col-12 col-sm-1 text-end">
+
+        </div>
+    </div>
     <form id="form-link-new">
-        <div class="row g-2 align-items-end">
-            <div class="col-12 col-sm-3">
-                <x-select name="language_id" label="Lingua" :options="$languages" />
-            </div>
-            <div class="col-12 col-sm-3">
-                <x-input name="label" label="Label" placeholder="es. Prenota ora" />
-            </div>
+        <div class="row g-2 align-items-center d-flex justify-content-between">
             <div class="col-12 col-sm-4">
-                <x-input name="link" label="URL" placeholder="https://..." />
+                <x-input name="label" placeholder="es. Prenota ora" />
             </div>
-            <div class="col-12 col-sm-2">
-                <x-button id="btn-link-add" emphasis="primary" status="success" size="small" leading="fa-plus" label="Aggiungi" />
+            <div class="col-12 col-sm-7" >
+                <x-input name="link" placeholder="https://..." />
+            </div>
+            <div class="col-12 col-sm-1 text-end">
+                <x-button size="medium" status="disabled" emphasis="light" leading="fa-regular fa-language icon" disabled="true" />
+                <x-button size="medium" status="disabled" emphasis="text-only" leading="fa-regular fa-trash icon" disabled="true" />
             </div>
         </div>
     </form>
+</div>
+
+{{-- Lista link --}}
+<div id="links-list" class="mb-3">
+    @foreach($model->links as $link)
+        <div class="link-item py-1" data-id="{{ $link->id }}">
+            <div class="row g-2 align-items-center ">
+                <div class="col-12 col-sm-4">
+                    <div class="text-field" data-mode="medium">
+                        <div class="text-field-container">
+                            <input class="input-miticko" name="label" value="{{ $link->label }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-7">
+                    <div class="text-field" data-mode="medium">
+                        <div class="text-field-container">
+                            <input class="input-miticko" name="link" value="{{ $link->link }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-1 d-flex gap-1 align-items-end justify-content-end pb-1">
+                    <x-button class="btn-link-translations" size="medium" emphasis="light " leading="fa-regular fa-language icon" />
+                    <x-button class="btn-link-delete" size="medium"  emphasis="text-only" leading="fa-regular fa-trash icon" />
+                </div>
+            </div>
+        </div>
+    @endforeach
 </div>
