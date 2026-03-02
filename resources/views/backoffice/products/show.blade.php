@@ -106,21 +106,6 @@
             <x-backoffice.product.tab-special-schedule :model="$model" />
             <x-backoffice.product.tab-closed-period :model="$model" />
             <x-backoffice.product.tab-media :model="$model" />
-            <div class="tab-pane fade" id="links-panel" role="tabpanel">
-                <x-card title="Link Utili" :saveable="false">
-                    <x-backoffice.product.links :model="$model" :languages="$languages" />
-                </x-card>
-            </div>
-            <div class="tab-pane fade" id="faqs-panel" role="tabpanel">
-                <x-card title="FAQ" :saveable="false">
-                    <x-backoffice.product.faqs :model="$model" :languages="$languages" />
-                </x-card>
-            </div>
-            <div class="tab-pane fade" id="related-panel" role="tabpanel">
-                <x-card title="Prodotti correlati" :saveable="false">
-                    <x-backoffice.product.related :model="$model" />
-                </x-card>
-            </div>
         </div>
     </div>
 @endsection
