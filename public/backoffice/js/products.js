@@ -1,4 +1,9 @@
 import App from "./app.js";
+import {
+    ClassicEditor, Essentials, Paragraph,
+    Bold, Italic, Underline, Strikethrough, RemoveFormat,
+    List, Link, Heading,
+} from 'ckeditor5';
 
 // ---------------------------------------------------------------------------
 // Form save configs (impostazioni, durata, categorie, pubblico)
@@ -52,6 +57,13 @@ const formConfigs = {
             }
             return errors;
         },
+    },
+    'form-info-description': {
+        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'description',
+        successMessage: 'Descrizione aggiornata con successo',
+        validate: () => ({}),
     },
 };
 
@@ -141,6 +153,7 @@ const saveForm = (formId, btn) => {
     }).then(() => {
         toastr.success(config.successMessage);
         setLoading(btn, false);
+        btn.attr('data-mode', 'medium disabled');
     }).catch((errors) => {
         setLoading(btn, false);
         if (errors.responseJSON) {
@@ -375,102 +388,182 @@ const initLinks = () => {
 };
 
 // ---------------------------------------------------------------------------
+// FAQ — CKEditor instances
+// ---------------------------------------------------------------------------
+const faqEditors = new Map(); // key: 'new' | String(faqId)
+
+const faqEditorConfig = {
+    plugins: [Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, RemoveFormat, List, Link, Heading],
+    toolbar: { items: ['heading', '|', 'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|', 'bulletedList', 'numberedList', '|', 'link'] },
+    licenseKey: 'GPL',
+};
+
+const initFaqEditor = async (key, textarea) => {
+    if (faqEditors.has(key)) {
+        await faqEditors.get(key).destroy();
+        faqEditors.delete(key);
+    }
+    const editor = await ClassicEditor.create(textarea, faqEditorConfig);
+    faqEditors.set(key, editor);
+    if (key !== 'new') {
+        editor.model.document.on('change:data', () => {
+            $(`#faqs-list .faq-item[data-id="${key}"]`).attr('data-dirty', '1');
+            updateSaveFaqsButton();
+        });
+    }
+    return editor;
+};
+
+const initAllFaqEditors = () => {
+    const newTextarea = document.querySelector('#form-faq-new textarea[name="answer"]');
+    if (newTextarea) initFaqEditor('new', newTextarea);
+
+    document.querySelectorAll('#faqs-list .faq-item').forEach(item => {
+        const key = String($(item).data('id'));
+        const textarea = item.querySelector('textarea[name="answer"]');
+        if (textarea) initFaqEditor(key, textarea);
+    });
+};
+
+// ---------------------------------------------------------------------------
 // FAQ
 // ---------------------------------------------------------------------------
 const renderFaqRow = (faq) => {
     const question = escapeHtml(faq.question);
     const answer   = escapeHtml(faq.answer);
     return `
-    <div class="faq-item py-3 border-bottom" data-id="${faq.id}">
-        <div class="faq-view">
-            <div class="row g-2 align-items-start">
-                <div class="col-12 col-sm-10">
-                    <div class="text-field" data-mode="medium">
-                        <label>Domanda</label>
-                        <div class="text-field-container">
-                            <input class="input-miticko" name="question" value="${question}" disabled>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-2 d-flex gap-1 align-items-start justify-content-end pt-4">
-                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-edit bt-m-outlined"><i class="fa-regular fa-pen icon"></i></button>
-                    <button type="button" data-mode="small danger" class="bt-miticko btn-faq-delete bt-m-outlined"><i class="fa-regular fa-trash icon"></i></button>
-                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-translations bt-m-outlined"><i class="fa-regular fa-globe icon"></i></button>
-                </div>
-                <div class="col-12">
-                    <div class="text-field" data-mode="medium">
-                        <label>Risposta</label>
-                        <div class="text-field-container">
-                            <textarea class="input-miticko" name="answer" rows="3" disabled>${answer}</textarea>
-                        </div>
+    <div class="faq-item py-1" data-id="${faq.id}">
+        <div class="row g-2 align-items-start">
+            <div class="col-12 col-sm-4">
+                <div class="text-field" data-mode="medium">
+                    <div class="text-field-container">
+                        <input class="input-miticko" name="question" value="${question}">
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="faq-edit d-none">
-            <div class="row g-2">
-                <div class="col-12">
-                    <div class="text-field" data-mode="medium">
-                        <label>Domanda</label>
-                        <div class="text-field-container">
-                            <input class="input-miticko" name="question" value="${question}" placeholder="es. Come posso prenotare?">
-                        </div>
+            <div class="col-12 col-sm-7">
+                <div class="text-field" data-mode="medium">
+                    <div class="text-field-container">
+                        <textarea class="input-miticko" name="answer" rows="2">${answer}</textarea>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="text-field" data-mode="medium">
-                        <label>Risposta</label>
-                        <div class="text-field-container">
-                            <textarea class="input-miticko" name="answer" rows="3" placeholder="Inserisci la risposta...">${answer}</textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 d-flex gap-1 justify-content-end">
-                    <button type="button" data-mode="small success" class="bt-miticko btn-faq-save bt-m-primary"><i class="fa-regular fa-check icon"></i> Salva</button>
-                    <button type="button" data-mode="small secondary" class="bt-miticko btn-faq-cancel bt-m-outlined"><i class="fa-regular fa-xmark icon"></i> Annulla</button>
-                </div>
+            </div>
+            <div class="col-12 col-sm-1 d-flex gap-1 align-items-end justify-content-end pb-1">
+                <button type="button" data-mode="medium primary" class="bt-miticko btn-faq-delete bt-m-text-only"><i class="fa-regular fa-trash icon"></i></button>
             </div>
         </div>
     </div>`;
 };
 
+const updateSaveFaqsButton = () => {
+    const hasDirty = $('#faqs-list .faq-item[data-dirty]').length > 0;
+    if (hasDirty) {
+        $('.btn-save-faq').attr('data-mode', 'medium primary').removeClass('btn-m-primary').addClass('btn-m-default');
+    } else {
+        $('.btn-save-faq').attr('data-mode', 'medium disabled').removeClass('btn-m-default').addClass('btn-m-primary');
+    }
+};
+
+const addFaq = () => {
+    const $form     = $('#form-faq-new');
+    const langId    = parseInt($('#faq-language-select').val());
+    const data = {
+        question:    $form.find('input[name="question"]').val(),
+        answer:      faqEditors.get('new')?.getData() ?? '',
+        language_id: langId,
+    };
+    if (!data.question || !data.answer) {
+        toastr.warning('Domanda e risposta sono obbligatorie');
+        return;
+    }
+    App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
+        .then((faq) => {
+            $('#faqs-empty').remove();
+            $('#faqs-list').append(renderFaqRow(faq));
+            const newItem = document.querySelector(`#faqs-list .faq-item[data-id="${faq.id}"]`);
+            if (newItem) initFaqEditor(String(faq.id), newItem.querySelector('textarea[name="answer"]'));
+            $form.find('input[name="question"]').val('');
+            faqEditors.get('new')?.setData('');
+            toastr.success('FAQ aggiunta');
+        })
+        .catch(() => toastr.error('Errore durante il salvataggio'));
+};
+
 const initFaqs = () => {
-    $(document).on('click', '.btn-faq-edit', function () {
-        const $item = $(this).closest('.faq-item');
-        $item.find('.faq-view').addClass('d-none');
-        $item.find('.faq-edit').removeClass('d-none');
+    // Dirty tracking — solo sul campo question (answer è gestito da CKEditor)
+    $(document).on('input', '.faq-item input[name="question"]', function () {
+        $(this).closest('.faq-item').attr('data-dirty', '1');
+        updateSaveFaqsButton();
     });
 
-    $(document).on('click', '.btn-faq-cancel', function () {
-        const $item = $(this).closest('.faq-item');
-        $item.find('.faq-edit').addClass('d-none');
-        $item.find('.faq-view').removeClass('d-none');
-    });
+    // Salva tutte le righe modificate
+    $(document).on('click', '.btn-save-faq', function () {
+        const $btn = $(this);
+        const $dirtyItems = $('#faqs-list .faq-item[data-dirty]');
+        if ($dirtyItems.length === 0) return;
 
-    $(document).on('click', '.btn-faq-save', function () {
-        const $item = $(this).closest('.faq-item');
-        const id = $item.data('id');
-        const data = {
-            question: $item.find('.faq-edit input[name="question"]').val(),
-            answer:   $item.find('.faq-edit textarea[name="answer"]').val(),
-        };
-        App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`, method: 'put', data })
-            .then((res) => {
-                $item.find('.faq-view input[name="question"]').val(res.question);
-                $item.find('.faq-view textarea[name="answer"]').val(res.answer);
-                $item.find('.faq-edit').addClass('d-none');
-                $item.find('.faq-view').removeClass('d-none');
-                toastr.success('FAQ aggiornata');
+        const langId = parseInt($('#faq-language-select').val());
+
+        setLoading($btn, true);
+        let pending = $dirtyItems.length;
+        let hasError = false;
+
+        $dirtyItems.each(function () {
+            const $item = $(this);
+            const id = $item.data('id');
+            const question = $item.find('input[name="question"]').val();
+            const answer   = faqEditors.get(String(id))?.getData() ?? '';
+
+            App.ajax({
+                path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`,
+                method: 'put',
+                data: { question, answer, language_id: langId },
             })
-            .catch(() => toastr.error('Errore durante il salvataggio'));
+                .then(() => { $item.removeAttr('data-dirty'); })
+                .catch(() => { hasError = true; })
+                .finally(() => {
+                    pending--;
+                    if (pending === 0) {
+                        setLoading($btn, false);
+                        if (hasError) {
+                            toastr.error('Alcune FAQ non sono state salvate. Riprova.');
+                        } else {
+                            toastr.success('FAQ aggiornate con successo');
+                        }
+                        updateSaveFaqsButton();
+                    }
+                });
+        });
     });
 
+    // Cambio lingua — sempre AJAX, italiano incluso
+    // $(document).on('change', '#faq-language-select', function () {
+    //     const langId = parseInt($(this).val());
+    //
+    //     $('#faqs-list .faq-item').each(function () {
+    //         const $item = $(this);
+    //         const id = $item.data('id');
+    //         App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}/translations`, method: 'get' })
+    //             .then((res) => {
+    //                 const lang = res.data.find(l => l.language_id === langId);
+    //                 $item.find('input[name="question"]').val(lang ? lang.question : '');
+    //                 faqEditors.get(String(id))?.setData(lang ? lang.answer : '');
+    //                 $item.removeAttr('data-dirty');
+    //                 updateSaveFaqsButton();
+    //             })
+    //             .catch(() => toastr.error('Errore nel caricamento delle traduzioni'));
+    //     });
+    // });
+
+    // Elimina FAQ
     $(document).on('click', '.btn-faq-delete', function () {
         const $item = $(this).closest('.faq-item');
         const id = $item.data('id');
         App.sweetConfirm('Vuoi eliminare questa FAQ?', () => {
             App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`, method: 'delete' })
                 .then(() => {
+                    faqEditors.get(String(id))?.destroy();
+                    faqEditors.delete(String(id));
                     $item.remove();
                     if ($('#faqs-list .faq-item').length === 0) {
                         $('#faqs-list').prepend('<p class="text-secondary small mb-0" id="faqs-empty">Nessuna FAQ aggiunta.</p>');
@@ -481,31 +574,11 @@ const initFaqs = () => {
         }, null, 'Elimina FAQ');
     });
 
-    $(document).on('click', '.btn-faq-translations', function () {
-        const $item = $(this).closest('.faq-item');
-        const id = $item.data('id');
-        openTranslationsModal('faq', id);
-    });
+    // Aggiungi FAQ
+    $(document).on('click', '.btn-link-faq', addFaq);
 
-    $(document).on('click', '#btn-faq-add', function () {
-        const $form = $('#form-faq-new');
-        const data = {
-            question: $form.find('input[name="question"]').val(),
-            answer:   $form.find('textarea[name="answer"]').val(),
-        };
-        if (!data.question || !data.answer) {
-            toastr.warning('Domanda e risposta sono obbligatorie');
-            return;
-        }
-        App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
-            .then((faq) => {
-                $('#faqs-empty').remove();
-                $('#faqs-list').append(renderFaqRow(faq));
-                $form[0].reset();
-                toastr.success('FAQ aggiunta');
-            })
-            .catch(() => toastr.error('Errore durante il salvataggio'));
-    });
+    // Init editors su tutti i textarea esistenti
+    initAllFaqEditors();
 };
 
 // ---------------------------------------------------------------------------
@@ -546,6 +619,7 @@ const initCustomerFields = () => {
         }).then(() => {
             toastr.success('Dati cliente aggiornati con successo');
             setLoading(btn, false);
+            btn.attr('data-mode', 'medium disabled');
         }).catch(() => {
             toastr.error('Errore durante il salvataggio');
             setLoading(btn, false);
@@ -556,112 +630,29 @@ const initCustomerFields = () => {
 // ---------------------------------------------------------------------------
 // Prodotti correlati
 // ---------------------------------------------------------------------------
-const MAX_RELATED = 5;
-
-const renderRelatedRow = (related) => `
-    <div class="related-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="${related.id}">
-        <span class="fw-semibold flex-grow-1">${escapeHtml(related.label)}</span>
-        <span class="text-secondary small">${escapeHtml(related.product_code ?? '')}</span>
-        <button class="btn-related-delete btn-miticko outlined danger small"><i class="fa-regular fa-trash icon"></i></button>
-    </div>`;
-
 const initRelated = () => {
-    let searchTimeout = null;
-    let selectedProduct = null;
-
-    $(document).on('input', '#related-search-input', function () {
-        const q = $(this).val().trim();
-        clearTimeout(searchTimeout);
-        if (q.length < 2) {
-            $('#related-search-results').hide().empty();
-            selectedProduct = null;
-            return;
-        }
-        searchTimeout = setTimeout(() => {
-            App.ajax({
-                path: `/backoffice/products/${window.PRODUCT_ID}/related/search?q=${encodeURIComponent(q)}`,
-                method: 'get',
-            }).then((res) => {
-                const $results = $('#related-search-results');
-                $results.empty();
-                if (!res.data || res.data.length === 0) {
-                    $results.append('<div class="list-group-item text-secondary small">Nessun risultato</div>');
-                } else {
-                    res.data.forEach(p => {
-                        $results.append(
-                            `<button type="button" class="list-group-item list-group-item-action btn-related-pick" data-id="${p.id}" data-label="${escapeHtml(p.label)}" data-code="${escapeHtml(p.product_code ?? '')}">
-                                <span class="fw-semibold">${escapeHtml(p.label)}</span>
-                                <span class="text-secondary small ms-2">${escapeHtml(p.product_code ?? '')}</span>
-                            </button>`
-                        );
-                    });
-                }
-                $results.show();
-            }).catch(() => {});
-        }, 300);
+    $(document).on('change', '.related-slot-select', function () {
+        $('.btn-save-related').attr('data-mode', 'medium primary');
     });
 
-    $(document).on('click', '.btn-related-pick', function () {
-        selectedProduct = {
-            id:    $(this).data('id'),
-            label: $(this).data('label'),
-            code:  $(this).data('code'),
-        };
-        $('#related-search-input').val(selectedProduct.label);
-        $('#related-search-results').hide().empty();
-    });
+    $(document).on('click', '.btn-save-related', function () {
+        const $btn = $(this);
+        const relatedIds = $('.related-slot-select').map(function () {
+            const val = $(this).val();
+            return val ? parseInt(val) : null;
+        }).get();
 
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('#related-search-input, #related-search-results').length) {
-            $('#related-search-results').hide();
-        }
-    });
-
-    $(document).on('click', '#btn-related-add', function () {
-        if (!selectedProduct) {
-            toastr.warning('Seleziona un prodotto dalla lista');
-            return;
-        }
+        setLoading($btn, true);
         App.ajax({
             path: `/backoffice/products/${window.PRODUCT_ID}/related`,
-            method: 'post',
-            data: { related_product_id: selectedProduct.id },
-        }).then((related) => {
-            $('#related-empty').remove();
-            $('#related-list').append(renderRelatedRow(related));
-            $('#related-search-input').val('');
-            selectedProduct = null;
-
-            const count = $('#related-list .related-item').length;
-            if (count >= MAX_RELATED) {
-                $('#related-add-section').hide();
-                if (!$('#related-limit-msg').length) {
-                    $('#related-add-section').after('<p class="text-secondary small mt-2 mb-0" id="related-limit-msg">Hai raggiunto il limite massimo di ' + MAX_RELATED + ' prodotti correlati.</p>');
-                }
-            }
-            toastr.success('Prodotto correlato aggiunto');
+            method: 'put',
+            data: { related_ids: relatedIds },
+        }).then(() => {
+            toastr.success('Prodotti correlati salvati');
+            $('.btn-save-related').attr('data-mode', 'medium disabled');
         }).catch((err) => {
             toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
-        });
-    });
-
-    $(document).on('click', '.btn-related-delete', function () {
-        const $item = $(this).closest('.related-item');
-        const id = $item.data('id');
-        App.sweetConfirm('Vuoi rimuovere questo prodotto correlato?', () => {
-            App.ajax({
-                path: `/backoffice/products/${window.PRODUCT_ID}/related/${id}`,
-                method: 'delete',
-            }).then(() => {
-                $item.remove();
-                if ($('#related-list .related-item').length === 0) {
-                    $('#related-list').prepend('<p class="text-secondary small mb-0" id="related-empty">Nessun prodotto correlato aggiunto.</p>');
-                }
-                $('#related-add-section').show();
-                $('#related-limit-msg').remove();
-                toastr.success('Prodotto correlato rimosso');
-            }).catch(() => toastr.error('Errore durante l\'eliminazione'));
-        }, null, 'Rimuovi prodotto correlato');
+        }).finally(() => setLoading($btn, false));
     });
 };
 
@@ -705,6 +696,16 @@ const initDeleteProduct = () => {
 // Init
 // ---------------------------------------------------------------------------
 const init = () => {
+    // Dirty tracking sui form delle card — attiva il btn-save-card quando un campo cambia
+    $(document).on('input change', 'form:not(#form-customer-fields) :input:not([disabled])', function () {
+        $(this).closest('.card-miticko').find('.btn-save-card').attr('data-mode', 'medium primary');
+    });
+
+    // Dirty tracking per Dati cliente
+    $(document).on('change', '#form-customer-fields :input', function () {
+        $('.btn-save-customer-fields').attr('data-mode', 'medium primary');
+    });
+
     $(document).on('click', '.btn-save-card', function () {
         const card = $(this).closest('.card-miticko');
         const form = card.find('form');

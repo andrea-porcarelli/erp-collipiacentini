@@ -23,10 +23,10 @@
                     </div>
                 </form>
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
-            <x-card title="Durata" class="mt-4 position-relative">
+            <x-card title="Durata" sub_title="sotto" class="mt-4 position-relative">
                 <form id="form-info-duration">
                     <div class="row">
                         <div class="col-12 col-sm-4" style="display: flex; gap: 10px">
@@ -37,19 +37,19 @@
                     </div>
                 </form>
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
             <x-card title="Categoria" class="mt-4 position-relative">
                 <form id="form-info-categories">
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <x-select name="category_id" label="Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio &quot;visite&quot; e &quot;degustazioni&quot;" required :options="$categories" icon="fa-regular fa-circle-info" />
+                            <x-select name="category_id" label="Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio 'visite' e 'degustazioni'" required :options="$categories" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
             <x-card title="Impostazioni prodotto pubbliche" class="mt-4 mb-5 position-relative" sub_title="titolo e descrizione che vedranno gli utenti su Google e sul sito">
@@ -76,12 +76,11 @@
                     </div>
                 </form>
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
-
             <x-card title="Breve descrizione del prodotto" class="mt-4 mb-5 position-relative" sub_title="Inserisci una breve descrizione che verrà mostrata nella barra laterale (sidebar) della pagina prodotto. Serve sia per gli utenti che per i motori di ricerca (SEO).">
-                <form id="form-info-public">
+                <form id="form-info-description">
                     <div class="row">
                         <div class="col-12">
                             <x-textarea :model="$model" maxlength="300" name="description" rows="5" label="Breve descrizione del prodotto" required class_container="mt-4" />
@@ -89,7 +88,7 @@
                     </div>
                 </form>
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-card" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
 
@@ -103,16 +102,27 @@
 
             <x-card title="Domande frequenti (FAQ)" class="mt-4 mb-5 position-relative" sub_title="Inserisci fino a 5 FAQ con le risposte alle domande più frequenti che solitamente ricevi per questo prodotto">
                 <x-backoffice.product.faqs :model="$model" :languages="$languages" />
+                <div class="button-card-absolute">
+                    <x-button class="btn-link-faq" emphasis="light" label="Aggiungi domanda" leading="fa-plus" />
+                    <x-button class="btn-save-faq" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                </div>
             </x-card>
 
             <x-card title="Altri prodotti" class="mt-4 mb-5 position-relative" sub_title="Seleziona fino a 5 tuoi prodotti disponibili da mostrare come suggerimento">
-                <x-backoffice.product.related :model="$model" :languages="$languages" />
+                <div class="row">
+                    <div class="col-3">
+                        <x-backoffice.product.related :model="$model" />
+                    </div>
+                </div>
+                <div class="button-card-absolute">
+                    <x-button class="btn-save-related" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                </div>
             </x-card>
 
             <x-card title="Dati cliente" class="mt-4 mb-5 position-relative" sub_title="scegli quali dati chiedere al cliente per questo prodotto, verranno richiesti in fase di pagamento. <br />Di norma, meno dati si chiedono, più si riduce l’abbandono del carrello: richiedi solamente le informazioni strettamente necessarie per agevolare l’acquisto.">
                 <x-backoffice.product.customer-fields :model="$model" :fieldTypes="$fieldTypes" />
                 <div class="button-card-absolute">
-                    <x-button class="btn-success btn-save-customer-fields" emphasis="primary" label="Salva modifiche" leading="fa-save" />
+                    <x-button class="btn-save-customer-fields" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
                 </div>
             </x-card>
 

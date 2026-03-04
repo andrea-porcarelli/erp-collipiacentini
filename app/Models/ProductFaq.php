@@ -11,8 +11,6 @@ class ProductFaq extends LogsModel
 
     public $fillable = [
         'product_id',
-        'question',
-        'answer',
     ];
 
     public function product(): BelongsTo

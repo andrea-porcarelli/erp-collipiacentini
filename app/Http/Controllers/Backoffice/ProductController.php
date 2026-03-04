@@ -137,7 +137,11 @@ class ProductController extends CrudController
         $model = $this->interface->find($id);
         $this->authorizeAccess($model);
         $categories = Utils::map_collection(Category::where('is_active', 1));
-        $languages = Utils::map_collection(Language::where('is_active', 1));
+        $languages = Language::where('is_active', 1)
+            ->get()
+            ->map(fn($l) => ['id' => $l->id, 'label' => $l->custom_label ?? $l->label, 'iso_code' => $l->iso_code])
+            ->values()
+            ->toArray();
         $fieldTypes = CustomerFieldType::orderBy('sort_order')->get();
 
         return view('backoffice.' . $this->path . '.show', compact('model', 'categories', 'languages', 'fieldTypes'))
@@ -151,11 +155,12 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
 
             match ($request->input('section')) {
-                'settings'   => $this->updateSettings($product, $request),
-                'duration'   => $this->updateDuration($product, $request),
-                'categories' => $this->updateCategories($product, $request),
-                'public'     => $this->updatePublic($product, $request),
-                default      => throw new \Exception('Sezione non valida'),
+                'settings'    => $this->updateSettings($product, $request),
+                'duration'    => $this->updateDuration($product, $request),
+                'categories'  => $this->updateCategories($product, $request),
+                'public'      => $this->updatePublic($product, $request),
+                'description' => $this->updateDescription($product, $request),
+                default       => throw new \Exception('Sezione non valida'),
             };
 
             return $this->success();
@@ -205,6 +210,13 @@ class ProductController extends CrudController
         $product->setContentFields([
             'meta_title'       => $request->meta_title,
             'meta_description' => $request->input('meta_description'),
+        ]);
+    }
+
+    private function updateDescription(Product $product, UpdateProductRequest $request): void
+    {
+        $product->setContentFields([
+            'description' => $request->input('description'),
         ]);
     }
 

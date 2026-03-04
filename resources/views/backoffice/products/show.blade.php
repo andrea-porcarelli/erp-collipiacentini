@@ -112,7 +112,64 @@
 
 @section('custom-css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/switchery/0.8.2/switchery.min.css" integrity="sha512-uyGg6dZr3cE1PxtKOCGqKGTiZybe5iSq3LsqOolABqAWlIRLo/HKyrMMD8drX+gls3twJdpYX0gDKEdtf2dpmw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<style>
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css" />
+
+    <script type="importmap">
+    {
+        "imports": {
+            "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.js",
+            "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.3.1/"
+        }
+    }
+    </script>
+    <style>
+
+    .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content {
+        border: none !important;
+    }
+    /* Il container fa da bordo esterno: blocca il layout interno di flex */
+    .text-field .text-field-container:has(.ck-editor) {
+        display: block;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* Rimuove il bordo e shadow nativi di CKEditor */
+    .text-field .text-field-container .ck.ck-editor {
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* Toolbar: separa con una linea interna, senza bordi propri */
+    .text-field .text-field-container .ck.ck-toolbar {
+        border: none !important;
+        border-bottom: 1px solid var(--text-field-empty-border, #E6E6E6) !important;
+        border-radius: 0 !important;
+        background: #f9f9f9;
+        box-shadow: none !important;
+    }
+
+    /* Area editabile: stessi stili di input/textarea */
+    .text-field .text-field-container .ck.ck-editor__editable {
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+        background: var(--text-field-empty-background, #FFF);
+        color: var(--text-main);
+        font-family: var(--font-font-1), serif;
+        font-size: var(--typography-body-size-medium);
+        font-weight: var(--typography-body-weight-medium);
+        line-height: var(--typography-body-lineheight-medium);
+        padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
+        min-height: 80px;
+    }
+
+    .text-field .text-field-container .ck.ck-editor__editable.ck-focused {
+        border: none !important;
+        box-shadow: none !important;
+    }
     .product-tabs {
         border-bottom: 2px solid #e9ecef;
         margin-bottom: 24px;

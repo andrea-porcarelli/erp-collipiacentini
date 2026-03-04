@@ -38,20 +38,24 @@ class ProductFaqController extends CrudController
     {
         try {
             $request->validate([
-                'question' => 'required|string',
-                'answer'   => 'required|string',
+                'question'    => 'required|string',
+                'answer'      => 'required|string',
+                'language_id' => 'required|integer|exists:languages,id',
             ]);
 
-            $faq = $this->interface->store([
-                'product_id' => $productId,
-                'question'   => $request->input('question'),
-                'answer'     => $request->input('answer'),
-            ]);
+            $lang = Language::findOrFail($request->input('language_id'));
+
+            $faq = $this->interface->store(['product_id' => $productId]);
+
+            $faq->setContentFields([
+                'question' => $request->input('question'),
+                'answer'   => $request->input('answer'),
+            ], $lang->iso_code);
 
             return $this->success([
                 'id'       => $faq->id,
-                'question' => $faq->question,
-                'answer'   => $faq->answer,
+                'question' => $request->input('question'),
+                'answer'   => $request->input('answer'),
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -62,23 +66,23 @@ class ProductFaqController extends CrudController
     {
         try {
             $request->validate([
-                'question' => 'required|string',
-                'answer'   => 'required|string',
+                'question'    => 'required|string',
+                'answer'      => 'required|string',
+                'language_id' => 'required|integer|exists:languages,id',
             ]);
 
-            $faq = $this->interface->find($faqId);
+            $lang = Language::findOrFail($request->input('language_id'));
+            $faq  = $this->interface->find($faqId);
 
-            $this->interface->edit($faq, [
+            $faq->setContentFields([
                 'question' => $request->input('question'),
                 'answer'   => $request->input('answer'),
-            ]);
-
-            $faq->refresh();
+            ], $lang->iso_code);
 
             return $this->success([
                 'id'       => $faq->id,
-                'question' => $faq->question,
-                'answer'   => $faq->answer,
+                'question' => $request->input('question'),
+                'answer'   => $request->input('answer'),
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -98,19 +102,15 @@ class ProductFaqController extends CrudController
     public function getTranslations(int $productId, int $faqId): JsonResponse
     {
         try {
-            $faq = $this->interface->find($faqId);
+            $faq       = $this->interface->find($faqId);
             $languages = Language::where('is_active', 1)->get();
 
             $data = $languages->map(fn($lang) => [
                 'language_id' => $lang->id,
                 'language'    => $lang->label,
                 'iso_code'    => $lang->iso_code,
-                'question'    => $lang->iso_code === 'it'
-                    ? $faq->question
-                    : ($faq->contentField('question', $lang->iso_code) ?? ''),
-                'answer'      => $lang->iso_code === 'it'
-                    ? $faq->answer
-                    : ($faq->contentField('answer', $lang->iso_code) ?? ''),
+                'question'    => $faq->contentField('question', $lang->iso_code) ?? '',
+                'answer'      => $faq->contentField('answer', $lang->iso_code) ?? '',
             ]);
 
             return $this->success(['data' => $data]);
@@ -128,18 +128,10 @@ class ProductFaqController extends CrudController
                 $lang = Language::find($translation['language_id']);
                 if (!$lang) continue;
 
-                if ($lang->iso_code === 'it') {
-                    $this->interface->edit($faq, [
-                        'question' => $translation['question'] ?? $faq->question,
-                        'answer'   => $translation['answer'] ?? $faq->answer,
-                    ]);
-                    $faq->refresh();
-                } else {
-                    $faq->setContentFields([
-                        'question' => $translation['question'] ?? '',
-                        'answer'   => $translation['answer'] ?? '',
-                    ], $lang->iso_code);
-                }
+                $faq->setContentFields([
+                    'question' => $translation['question'] ?? '',
+                    'answer'   => $translation['answer'] ?? '',
+                ], $lang->iso_code);
             }
 
             return $this->success();

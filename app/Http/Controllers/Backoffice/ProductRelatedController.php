@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Interfaces\ProductRelatedInterface;
 use App\Models\Product;
+use App\Models\ProductRelated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -77,6 +78,35 @@ class ProductRelatedController extends CrudController
                 'label'               => $related->relatedProduct?->label,
                 'product_code'        => $related->relatedProduct?->product_code,
             ]);
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    public function sync(Request $request, int $productId): JsonResponse
+    {
+        try {
+            $request->validate([
+                'related_ids'   => 'array|max:5',
+                'related_ids.*' => 'nullable|integer|exists:products,id',
+            ]);
+
+            $ids = collect($request->input('related_ids', []))
+                ->filter(fn($id) => !is_null($id) && $id !== '' && (int) $id !== $productId)
+                ->map(fn($id) => (int) $id)
+                ->unique()
+                ->values();
+
+            ProductRelated::where('product_id', $productId)->delete();
+
+            foreach ($ids as $relatedId) {
+                $this->interface->store([
+                    'product_id'         => $productId,
+                    'related_product_id' => $relatedId,
+                ]);
+            }
+
+            return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }

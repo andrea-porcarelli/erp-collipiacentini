@@ -66,6 +66,7 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::get('products/{product}/related/search', [ProductRelatedController::class, 'find'])->name('products.related.search');
         Route::get('products/{product}/related', [ProductRelatedController::class, 'index'])->name('products.related.index');
         Route::post('products/{product}/related', [ProductRelatedController::class, 'store'])->name('products.related.store');
+        Route::put('products/{product}/related', [ProductRelatedController::class, 'sync'])->name('products.related.sync');
         Route::delete('products/{product}/related/{related}', [ProductRelatedController::class, 'destroy'])->name('products.related.destroy');
         Route::post('products/{product}/customer-fields/sync', [ProductCustomerFieldController::class, 'sync'])->name('products.customer-fields.sync');
         Route::resource('categories', CategoryController::class);

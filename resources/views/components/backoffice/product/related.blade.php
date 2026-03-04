@@ -2,40 +2,28 @@
 
 @php
     $maxRelated = 5;
-    $currentCount = $model->relatedProducts()->count();
+    $currentRelated = $model->relatedProducts()->with('relatedProduct')->get();
+    $slots = collect(range(0, $maxRelated - 1))->map(fn($i) => $currentRelated->get($i)?->related_product_id);
+
+    $availableProducts = \App\Models\Product::where('id', '!=', $model->id)
+        ->when($model->partner_id, fn($q) => $q->where('partner_id', $model->partner_id))
+        ->orderBy('label')
+        ->get(['id', 'label']);
 @endphp
 
-{{-- Lista prodotti correlati --}}
-<div id="related-list" class="mb-4">
-    @forelse($model->relatedProducts()->with('relatedProduct')->get() as $related)
-        <div class="related-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="{{ $related->id }}">
-            <span class="fw-semibold flex-grow-1">{{ $related->relatedProduct?->label }}</span>
-            <span class="text-secondary small">{{ $related->relatedProduct?->product_code }}</span>
-            <x-button emphasis="outlined" status="danger" size="small" leading="fa-trash" class="btn-related-delete" />
-        </div>
-    @empty
-        <p class="text-secondary small mb-0" id="related-empty">Nessun prodotto correlato aggiunto.</p>
-    @endforelse
-</div>
-
-<div class="border-top pt-3" id="related-add-section" @if($currentCount >= $maxRelated) style="display:none" @endif>
-    <p class="fw-semibold small mb-3">Aggiungi prodotto correlato <span class="text-secondary fw-normal">(max {{ $maxRelated }})</span></p>
-    <div class="row g-2 align-items-end">
-        <div class="col-12 col-sm-8">
-            <div class="text-field" data-mode="medium">
-                <label>Cerca prodotto</label>
-                <div class="text-field-container">
-                    <input id="related-search-input" class="input-miticko" type="text" placeholder="Digita per cercare..." autocomplete="off" />
-                </div>
+@for($i = 0; $i < $maxRelated; $i++)
+    <div class="{{ $i < $maxRelated - 1 ? 'mb-2' : '' }}">
+        <div class="text-field" data-mode="medium">
+            <div class="text-field-container">
+                <select class="input-miticko related-slot-select" data-slot="{{ $i }}">
+                    <option value="">Nessun prodotto</option>
+                    @foreach($availableProducts as $product)
+                        <option value="{{ $product->id }}" {{ $slots[$i] == $product->id ? 'selected' : '' }}>
+                            {{ $product->label }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-            <div id="related-search-results" class="list-group mt-1" style="display:none;max-height:220px;overflow-y:auto;position:relative;z-index:10;"></div>
-        </div>
-        <div class="col-12 col-sm-4">
-            <x-button id="btn-related-add" emphasis="primary" status="success" size="small" leading="fa-plus" label="Aggiungi" />
         </div>
     </div>
-</div>
-
-@if($currentCount >= $maxRelated)
-    <p class="text-secondary small mt-2 mb-0" id="related-limit-msg">Hai raggiunto il limite massimo di {{ $maxRelated }} prodotti correlati.</p>
-@endif
+@endfor
