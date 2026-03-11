@@ -657,6 +657,291 @@ const initRelated = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Varianti — lista (edit inline, delete, reorder)
+// ---------------------------------------------------------------------------
+const editPriceRowTemplate = () => `
+<div class="edit-price-row d-flex align-items-center gap-2 mb-2">
+    <div class="flex-grow-1">
+        <div class="text-field" data-mode="medium">
+            <div class="text-field-container">
+                <input class="input-miticko" name="price_label[]" placeholder="es. Visita">
+            </div>
+        </div>
+    </div>
+    <div class="text-field" data-mode="medium" style="width:180px;flex-shrink:0">
+        <div class="text-field-container">
+            <input type="number" min="0" step="0.01" class="input-miticko" name="price_value[]" placeholder="0.00" style="min-width:0">
+            <span class="text-secondary small fw-semibold px-2" style="white-space:nowrap">EUR</span>
+        </div>
+    </div>
+    <div style="width:150px;flex-shrink:0">
+        <div class="text-field" data-mode="medium">
+            <div class="text-field-container">
+                <select class="input-miticko" name="price_vat[]">
+                    <option value="0">Esente</option>
+                    <option value="4">4%</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="22" selected>22%</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div style="width:40px;flex-shrink:0">
+        <button type="button" class="bt-miticko outlined danger small btn-edit-remove-price">
+            <i class="fa-regular fa-trash icon"></i>
+        </button>
+    </div>
+</div>`;
+
+const openVariantEdit = ($item) => {
+    $item.find('.variant-header').addClass('border-bottom');
+    $item.find('.variant-edit-panel').removeClass('d-none');
+    $item.find('.btn-variant-toggle i').attr('class', 'fa-regular fa-chevron-up icon');
+    $item.find('.btn-variant-delete').addClass('d-none');
+};
+
+const closeVariantEdit = ($item) => {
+    $item.find('.variant-header').removeClass('border-bottom');
+    $item.find('.variant-edit-panel').addClass('d-none');
+    $item.find('.btn-variant-toggle i').attr('class', 'fa-regular fa-chevron-down icon');
+    $item.find('.btn-variant-delete').removeClass('d-none');
+};
+
+const initVariants = () => {
+    let _sortable = null;
+
+    const initSortable = () => {
+        const el = document.getElementById('sortable-variants');
+        if (!el) return;
+        if (_sortable) { _sortable.destroy(); _sortable = null; }
+        _sortable = Sortable.create(el, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd() {
+                const ids = [...el.querySelectorAll('.variant-item[data-id]')]
+                    .map(el => parseInt(el.dataset.id));
+                App.ajax({
+                    path: `/backoffice/products/${window.PRODUCT_ID}/variants/reorder`,
+                    method: 'post',
+                    data: { ordered_ids: ids },
+                }).catch(() => toastr.error('Errore durante il riordinamento'));
+            },
+        });
+    };
+
+    initSortable();
+
+    $(document).on('click', '.btn-variant-toggle', function () {
+        const $item = $(this).closest('.variant-item');
+        const isOpen = !$item.find('.variant-edit-panel').hasClass('d-none');
+        isOpen ? closeVariantEdit($item) : openVariantEdit($item);
+    });
+
+    $(document).on('click', '.btn-variant-cancel', function () {
+        closeVariantEdit($(this).closest('.variant-item'));
+    });
+
+    $(document).on('click', '.btn-variant-delete', function () {
+        const $item = $(this).closest('.variant-item');
+        const id = $item.data('id');
+        const label = $item.find('.variant-label-text').text();
+        App.sweetConfirm(`Eliminare la variante "${label}" e tutte le sue componenti IVA?`, () => {
+            App.ajax({
+                path: `/backoffice/products/${window.PRODUCT_ID}/variants/${id}`,
+                method: 'delete',
+            }).then(() => {
+                $item.remove();
+                if ($('#sortable-variants .variant-item').length === 0) {
+                    $('#sortable-variants').html('<p class="text-secondary small mb-4" id="variants-empty">Nessuna variante aggiunta.</p>');
+                }
+                toastr.success('Variante eliminata');
+            }).catch(() => toastr.error('Errore durante l\'eliminazione'));
+        }, null, 'Elimina variante');
+    });
+
+    $(document).on('click', '.btn-edit-add-price', function () {
+        $(this).closest('.variant-edit-panel').find('.variant-edit-prices').append(editPriceRowTemplate());
+    });
+
+    $(document).on('click', '.btn-edit-remove-price', function () {
+        const $prices = $(this).closest('.variant-edit-prices');
+        if ($prices.find('.edit-price-row').length > 1) {
+            $(this).closest('.edit-price-row').remove();
+        }
+    });
+
+    $(document).on('click', '.btn-variant-save', function () {
+        const $btn = $(this);
+        const $item = $btn.closest('.variant-item');
+        const $panel = $item.find('.variant-edit-panel');
+        const id = $item.data('id');
+
+        const label = $panel.find('[name="edit_label"]').val().trim();
+        if (!label) { toastr.warning('Il nome variante è obbligatorio'); return; }
+
+        const prices = [];
+        let valid = true;
+        $panel.find('.edit-price-row').each(function () {
+            const priceLabel = $(this).find('[name="price_label[]"]').val().trim();
+            const price      = $(this).find('[name="price_value[]"]').val().trim();
+            if (!priceLabel || price === '') { valid = false; return false; }
+            const priceId = $(this).data('price-id') || undefined;
+            prices.push({
+                ...(priceId && { id: priceId }),
+                label: priceLabel,
+                price: parseFloat(price),
+                vat_rate: parseFloat($(this).find('[name="price_vat[]"]').val()),
+            });
+        });
+
+        if (!valid) { toastr.warning('Compila tutti i campi delle componenti IVA'); return; }
+
+        setLoading($btn, true);
+        App.ajax({
+            path: `/backoffice/products/${window.PRODUCT_ID}/variants/${id}`,
+            method: 'put',
+            data: {
+                label,
+                description:  $panel.find('[name="edit_description"]').val().trim() || null,
+                max_quantity: $panel.find('[name="edit_max_quantity"]').val() || null,
+                prices,
+            },
+        }).then(() => {
+            $item.find('.variant-label-text').text(label);
+            const count = prices.length;
+            $item.find('.variant-prices-count').text(count + (count === 1 ? ' componente IVA' : ' componenti IVA'));
+            closeVariantEdit($item);
+            toastr.success('Variante aggiornata');
+        }).catch(err => {
+            toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
+        }).finally(() => setLoading($btn, false));
+    });
+};
+
+// ---------------------------------------------------------------------------
+// Varianti (modal aggiungi)
+// ---------------------------------------------------------------------------
+const priceRowTemplate = () => `
+<div class="mb-2 variant-price-row">
+    <div class="d-flex align-items-end gap-2">
+        <div class="flex-grow-1">
+            <div class="text-field" data-mode="medium">
+                <label>Servizio *</label>
+                <div class="text-field-container">
+                    <input class="input-miticko" name="price_label[]" placeholder="es. Adulto">
+                </div>
+            </div>
+        </div>
+        <div style="width:200px;flex-shrink:0">
+            <div class="text-field" data-mode="medium">
+                <label>Prezzo al pubblico *</label>
+                <div class="text-field-container">
+                    <input type="number" min="0" step="0.01" class="input-miticko" name="price_value[]" placeholder="0.00" style="min-width:0">
+                    <span class="text-secondary small fw-semibold px-2" style="white-space:nowrap">EUR</span>
+                </div>
+            </div>
+        </div>
+        <div style="width:150px;flex-shrink:0">
+            <div class="text-field" data-mode="medium">
+                <label>IVA *</label>
+                <div class="text-field-container">
+                    <select class="input-miticko" name="price_vat[]">
+                        <option value="0">Esente</option>
+                        <option value="4">4%</option>
+                        <option value="5">5%</option>
+                        <option value="10">10%</option>
+                        <option value="22" selected>22%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="padding-bottom:2px">
+            <button type="button" class="bt-miticko bt-m-text-only danger small btn-remove-price-row">
+                <i class="fa-regular fa-xmark icon"></i>
+            </button>
+        </div>
+    </div>
+</div>`;
+
+const initVariantModal = () => {
+    const $modal = $('#modal-add-variant');
+
+    $modal.on('show.bs.modal', () => {
+        if ($('#variant-prices-list .variant-price-row').length === 0) {
+            $('#variant-prices-list').html(priceRowTemplate());
+        }
+    });
+
+    $modal.on('hidden.bs.modal', () => {
+        $('#variant_label').val('');
+        $('#variant_description').val('');
+        $('#variant_max_quantity').val('');
+        $('#variant-prices-list').empty();
+    });
+
+    $(document).on('click', '#btn-add-price-row', () => {
+        $('#variant-prices-list').append(priceRowTemplate());
+    });
+
+    $(document).on('click', '.btn-remove-price-row', function () {
+        if ($('#variant-prices-list .variant-price-row').length > 1) {
+            $(this).closest('.variant-price-row').remove();
+        }
+    });
+
+    $(document).on('click', '#btn-create-variant', function () {
+        const $btn = $(this);
+        const label = $('#variant_label').val().trim();
+
+        if (!label) {
+            toastr.warning('Il nome variante è obbligatorio');
+            return;
+        }
+
+        const prices = [];
+        let valid = true;
+
+        $('#variant-prices-list .variant-price-row').each(function () {
+            const priceLabel = $(this).find('input[name="price_label[]"]').val().trim();
+            const price      = $(this).find('input[name="price_value[]"]').val().trim();
+            const vatRate    = $(this).find('select[name="price_vat[]"]').val();
+
+            if (!priceLabel || price === '') {
+                valid = false;
+                return false;
+            }
+            prices.push({ label: priceLabel, price: parseFloat(price), vat_rate: parseFloat(vatRate) });
+        });
+
+        if (!valid) {
+            toastr.warning('Compila tutti i campi delle componenti IVA');
+            return;
+        }
+
+        setLoading($btn, true);
+
+        App.ajax({
+            path: `/backoffice/products/${window.PRODUCT_ID}/variants`,
+            method: 'post',
+            data: {
+                label,
+                description:  $('#variant_description').val().trim() || null,
+                max_quantity: $('#variant_max_quantity').val() || null,
+                prices,
+            },
+        }).then(() => {
+            toastr.success('Variante aggiunta con successo');
+            $modal.modal('hide');
+            setTimeout(() => window.location.reload(), 800);
+        }).catch((err) => {
+            toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
+        }).finally(() => setLoading($btn, false));
+    });
+};
+
+// ---------------------------------------------------------------------------
 // Categoria
 // ---------------------------------------------------------------------------
 const initCategorySelect = () => {
@@ -723,6 +1008,8 @@ const init = () => {
     initRelated();
     initCustomerFields();
     initDeleteProduct();
+    initVariants();
+    initVariantModal();
 };
 
 $(function () {

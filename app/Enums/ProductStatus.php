@@ -2,10 +2,11 @@
 
 namespace App\Enums;
 
-enum ProductStatus: string
+enum ProductStatus: int
 {
-    case ACTIVE = '1';
-    case INACTIVE = '0';
+    case PENDING     = 0;
+    case ACTIVE      = 1;
+    case UNAVAILABLE = 2;
 
     public static function statuses(): array
     {
@@ -13,19 +14,22 @@ enum ProductStatus: string
             ->mapWithKeys(fn($case) => [$case->value => $case->label()])
             ->toArray();
     }
+
     public function label(): string
     {
         return match($this) {
-            self::ACTIVE => __('products.status.active'),
-            self::INACTIVE => __('products.status.inactive'),
+            self::PENDING     => __('products.status.pending'),
+            self::ACTIVE      => __('products.status.active'),
+            self::UNAVAILABLE => __('products.status.unavailable'),
         };
     }
 
-    public function class(): string
+    public function status(): string
     {
         return match($this) {
-            self::ACTIVE => 'active',
-            self::INACTIVE => 'inactive',
+            self::PENDING     => 'disabled',
+            self::ACTIVE      => 'success',
+            self::UNAVAILABLE => 'warning',
         };
     }
 }

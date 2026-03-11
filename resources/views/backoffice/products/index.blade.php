@@ -20,7 +20,8 @@
                                 <th>Partner</th>
                                 <th>Categoria</th>
                                 <th>Prodotto</th>
-                                <th>Prezzi</th>
+                                <th>Prezzo</th>
+                                <th>Stato</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -66,6 +67,7 @@
                         {data: 'category'},
                         {data: 'label'},
                         {data: 'pricing'},
+                        {data: 'status'},
                         {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',

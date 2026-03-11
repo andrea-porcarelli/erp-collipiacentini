@@ -1,12 +1,9 @@
 <?php
 
 return [
-    'types' => [
-        'free' => 'Visita Libera',
-        'guided' => 'Visita Guidata',
-    ],
     'status' => [
-        'active' => 'Pubblicato',
-        'inactive' => 'Non pubblicato',
+        'pending' => 'Non pubblicato',
+        'active' => 'Prenotabile',
+        'unavailable' => 'Non prenotabile',
     ],
 ];

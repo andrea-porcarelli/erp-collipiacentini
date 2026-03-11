@@ -15,6 +15,7 @@ use App\Http\Controllers\Backoffice\ProductFaqController;
 use App\Http\Controllers\Backoffice\ProductLinkController;
 use App\Http\Controllers\Backoffice\ProductRelatedController;
 use App\Http\Controllers\Backoffice\ProductCustomerFieldController;
+use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,10 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::resource('products', ProductController::class);
         Route::get('products/partners-by-company/{companyId}', [ProductController::class, 'partnersByCompany'])->name('products.partners-by-company');
         Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
+        Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
+        Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
+        Route::put('products/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('products.variants.update');
+        Route::delete('products/{product}/variants/{variant}', [ProductController::class, 'destroyVariant'])->name('products.variants.destroy');
         Route::get('products/{product}/links', [ProductLinkController::class, 'index'])->name('products.links.index');
         Route::post('products/{product}/links', [ProductLinkController::class, 'store'])->name('products.links.store');
         Route::put('products/{product}/links/{link}', [ProductLinkController::class, 'update'])->name('products.links.update');
@@ -71,6 +76,9 @@ Route::group(['prefix' => '/backoffice'], function() {
         Route::post('products/{product}/customer-fields/sync', [ProductCustomerFieldController::class, 'sync'])->name('products.customer-fields.sync');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
+        Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
+        Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
+        Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');
         Route::resource('companies', CompanyController::class);
         Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
         Route::resource('users', UserController::class);

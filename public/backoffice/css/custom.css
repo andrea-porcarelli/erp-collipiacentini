@@ -275,7 +275,7 @@ a.text-small {
     padding: var(--be---page-padding-top, 32px) var(--be---page-padding-right, 32px) var(--be---page-padding-bottom, 0) var(--be---page-padding-left, 32px);
     width: calc(100vw - 200px);
 }
-.main-content h1 {
+.top-bar-page {
     margin-bottom: var(--layout-backend-main-column-spacing, 24px) !important;
 }
 .page-container {
@@ -335,7 +335,6 @@ a.text-small {
 
 .card-miticko .card-body {
     width: 100%;
-    position: relative;
 }
 .table-header {
     display: flex;
@@ -751,10 +750,12 @@ span.flatpickr-weekday{
     margin-bottom: 24px !important;
     margin-top: 24px !important;
 }
+[x-cloak] { display: none !important; }
+
 .button-card-absolute {
     position: absolute;
-    top: -70px;
-    right: -6px;
+    top: var(--card-padding);
+    right: var(--card-padding);
 }
 .form-customer-fields {
     font-size: var(--size, 16px);

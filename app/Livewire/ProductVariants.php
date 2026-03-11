@@ -5,21 +5,17 @@ namespace App\Livewire;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ProductVariants extends Component
 {
     public Product $product;
 
-    // Form nuova variante
-    public array $newVariant = ['label' => '', 'description' => '', 'max_quantity' => ''];
-
-    // Righe componenti IVA per la nuova variante
-    public array $newVariantPrices = [];
-
     // Editing variante
     public ?int $editingVariantId = null;
     public array $editVariant = [];
+    public array $editVariantPrices = [];
 
     // Form nuova componente IVA (keyed by variant_id)
     public array $newPrice = [];
@@ -33,97 +29,85 @@ class ProductVariants extends Component
         $this->product = $product;
     }
 
-    // ─── Varianti ────────────────────────────────────────────────
-
-    public function addPriceRow(): void
+    #[On('variant-created')]
+    public function onVariantCreated(): void
     {
-        $this->newVariantPrices[] = ['label' => '', 'price' => '', 'vat_rate' => ''];
-    }
-
-    public function removePriceRow(int $index): void
-    {
-        array_splice($this->newVariantPrices, $index, 1);
-        $this->newVariantPrices = array_values($this->newVariantPrices);
-    }
-
-    public function addVariant(): void
-    {
-        $rules = [
-            'newVariant.label'        => 'required|string|max:255',
-            'newVariant.description'  => 'nullable|string|max:500',
-            'newVariant.max_quantity' => 'nullable|integer|min:1',
-        ];
-
-        $attributes = [
-            'newVariant.label'        => 'nome variante',
-            'newVariant.description'  => 'descrizione',
-            'newVariant.max_quantity' => 'massimi consentiti',
-        ];
-
-        foreach ($this->newVariantPrices as $i => $row) {
-            $rules["newVariantPrices.{$i}.label"]    = 'required|string|max:255';
-            $rules["newVariantPrices.{$i}.price"]    = 'required|numeric|min:0';
-            $rules["newVariantPrices.{$i}.vat_rate"] = 'required|numeric|min:0|max:100';
-            $attributes["newVariantPrices.{$i}.label"]    = 'servizio';
-            $attributes["newVariantPrices.{$i}.price"]    = 'prezzo';
-            $attributes["newVariantPrices.{$i}.vat_rate"] = 'IVA';
-        }
-
-        $this->validate($rules, [], $attributes);
-
-        $maxOrder = $this->product->variants()->max('sort_order') ?? 0;
-
-        $variant = $this->product->variants()->create([
-            'label'        => $this->newVariant['label'],
-            'description'  => $this->newVariant['description'] ?: null,
-            'max_quantity' => $this->newVariant['max_quantity'] ?: null,
-            'sort_order'   => $maxOrder + 1,
-        ]);
-
-        foreach ($this->newVariantPrices as $row) {
-            $variant->prices()->create([
-                'label'    => $row['label'],
-                'price'    => $row['price'],
-                'vat_rate' => $row['vat_rate'],
-            ]);
-        }
-
-        $this->newVariant = ['label' => '', 'description' => '', 'max_quantity' => ''];
-        $this->newVariantPrices = [];
         $this->notify('success', 'Variante aggiunta con successo');
     }
 
+    // ─── Varianti ────────────────────────────────────────────────
+
     public function startEditVariant(int $id): void
     {
-        $variant = ProductVariant::findOrFail($id);
+        $variant = ProductVariant::with('prices')->findOrFail($id);
         $this->editingVariantId = $id;
         $this->editVariant = [
             'label'        => $variant->label,
             'description'  => $variant->description ?? '',
             'max_quantity' => $variant->max_quantity ?? '',
         ];
+        $this->editVariantPrices = $variant->prices->map(fn($p) => [
+            'id'       => $p->id,
+            'label'    => $p->label,
+            'price'    => $p->price,
+            'vat_rate' => (int) $p->vat_rate,
+        ])->toArray();
     }
 
     public function updateVariant(): void
     {
-        $this->validate([
+        $rules = [
             'editVariant.label'        => 'required|string|max:255',
             'editVariant.description'  => 'nullable|string|max:500',
             'editVariant.max_quantity' => 'nullable|integer|min:1',
-        ], [], [
+        ];
+        $attributes = [
             'editVariant.label'        => 'nome variante',
             'editVariant.description'  => 'descrizione',
             'editVariant.max_quantity' => 'massimi consentiti',
-        ]);
+        ];
 
-        ProductVariant::findOrFail($this->editingVariantId)->update([
+        foreach ($this->editVariantPrices as $i => $row) {
+            $rules["editVariantPrices.{$i}.label"]    = 'required|string|max:255';
+            $rules["editVariantPrices.{$i}.price"]    = 'required|numeric|min:0';
+            $rules["editVariantPrices.{$i}.vat_rate"] = 'required|numeric|min:0|max:100';
+            $attributes["editVariantPrices.{$i}.label"]    = 'servizio';
+            $attributes["editVariantPrices.{$i}.price"]    = 'prezzo';
+            $attributes["editVariantPrices.{$i}.vat_rate"] = 'IVA';
+        }
+
+        $this->validate($rules, [], $attributes);
+
+        $variant = ProductVariant::findOrFail($this->editingVariantId);
+        $variant->update([
             'label'        => $this->editVariant['label'],
             'description'  => $this->editVariant['description'] ?: null,
             'max_quantity' => $this->editVariant['max_quantity'] ?: null,
         ]);
 
+        // Sync prices: delete removed, update existing, create new
+        $keptIds = collect($this->editVariantPrices)->pluck('id')->filter()->values();
+        $variant->prices()->whereNotIn('id', $keptIds)->delete();
+
+        foreach ($this->editVariantPrices as $row) {
+            if (!empty($row['id'])) {
+                ProductVariantPrice::where('id', $row['id'])->update([
+                    'label'    => $row['label'],
+                    'price'    => $row['price'],
+                    'vat_rate' => $row['vat_rate'],
+                ]);
+            } else {
+                $variant->prices()->create([
+                    'label'    => $row['label'],
+                    'price'    => $row['price'],
+                    'vat_rate' => $row['vat_rate'],
+                ]);
+            }
+        }
+
         $this->editingVariantId = null;
         $this->editVariant = [];
+        $this->editVariantPrices = [];
         $this->notify('success', 'Variante aggiornata');
     }
 
@@ -131,6 +115,18 @@ class ProductVariants extends Component
     {
         $this->editingVariantId = null;
         $this->editVariant = [];
+        $this->editVariantPrices = [];
+    }
+
+    public function addEditPriceRow(): void
+    {
+        $this->editVariantPrices[] = ['id' => null, 'label' => '', 'price' => '', 'vat_rate' => 22];
+    }
+
+    public function removeEditPriceRow(int $index): void
+    {
+        array_splice($this->editVariantPrices, $index, 1);
+        $this->editVariantPrices = array_values($this->editVariantPrices);
     }
 
     public function deleteVariant(int $id): void

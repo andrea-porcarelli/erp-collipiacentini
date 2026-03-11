@@ -16,7 +16,17 @@
     'required' => false,
     'message' => null,
     'icon' => null,
+    'model' => null,
 ])
+@php
+$default = null;
+if (isset($value)){
+    $default = $value;
+}
+if (isset($model->{$name})){
+    $default = $model->{$name};
+}
+@endphp
 <div class="text-field" data-mode="{{ $size }}">
     @isset($label)
         <label>{!! $label !!}</label>
@@ -26,13 +36,14 @@
             <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>
         @endisset
         <select
+            {{ $attributes->whereStartsWith(['wire:', 'x-', '@', ':']) }}
             class="input-miticko {{ $class }}"
             name="{{ $name }}"
             id="{{ $name }}"
         >
             <option value="">Scegli</option>
             @foreach($options as $option)
-                <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
+                <option @if(isset($default) && $default == $option['id']) selected @endif value="{{ $option['id'] }}">{{ $option['label'] }}</option>
             @endforeach
         </select>
         @isset($trailing)

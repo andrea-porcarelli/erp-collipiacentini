@@ -17,6 +17,8 @@ use App\Models\Media;
 use App\Models\OrderProduct;
 use App\Models\Partner;
 use App\Models\ProductCustomerField;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantPrice;
 use App\Models\ProductFaq;
 use App\Models\ProductLink;
 use App\Models\ProductRelated;
@@ -83,7 +85,7 @@ class ProductController extends CrudController
                 });
             }
 
-            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
+            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
                 })
@@ -104,6 +106,9 @@ class ProductController extends CrudController
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';
+                })
+                ->addColumn('status', function ($item) {
+                    return view('backoffice.components.label', ['status' => $item->status()->status(), 'label' => $item->status()->label()])->render();
                 })
                 ->rawColumns(['status'])
                 ->toJson();
@@ -247,6 +252,130 @@ class ProductController extends CrudController
             return $this->success(['redirect' => route($this->path . '.index')]);
         } catch (\Exception $e) {
             return $this->exception($e);
+        }
+    }
+
+    public function storeVariant(Request $request, int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $data = $request->validate([
+                'label'             => 'required|string|max:255',
+                'description'       => 'nullable|string|max:500',
+                'max_quantity'      => 'nullable|integer|min:1',
+                'prices'            => 'required|array|min:1',
+                'prices.*.label'    => 'required|string|max:255',
+                'prices.*.price'    => 'required|numeric|min:0',
+                'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+            ]);
+
+            $maxOrder = $product->variants()->max('sort_order') ?? 0;
+
+            $variant = $product->variants()->create([
+                'label'        => $data['label'],
+                'description'  => $data['description'] ?? null,
+                'max_quantity' => $data['max_quantity'] ?? null,
+                'sort_order'   => $maxOrder + 1,
+            ]);
+
+            foreach ($data['prices'] as $row) {
+                $variant->prices()->create([
+                    'label'    => $row['label'],
+                    'price'    => $row['price'],
+                    'vat_rate' => $row['vat_rate'],
+                ]);
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    public function updateVariant(Request $request, int $id, int $variantId): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $data = $request->validate([
+                'label'             => 'required|string|max:255',
+                'description'       => 'nullable|string|max:500',
+                'max_quantity'      => 'nullable|integer|min:1',
+                'prices'            => 'required|array|min:1',
+                'prices.*.id'       => 'nullable|integer',
+                'prices.*.label'    => 'required|string|max:255',
+                'prices.*.price'    => 'required|numeric|min:0',
+                'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+            ]);
+
+            $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
+            $variant->update([
+                'label'        => $data['label'],
+                'description'  => $data['description'] ?? null,
+                'max_quantity' => $data['max_quantity'] ?? null,
+            ]);
+
+            $keptIds = collect($data['prices'])->pluck('id')->filter()->values();
+            $variant->prices()->whereNotIn('id', $keptIds)->delete();
+
+            foreach ($data['prices'] as $row) {
+                if (!empty($row['id'])) {
+                    ProductVariantPrice::where('id', $row['id'])->update([
+                        'label'    => $row['label'],
+                        'price'    => $row['price'],
+                        'vat_rate' => $row['vat_rate'],
+                    ]);
+                } else {
+                    $variant->prices()->create([
+                        'label'    => $row['label'],
+                        'price'    => $row['price'],
+                        'vat_rate' => $row['vat_rate'],
+                    ]);
+                }
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    public function destroyVariant(int $id, int $variantId): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
+            $variant->prices()->delete();
+            $variant->delete();
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function reorderVariants(Request $request, int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $request->validate(['ordered_ids' => 'required|array']);
+
+            foreach ($request->ordered_ids as $index => $variantId) {
+                ProductVariant::where('id', $variantId)
+                    ->where('product_id', $id)
+                    ->update(['sort_order' => $index + 1]);
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
         }
     }
 

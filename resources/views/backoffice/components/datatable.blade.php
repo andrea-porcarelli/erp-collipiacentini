@@ -6,7 +6,7 @@
     @endif
     @if (in_array('edit', $options))
         <a href="{{ route( $route . '.show', $item->id) }}" title="Modifica">
-            <x-button label="Modifica" size="small" leading="fa-edit" emphasis="outlined"/>
+            <x-button label="" size="small" leading="fa-edit" emphasis="r"/>
         </a>
     @endif
     @if (in_array('status', $options))

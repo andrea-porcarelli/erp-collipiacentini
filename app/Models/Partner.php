@@ -17,6 +17,11 @@ class Partner extends LogsModel
         'has_notify',
         'email_notify',
         'is_active',
+        'commission_presale_low',
+        'commission_presale_high',
+        'commission_miticko_fixed',
+        'commission_miticko_variable',
+        'commission_payment',
     ];
 
     public function company() : BelongsTo

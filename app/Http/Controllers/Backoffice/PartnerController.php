@@ -55,6 +55,36 @@ class PartnerController extends CrudController
         return $this->success(['redirect' => route($this->path . '.show', $partner->id)]);
     }
 
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $partner = $this->interface->find($id);
+
+            match ($request->input('section')) {
+                'status' => $this->interface->edit($partner, [
+                    'is_active' => $request->input('is_active'),
+                ]),
+                'info' => $this->interface->edit($partner, [
+                    'partner_name'  => $request->input('partner_name'),
+                    'partner_code'  => $request->input('partner_code'),
+                    'email_notify'  => $request->input('email_notify'),
+                ]),
+                'commissions' => $this->interface->edit($partner, [
+                    'commission_presale_low'      => $request->input('commission_presale_low'),
+                    'commission_presale_high'     => $request->input('commission_presale_high'),
+                    'commission_miticko_fixed'    => $request->input('commission_miticko_fixed'),
+                    'commission_miticko_variable' => $request->input('commission_miticko_variable'),
+                    'commission_payment'          => $request->input('commission_payment'),
+                ]),
+                default => throw new \Exception('Sezione non valida'),
+            };
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
     public function data(Request $request) : JsonResponse {
         try {
             $filters = $request->get('filters') ?? [];

@@ -13,8 +13,8 @@
         </div>
         <div class="d-flex gap-3 align-items-center">
             <div class="d-flex gap-1 product-status align-items-center">
-                <span class="small-icon {{ $model->is_active->class() }}"></span>
-                {{ $model->is_active->label() }}
+                <span class="small-icon"></span>
+                {{ $model->status()->label() }}
             </div>
             @if($model->partner?->company?->has_woocommerce && $model->partner?->company?->endpoint_woocommerce)
                 <div>

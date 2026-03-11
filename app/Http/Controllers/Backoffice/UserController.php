@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class UserController extends CrudController
@@ -39,7 +40,6 @@ class UserController extends CrudController
             ['id' => 'admin', 'label' => 'Admin'],
             ['id' => 'operator', 'label' => 'Operatore'],
             ['id' => 'partner', 'label' => 'Partner'],
-            ['id' => 'company', 'label' => 'Azienda'],
         ];
 
         return view('backoffice.' . $this->path . '.index', compact('companies', 'partners', 'roles'))
@@ -72,7 +72,8 @@ class UserController extends CrudController
         try {
             $filters = $request->get('filters') ?? [];
 
-            $elements = $this->interface->filters($filters);
+            $elements = $this->interface->filters($filters)
+            ->when(!in_array(Auth::user()->role, ['god']), fn($q) => $q->where('role', 'partner'));
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
                 ->addColumn('role', function ($item) {
                     return ucfirst($item->role);

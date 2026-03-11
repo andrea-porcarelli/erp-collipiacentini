@@ -9,10 +9,11 @@
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Categorie" icon="fa fa-border-all" route="categories.index" :is_active="$active === 'categories'"  />
             <x-navigation-item label="Statistiche" icon="fa fa-chart-line" />
+            <x-navigation-item label="Gestione Partner" icon="fa fa-buildings" route="partners.index" :is_active="$active === 'partners'" />
+        @endif
+        <x-navigation-item label="Gestione utenti" icon="fa fa-user-group" route="users.index" :is_active="$active === 'users'" />
+        @if(Auth::user()->role == 'god')
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
-            <x-navigation-item label="Aziende" icon="fa fa-border-all"  route="companies.index" :is_active="$active === 'companies'"/>
-            <x-navigation-item label="Partner" icon="fa fa-border-all" route="partners.index" :is_active="$active === 'partners'" />
-            <x-navigation-item label="Utenti CP" icon="fa fa-border-all" route="users.index" :is_active="$active === 'users'" />
         @endif
     </div>
 </nav>

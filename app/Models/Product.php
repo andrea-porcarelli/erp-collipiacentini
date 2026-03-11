@@ -25,10 +25,22 @@ class Product extends LogsModel
         'free_occupancy_rule',
     ];
 
-    protected $casts = [
-        'is_active' => ProductStatus::class,
-    ];
+    protected $casts = [];
 
+
+    public function status(): ProductStatus
+    {
+        if (!$this->is_active) {
+            return ProductStatus::PENDING;
+        }
+
+        $hasFutureAvailability = $this->availabilities()
+            ->whereDate('date', '>', now())
+            ->where('availability', '>', 0)
+            ->exists();
+
+        return $hasFutureAvailability ? ProductStatus::ACTIVE : ProductStatus::UNAVAILABLE;
+    }
 
     public function partner() : BelongsTo
     {

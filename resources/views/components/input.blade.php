@@ -39,6 +39,7 @@
             <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>
         @endisset
         <input
+            {{ $attributes->whereStartsWith(['wire:', 'x-', '@', ':']) }}
             class="input-miticko {{ $class }}"
             name="{{ $name }}"
             id="{{ $name }}"
