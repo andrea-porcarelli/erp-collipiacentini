@@ -58,7 +58,7 @@
                 };
 
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/categories/{{ $model->id }}`,
+                    path: `/categories/{{ $model->id }}`,
                     method: 'post',
                     data: data,
                     then: (response) => {

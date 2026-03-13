@@ -1,11 +1,26 @@
 services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - erp
+    depends_on:
+      - erp_panel
+
   erp_panel:
     restart: unless-stopped
     build:
       context: ./
       dockerfile: Dockerfile
-    ports:
-      - '803:8000'
+    expose:
+      - "8000"
     volumes:
       - ./:/app
     #      - ./app:/app
@@ -33,5 +48,9 @@ services:
       - ./storage/dbdata:/var/lib/mysql
     networks:
       - erp
+volumes:
+  caddy_data:
+  caddy_config:
+
 networks:
   erp:

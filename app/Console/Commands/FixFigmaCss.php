@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class FixFigmaCss extends Command
 {
-    protected $signature = 'figma:fix-css {file=public/backoffice/css/miticko.css}';
+    protected $signature = 'figma:fix-css {file=public/backoffice/css/Miticko.css}';
 
     protected $description = 'Corregge il CSS esportato da Figma: selettori data-mode, unità px e proprietà duplicate';
 

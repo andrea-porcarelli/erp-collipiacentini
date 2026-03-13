@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\Backoffice;
 
-use App\Enums\OrderStatus;
-use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreCompanyRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CompanyInterface;
-use App\Interfaces\OrderInterface;
-use App\Models\Order;
+use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -33,6 +30,36 @@ class CompanyController extends CrudController
     {
         return view('backoffice.' . $this->path . '.index')
             ->with('path', $this->path);
+    }
+
+    public function show(int $id): View
+    {
+        $model = $this->interface->find($id);
+
+        $selectedProductIds = $model->products()->pluck('products.id')->toArray();
+
+        $partners = Partner::where('is_active', 1)
+            ->with(['products' => function ($q) {
+                $q->where('is_active', 1)->orderBy('label');
+            }])
+            ->orderBy('partner_name')
+            ->get();
+
+        return view('backoffice.' . $this->path . '.show', compact('model', 'partners', 'selectedProductIds'))
+            ->with('path', $this->path);
+    }
+
+    public function syncProducts(int $id, Request $request): JsonResponse
+    {
+        try {
+            $company = $this->interface->find($id);
+            $productIds = $request->input('product_ids', []);
+            $company->products()->sync($productIds);
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
     }
 
     public function store(StoreCompanyRequest $request): JsonResponse

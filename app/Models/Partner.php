@@ -3,7 +3,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -11,23 +10,19 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Partner extends LogsModel
 {
     public $fillable = [
-        'company_id',
         'partner_name',
         'partner_code',
         'has_notify',
         'email_notify',
         'is_active',
+        'sale_method',
+        'domain_name',
         'commission_presale_low',
         'commission_presale_high',
         'commission_miticko_fixed',
         'commission_miticko_variable',
         'commission_payment',
     ];
-
-    public function company() : BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function products() : HasMany
     {

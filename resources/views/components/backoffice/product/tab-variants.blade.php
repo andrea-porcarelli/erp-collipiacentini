@@ -44,7 +44,7 @@
                                         <x-supporting-text :message="$variant->max_quantity . ' max'" icon="fa-regular fa-users"/>
                                     @endif
                                     <span class="variant-prices-count text-secondary small">
-                                        {{ $variant->prices->count() . ($variant->prices->count() == 1 ? ' componente' : ' componenti') . ‘ IVA’ }}
+                                        {{ $variant->prices->count() . ($variant->prices->count() == 1 ? ' componente' : ' componenti') . ' IVA' }}
                                     </span>
                                     <button type="button" class="bt-miticko outlined danger small btn-variant-delete">
                                         <i class="fa-regular fa-trash icon"></i>
@@ -58,7 +58,7 @@
                             {{-- Pannello di modifica (nascosto) --}}
                             <div class="variant-edit-panel d-none border-top p-4">
                                 <div class="row g-3">
-                                    <div class="col-12 col-sm-5">
+                                    <div class="col-12 col-sm-4">
                                         <div class="text-field" data-mode="medium">
                                             <label>Nome variante *</label>
                                             <div class="text-field-container">
@@ -76,13 +76,18 @@
                                             <x-supporting-text message="Descrizione breve visualizzata in fase di selezione" icon="fa-regular fa-circle-info"/>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-sm-2">
+                                    <div class="col-12 col-sm-2 d-flex">
                                         <div class="text-field" data-mode="medium">
                                             <label>Massimi consentiti</label>
                                             <div class="text-field-container">
                                                 <input class="input-miticko" name="edit_max_quantity" type="number" value="{{ $variant->max_quantity }}" placeholder="∞">
+
                                             </div>
                                         </div>
+                                        <x-button class="btn-variant-translations" emphasis="outlined"  leading="fa-language" />
+
+                                    </div>
+                                    <div class="col-12 col-sm-1">
                                     </div>
                                 </div>
 

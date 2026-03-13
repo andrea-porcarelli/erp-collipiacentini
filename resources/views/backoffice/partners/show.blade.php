@@ -41,6 +41,23 @@
                                 <x-input :model="$model" name="email_notify" label="Email notifiche" />
                             </div>
                         </div>
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-4">
+                                <x-select
+                                    name="sale_method"
+                                    label="Metodo di vendita"
+                                    :options="[
+                                        ['id' => 'none',              'label' => 'Plugin esterno'],
+                                        ['id' => 'whitelabel_domain', 'label' => 'Dominio dedicato'],
+                                        ['id' => 'whitelabel_no_domain', 'label' => 'Miticko.com'],
+                                    ]"
+                                    :model="$model"
+                                />
+                            </div>
+                            <div class="col-12 col-sm-4" id="domain-name-container" style="{{ $model->sale_method !== 'none' ? '' : 'display:none' }}">
+                                <x-input :model="$model" name="domain_name" label="Nome dominio" placeholder="es. www.esempio.it" />
+                            </div>
+                        </div>
                     </form>
                     <div class="button-card-absolute">
                         <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
@@ -136,6 +153,20 @@
 @section('custom-script')
     <script>
         window.PARTNER_ID = {{ $model->id }};
+
+        $(function () {
+            @if($model->sale_method === 'whitelabel_no_domain')
+                $('#domain-name-container label').first().text('Slug identificativo partner');
+            @endif
+
+            $(document).on('change', 'select[name="sale_method"]', function () {
+                const val = $(this).val();
+                $('#domain-name-container').toggle(val !== 'none');
+                $('#domain-name-container label').first().text(
+                    val === 'whitelabel_no_domain' ? 'Slug identificativo partner' : 'Nome dominio'
+                );
+            });
+        });
     </script>
     <script src="{{ asset('backoffice/js/partners.js') }}?v=1.0" type="module"></script>
 @endsection

@@ -22,14 +22,9 @@ class BookingController extends Controller
 
     public function index(Request $request) : View {
         $company = $request->company;
-        $products = $company->active_partners->flatMap(function ($partner) {
-            return $partner->active_products()
-                ->with(['partner.company', 'category', 'contents.language', 'prices', 'availabilities'])
-                ->get()
-                ->map(function ($product) {
-                    return $product;
-                });
-        });
+        $products = Product::where('is_active', 1)
+            ->with(['partner', 'category', 'contents.language', 'prices', 'availabilities'])
+            ->get();
         return view('whitelabel.index' , compact('products', 'company'));
     }
 
@@ -38,20 +33,16 @@ class BookingController extends Controller
         $filter = $request->get('filter', 'all');
         $date = $request->get('date', null);
 
-        $products = $company->active_partners->flatMap(function ($partner) use($date, $filter) {
-            return $partner->active_products()
-                ->with(['partner.company', 'category', 'contents.language', 'prices', 'availabilities'])
-                ->when(isset($date), function ($query) use ($date) {
-                    return $query->whereHas('availabilities', function ($query) use ($date) {
-                        return $query->where('date', $date)
-                            ->where('availability', '>', 0);
-                    });
-                })
-                ->when($filter !== 'all', fn($q) => $q->whereDate('product_type', $filter))
-                ->get()->map(function ($product) {
-                return $product;
-            });
-        });
+        $products = Product::where('is_active', 1)
+            ->with(['partner', 'category', 'contents.language', 'prices', 'availabilities'])
+            ->when(isset($date), function ($query) use ($date) {
+                return $query->whereHas('availabilities', function ($query) use ($date) {
+                    return $query->where('date', $date)
+                        ->where('availability', '>', 0);
+                });
+            })
+            ->when($filter !== 'all', fn($q) => $q->whereDate('product_type', $filter))
+            ->get();
 
         // Genera l'HTML dei prodotti
         $html = '';
@@ -72,10 +63,10 @@ class BookingController extends Controller
         $productId = (int) substr($productCode_ex[count($productCode_ex) - 1], 2);
 
         // Trova il prodotto tramite product_code
-        $product = Product::with(['partner.company', 'partner.media', 'category', 'contents.language', 'prices', 'availabilities', 'media'])
+        $product = Product::with(['partner', 'partner.media', 'category', 'contents.language', 'prices', 'availabilities', 'media'])
             ->where('id', $productId)
             ->first();
-        $company = $product->partner->company;
+        $company = $request->company;
         if (!$product) {
             abort(404);
         }
@@ -165,7 +156,7 @@ class BookingController extends Controller
             // Crea il nuovo carrello
             $cart = Cart::create([
                 'session_id' => $sessionId,
-                'company_id' => $product->partner->company_id,
+                'company_id' => $request->company?->id,
                 'product_id' => $product->id,
                 'product_availability_id' => $availability->id,
                 'date' => $availability->date,
@@ -195,11 +186,11 @@ class BookingController extends Controller
     public function cart(Request $request): View
     {
         $sessionId = session()->getId();
-        $cart = Cart::with(['product.partner.company', 'product.prices', 'productAvailability'])
+        $cart = Cart::with(['product.partner', 'product.prices', 'productAvailability'])
             ->where('session_id', $sessionId)
             ->first();
 
-        $company = $cart?->product?->partner?->company ?? $request->company;
+        $company = $request->company;
 
         return view('whitelabel.cart', compact('cart', 'company'));
     }

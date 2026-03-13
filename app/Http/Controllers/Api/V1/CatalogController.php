@@ -16,10 +16,7 @@ class CatalogController extends Controller
         $perPage = min((int) $request->query('per_page', 100), 500);
         $page = max((int) $request->query('page', 1), 1);
 
-        $products = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })
-            ->with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner.company'])
+        $products = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
             ->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
@@ -37,17 +34,13 @@ class CatalogController extends Controller
     {
         $company = $request->get('company');
 
-        $query = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        });
+        $query = Product::query();
 
         $total = $query->count();
         $lastUpdated = $query->max('updated_at');
 
         // Checksum based on ids and updated_at
-        $checksumData = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })
+        $checksumData = Product::query()
             ->orderBy('id')
             ->get(['id', 'updated_at'])
             ->map(fn($p) => $p->id . ':' . $p->updated_at)

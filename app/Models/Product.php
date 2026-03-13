@@ -3,6 +3,7 @@ namespace App\Models;
 use App\Enums\ProductStatus;
 use App\Traits\HasLanguageContent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
@@ -45,6 +46,11 @@ class Product extends LogsModel
     public function partner() : BelongsTo
     {
         return $this->belongsTo(Partner::class);
+    }
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class)->withTimestamps();
     }
 
     public function category() : BelongsTo
@@ -117,7 +123,7 @@ class Product extends LogsModel
         if (!isset($this->category)) {
             return ' #---- ';
         }
-        return isset($this->partner) ? sprintf('%s-%s-%s%s', $this->partner->company->company_code, $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
+        return isset($this->partner) ? sprintf('%s-%s%s', $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
     }
 
     public function getLowestPriceAttribute() : string {

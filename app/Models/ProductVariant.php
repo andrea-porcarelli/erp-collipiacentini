@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasLanguageContent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductVariant extends LogsModel
 {
+    use HasLanguageContent;
     public $fillable = [
         'product_id',
         'label',

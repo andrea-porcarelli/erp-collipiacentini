@@ -14,7 +14,6 @@ class StorePartnerRequest extends FormRequest
     public function rules() : array {
         return [
             'partner_name' => ['required', 'unique:partners,partner_name'],
-            'company_id' => ['required', 'exists:companies,id'],
         ];
     }
 
@@ -23,7 +22,6 @@ class StorePartnerRequest extends FormRequest
         return [
             'partner_name.required' => 'Il nome del partner è obbligatorio',
             'partner_name.unique' => 'Il nome del partner scelto è già stato usato',
-            'company_id.required' => 'Devi selezionare l\'azienda',
         ];
     }
 }

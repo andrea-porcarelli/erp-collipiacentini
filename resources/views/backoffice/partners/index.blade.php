@@ -18,7 +18,6 @@
                             <tr>
                                 <th style="width: 10%">#codice</th>
                                 <th>Partner</th>
-                                <th>Azienda</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -32,7 +31,6 @@
         <div class="row">
             <form id="create-partner-form" class="w-100">
                 <div class="col-12">
-                    <x-select name="company_id" label="Azienda" placeholder="Seleziona l'azienda" required :options="$companies" />
                     <x-input name="partner_name" label="Nome partner" placeholder="Inserisci nome partner" required />
                 </div>
             </form>
@@ -54,7 +52,6 @@
                     columns: [
                         {data: 'partner_code', type: 'string'},
                         {data: 'partner_name'},
-                        {data: 'company'},
                         {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',
@@ -79,11 +76,10 @@
 
             $(document).on('click', '#create-partner .btn-success', function () {
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/partners/create`,
+                    path: `/partners/create`,
                     method: "post",
                     data: {
                         partner_name: $(`#create-partner input[name='partner_name']`).val(),
-                        company_id: $(`#create-partner select[name='company_id']`).val(),
                     },
                     then: (response) => {
                         setTimeout(() => {

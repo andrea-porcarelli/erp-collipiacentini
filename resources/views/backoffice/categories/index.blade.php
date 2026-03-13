@@ -102,7 +102,7 @@
                 };
 
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/categories/create`,
+                    path: `/categories/create`,
                     method: "post",
                     data: data,
                     then: (response) => {

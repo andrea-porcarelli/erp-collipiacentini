@@ -39,7 +39,7 @@ class LoginController extends Controller
                 Session::put('company', $user->company);
                 Session::put('company-to-be-select', true);
             }
-            return response()->json(['response' => 'ok', 'url' => redirect()->getIntendedUrl() ?? '/backoffice/index']);
+            return response()->json(['response' => 'ok', 'url' => redirect()->getIntendedUrl() ?? '/index']);
         } catch (Exception $e) {
             $this->exception($e);
         }

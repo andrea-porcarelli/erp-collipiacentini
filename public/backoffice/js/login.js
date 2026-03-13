@@ -2,7 +2,7 @@ import App from "./app.js";
 
 const login = () => {
     const serialized = App.serialize('.form-login');
-    App.ajax({path: `/backoffice/login`, method: 'post', data: serialized.data}).then(response => {
+    App.ajax({path: `/login`, method: 'post', data: serialized.data}).then(response => {
         $('.form-login').find("input:last")
             .parent()
             .parent()
@@ -19,7 +19,7 @@ const login = () => {
     })
 }
 const logout = () => {
-    App.ajax({path: `/backoffice/logout`, method: 'post'}).then(() => {
+    App.ajax({path: `/logout`, method: 'post'}).then(() => {
         location.href = '/login'
     })
 }

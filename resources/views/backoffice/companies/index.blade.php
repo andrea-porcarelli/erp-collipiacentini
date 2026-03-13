@@ -84,7 +84,7 @@
 
             $(document).on('click', '#create-company .btn-success', function () {
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/companies/create`,
+                    path: `/companies/create`,
                     method: "post",
                     data: {
                         company_name: $(`#create-company input[name='company_name']`).val(),

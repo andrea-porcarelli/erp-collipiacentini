@@ -111,7 +111,7 @@
                 }
 
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/users/create`,
+                    path: `/users/create`,
                     method: "post",
                     data: data,
                     then: (response) => {

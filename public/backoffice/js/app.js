@@ -367,7 +367,7 @@ const selectChoice = (parameters) => {
         const body = parameters.body;
         body.value = searchTerm;
         // Chiamata AJAX
-        fetch(`/backoffice/${parameters.path}`, {
+        fetch(`/${parameters.path}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -536,7 +536,7 @@ const change_status_element = (btn) => {
     App.sweetConfirm(`Confermi?`, () => {
         const id = btn.data("id");
         const route = btn.data("route");
-        ajax({ path: `/backoffice/${route}/${id}/status`, method: "post" }).then(() => {
+        ajax({ path: `/${route}/${id}/status`, method: "post" }).then(() => {
             reloadTable();
         });
     }, null,  `Stai per ${is_active === 1 ? 'disattivare' : 'attivare'} questo elemento`)

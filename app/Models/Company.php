@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -21,12 +22,8 @@ class Company extends LogsModel
         'endpoint_woocommerce',
     ];
 
-    public function partners(): HasMany {
-        return $this->hasMany(Partner::class);
-    }
-
-    public function active_partners(): HasMany {
-        return $this->partners()->where('is_active', 1);
+    public function products(): BelongsToMany {
+        return $this->belongsToMany(Product::class)->withTimestamps();
     }
 
     public function users(): HasMany {

@@ -1,15 +1,18 @@
 @extends('backoffice.layout', ['title' => 'Dashboard', 'active' => $path])
 
 @section('main-content')
-    <x-header-page title="Prodotti" />
+    <x-header-page title="I tuoi prodotti" />
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista prodotti" class="position-relative"  sub_title="I prodotti dei tuoi Partners">
+                <x-card title="Lista dei prodotti caricati" class="position-relative"  sub_title="I prodotti dei tuoi Partners">
                     <div class="position-absolute" style="top: -70px; right: 0">
                         <x-button label="Aggiungi prodotto" status="primary" class="btn-create-product" size="small" leading="fa-plus" />
                     </div>
                     <x-table-header>
+                        <div class="filters-miticko">
+                            <x-filter label="Stato" name="status" />
+                        </div>
                         <span class="table-header-total" > - </span>
                     </x-table-header>
                     <div class="table-responsive">
@@ -35,12 +38,7 @@
         <div class="row">
             <form id="create-product-form" class="w-100">
                 <div class="col-12">
-                    @if(in_array(Auth::user()->role, ['god', 'admin']))
-                        <x-select name="company_id" label="Azienda" placeholder="Seleziona l'azienda" required :options="$companies" />
-                        <div id="product-partner-select-container">
-                            <x-select name="partner_id" label="Partner" placeholder="Prima seleziona un'azienda" required :options="[]" />
-                        </div>
-                    @elseif(Auth::user()->role === 'company')
+                    @if(in_array(Auth::user()->role, ['god', 'admin', 'company']))
                         <x-select name="partner_id" label="Partner" placeholder="Seleziona il partner" required :options="$partners" />
                     @endif
                     <x-input name="label" label="Nome prodotto" placeholder="Inserisci nome prodotto" required />
@@ -89,28 +87,6 @@
                 $(`#create-product`).modal('hide');
             });
 
-            @if(in_array(Auth::user()->role, ['god', 'admin']))
-            $(document).on('change', '#create-product select[name="company_id"]', function () {
-                const companyId = $(this).val();
-                const partnerSelect = $(`#create-product select[name='partner_id']`);
-
-                partnerSelect.html('<option value="">Caricamento...</option>');
-
-                if (!companyId) {
-                    partnerSelect.html('<option value="">Prima seleziona un\'azienda</option>');
-                    return;
-                }
-
-                $.get(`/backoffice/products/partners-by-company/${companyId}`, function (partners) {
-                    let options = '<option value="">Scegli</option>';
-                    partners.forEach(function (partner) {
-                        options += `<option value="${partner.id}">${partner.label}</option>`;
-                    });
-                    partnerSelect.html(options);
-                });
-            });
-            @endif
-
             $(document).on('click', '#create-product .btn-success', function () {
                 const data = {
                     label: $(`#create-product input[name='label']`).val(),
@@ -122,7 +98,7 @@
                 }
 
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/products/create`,
+                    path: `/products/create`,
                     method: "post",
                     data: data,
                     then: (response) => {

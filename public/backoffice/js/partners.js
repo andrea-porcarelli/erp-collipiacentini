@@ -5,14 +5,14 @@ import App from "./app.js";
 // ---------------------------------------------------------------------------
 const formConfigs = {
     'form-partner-status': {
-        endpoint: () => `/backoffice/partners/${window.PARTNER_ID}`,
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
         section: 'status',
         successMessage: 'Stato partner aggiornato con successo',
         validate: () => ({}),
     },
     'form-partner-info': {
-        endpoint: () => `/backoffice/partners/${window.PARTNER_ID}`,
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
         section: 'info',
         successMessage: 'Informazioni partner aggiornate con successo',
@@ -28,7 +28,7 @@ const formConfigs = {
         },
     },
     'form-partner-commissions': {
-        endpoint: () => `/backoffice/partners/${window.PARTNER_ID}`,
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
         section: 'commissions',
         successMessage: 'Commissioni aggiornate con successo',
@@ -211,7 +211,7 @@ const addUser = () => {
         return;
     }
 
-    App.ajax({ path: `/backoffice/partners/${window.PARTNER_ID}/users`, method: 'post', data })
+    App.ajax({ path: `/partners/${window.PARTNER_ID}/users`, method: 'post', data })
         .then((user) => {
             $('#users-empty').remove();
             $('#users-list').append(renderUserRow(user));
@@ -252,7 +252,7 @@ const initUsers = () => {
             const password = $item.find('input[name="password"]').val();
             if (password) data.password = password;
 
-            App.ajax({ path: `/backoffice/partners/${window.PARTNER_ID}/users/${id}`, method: 'put', data })
+            App.ajax({ path: `/partners/${window.PARTNER_ID}/users/${id}`, method: 'put', data })
                 .then(() => {
                     $item.removeAttr('data-dirty');
                     $item.find('input[name="password"]').val('');
@@ -277,7 +277,7 @@ const initUsers = () => {
         const $item = $(this).closest('.user-item');
         const id = $item.data('id');
         App.sweetConfirm('Vuoi eliminare questo account?', () => {
-            App.ajax({ path: `/backoffice/partners/${window.PARTNER_ID}/users/${id}`, method: 'delete' })
+            App.ajax({ path: `/partners/${window.PARTNER_ID}/users/${id}`, method: 'delete' })
                 .then(() => {
                     $item.remove();
                     if ($('#users-list .user-item').length === 0) {
@@ -301,12 +301,12 @@ const initDeletePartner = () => {
             'Vuoi eliminare definitivamente questo partner? L\'operazione è irreversibile.',
             () => {
                 App.ajax({
-                    path: `/backoffice/partners/${window.PARTNER_ID}`,
+                    path: `/partners/${window.PARTNER_ID}`,
                     method: 'delete',
                 }).then((res) => {
                     toastr.success('Partner eliminato con successo');
                     setTimeout(() => {
-                        window.location.href = res.redirect ?? '/backoffice/partners';
+                        window.location.href = res.redirect ?? '/partners';
                     }, 800);
                 }).catch((err) => {
                     toastr.error(err?.responseJSON?.message || 'Errore durante l\'eliminazione');

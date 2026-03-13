@@ -15,10 +15,7 @@ class ProductController extends Controller
         $company = $request->get('company');
         $numericId = $this->extractNumericId($id);
 
-        $product = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })
-            ->with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner.company'])
+        $product = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
             ->find($numericId);
 
         if (!$product) {
@@ -45,10 +42,7 @@ class ProductController extends Controller
 
         $numericIds = array_map(fn($id) => $this->extractNumericId($id), $ids);
 
-        $products = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })
-            ->with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner.company'])
+        $products = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
             ->whereIn('id', $numericIds)
             ->get();
 

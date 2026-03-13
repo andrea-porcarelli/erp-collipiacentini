@@ -271,6 +271,17 @@
     <script>
         window.PRODUCT_ID = {{ $model->id }};
         window.PRODUCT_CATEGORY_ID = {{ $model->category_id ?? 'null' }};
+
+        $(function () {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const $tab = $(`[data-bs-target="#${hash}"]`);
+                if ($tab.length) {
+                    $tab.tab('show');
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+        });
     </script>
     <script src="{{ asset('backoffice/js/products.js') }}?v=1.0" type="module"></script>
     <script>
@@ -298,7 +309,7 @@
                     title: 'Sincronizzazione WooCommerce',
                     callback: () => {
                         $(document).trigger('fetch', [{
-                            path: `/backoffice/products/{{ $model->id }}/sync-woocommerce`,
+                            path: `/products/{{ $model->id }}/sync-woocommerce`,
                             method: "post",
                             then: (response) => {
                                 toastr.success('Sincronizzazione avviata con successo');

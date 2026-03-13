@@ -47,6 +47,18 @@
                     class=""
                     status="secondary"
                     emphasis="outlined"
+                    id="products-tab"
+                    role="tab"
+                    label="Prodotti"
+                    :dataset="['bs-target' => '#products-panel', 'bs-toggle' => 'tab']"
+                    :ariaset="['controls' => 'products-panel', 'selected' => 'false']"
+                />
+            </li>
+            <li class="nav-item" role="presentation">
+                <x-button
+                    class=""
+                    status="secondary"
+                    emphasis="outlined"
                     id="users-tab"
                     role="tab"
                     label="Utenti"
@@ -149,7 +161,46 @@
                 </div>
             </div>
 
-            {{-- Tab 3: Utenti --}}
+            {{-- Tab 3: Prodotti --}}
+            <div class="tab-pane fade" id="products-panel" role="tabpanel" aria-labelledby="products-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <x-card title="Prodotti associati" sub_title="Seleziona i prodotti visibili per questa azienda">
+                            <div class="d-flex justify-content-end mb-3">
+                                <x-button label="Salva selezione" status="primary" emphasis="light" leading="fa-save" class="btn-save-products" size="small" />
+                            </div>
+                            @forelse($partners as $partner)
+                                <div class="mb-4">
+                                    <div class="fw-semibold mb-2 pb-1" style="border-bottom: 1px solid #e9ecef;">
+                                        {{ $partner->partner_name }}
+                                    </div>
+                                    @forelse($partner->products as $product)
+                                        <div class="form-check py-1">
+                                            <input
+                                                class="form-check-input product-checkbox"
+                                                type="checkbox"
+                                                value="{{ $product->id }}"
+                                                id="product-{{ $product->id }}"
+                                                {{ in_array($product->id, $selectedProductIds) ? 'checked' : '' }}
+                                            >
+                                            <label class="form-check-label" for="product-{{ $product->id }}">
+                                                {{ $product->label }}
+                                                <span class="text-muted small ms-2">#{{ $product->product_code }}</span>
+                                            </label>
+                                        </div>
+                                    @empty
+                                        <p class="text-muted small mb-0">Nessun prodotto attivo per questo partner.</p>
+                                    @endforelse
+                                </div>
+                            @empty
+                                <p class="text-muted">Nessun partner attivo disponibile.</p>
+                            @endforelse
+                        </x-card>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tab 4: Utenti --}}
             <div class="tab-pane fade" id="users-panel" role="tabpanel" aria-labelledby="users-tab">
                 <div class="row">
                     <div class="col-12">
@@ -253,7 +304,7 @@
                 });
 
                 $(document).trigger('fetch', [{
-                    path: `/backoffice/companies/{{ $model->id }}`,
+                    path: `/companies/{{ $model->id }}`,
                     method: "put",
                     data: obj,
                     then: (response) => {
@@ -265,13 +316,32 @@
                 }]);
             });
 
+            $(document).on('click', '.btn-save-products', function () {
+                const productIds = [];
+                $('.product-checkbox:checked').each(function () {
+                    productIds.push($(this).val());
+                });
+
+                $(document).trigger('fetch', [{
+                    path: `/companies/{{ $model->id }}/products`,
+                    method: "put",
+                    data: { product_ids: productIds },
+                    then: () => {
+                        toastr.success('Prodotti aggiornati con successo');
+                    },
+                    catch: () => {
+                        toastr.error('Errore durante il salvataggio');
+                    },
+                }]);
+            });
+
             $(document).on('click', '.btn-generate-token', function () {
                 $(document).trigger('sweetConfirmTrigger', [{
                     text: 'Confermi la generazione di un nuovo token?',
                     title: 'Il token attuale verrà sostituito',
                     callback: () => {
                         $(document).trigger('fetch', [{
-                            path: `/backoffice/companies/{{ $model->id }}/generate-token`,
+                            path: `/companies/{{ $model->id }}/generate-token`,
                             method: "post",
                             then: (response) => {
                                 $(`input[name='token']`).val(response.token);

@@ -11,7 +11,6 @@ use App\Models\CustomerFieldType;
 use App\Models\Language;
 use App\Models\Product;
 use App\Jobs\SyncProductToWooCommerce;
-use App\Models\Company;
 use App\Models\LanguageContent;
 use App\Models\Media;
 use App\Models\OrderProduct;
@@ -46,28 +45,14 @@ class ProductController extends CrudController
     public function index(): View
     {
         $user = Auth::user();
-        $companies = [];
         $partners = [];
 
-        if (in_array($user->role, ['god', 'admin'])) {
-            $companies = Company::where('is_active', 1)->get()->map(function ($item) {
-                return ['id' => $item->id, 'label' => $item->company_name];
-            })->values()->toArray();
-        } elseif ($user->role === 'company') {
-            $partners = Utils::map_collection(Partner::active()->where('company_id', $user->company_id));
+        if (in_array($user->role, ['god', 'admin', 'company'])) {
+            $partners = Utils::map_collection(Partner::active());
         }
 
-        return view('backoffice.' . $this->path . '.index', compact('companies', 'partners'))
+        return view('backoffice.' . $this->path . '.index', compact('partners'))
             ->with('path', $this->path);
-    }
-
-    public function partnersByCompany(int $companyId): JsonResponse
-    {
-        $partners = Partner::active()->where('company_id', $companyId)->get()->map(function ($item) {
-            return ['id' => $item->id, 'label' => $item->partner_name];
-        })->values()->toArray();
-
-        return response()->json($partners);
     }
 
     public function data(Request $request) : JsonResponse {
@@ -79,10 +64,6 @@ class ProductController extends CrudController
 
             if ($user->role === 'partner') {
                 $elements->where('partner_id', $user->partner_id);
-            } elseif ($user->role === 'company') {
-                $elements->whereHas('partner', function ($q) use ($user) {
-                    $q->where('company_id', $user->company_id);
-                });
             }
 
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit'])
@@ -379,6 +360,59 @@ class ProductController extends CrudController
         }
     }
 
+    public function getVariantTranslations(int $id, int $variantId): JsonResponse
+    {
+        try {
+            $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
+            $languages = Language::where('is_active', 1)->get();
+
+            $data = $languages->map(fn($lang) => [
+                'language_id' => $lang->id,
+                'language'    => $lang->label,
+                'iso_code'    => $lang->iso_code,
+                'label'       => $lang->iso_code === 'it'
+                    ? $variant->label
+                    : ($variant->contentField('label', $lang->iso_code) ?? ''),
+                'description' => $lang->iso_code === 'it'
+                    ? $variant->description
+                    : ($variant->contentField('description', $lang->iso_code) ?? ''),
+            ]);
+
+            return $this->success(['data' => $data]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function saveVariantTranslations(Request $request, int $id, int $variantId): JsonResponse
+    {
+        try {
+            $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
+
+            foreach ($request->input('translations', []) as $translation) {
+                $lang = Language::find($translation['language_id']);
+                if (!$lang) continue;
+
+                if ($lang->iso_code === 'it') {
+                    $variant->update([
+                        'label'       => $translation['label'] ?? $variant->label,
+                        'description' => $translation['description'] ?? $variant->description,
+                    ]);
+                    $variant->refresh();
+                } else {
+                    $variant->setContentFields([
+                        'label'       => $translation['label'] ?? '',
+                        'description' => $translation['description'] ?? '',
+                    ], $lang->iso_code);
+                }
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
     public function syncWooCommerce(int $id): JsonResponse
     {
         try {
@@ -415,8 +449,5 @@ class ProductController extends CrudController
             abort(403);
         }
 
-        if ($user->role === 'company' && (!$product->partner || $product->partner->company_id !== $user->company_id)) {
-            abort(403);
-        }
     }
 }

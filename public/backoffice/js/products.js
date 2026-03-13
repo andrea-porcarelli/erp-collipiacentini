@@ -10,7 +10,7 @@ import {
 // ---------------------------------------------------------------------------
 const formConfigs = {
     'form-info-settings': {
-        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'settings',
         successMessage: 'Impostazioni prodotto aggiornate con successo',
@@ -23,7 +23,7 @@ const formConfigs = {
         },
     },
     'form-info-duration': {
-        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'duration',
         successMessage: 'Durata aggiornata con successo',
@@ -39,14 +39,14 @@ const formConfigs = {
         },
     },
     'form-info-categories': {
-        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'categories',
         successMessage: 'Categoria aggiornata con successo',
         validate: () => ({}),
     },
     'form-info-public': {
-        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'public',
         successMessage: 'Impostazioni pubbliche aggiornate con successo',
@@ -59,7 +59,7 @@ const formConfigs = {
         },
     },
     'form-info-description': {
-        endpoint: () => `/backoffice/products/${window.PRODUCT_ID}`,
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'description',
         successMessage: 'Descrizione aggiornata con successo',
@@ -78,6 +78,10 @@ const translationFields = {
     faq: [
         { name: 'question', label: 'Domanda',  type: 'input',    placeholder: 'es. Come posso prenotare?' },
         { name: 'answer',   label: 'Risposta', type: 'textarea', placeholder: 'Inserisci la risposta...' },
+    ],
+    variant: [
+        { name: 'label',       label: 'Nome variante',   type: 'input',    placeholder: 'es. Intero' },
+        { name: 'description', label: 'Descrizione breve', type: 'input',  placeholder: 'es. Biglietto intero per adulti' },
     ],
 };
 
@@ -216,9 +220,12 @@ const renderTranslationBody = (data, entityType) => {
 
 const openTranslationsModal = (entityType, id) => {
     const $modal = $('#modal-translations');
-    const path = entityType === 'link'
-        ? `/backoffice/products/${window.PRODUCT_ID}/links/${id}/translations`
-        : `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}/translations`;
+    const paths = {
+        link:    `/products/${window.PRODUCT_ID}/links/${id}/translations`,
+        faq:     `/products/${window.PRODUCT_ID}/faqs/${id}/translations`,
+        variant: `/products/${window.PRODUCT_ID}/variants/${id}/translations`,
+    };
+    const path = paths[entityType];
 
     $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
     $modal.data('save-path', path).data('entity-type', entityType);
@@ -308,7 +315,7 @@ const addLink = () => {
         toastr.warning('Label e URL sono obbligatori');
         return;
     }
-    App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links`, method: 'post', data })
+    App.ajax({ path: `/products/${window.PRODUCT_ID}/links`, method: 'post', data })
         .then((link) => {
             $('#links-empty').remove();
             $('#links-list').append(renderLinkRow(link));
@@ -342,7 +349,7 @@ const initLinks = () => {
                 label: $item.find('input[name="label"]').val(),
                 link:  $item.find('input[name="link"]').val(),
             };
-            App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links/${id}`, method: 'put', data })
+            App.ajax({ path: `/products/${window.PRODUCT_ID}/links/${id}`, method: 'put', data })
                 .then(() => {
                     $item.removeAttr('data-dirty');
                 })
@@ -366,7 +373,7 @@ const initLinks = () => {
         const $item = $(this).closest('.link-item');
         const id = $item.data('id');
         App.sweetConfirm('Vuoi eliminare questo link?', () => {
-            App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/links/${id}`, method: 'delete' })
+            App.ajax({ path: `/products/${window.PRODUCT_ID}/links/${id}`, method: 'delete' })
                 .then(() => {
                     $item.remove();
                     if ($('#links-list .link-item').length === 0) {
@@ -476,7 +483,7 @@ const addFaq = () => {
         toastr.warning('Domanda e risposta sono obbligatorie');
         return;
     }
-    App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
+    App.ajax({ path: `/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
         .then((faq) => {
             $('#faqs-empty').remove();
             $('#faqs-list').append(renderFaqRow(faq));
@@ -515,7 +522,7 @@ const initFaqs = () => {
             const answer   = faqEditors.get(String(id))?.getData() ?? '';
 
             App.ajax({
-                path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`,
+                path: `/products/${window.PRODUCT_ID}/faqs/${id}`,
                 method: 'put',
                 data: { question, answer, language_id: langId },
             })
@@ -543,7 +550,7 @@ const initFaqs = () => {
     //     $('#faqs-list .faq-item').each(function () {
     //         const $item = $(this);
     //         const id = $item.data('id');
-    //         App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}/translations`, method: 'get' })
+    //         App.ajax({ path: `/products/${window.PRODUCT_ID}/faqs/${id}/translations`, method: 'get' })
     //             .then((res) => {
     //                 const lang = res.data.find(l => l.language_id === langId);
     //                 $item.find('input[name="question"]').val(lang ? lang.question : '');
@@ -560,7 +567,7 @@ const initFaqs = () => {
         const $item = $(this).closest('.faq-item');
         const id = $item.data('id');
         App.sweetConfirm('Vuoi eliminare questa FAQ?', () => {
-            App.ajax({ path: `/backoffice/products/${window.PRODUCT_ID}/faqs/${id}`, method: 'delete' })
+            App.ajax({ path: `/products/${window.PRODUCT_ID}/faqs/${id}`, method: 'delete' })
                 .then(() => {
                     faqEditors.get(String(id))?.destroy();
                     faqEditors.delete(String(id));
@@ -613,7 +620,7 @@ const initCustomerFields = () => {
 
         setLoading(btn, true);
         App.ajax({
-            path: `/backoffice/products/${window.PRODUCT_ID}/customer-fields/sync`,
+            path: `/products/${window.PRODUCT_ID}/customer-fields/sync`,
             method: 'post',
             data: { fields },
         }).then(() => {
@@ -644,7 +651,7 @@ const initRelated = () => {
 
         setLoading($btn, true);
         App.ajax({
-            path: `/backoffice/products/${window.PRODUCT_ID}/related`,
+            path: `/products/${window.PRODUCT_ID}/related`,
             method: 'put',
             data: { related_ids: relatedIds },
         }).then(() => {
@@ -723,7 +730,7 @@ const initVariants = () => {
                 const ids = [...el.querySelectorAll('.variant-item[data-id]')]
                     .map(el => parseInt(el.dataset.id));
                 App.ajax({
-                    path: `/backoffice/products/${window.PRODUCT_ID}/variants/reorder`,
+                    path: `/products/${window.PRODUCT_ID}/variants/reorder`,
                     method: 'post',
                     data: { ordered_ids: ids },
                 }).catch(() => toastr.error('Errore durante il riordinamento'));
@@ -743,13 +750,18 @@ const initVariants = () => {
         closeVariantEdit($(this).closest('.variant-item'));
     });
 
+    $(document).on('click', '.btn-variant-translations', function () {
+        const id = $(this).closest('.variant-item').data('id');
+        openTranslationsModal('variant', id);
+    });
+
     $(document).on('click', '.btn-variant-delete', function () {
         const $item = $(this).closest('.variant-item');
         const id = $item.data('id');
         const label = $item.find('.variant-label-text').text();
         App.sweetConfirm(`Eliminare la variante "${label}" e tutte le sue componenti IVA?`, () => {
             App.ajax({
-                path: `/backoffice/products/${window.PRODUCT_ID}/variants/${id}`,
+                path: `/products/${window.PRODUCT_ID}/variants/${id}`,
                 method: 'delete',
             }).then(() => {
                 $item.remove();
@@ -800,7 +812,7 @@ const initVariants = () => {
 
         setLoading($btn, true);
         App.ajax({
-            path: `/backoffice/products/${window.PRODUCT_ID}/variants/${id}`,
+            path: `/products/${window.PRODUCT_ID}/variants/${id}`,
             method: 'put',
             data: {
                 label,
@@ -923,7 +935,7 @@ const initVariantModal = () => {
         setLoading($btn, true);
 
         App.ajax({
-            path: `/backoffice/products/${window.PRODUCT_ID}/variants`,
+            path: `/products/${window.PRODUCT_ID}/variants`,
             method: 'post',
             data: {
                 label,
@@ -934,7 +946,10 @@ const initVariantModal = () => {
         }).then(() => {
             toastr.success('Variante aggiunta con successo');
             $modal.modal('hide');
-            setTimeout(() => window.location.reload(), 800);
+            setTimeout(() => {
+                window.location.hash = 'variants-panel';
+                window.location.reload();
+            }, 800);
         }).catch((err) => {
             toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
         }).finally(() => setLoading($btn, false));
@@ -960,12 +975,12 @@ const initDeleteProduct = () => {
             'Vuoi eliminare definitivamente questo prodotto? L\'operazione è irreversibile.',
             () => {
                 App.ajax({
-                    path: `/backoffice/products/${window.PRODUCT_ID}`,
+                    path: `/products/${window.PRODUCT_ID}`,
                     method: 'delete',
                 }).then((res) => {
                     toastr.success('Prodotto eliminato con successo');
                     setTimeout(() => {
-                        window.location.href = res.redirect ?? '/backoffice/products';
+                        window.location.href = res.redirect ?? '/products';
                     }, 800);
                 }).catch((err) => {
                     toastr.error(err?.responseJSON?.message || 'Errore durante l\'eliminazione');

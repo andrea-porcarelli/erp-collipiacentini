@@ -1,19 +1,29 @@
 body {
-    background: var(--standard-black-black-5) !important;
-    font-family: var(--font-font-1), serif !important;
+    background: var(--background-be-default) !important;
+    color: var(--text-secondary) !important;
+    font-family: var(--typography-title-font), serif !important;
 }
 input.form-control {
     font-size: var(--typography-body-size-medium) !important;
-    font-family: var(--font-font-1), serif !important;
+    font-family: var(--typography-title-font), serif !important;
 
 }
 .mt-spacing-l {
     margin-top: var(--spacing-l) !important;
 }
+.mt-spacing-xl {
+    margin-top: var(--spacing-xl) !important;
+}
+.mt-spacing-2xl {
+    margin-top: var(--spacing-2xl) !important;
+}
+.mt-spacing-m {
+    margin-top: var(--spacing-m) !important;
+}
 
 a {
-    font-family: var(--font-font-1), serif !important;
-    color: var(--orange-orange-6) !important;
+    font-family: var(--typography-title-font), serif !important;
+    color: var(--color) !important;
     text-decoration: none !important;
 }
 a.text-small {
@@ -25,18 +35,27 @@ a.text-small {
 .login-card {
     width: 415px;
 }
+.content-header h1 {
+    color: var(--text-main, #0D0D0D);
 
+    /* Heading */
+    font-family: var(--typography-heading-font, "DM Sans"), sans-serif !important;
+    font-size: var(--size, 48px);
+    font-style: normal;
+    font-weight: var(--weight, 500);
+    line-height: var(--line-height, 48px); /* 100% */
+}
 .bt-miticko {
     display: inline-flex;
     justify-content: center;
     align-items: center;
     gap: var(--spacing-m);
     padding: var(--button-paddingtop) var(--button-paddingright) var(--button-paddingbottom) var(--button-paddingleft);
-    border-radius: var(--button-border-radius, 12px);
-    border: var(--button-color-primary-default-borderwidth, 0) solid var(--default-bordercolor, rgba(255, 255, 255, 0.00));
-    background: var(--default-background, #D24600);
-    font-size: var(--typography-button-size-small);
-    font-weight: 500;
+    border-radius: var(--button-corner-radius, 12px);
+    border: var(--button-resting-border-width, 0) solid var(--button-resting-border-color, rgba(255, 255, 255, 0.00));
+    font-size: var(--button-font-size);
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
     text-decoration: none;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -52,8 +71,8 @@ a.text-small {
 }
 
 .bt-miticko.bt-m-default {
-    background: var(--light-background);
-    color: var(--light-foreground);
+    background: var(--button-resting-background, #D24600);
+    color: var(--button-resting-foreground);
 }
 
 .bt-miticko.bt-m-light {
@@ -97,13 +116,15 @@ a.text-small {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: var(--spacing-s);
+    gap: var(--text-field-spacing);
+    align-self: stretch;
+
 }
 
 .text-field label{
     color: var(--text-main, #0D0D0D);
     /* titleSmall */
-    font-family: var(--font-font-1, "DM Sans"), sans-serif;
+    font-family: var(--typography-title-font, "DM Sans"), sans-serif;
     font-size: var(--typography-title-size-small, 14px);
     font-style: normal;
     font-weight: var(--typography-title-weight-small, 700);
@@ -111,10 +132,11 @@ a.text-small {
 }
 .text-field .text-field-container {
     display: flex;
+    padding: 0 var(--text-field-paddinghorizontal, 16px);
     align-items: center;
-    gap: var(--text-field-spacing);
+    gap: var(--text-field-spacing, 8px);
     align-self: stretch;
-    border-radius: var(--text-field-borderradius);
+    border-radius: var(--text-field-borderradius, 12px);
     border: var(--text-field-empty-borderwidth, 1px) solid var(--text-field-empty-border, #E6E6E6);
     background: var(--text-field-empty-background, #FFF);
 }
@@ -127,15 +149,15 @@ a.text-small {
     align-self: stretch;
     color: var(--text-main);
     text-overflow: ellipsis;
-    font-family: var(--font-font-1), serif;
-    font-size: var(--typography-body-size-medium);
+    font-family: var(--typography-title-font), serif;
+    font-size: var(--size);
     font-style: normal;
     font-weight: var(--typography-body-weight-medium);
     line-height: var(--typography-body-lineheight-medium); /* 114.286% */
     width: 100%;
     border: none;
     border-radius: var(--text-field-borderradius);
-    padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
+    padding: var(--text-field-paddingvertical) 0;
 }
 .text-field .text-field-container input:focus,
 .text-field .text-field-container input:active {
@@ -144,7 +166,8 @@ a.text-small {
     box-shadow: 0 0 5px rgba(0,0,0,0);
 }
 .text-field .text-field-container input::placeholder {
-    color: var(--text-secondary);
+    color: var(--text-field-empty-label);
+    font-size: var(--size);
 }
 .text-field .text-field-container input:-webkit-autofill,
 .text-field .text-field-container input:-webkit-autofill:hover,
@@ -174,7 +197,7 @@ a.text-small {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    font-family: var(--font-font-1), serif;
+    font-family: var(--typography-title-font), serif;
     font-size: var(--typography-body-size-small);
     font-style: normal;
     font-weight: var(--typography-body-weight-small);
@@ -216,7 +239,6 @@ a.text-small {
     height: 100vh;
     padding: var(--spacing-l, 16px);
     align-items: flex-start;
-    gap: var(--spacing-xl, 24px);
     background: var(--neutral-black, #000);
     z-index: 100;
 }
@@ -235,28 +257,27 @@ a.text-small {
     margin-bottom: var(--spacing-xs);
 }
 .sidebar .navigation-bar .item .nav-item {
+
+    color: var(--colors-primitives-grey-scale-black-0, #FFF) !important;
+    font-family: var(--typography-body-font, "DM Sans"), sans-serif !important;
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 300);
+    line-height: var(--line-height, 16px); /* 114.286% */
     display: flex;
     height: 40px;
     padding: 12px;
     align-items: center;
     gap: 4px;
     align-self: stretch;
-    color: #FFF;
-    font-family: var(--font-font-1), serif;
-    font-size: var(--typography-title-size-small, 14px);
-    font-style: normal;
     width: 100%;
 }
 
-.sidebar .navigation-bar .item .nav-item{
-    color: #FFF !important;
-    font-weight: var(--typography-title-weight-medium);
-    line-height: var(--typography-title-lineheight-medium); /* 100% */
-}
-
 .sidebar .navigation-bar .item .nav-item.active {
-    font-weight: var(--typography-title-weight-small);
-    line-height: var(--typography-title-lineheight-small); /* 100% */
+    border-radius: var(--border-radius-s, 8px) !important;
+    background: var(--neutral-grey-80, #333) !important;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
 }
 
 .sidebar .navigation-bar .item .nav-item.active {
@@ -271,7 +292,6 @@ a.text-small {
 .main-content {
     margin-left: 200px;
     min-height: 100vh;
-    background-color: #FFF;
     padding: var(--be---page-padding-top, 32px) var(--be---page-padding-right, 32px) var(--be---page-padding-bottom, 0) var(--be---page-padding-left, 32px);
     width: calc(100vw - 200px);
 }
@@ -290,7 +310,7 @@ a.text-small {
     color: #000;
 
     /* headingMedium */
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-heading-size-medium);
     font-style: normal;
     font-weight: var(--typography-heading-weight-medium);
@@ -307,9 +327,8 @@ a.text-small {
     gap: var(--card-spacing);
     align-self: stretch;
     border-radius: var(--card-border-radius);
-    border: var(--card-width) solid var(--card-border);
+    border: var(--card-border-width) solid var(--card-border-color);
     background: var(--card-background);
-    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.20);
 }
 .card-miticko .card-header {
     width: 100%;
@@ -317,7 +336,7 @@ a.text-small {
 }
 .card-miticko .card-header h2 {
     color: var(--card-title);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-medium);
     font-style: normal;
     font-weight: var(--typography-title-weight-medium);
@@ -325,7 +344,7 @@ a.text-small {
 }
 .card-miticko .card-header p {
     color: var(--card-subtitle);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-body-size-medium);
     font-style: normal;
     font-weight: var(--typography-body-weight-medium);
@@ -335,6 +354,7 @@ a.text-small {
 
 .card-miticko .card-body {
     width: 100%;
+    position: relative !important;
 }
 .table-header {
     display: flex;
@@ -355,18 +375,22 @@ a.text-small {
 }
 .filters-miticko .filter {
     display: inline-flex;
-    padding: var(--spacing-xs) var(--spacing-s) var(--spacing-xs) var(--spacing-xs);
+    padding: var(--filter-paddingtop, 4px) var(--filter-paddingright, 8px) var(--filter-paddingbottom, 4px) var(--filter-paddingleft, 8px);
     align-items: center;
-    gap: var(--spacing-xs);
-    border-radius: var(--border-radius-s);
-    border: 1px dashed var(--primary-brandlighthover);
+    gap: var(--filter-spacing, 4px);
+    border-radius: var(--filter-borderradius, 8px);
+    border: var(--filter-borderwidth, 1px) solid var(--brand-secondary-brandLighthover, #C6D1f2);
+    background: var(--background-global-paper1, #FFF);
+    /* Elevation */
+    box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
     width: auto;
-    color: var(--primary-brand);
-    font-family: var(--font-font-1), sans-serif;
-    font-size: var(--typography-label-size-large);
+    color: var(--brand-secondary-brand, #3948D3);
+    /* Body */
+    font-family: var(--typography-body-font, "DM Sans");
+    font-size: var(--size, 14px);
     font-style: normal;
-    font-weight: var(--typography-label-weight-large);
-    line-height: var(--typography-label-lineheight-large);
+    font-weight: var(--weight, 300);
+    line-height: var(--line-height, 16px); /* 114.286% */
     max-width: max-content;
 }
 .filters-miticko .filter:hover {
@@ -382,7 +406,7 @@ a.text-small {
 }
 .table-header .table-header-total {
     color: var(--text-secondary);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-label-size-large);
     font-style: normal;
     font-weight: var(--typography-label-weight-large);
@@ -403,19 +427,17 @@ a.text-small {
     width: 100%;
 }
 
-.table-miticko thead tr {
-    border-radius: var(--border-radius-xs) var(--border-radius-xs) 0 0 !important;
-    background: var(--secondary-brandlight) !important;
-}
 
 .table-miticko thead tr th {
     padding: var(--spacing-l) var(--spacing-m) !important;
     color: var(--text-secondary);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-small);
     font-style: normal;
     font-weight: var(--typography-title-weight-small) !important;
     line-height: var(--typography-title-lineheight-small); /* 128.571% */
+    border-radius: var(--heading-border-radius, 8px) var(--heading-border-radius, 8px) 0 0;
+    background: var(--heading-background-color, #FAFAFA);
 }
 .table-miticko > tbody > tr > th, .table-miticko > tbody > tr > td {
     padding: var(--spacing-l) var(--spacing-m) !important;
@@ -432,7 +454,7 @@ a.text-small {
 /* Dalla prima alla seconda colonna */
 .table-miticko > tbody > tr > td:nth-child(-n+2) {
     color: var(--text-main);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-small);
     font-style: normal;
     font-weight: var(--typography-title-weight-small);
@@ -533,7 +555,7 @@ div.dt-container .dt-paging .dt-paging-button:active {
 .modal-miticko {
     align-self: stretch;
     color: var(--text-main) !important;
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-medium);
     font-style: normal;
     font-weight: var(--typography-title-weight-medium);
@@ -559,7 +581,7 @@ div.dt-container .dt-paging .dt-paging-button:active {
 }
 .modal-miticko .modal-header .modal-title {
     color: var(--text-main);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-medium);
     font-style: normal;
     font-weight: var(--typography-title-weight-medium);
@@ -584,7 +606,7 @@ div.dt-container .dt-paging .dt-paging-button:active {
 .flatpickr-calendar .flatpickr-current-month .cur-year {
     color: #000;
     text-align: center;
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-small);
     font-style: normal;
     font-weight: var(--typography-title-weight-small);
@@ -670,7 +692,7 @@ span.flatpickr-weekday{
 }
 .swal-modal .swal-title {
     color: var(--text-main);
-    font-family: var(--font-font-1), sans-serif;
+    font-family: var(--typography-title-font), sans-serif;
     font-size: var(--typography-title-size-medium);
     font-style: normal;
     font-weight: var(--typography-title-weight-medium);
@@ -780,9 +802,12 @@ span.flatpickr-weekday{
     right: 0;
 }
 .sub-title {
-    font-family: var(--font-font-1, "DM Sans"), sans-serif;
+    font-family: var(--typography-title-font, "DM Sans"), sans-serif;
     font-size: var(--typography-title-size-medium, 18px);
     font-style: normal;
     font-weight: var(--typography-title-weight-medium, 700);
     line-height: var(--typography-title-line-height-medium, 24px); /* 133.333% */
+}
+.gap-spacing-l {
+    gap: var(--spacing-l, 16px);
 }
