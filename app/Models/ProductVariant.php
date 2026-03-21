@@ -11,6 +11,7 @@ class ProductVariant extends LogsModel
     use HasLanguageContent;
     public $fillable = [
         'product_id',
+        'availability_id',
         'label',
         'description',
         'max_quantity',
@@ -20,6 +21,11 @@ class ProductVariant extends LogsModel
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function availability(): BelongsTo
+    {
+        return $this->belongsTo(ProductAvailability::class);
     }
 
     public function prices(): HasMany

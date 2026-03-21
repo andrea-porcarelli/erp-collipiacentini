@@ -6,14 +6,14 @@
     'mode' => 'White',
     'class' => null,
     'h1' => null,
-    'leading' => null
+    'leading' => null,
+    'brelative' => null
 ])
 
-<div class="card-miticko {{ $class }}" data-mode="{{ $size }} {{ $mode }}">
+<div class="card-miticko {{ $class }}" data-mode="cardSize-{{ $size }} cardAppearance-{{ $mode }}">
     @if(isset($title) or isset($sub_title) or isset($pre_title))
         <div class="card-header">
             @isset($pre_title)
-
                 <small class="mb-0">
                     @isset($leading)
                         <i class="fa-regular {{ $leading }} icon"></i>
@@ -29,12 +29,12 @@
                 @endif
             @endisset
             @isset($sub_title)
-                <p>{!! $sub_title !!}</p>
+                <p class="mt-spacing-m" style="max-width: 70%">{!! $sub_title !!}</p>
             @endisset
         </div>
     @endif
 
-    <div class="card-body">
+    <div class="card-body @isset($brelative) position-relative @endisset">
         {{ $slot }}
     </div>
 

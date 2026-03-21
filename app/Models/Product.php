@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 use App\Enums\ProductStatus;
+use App\Models\ProductPriceVariation;
 use App\Traits\HasLanguageContent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -36,7 +37,6 @@ class Product extends LogsModel
         }
 
         $hasFutureAvailability = $this->availabilities()
-            ->whereDate('date', '>', now())
             ->where('availability', '>', 0)
             ->exists();
 
@@ -73,9 +73,9 @@ class Product extends LogsModel
             ->get();
     }
 
-    public function prices() : HasMany
+    public function priceVariations(): HasMany
     {
-        return $this->hasMany(ProductPrice::class);
+        return $this->hasMany(ProductPriceVariation::class);
     }
 
     public function links() : HasMany
@@ -180,5 +180,15 @@ class Product extends LogsModel
 
     public function getProductTagsAttribute() : ?string {
         return view('whitelabel.products.product_tags', ['product' => $this])->render();
+    }
+
+    public function getAvailabilityDaysAttribute() : array
+    {
+        return $this->availabilities()
+            ->whereNotNull('day_of_week')
+            ->distinct()
+            ->pluck('day_of_week')
+            ->values()
+            ->toArray();
     }
 }

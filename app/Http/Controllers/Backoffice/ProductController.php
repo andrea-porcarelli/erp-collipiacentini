@@ -146,6 +146,7 @@ class ProductController extends CrudController
                 'categories'  => $this->updateCategories($product, $request),
                 'public'      => $this->updatePublic($product, $request),
                 'description' => $this->updateDescription($product, $request),
+                'occupancy'   => $this->updateOccupancy($product, $request),
                 default       => throw new \Exception('Sezione non valida'),
             };
 
@@ -203,6 +204,15 @@ class ProductController extends CrudController
     {
         $product->setContentFields([
             'description' => $request->input('description'),
+        ]);
+    }
+
+    private function updateOccupancy(Product $product, UpdateProductRequest $request): void
+    {
+        $this->interface->edit($product, [
+            'occupancy'            => (int) $request->input('occupancy'),
+            'occupancy_for_price'  => $request->boolean('occupancy_for_price'),
+            'free_occupancy_rule'  => $request->boolean('free_occupancy_rule'),
         ]);
     }
 

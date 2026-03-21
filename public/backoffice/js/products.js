@@ -65,6 +65,19 @@ const formConfigs = {
         successMessage: 'Descrizione aggiornata con successo',
         validate: () => ({}),
     },
+    'form-variants-occupancy': {
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'occupancy',
+        successMessage: 'Capienza aggiornata con successo',
+        validate: (data) => {
+            const errors = {};
+            if (!data.occupancy || parseInt(data.occupancy) < 1) {
+                errors.occupancy = ['Inserisci una capienza valida'];
+            }
+            return errors;
+        },
+    },
 };
 
 // ---------------------------------------------------------------------------
@@ -175,14 +188,14 @@ const renderTranslationBody = (data, entityType) => {
     const fields = translationFields[entityType];
 
     if (!data || data.length === 0) {
-        return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
+        return '<p class="text-secondary small  mb-0">Nessuna lingua disponibile nel sistema.</p>';
     }
 
 
     const headerRow = `<div class="row g-2 align-items-center mb-1">
         <div class="col-auto" style="width:64px"></div>
         <div class="col"><span class="small fw-semibold">Nome variante *</span></div>
-        <div class="col"><span class="small fw-semibold">URL</span></div>
+        <div class="col"><span class="small fw-semibold">Descrizione breve *</span></div>
     </div>`;
 
     const rowsHtml = data.map(lang => {
@@ -190,15 +203,15 @@ const renderTranslationBody = (data, entityType) => {
             const value = escapeHtml(lang[f.name] || '');
             if (f.type === 'textarea') {
                 return `<div class="col">
-                    <div class="text-field" data-mode="medium">
+                    <div class="text-field"
                         <div class="text-field-container">
                             <textarea class="input-miticko" name="${f.name}" rows="2" placeholder="${f.placeholder || ''}">${value}</textarea>
                         </div>
                     </div>
                 </div>`;
             }
-            return `<div class="col">
-                <div class="text-field" data-mode="medium">
+            return `<div class="col" style="${f.name == 'label' ? 'max-width:35%' : ''}">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting" >
                     <div class="text-field-container">
                         <input class="input-miticko" name="${f.name}" value="${value}" placeholder="${f.placeholder || ''}">
                     </div>
@@ -259,7 +272,9 @@ const saveTranslations = () => {
     App.ajax({ path: savePath, method: 'put', data: { translations } })
         .then(() => {
             toastr.success('Traduzioni salvate con successo');
-            $modal.modal('hide');
+            setTimeout(() => {
+                $modal.modal('hide');
+            }, 1500)
         })
         .catch(() => toastr.error('Errore durante il salvataggio delle traduzioni'));
 };
@@ -442,14 +457,14 @@ const renderFaqRow = (faq) => {
     <div class="faq-item py-1" data-id="${faq.id}">
         <div class="row g-2 align-items-start">
             <div class="col-12 col-sm-4">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <input class="input-miticko" name="question" value="${question}">
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-7">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <textarea class="input-miticko" name="answer" rows="2">${answer}</textarea>
                     </div>
@@ -465,7 +480,7 @@ const renderFaqRow = (faq) => {
 const updateSaveFaqsButton = () => {
     const hasDirty = $('#faqs-list .faq-item[data-dirty]').length > 0;
     if (hasDirty) {
-        $('.btn-save-faq').attr('data-mode', 'medium primary').removeClass('btn-m-primary').addClass('btn-m-default');
+        $('.btn-save-faq').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Primary').removeClass('btn-m-primary').addClass('btn-m-default');
     } else {
         $('.btn-save-faq').attr('data-mode', 'medium disabled').removeClass('btn-m-default').addClass('btn-m-primary');
     }
@@ -639,7 +654,7 @@ const initCustomerFields = () => {
 // ---------------------------------------------------------------------------
 const initRelated = () => {
     $(document).on('change', '.related-slot-select', function () {
-        $('.btn-save-related').attr('data-mode', 'medium primary');
+        $('.btn-save-related').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Primary');
     });
 
     $(document).on('click', '.btn-save-related', function () {
@@ -656,7 +671,7 @@ const initRelated = () => {
             data: { related_ids: relatedIds },
         }).then(() => {
             toastr.success('Prodotti correlati salvati');
-            $('.btn-save-related').attr('data-mode', 'medium disabled');
+            $('.btn-save-related').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Disabled');
         }).catch((err) => {
             toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
         }).finally(() => setLoading($btn, false));
@@ -669,34 +684,36 @@ const initRelated = () => {
 const editPriceRowTemplate = () => `
 <div class="edit-price-row d-flex align-items-center gap-2 mb-2">
     <div class="flex-grow-1">
-        <div class="text-field" data-mode="medium">
+        <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
             <div class="text-field-container">
-                <input class="input-miticko" name="price_label[]" placeholder="es. Visita">
+                <input class="input-miticko " name="price_label[]" type="text" placeholder="es. Visita">
             </div>
         </div>
     </div>
-    <div class="text-field" data-mode="medium" style="width:180px;flex-shrink:0">
-        <div class="text-field-container">
-            <input type="number" min="0" step="0.01" class="input-miticko" name="price_value[]" placeholder="0.00" style="min-width:0">
-            <span class="text-secondary small fw-semibold px-2" style="white-space:nowrap">EUR</span>
+    <div style="width:180px;flex-shrink:0">
+        <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+            <div class="text-field-container">
+                <input class="input-miticko " name="price_value[]" type="number" min="0" step="0.01" placeholder="0.00">
+                <i class="extra">EUR</i>
+            </div>
         </div>
     </div>
     <div style="width:150px;flex-shrink:0">
-        <div class="text-field" data-mode="medium">
+        <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
             <div class="text-field-container">
                 <select class="input-miticko" name="price_vat[]">
-                    <option value="0">Esente</option>
+                    <option value="0" selected="">Esente</option>
                     <option value="4">4%</option>
                     <option value="5">5%</option>
                     <option value="10">10%</option>
-                    <option value="22" selected>22%</option>
+                    <option value="22">22%</option>
                 </select>
             </div>
         </div>
     </div>
     <div style="width:40px;flex-shrink:0">
         <button type="button" class="bt-miticko outlined danger small btn-edit-remove-price">
-            <i class="fa-regular fa-trash icon"></i>
+            <i class="fa-regular fa-trash-can icon"></i>
         </button>
     </div>
 </div>`;
@@ -752,6 +769,11 @@ const initVariants = () => {
 
     $(document).on('click', '.btn-variant-translations', function () {
         const id = $(this).closest('.variant-item').data('id');
+        openTranslationsModal('variant', id);
+    });
+
+    $(document).on('click', '.btn-slot-variant-translations', function () {
+        const id = $(this).data('id');
         openTranslationsModal('variant', id);
     });
 
@@ -839,40 +861,38 @@ const priceRowTemplate = () => `
 <div class="mb-2 variant-price-row">
     <div class="d-flex align-items-end gap-2">
         <div class="flex-grow-1">
-            <div class="text-field" data-mode="medium">
-                <label>Servizio *</label>
+            <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                <label>Servizio * </label>
                 <div class="text-field-container">
-                    <input class="input-miticko" name="price_label[]" placeholder="es. Adulto">
+                    <input class="input-miticko " name="price_label[]" id="variant_label" type="text" placeholder="es. Adulto" required="">
                 </div>
             </div>
         </div>
         <div style="width:200px;flex-shrink:0">
             <div class="text-field" data-mode="medium">
                 <label>Prezzo al pubblico *</label>
-                <div class="text-field-container">
-                    <input type="number" min="0" step="0.01" class="input-miticko" name="price_value[]" placeholder="0.00" style="min-width:0">
-                    <span class="text-secondary small fw-semibold px-2" style="white-space:nowrap">EUR</span>
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                    <div class="text-field-container">
+                        <input type="number" min="0" step="0.01" class="input-miticko" name="price_value[]" placeholder="0.00" style="min-width:0">
+                        <i class="extra">EUR</i>
+                    </div>
                 </div>
             </div>
         </div>
         <div style="width:150px;flex-shrink:0">
-            <div class="text-field" data-mode="medium">
+            <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                 <label>IVA *</label>
                 <div class="text-field-container">
-                    <select class="input-miticko" name="price_vat[]">
+                    <select  class="input-miticko" name="price_vat[]">
+                        <option value="">Scegli</option>
                         <option value="0">Esente</option>
                         <option value="4">4%</option>
                         <option value="5">5%</option>
                         <option value="10">10%</option>
-                        <option value="22" selected>22%</option>
+                        <option value="22">22%</option>
                     </select>
                 </div>
             </div>
-        </div>
-        <div style="padding-bottom:2px">
-            <button type="button" class="bt-miticko bt-m-text-only danger small btn-remove-price-row">
-                <i class="fa-regular fa-xmark icon"></i>
-            </button>
         </div>
     </div>
 </div>`;
@@ -998,12 +1018,12 @@ const initDeleteProduct = () => {
 const init = () => {
     // Dirty tracking sui form delle card — attiva il btn-save-card quando un campo cambia
     $(document).on('input change', 'form:not(#form-customer-fields) :input:not([disabled])', function () {
-        $(this).closest('.card-miticko').find('.btn-save-card').attr('data-mode', 'medium primary');
+        $(this).closest('.card-miticko').find('.btn-save-card').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Primary');
     });
 
     // Dirty tracking per Dati cliente
     $(document).on('change', '#form-customer-fields :input', function () {
-        $('.btn-save-customer-fields').attr('data-mode', 'medium primary');
+        $('.btn-save-customer-fields').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Primary');
     });
 
     $(document).on('click', '.btn-save-card', function () {
@@ -1025,8 +1045,163 @@ const init = () => {
     initDeleteProduct();
     initVariants();
     initVariantModal();
+    initPriceVariations();
 };
 
 $(function () {
     init();
 });
+
+// ─── Price Variations ────────────────────────────────────────────────────────
+
+const renderPriceVariationRow = (v) => `
+    <div class="d-flex align-items-center price-variation-item"
+         data-id="${v.id}"
+         data-date-from="${v.date_from_iso}"
+         data-date-to="${v.date_to_iso}"
+         data-direction="${v.direction}"
+         data-value="${v.value}"
+         data-unit="${v.unit}">
+        <b>${v.date_from} → ${v.date_to}</b>
+        <span>${v.direction_label} ${parseFloat(v.value).toFixed(2)} ${v.unit_label}</span>
+        <button type="button" class="bt-miticko outlined Primary small btn-edit-price-variation ms-auto">
+            <i class="fa-regular fa-pen icon"></i>
+        </button>
+        <button type="button" class="bt-miticko outlined danger small btn-delete-price-variation">
+            <i class="fa-regular fa-trash-can icon"></i>
+        </button>
+    </div>`;
+
+const initPriceVariations = () => {
+    const $modal   = $('#modal-price-variation');
+    let _fp        = null;
+
+    const openModal = (variation = null) => {
+        $('#pv-variation-id').val(variation ? variation.id : '');
+        $('#modal-price-variation .modal-title').text(variation ? 'Modifica personalizzazione' : 'Modifica intero periodo');
+        $('#btn-create-price-variation').text(variation ? 'Salva modifiche' : 'Crea personalizzazione');
+
+        if (variation) {
+            $('#pv-date-from').val(variation.dateFrom);
+            $('#pv-date-to').val(variation.dateTo);
+            const fmt = (iso) => {
+                const d = new Date(iso);
+                return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+            };
+            $('#pv-date-from-label').text(fmt(variation.dateFrom));
+            $('#pv-date-to-label').text(fmt(variation.dateTo));
+            $('#pv_direction').val(variation.direction);
+            $('#pv_increment').val(variation.value);
+            $('#pv_unit').val(variation.unit);
+        } else {
+            $('#pv-date-from').val('');
+            $('#pv-date-to').val('');
+            $('#pv-date-from-label').text('—');
+            $('#pv-date-to-label').text('—');
+            $('#pv_direction').val('increment');
+            $('#pv_increment').val('');
+            $('#pv_unit').val('euro');
+        }
+
+        $modal.modal('show');
+    };
+
+    $(document).on('click', '.btn-add-prices-editing', () => openModal());
+
+    $(document).on('click', '.btn-edit-price-variation', function () {
+        const $item = $(this).closest('.price-variation-item');
+        openModal({
+            id:        $item.data('id'),
+            dateFrom:  $item.data('date-from'),
+            dateTo:    $item.data('date-to'),
+            direction: $item.data('direction'),
+            value:     $item.data('value'),
+            unit:      $item.data('unit'),
+        });
+    });
+
+    $modal.on('shown.bs.modal', () => {
+        if (_fp) { _fp.destroy(); _fp = null; }
+        const defaultDates = [];
+        const from = $('#pv-date-from').val();
+        const to   = $('#pv-date-to').val();
+        if (from) defaultDates.push(from);
+        if (to)   defaultDates.push(to);
+
+        _fp = flatpickr('#pv-flatpickr-input', {
+            mode: 'range',
+            locale: 'it',
+            dateFormat: 'Y-m-d',
+            defaultDate: defaultDates,
+            onChange(dates) {
+                if (dates.length === 2) {
+                    const fmt = (d) => d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+                    $('#pv-date-from').val(dates[0].toISOString().slice(0,10));
+                    $('#pv-date-to').val(dates[1].toISOString().slice(0,10));
+                    $('#pv-date-from-label').text(fmt(dates[0]));
+                    $('#pv-date-to-label').text(fmt(dates[1]));
+                }
+            },
+        });
+    });
+
+    $(document).on('click', '#btn-pv-open-picker', () => {
+        _fp?.open();
+    });
+
+    $(document).on('click', '#btn-create-price-variation', function () {
+        const dateFrom  = $('#pv-date-from').val();
+        const dateTo    = $('#pv-date-to').val();
+        const value     = $('#pv_increment').val().trim();
+        const direction = $('#pv_direction').val();
+        const unit      = $('#pv_unit').val();
+
+        if (!dateFrom || !dateTo) { toastr.warning('Seleziona un periodo'); return; }
+        if (value === '') { toastr.warning('Inserisci un valore'); return; }
+
+        const variationId = $('#pv-variation-id').val();
+        const isEdit      = !!variationId;
+        const $btn        = $(this).prop('disabled', true);
+
+        App.ajax({
+            path:   isEdit
+                ? `/products/${window.PRODUCT_ID}/price-variations/${variationId}`
+                : `/products/${window.PRODUCT_ID}/price-variations`,
+            method: isEdit ? 'put' : 'post',
+            data:   { date_from: dateFrom, date_to: dateTo, direction, value, unit },
+        }).then((v) => {
+            if (isEdit) {
+                const $item = $(`.price-variation-item[data-id="${variationId}"]`);
+                $item.replaceWith(renderPriceVariationRow(v));
+                toastr.success('Personalizzazione aggiornata');
+            } else {
+                $('#price-variations-empty').remove();
+                $('#price-variations-list').append(renderPriceVariationRow(v));
+                toastr.success('Personalizzazione creata');
+            }
+            $modal.modal('hide');
+        }).catch((err) => {
+            toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');
+        }).finally(() => {
+            $btn.prop('disabled', false);
+        });
+    });
+
+    $(document).on('click', '.btn-delete-price-variation', function () {
+        const $item = $(this).closest('.price-variation-item');
+        const id    = $item.data('id');
+        $(document).trigger('sweetConfirmTrigger', [{
+            title: 'Elimina personalizzazione',
+            text: 'Vuoi eliminare questa personalizzazione di prezzo?',
+            callback: () => {
+                App.ajax({
+                    path: `/products/${window.PRODUCT_ID}/price-variations/${id}`,
+                    method: 'delete',
+                }).then(() => {
+                    $item.remove();
+                    toastr.success('Personalizzazione eliminata');
+                }).catch(() => toastr.error('Errore durante l\'eliminazione'));
+            },
+        }]);
+    });
+};

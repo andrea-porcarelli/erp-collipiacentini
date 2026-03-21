@@ -101,4 +101,20 @@ class Utils
         }
         return Str::slug($company->company_name);
     }
+
+    public static function hours() : array {
+        return array_map(function($h) {
+            return [
+                'id'    => $h,
+                'label' => str_pad($h, 2, '0', STR_PAD_LEFT)
+            ];
+        }, range(0, 23));
+    }
+
+    public static function minutes() : array {
+        return array_map(fn($m) => [
+            'id'    => str_pad($m, 2, '0', STR_PAD_LEFT),
+            'label' => str_pad($m, 2, '0', STR_PAD_LEFT)
+        ], range(0, 59, 1));
+    }
 }

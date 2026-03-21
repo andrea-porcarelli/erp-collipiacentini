@@ -14,6 +14,8 @@ use App\Http\Controllers\Backoffice\ProductController;
 use App\Http\Controllers\Backoffice\ProductFaqController;
 use App\Http\Controllers\Backoffice\ProductLinkController;
 use App\Http\Controllers\Backoffice\ProductRelatedController;
+use App\Http\Controllers\Backoffice\ProductAvailabilityController;
+use App\Http\Controllers\Backoffice\ProductPriceVariationController;
 use App\Http\Controllers\Backoffice\ProductCustomerFieldController;
 use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\UserController;
@@ -55,6 +57,10 @@ Route::domain('admin.miticko.com')->group(function () {
 
         Route::resource('orders', OrderController::class);
         Route::resource('products', ProductController::class);
+        Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');
+        Route::post('products/{product}/price-variations', [ProductPriceVariationController::class, 'store'])->name('products.price-variations.store');
+        Route::put('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'update'])->name('products.price-variations.update');
+        Route::delete('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'destroy'])->name('products.price-variations.destroy');
         Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
         Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
         Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
@@ -80,6 +86,10 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('products/{product}/related', [ProductRelatedController::class, 'sync'])->name('products.related.sync');
         Route::delete('products/{product}/related/{related}', [ProductRelatedController::class, 'destroy'])->name('products.related.destroy');
         Route::post('products/{product}/customer-fields/sync', [ProductCustomerFieldController::class, 'sync'])->name('products.customer-fields.sync');
+        Route::get('products/{product}/schedule/{dayIndex}', [ProductAvailabilityController::class, 'index'])->name('products.schedule.index');
+        Route::post('products/{product}/schedule', [ProductAvailabilityController::class, 'store'])->name('products.schedule.store');
+        Route::put('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'update'])->name('products.schedule.update');
+        Route::delete('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'destroy'])->name('products.schedule.destroy');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');

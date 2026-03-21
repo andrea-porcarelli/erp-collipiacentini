@@ -13,7 +13,7 @@
 
 @for($i = 0; $i < $maxRelated; $i++)
     <div class="{{ $i < $maxRelated - 1 ? 'mb-2' : '' }}">
-        <div class="text-field" data-mode="medium">
+        <div class="text-field" data-mode="textfieldSize-Medium">
             <div class="text-field-container">
                 <select class="input-miticko related-slot-select" data-slot="{{ $i }}">
                     <option value="">Nessun prodotto</option>

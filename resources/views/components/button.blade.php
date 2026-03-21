@@ -3,9 +3,9 @@
     'leading_style' => 'regular',
     'trailing' => null,
     'trailing_style' => 'regular',
-    'emphasis' => 'default',
     'status' => 'Primary',
-    'size' => 'High',
+    'emphasis' => 'Medium',
+    'size' => 'Medium',
     'label' => '',
     'class' => '',
     'type' => 'button',
@@ -16,13 +16,14 @@
     'role' => null,
     'ariaset' => [],
     'w_click' => null,
+    'style' => null
 ])
 
 @if($href)
     <a
         href="{{ $disabled ? '#' : $href }}"
-        data-mode="{{ $size }} {{ $status }}"
-        class="bt-miticko {{ $class }} bt-m-{{ $emphasis }} {{ $disabled ? 'disabled' : '' }}"
+        data-mode="buttonSize-{{ $size }} buttonEmphasis-{{ $emphasis }} buttonAppearance-{{ $status }}"
+        class="bt-miticko {{ $class }} {{ $disabled ? 'disabled' : '' }}"
         @if($disabled) aria-disabled="true" onclick="return false;" @endif
         @isset($id) id="{{ $id }}" @endisset
         @if(!empty($dataset))
@@ -41,10 +42,11 @@
     </a>
 @else
     <button
-        data-mode="{{ $size }} {{ $status }}"
+        data-mode="buttonSize-{{ $size }} buttonEmphasis-{{ $emphasis }}  buttonAppearance-{{ $status }}"
         type="{{ $type }}"
-        class="bt-miticko {{ $class }} bt-m-{{ $emphasis }}"
+        class="bt-miticko {{ $class }} btn-miticko-{{ $emphasis }}"
         @isset($id) id="{{ $id }}" @endisset
+        @isset($style) style="{{ $style }}" @endisset
         @isset($role) role="{{ $role }}" @endisset
         @if($disabled) disabled @endif
         @if(!empty($dataset))

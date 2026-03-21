@@ -23,83 +23,41 @@
             @endif
         </div>
     </div>
-    <div class="w-100">
+    <div class="w-100 mt-spacing-2xl">
         {{-- Tabs Navigation --}}
-        <ul class="nav nav-tabs product-tabs" id="productTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class="active"
-                    status="secondary"
-                    id="info-tab"
-                    role="tab"
-                    label="Informazioni"
-                    :dataset="['bs-target' => '#info-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'info-panel', 'selected' => 'true']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="variants-tab"
-                    role="tab"
-                    label="Varianti e prezzi"
-                    :dataset="['bs-target' => '#variants-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'variants-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="schedule-tab"
-                    role="tab"
-                    label="Date e orari"
-                    :dataset="['bs-target' => '#schedule-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'schedule-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="special-schedule-tab"
-                    role="tab"
-                    label="Date e orari speciali"
-                    :dataset="['bs-target' => '#special-schedule-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'special-schedule-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="closed-period-tab"
-                    role="tab"
-                    label="Periodi di chiusura"
-                    :dataset="['bs-target' => '#closed-period-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'closed-period-panel', 'selected' => 'false']"
-                />
-            </li>
-            <li class="nav-item" role="presentation">
-                <x-button
-                    class=""
-                    status="secondary"
-                    emphasis="outlined"
-                    id="media-tab"
-                    role="tab"
-                    label="Foto e descrizione"
-                    :dataset="['bs-target' => '#media-panel', 'bs-toggle' => 'tab']"
-                    :ariaset="['controls' => 'media-panel', 'selected' => 'false']"
-                />
-            </li>
-        </ul>
+        <div class="d-flex gap-2" id="productTabs" role="tablist">
+            <x-chip
+                label="Informazioni"
+                :dataset="['tab-target' => '#info-panel']"
+            />
+            <x-chip
+                label="Varianti e prezzi"
+                appearance="Resting"
+                :dataset="['tab-target' => '#variants-panel']"
+            />
+            <x-chip
+                label="Date e orari"
+                appearance="Resting"
+                :dataset="['tab-target' => '#schedule-panel']"
+            />
+            <x-chip
+                label="Date e orari speciali"
+                appearance="Resting"
+                :dataset="['tab-target' => '#special-schedule-panel']"
+            />
+            <x-chip
+                label="Periodi di chiusura"
+                appearance="Resting"
+                :dataset="['tab-target' => '#closed-period-panel']"
+            />
+            <x-chip
+                label="Foto e descrizione"
+                appearance="Resting"
+                :dataset="['tab-target' => '#media-panel']"
+            />
+        </div>
         {{-- Tabs Content --}}
-        <div class="tab-content" id="productTabsContent">
+        <div class="tab-content mt-spacing-xl" id="productTabsContent">
             <x-backoffice.product.tab-info :model="$model" :categories="$categories" :languages="$languages" :fieldTypes="$fieldTypes" />
             <x-backoffice.product.tab-variants :model="$model" />
             <x-backoffice.product.tab-schedule :model="$model" />
@@ -108,6 +66,72 @@
             <x-backoffice.product.tab-media :model="$model" />
         </div>
     </div>
+
+    {{-- Modal: Nuovo orario di visita (schedule) --}}
+    <div class="modal fade" tabindex="-1" id="modal-add-slot">
+        <div class="modal-dialog modal-sm" data-mode="Miticko Light Desktop White">
+            <div class="modal-content modal-miticko">
+                <div class="modal-header">
+                    <h1 class="modal-title">Nuovo orario di visita</h1>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fa-regular fa-times"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @php
+
+                    @endphp
+                    <div class="d-flex align-items-center gap-2">
+                        <x-dropdown
+                            name="slot-hour"
+                            :options="Utils::hours()"
+                            id="slot-hour"
+                        />
+
+                        <span class="fw-medium">e</span>
+
+                        <x-dropdown
+                            name="slot-minute"
+                            :options="Utils::minutes()"
+                            id="slot-minute"
+                        />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <x-button size="Small" emphasis="text-only" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
+                    <x-button size="Small" emphasis="High" id="btn-confirm-add-slot" label="Aggiungi" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modale traduzioni condivisa (link, faq, e futuri elementi) --}}
+    <div class="modal" tabindex="-1" id="modal-translations">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content modal-miticko">
+                <div class="modal-header">
+                    <h1 class="modal-title">Traduci</h1>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fa-regular fa-times"></span>
+                    </button>
+                </div>
+                <div class="modal-body w-100" id="modal-trans-body">
+                    <div class="text-center py-3">
+                        <i class="fa-regular fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <x-button size="Small " emphasis="Low" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
+                    <x-button size="Small " emphasis="High" class="btn-save-translations" label="Salva"  />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
 @endsection
 
 @section('custom-css')
@@ -275,9 +299,9 @@
         $(function () {
             const hash = window.location.hash.replace('#', '');
             if (hash) {
-                const $tab = $(`[data-bs-target="#${hash}"]`);
-                if ($tab.length) {
-                    $tab.tab('show');
+                const chip = document.querySelector(`[data-tab-target="#${hash}"]`);
+                if (chip) {
+                    chip.click();
                     history.replaceState(null, '', window.location.pathname);
                 }
             }
@@ -298,6 +322,33 @@
         $(document).on('input', '#form-info-public [name="meta_description"]', function () {
             $('#preview-meta-description').text($(this).val());
         });
+
+        (function () {
+            const chips = document.querySelectorAll('#productTabs .chip-miticko');
+            const panes = document.querySelectorAll('#productTabsContent .tab-pane');
+
+function showTab(target) {
+                panes.forEach(function (pane) {
+                    pane.style.display = 'none';
+                    pane.style.opacity = '0';
+                });
+                const active = document.querySelector(target);
+                if (active) {
+                    active.style.display = 'block';
+                    active.style.opacity = '1';
+                }
+            }
+
+            chips.forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    const target = this.getAttribute('data-tab-target');
+                    if (!target) return;
+                    showTab(target);
+                    chips.forEach(function (c) { c.setAttribute('data-mode', 'chipAppearance-Resting'); });
+                    this.setAttribute('data-mode', 'chipAppearance-Active');
+                });
+            });
+        })();
 
         $(document).ready(function(){
             setTimeout(() => {

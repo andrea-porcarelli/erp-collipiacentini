@@ -22,10 +22,10 @@
             </div>
             <div class="modal-footer">
                 @isset($secondary)
-                    <x-button :label="$secondary" class="btn-cancel" type="default" emphasis="text-only" size="small"/>
+                    <x-button :label="$secondary" class="btn-cancel" type="default" emphasis="Low"/>
                 @endisset
                 @isset($primary)
-                    <x-button :label="$primary" class="btn-success" size="small" emphasis="light" size="small"/>
+                    <x-button :label="$primary" class="btn-success" emphasis="High" />
                 @endisset
             </div>
         </div>

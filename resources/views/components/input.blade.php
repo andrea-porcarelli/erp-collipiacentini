@@ -10,13 +10,15 @@
     'placeholder' => null,
     'value' => null,
     'type' => 'text',
-    'size' => 'medium',
+    'size' => 'Medium',
+    'appearance' => 'Resting',
     'required' => false,
     'disabled' => false,
     'message' => null,
     'icon' => null,
     'model' => null,
     'maxlength' => null,
+    'extra' => null,
 ])
 @php
     $default = null;
@@ -30,7 +32,7 @@
         ? ($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'
         : null;
 @endphp
-<div class="text-field" data-mode="{{ $size }}">
+<div class="text-field" data-mode="textfieldSize-{{ $size }} textfieldAppearance-{{ $appearance }}">
     @isset($label)
         <label>{!! $label !!} @if($required)* @endif</label>
     @endisset
@@ -63,6 +65,9 @@
         />
         @isset($trailing)
             <i class="fa-{{ $trailing_style }} {{ $trailing }} icon"></i>
+        @endisset
+        @isset($extra)
+            <i class="extra">{{ $extra }}</i>
         @endisset
     </div>
     @if($maxlength)

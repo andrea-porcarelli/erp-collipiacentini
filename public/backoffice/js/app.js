@@ -30,7 +30,8 @@ const sweetConfirm = (text, callback, willClose, title) => {
     setTimeout(() => {
         const confirmButton = document.querySelector('.swal-button--confirm');
         if (confirmButton) {
-            confirmButton.setAttribute('data-mode', 'Primary Medium');
+            confirmButton.setAttribute('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Error');
+            confirmButton.classList.add('bt-miticko');
         }
     }, 100);
 };
@@ -244,7 +245,6 @@ const loadSwitch = (container, options = {}) => {
     elems.forEach(function (html, number) {
         let el = $(`${container} .js-switch`).eq(number);
         if (el.parent().find("span.switchery").length === 0) {
-            console.log(options)
             Switchery(html, options);
         }
     });

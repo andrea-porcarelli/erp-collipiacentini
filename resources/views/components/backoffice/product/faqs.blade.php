@@ -2,7 +2,7 @@
 
 {{-- Selettore lingua --}}
 <div class="mb-3" style="max-width: 220px">
-    <div class="text-field" data-mode="medium">
+    <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
         <label>Lingua (traduzioni)</label>
         <div class="text-field-container">
             <select class="input-miticko" id="faq-language-select">
@@ -35,7 +35,11 @@
             <x-input name="question" placeholder="es. Come posso prenotare?" />
         </div>
         <div class="col-12 col-sm-7">
-            <x-textarea name="answer" rows="2" placeholder="Inserisci la risposta..." />
+            <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                <div class="text-field-container">
+                    <textarea class="input-miticko" name="answer" rows="2" placeholder="Inserisci la risposta..." ></textarea>
+                </div>
+            </div>
         </div>
         <div class="col-12 col-sm-1 d-flex gap-1 align-items-end justify-content-end pb-1">
             <x-button size="medium" status="disabled" emphasis="text-only" leading="fa-regular fa-trash icon" disabled="true" />
@@ -52,14 +56,14 @@
         <div class="faq-item py-1" data-id="{{ $faq->id }}">
             <div class="row g-2 align-items-start">
                 <div class="col-12 col-sm-4">
-                    <div class="text-field" data-mode="medium">
+                    <div class="text-field" data-mode="textfieldSize-Medium">
                         <div class="text-field-container">
                             <input class="input-miticko" name="question" value="{{ $faq->contentField('question', $language->language->iso_code) }}">
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-sm-7">
-                    <div class="text-field" data-mode="medium">
+                    <div class="text-field" data-mode="textfieldSize-Medium">
                         <div class="text-field-container">
                             <textarea class="input-miticko" name="answer" rows="2">{{ $faq->contentField('answer', $language->language->iso_code) }}</textarea>
                         </div>

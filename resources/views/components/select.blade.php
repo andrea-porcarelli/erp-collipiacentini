@@ -12,7 +12,7 @@
     'value' => null,
     'options' => [],
     'type' => 'text',
-    'size' => 'medium',
+    'size' => 'Medium',
     'required' => false,
     'message' => null,
     'icon' => null,
@@ -27,7 +27,7 @@ if (isset($model->{$name})){
     $default = $model->{$name};
 }
 @endphp
-<div class="text-field" data-mode="{{ $size }}">
+<div class="text-field" data-mode="textfieldSize-{{ $size }}">
     @isset($label)
         <label>{!! $label !!}</label>
     @endisset

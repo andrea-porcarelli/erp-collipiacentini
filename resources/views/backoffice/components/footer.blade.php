@@ -22,3 +22,5 @@
     })
 </script>
 @yield('custom-script')
+
+@stack('scripts')
