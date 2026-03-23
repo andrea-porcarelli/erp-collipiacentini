@@ -1020,3 +1020,6 @@ span.flatpickr-weekday{
     align-self: stretch;
     justify-content: space-between;
 }
+#form-variants-occupancy .switchery {
+    right: 30px !important;
+}
