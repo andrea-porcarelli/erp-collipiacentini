@@ -1013,6 +1013,152 @@ const initDeleteProduct = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Media gallery
+// ---------------------------------------------------------------------------
+const initMediaGallery = () => {
+    const el = document.getElementById('media-list');
+    if (!el) return;
+
+    Sortable.create(el, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+    });
+
+    $(document).on('click', '.btn-add-media', () => {
+        $('#media-file-input').val('').trigger('click');
+    });
+
+    $(document).on('change', '#media-file-input', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const $btn = $('.btn-add-media');
+        setLoading($btn, true);
+
+        const fd = new FormData();
+        fd.append('image', file);
+
+        $.ajax({
+            url: `/products/${window.PRODUCT_ID}/media`,
+            method: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+        }).then((media) => {
+            $('#media-empty').remove();
+            const html =
+                `<div class="media-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="${media.id}">` +
+                    `<span class="drag-handle text-secondary" style="cursor:grab;font-size:18px;line-height:1">⠿</span>` +
+                    `<img src="${media.url}" alt="${media.file_name}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0">` +
+                    `<span class="flex-grow-1 small text-truncate">${media.file_name}</span>` +
+                    `<button type="button" class="bt-miticko btn-media-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash icon"></i></button>` +
+                `</div>`;
+            $('#media-list').append(html);
+            toastr.success('Immagine aggiunta');
+        }).catch((err) => {
+            toastr.error(err?.responseJSON?.message || 'Errore durante il caricamento');
+        }).always(() => {
+            setLoading($btn, false);
+        });
+    });
+
+    $(document).on('click', '.btn-save-media-order', function () {
+        const $btn = $(this);
+        const ids = [...document.querySelectorAll('#media-list .media-item[data-id]')]
+            .map(el => parseInt(el.dataset.id));
+
+        setLoading($btn, true);
+        App.ajax({
+            path: `/products/${window.PRODUCT_ID}/media/reorder`,
+            method: 'post',
+            data: { ordered_ids: ids },
+        }).then(() => {
+            toastr.success('Ordine salvato');
+        }).catch(() => {
+            toastr.error('Errore durante il salvataggio');
+        }).finally(() => setLoading($btn, false));
+    });
+
+    $(document).on('click', '.btn-media-delete', function () {
+        const $item = $(this).closest('.media-item');
+        const id    = $item.data('id');
+        App.sweetConfirm('Vuoi eliminare questa immagine?', () => {
+            App.ajax({ path: `/products/${window.PRODUCT_ID}/media/${id}`, method: 'delete' })
+                .then(() => {
+                    $item.remove();
+                    if ($('#media-list .media-item').length === 0) {
+                        $('#media-list').html('<p class="text-secondary small mb-0" id="media-empty">Nessuna immagine aggiunta.</p>');
+                    }
+                    toastr.success('Immagine eliminata');
+                })
+                .catch(() => toastr.error('Errore durante l\'eliminazione'));
+        }, null, 'Elimina immagine');
+    });
+};
+
+// ---------------------------------------------------------------------------
+// Long description — CKEditor
+// ---------------------------------------------------------------------------
+let _longDescEditor = null;
+let _longDescLangId = null;
+
+const initLongDescription = async () => {
+    const textarea = document.getElementById('long-description-editor');
+    if (!textarea) return;
+
+    // Leggi la prima lingua disponibile
+    const $select = $('#long-desc-language-select');
+    _longDescLangId = $select.length ? parseInt($select.val()) : null;
+
+    _longDescEditor = await ClassicEditor.create(textarea, faqEditorConfig);
+
+    // Precompila con il valore IT dal data attribute
+    const itValue = textarea.dataset.it || '';
+    _longDescEditor.setData(itValue);
+    $('#long-desc-count').text(_longDescEditor.getData().replace(/<[^>]*>/g, '').length);
+
+    _longDescEditor.model.document.on('change:data', () => {
+        const len = _longDescEditor.getData().replace(/<[^>]*>/g, '').length;
+        $('#long-desc-count').text(len);
+    });
+
+    // Cambio lingua — carica via AJAX
+    $(document).on('change', '#long-desc-language-select', function () {
+        _longDescLangId = parseInt($(this).val());
+        App.ajax({
+            path: `/products/${window.PRODUCT_ID}/long-description`,
+            method: 'get',
+            data: { language_id: _longDescLangId },
+        }).then((res) => {
+            _longDescEditor.setData(res.long_description || '');
+        }).catch(() => toastr.error('Errore nel caricamento della descrizione'));
+    });
+
+    // Salva
+    $(document).on('click', '.btn-save-long-description', function () {
+        const $btn = $(this);
+        if (!_longDescEditor || _longDescLangId === null) return;
+
+        setLoading($btn, true);
+        App.ajax({
+            path: `/products/${window.PRODUCT_ID}`,
+            method: 'put',
+            data: {
+                section: 'long_description',
+                language_id: _longDescLangId,
+                long_description: _longDescEditor.getData(),
+            },
+        }).then(() => {
+            toastr.success('Descrizione salvata con successo');
+        }).catch(() => {
+            toastr.error('Errore durante il salvataggio');
+        }).finally(() => setLoading($btn, false));
+    });
+};
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 const init = () => {
@@ -1046,6 +1192,8 @@ const init = () => {
     initVariants();
     initVariantModal();
     initPriceVariations();
+    initMediaGallery();
+    initLongDescription();
 };
 
 $(function () {

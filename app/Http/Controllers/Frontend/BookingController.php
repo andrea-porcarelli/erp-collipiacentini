@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\ProductAvailability;
-use App\Models\User;
+use App\Models\ProductVariant;
+use App\Services\ProductAvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,34 +19,40 @@ use Illuminate\View\View;
 
 class BookingController extends Controller
 {
+    public function __construct(private ProductAvailabilityService $availabilityService) {}
 
-    public function index(Request $request) : View {
-        $company = $request->company;
+    public function index(Request $request): View
+    {
+        $company  = $request->company;
         $products = Product::where('is_active', 1)
-            ->with(['partner', 'category', 'contents.language', 'prices', 'availabilities'])
+            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
             ->get();
-        return view('whitelabel.index' , compact('products', 'company'));
+
+        return view('whitelabel.index', compact('products', 'company'));
     }
 
-    public function filterProducts(Request $request) : JsonResponse {
+    public function filterProducts(Request $request): JsonResponse
+    {
         $company = $request->company;
-        $filter = $request->get('filter', 'all');
-        $date = $request->get('date', null);
+        $filter  = $request->get('filter', 'all');
+        $date    = $request->get('date'); // Y-m-d or null
 
         $products = Product::where('is_active', 1)
-            ->with(['partner', 'category', 'contents.language', 'prices', 'availabilities'])
-            ->when(isset($date), function ($query) use ($date) {
-                return $query->whereHas('availabilities', function ($query) use ($date) {
-                    return $query->where('date', $date)
-                        ->where('availability', '>', 0);
+            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
+            ->when($filter !== 'all', fn($q) => $q->where('product_type', $filter))
+            ->get()
+            ->when($date !== null, function ($collection) use ($date) {
+                return $collection->filter(function (Product $product) use ($date) {
+                    if ($this->availabilityService->isDateClosed($product, $date)) {
+                        return false;
+                    }
+                    $slots = $this->availabilityService->getSlotsForDate($product, $date);
+                    return $slots->contains(fn($s) => is_null($s['availability']) || $s['availability'] > 0);
                 });
-            })
-            ->when($filter !== 'all', fn($q) => $q->whereDate('product_type', $filter))
-            ->get();
+            });
 
-        // Genera l'HTML dei prodotti
         $html = '';
-        if ($products->count() === 0) {
+        if ($products->isEmpty()) {
             $html = __('whitelabel.products.no_availability');
         } else {
             foreach ($products as $product) {
@@ -57,27 +63,36 @@ class BookingController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function product(Request $request, $slugPartner, $slugProduct, $productCode) : View
+    public function product(Request $request, $slugPartner, $slugProduct, $productCode): View
     {
         $productCode_ex = explode('-', $productCode);
         $productId = (int) substr($productCode_ex[count($productCode_ex) - 1], 2);
 
-        // Trova il prodotto tramite product_code
-        $product = Product::with(['partner', 'partner.media', 'category', 'contents.language', 'prices', 'availabilities', 'media'])
-            ->where('id', $productId)
-            ->first();
-        $company = $request->company;
+        $product = Product::with([
+            'partner',
+            'partner.media',
+            'category',
+            'contents.language',
+            'variants.prices',
+            'priceVariations',
+            'closedPeriods',
+            'gallery',
+        ])->where('id', $productId)->first();
+
         if (!$product) {
             abort(404);
         }
 
-        // Ottieni i prezzi del prodotto
-        $productPrices = $product->prices->first();
+        $company = $request->company;
 
-        return view('whitelabel.product', compact('product', 'company', 'productPrices'));
+        return view('whitelabel.product', compact('product', 'company'));
     }
 
-    public function getAvailableTimes(Request $request, $productId) : JsonResponse
+    /**
+     * Returns available time slots for a product on a given date.
+     * Each slot includes pricing information with any applicable price variation.
+     */
+    public function getAvailableTimes(Request $request, int $productId): JsonResponse
     {
         $date = $request->get('date');
 
@@ -85,96 +100,166 @@ class BookingController extends Controller
             return response()->json(['error' => 'Data non specificata'], 400);
         }
 
+        $product = Product::with('variants.prices')->find($productId);
+
+        if (!$product) {
+            return response()->json(['error' => 'Prodotto non trovato'], 404);
+        }
+
+        if ($this->availabilityService->isDateClosed($product, $date)) {
+            return response()->json(['times' => [], 'closed' => true]);
+        }
+
+        $variation = $this->availabilityService->getApplicablePriceVariation($product, $date);
+        $slots     = $this->availabilityService->getSlotsForDate($product, $date);
+
+        $dayOfWeek = \Carbon\Carbon::parse($date)->isoWeekday();
+
+        $times = $slots->map(function ($slot) use ($product, $variation, $date, $dayOfWeek) {
+            if ($slot['slot_type'] === 'weekly') {
+                $availabilityId = $slot['slot_id'];
+            } else {
+                // Special schedule: find the matching weekly template slot (same day + time)
+                $weeklySlot = \App\Models\ProductAvailability::where('product_id', $product->id)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->where('time', 'like', $slot['time'] . '%')
+                    ->first();
+                $availabilityId = $weeklySlot?->id;
+            }
+
+            $variantCollection = $availabilityId
+                ? $product->variants->where('availability_id', $availabilityId)
+                : $product->variants;
+
+            $variants = $variantCollection->map(fn(ProductVariant $v) => [
+                'id'         => $v->id,
+                'label'      => $v->label,
+                'base_price' => $v->full_price,
+                'price'      => $this->availabilityService->applyPriceVariation($v->full_price, $variation),
+            ])->values();
+
+            return [
+                'time'         => $slot['time'],
+                'availability' => $slot['availability'],
+                'slot_type'    => $slot['slot_type'],
+                'slot_id'      => $slot['slot_id'],
+                'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
+                'variants'     => $variants,
+            ];
+        });
+
+        return response()->json([
+            'times'              => $times,
+            'price_variation_id' => $variation?->id,
+        ]);
+    }
+
+    /**
+     * Returns available days for a calendar month view.
+     */
+    public function getAvailableDays(Request $request, int $productId): JsonResponse
+    {
+        $year  = (int) $request->get('year', now()->year);
+        $month = (int) $request->get('month', now()->month);
+
         $product = Product::find($productId);
 
         if (!$product) {
             return response()->json(['error' => 'Prodotto non trovato'], 404);
         }
 
-        // Recupera tutte le availabilities per la data selezionata (anche quelle con availability = 0)
-        $availabilities = \App\Models\ProductAvailability::where('product_id', $product->id)
-            ->where('date', $date)
-            ->whereNotNull('time')
-            ->orderBy('time', 'ASC')
-            ->get();
+        $days = $this->availabilityService->getAvailableDaysForMonth($product, $year, $month);
 
-        $times = $availabilities->map(function($availability) {
-            return [
-                'id' => $availability->id,
-                'time' => $availability->time,
-                'availability' => $availability->availability,
-                'formatted_time' => Carbon::parse($availability->time)->format('H:i'),
-                'is_available' => $availability->availability > 0
-            ];
-        });
-
-        return response()->json(['times' => $times]);
+        return response()->json(['days' => $days]);
     }
 
+    /**
+     * Add items to cart.
+     * Request: product_id, date, time, items: [{variant_id, quantity}]
+     */
     public function addToCart(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'availability_id' => 'required|exists:product_availabilities,id',
-            'quantity_full' => 'required|integer|min:0',
-            'quantity_reduced' => 'required|integer|min:0',
-            'quantity_free' => 'required|integer|min:0',
+            'product_id'           => 'required|exists:products,id',
+            'date'                 => 'required|date_format:Y-m-d',
+            'time'                 => 'required|date_format:H:i',
+            'items'                => 'required|array|min:1',
+            'items.*.variant_id'   => 'required|exists:product_variants,id',
+            'items.*.quantity'     => 'required|integer|min:1',
         ]);
 
-        $totalQuantity = $validated['quantity_full'] + $validated['quantity_reduced'] + $validated['quantity_free'];
-        if ($totalQuantity <= 0) {
-            return response()->json(['error' => 'Seleziona almeno un biglietto'], 400);
+        $product = Product::with('variants.prices')->findOrFail($validated['product_id']);
+
+        // Check closed periods
+        if ($this->availabilityService->isDateClosed($product, $validated['date'])) {
+            return response()->json(['error' => 'Il prodotto non è disponibile in questa data'], 400);
         }
 
-        $product = Product::with('prices')->find($validated['product_id']);
-        $availability = ProductAvailability::find($validated['availability_id']);
+        // Find the matching slot
+        $slot = $this->availabilityService->getSlot($product, $validated['date'], $validated['time']);
 
-        if (!$product || !$availability) {
-            return response()->json(['error' => 'Prodotto o disponibilità non trovati'], 404);
+        if (!$slot) {
+            return response()->json(['error' => 'Orario non disponibile per questa data'], 400);
         }
 
-        if ($availability->availability < $totalQuantity) {
-            return response()->json(['error' => 'Disponibilità insufficiente'], 400);
+        // Check total quantity against slot availability
+        $totalQuantity = collect($validated['items'])->sum('quantity');
+
+        if (!is_null($slot['availability']) && $slot['availability'] < $totalQuantity) {
+            return response()->json(['error' => 'Disponibilità insufficiente per l\'orario selezionato'], 400);
         }
 
-        $prices = $product->prices->first();
-        $priceFull = $prices->price ?? 0;
-        $priceReduced = $prices->reduced ?? 0;
-        $priceFree = $prices->free ?? 0;
+        // Find applicable price variation
+        $variation   = $this->availabilityService->getApplicablePriceVariation($product, $validated['date']);
+        $variantMap  = $product->variants->keyBy('id');
 
-        $total = ($validated['quantity_full'] * $priceFull) +
-                 ($validated['quantity_reduced'] * $priceReduced) +
-                 ($validated['quantity_free'] * $priceFree);
+        // Build cart items with unit prices
+        $cartItemsData = [];
+        $total = 0;
+
+        foreach ($validated['items'] as $item) {
+            $variant = $variantMap->get($item['variant_id']);
+            if (!$variant) {
+                return response()->json(['error' => 'Variante non trovata'], 404);
+            }
+
+            $unitPrice = $this->availabilityService->applyPriceVariation($variant->full_price, $variation);
+            $cartItemsData[] = [
+                'product_variant_id' => $variant->id,
+                'quantity'           => $item['quantity'],
+                'unit_price'         => $unitPrice,
+            ];
+            $total += $unitPrice * $item['quantity'];
+        }
 
         $sessionId = session()->getId();
 
         DB::beginTransaction();
         try {
-            // Rimuovi il carrello esistente per questa sessione (mono-prodotto)
+            // Single-product cart: remove existing cart for this session
             Cart::where('session_id', $sessionId)->delete();
 
-            // Crea il nuovo carrello
             $cart = Cart::create([
-                'session_id' => $sessionId,
-                'company_id' => $request->company?->id,
-                'product_id' => $product->id,
-                'product_availability_id' => $availability->id,
-                'date' => $availability->date,
-                'time' => $availability->time,
-                'quantity_full' => $validated['quantity_full'],
-                'quantity_reduced' => $validated['quantity_reduced'],
-                'quantity_free' => $validated['quantity_free'],
-                'price_full' => $priceFull,
-                'price_reduced' => $priceReduced,
-                'price_free' => $priceFree,
-                'total' => $total,
+                'session_id'                => $sessionId,
+                'company_id'                => $request->company?->id,
+                'product_id'                => $product->id,
+                'date'                      => $validated['date'],
+                'time'                      => $validated['time'],
+                'slot_type'                 => $slot['slot_type'],
+                'slot_id'                   => $slot['slot_id'],
+                'applied_price_variation_id' => $variation?->id,
+                'total'                     => round($total, 2),
             ]);
+
+            foreach ($cartItemsData as $itemData) {
+                CartItem::create(array_merge(['cart_id' => $cart->id], $itemData));
+            }
 
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'cart_id' => $cart->id,
+                'success'      => true,
+                'cart_id'      => $cart->id,
                 'redirect_url' => route('booking.cart'),
             ]);
         } catch (\Exception $e) {
@@ -186,7 +271,7 @@ class BookingController extends Controller
     public function cart(Request $request): View
     {
         $sessionId = session()->getId();
-        $cart = Cart::with(['product.partner', 'product.prices', 'productAvailability'])
+        $cart = Cart::with(['product.partner', 'product.variants.prices', 'items.variant', 'appliedPriceVariation'])
             ->where('session_id', $sessionId)
             ->first();
 
@@ -207,7 +292,7 @@ class BookingController extends Controller
         $cart->delete();
 
         return response()->json([
-            'success' => true,
+            'success'      => true,
             'redirect_url' => url('/shop'),
         ]);
     }
@@ -215,18 +300,18 @@ class BookingController extends Controller
     public function saveCustomer(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'address' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:10',
-            'city' => 'required|string|max:255',
-            'country' => 'required|string|size:2',
-            'phone' => 'required|string|max:20',
+            'name'        => 'required|string|max:255',
+            'surname'     => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'address'     => 'required|string|max:255',
+            'zip_code'    => 'required|string|max:10',
+            'city'        => 'required|string|max:255',
+            'country'     => 'required|string|size:2',
+            'phone'       => 'required|string|max:20',
             'fiscal_code' => 'nullable|string|max:16',
-            'birth_date' => 'nullable|date',
-            'privacy' => 'required|accepted',
-            'newsletter' => 'nullable|boolean',
+            'birth_date'  => 'nullable|date',
+            'privacy'     => 'required|accepted',
+            'newsletter'  => 'nullable|boolean',
         ]);
 
         $sessionId = session()->getId();
@@ -238,45 +323,42 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Cerca utente esistente per email o crea nuovo
             $user = Customer::where('email', $validated['email'])->first();
 
             if (!$user) {
                 $user = Customer::create([
-                    'name' => $validated['name'],
-                    'surname' => $validated['surname'],
-                    'email' => $validated['email'],
-                    'password' => Hash::make(Str::random(16)),
-                    'role' => 'customer',
-                    'company_id' => $cart->company_id,
-                    'partner_id' => $cart->product->partner_id,
-                    'address' => $validated['address'],
-                    'zip_code' => $validated['zip_code'],
-                    'city' => $validated['city'],
-                    'country' => $validated['country'],
-                    'phone' => $validated['phone'],
-                    'fiscal_code' => $validated['fiscal_code'] ?? null,
-                    'birth_date' => $validated['birth_date'] ?? null,
+                    'name'             => $validated['name'],
+                    'surname'          => $validated['surname'],
+                    'email'            => $validated['email'],
+                    'password'         => Hash::make(Str::random(16)),
+                    'role'             => 'customer',
+                    'company_id'       => $cart->company_id,
+                    'partner_id'       => $cart->product->partner_id,
+                    'address'          => $validated['address'],
+                    'zip_code'         => $validated['zip_code'],
+                    'city'             => $validated['city'],
+                    'country'          => $validated['country'],
+                    'phone'            => $validated['phone'],
+                    'fiscal_code'      => $validated['fiscal_code'] ?? null,
+                    'birth_date'       => $validated['birth_date'] ?? null,
                     'privacy_accepted' => true,
-                    'newsletter' => $validated['newsletter'] ?? false,
+                    'newsletter'       => $validated['newsletter'] ?? false,
                 ]);
             } else {
-                // Aggiorna i dati dell'utente esistente
                 $user->update([
-                    'name' => $validated['name'],
-                    'surname' => $validated['surname'],
-                    'address' => $validated['address'],
-                    'zip_code' => $validated['zip_code'],
-                    'city' => $validated['city'],
-                    'country' => $validated['country'],
-                    'phone' => $validated['phone'],
+                    'name'        => $validated['name'],
+                    'surname'     => $validated['surname'],
+                    'address'     => $validated['address'],
+                    'zip_code'    => $validated['zip_code'],
+                    'city'        => $validated['city'],
+                    'country'     => $validated['country'],
+                    'phone'       => $validated['phone'],
                     'fiscal_code' => $validated['fiscal_code'] ?? $user->fiscal_code,
-                    'birth_date' => $validated['birth_date'] ?? $user->birth_date,
-                    'newsletter' => $validated['newsletter'] ?? $user->newsletter,
+                    'birth_date'  => $validated['birth_date'] ?? $user->birth_date,
+                    'newsletter'  => $validated['newsletter'] ?? $user->newsletter,
                 ]);
             }
 
-            // Associa l'utente al carrello
             $cart->update(['customer_id' => $user->id]);
 
             DB::commit();

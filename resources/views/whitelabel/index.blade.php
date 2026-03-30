@@ -3,7 +3,7 @@
 @section('content')
     <div class="container mt-5">
         <div class="row w-100">
-            <div class="col-12 text-center hero ">
+            <div class="col-12 text-center hero mt-spacing-3xl mb-spacing-3xl">
                 <h1>{{ __('whitelabel.hero.title', ['company' => $company->company_name]) }}</h1>
                 <h5>{{ __('whitelabel.hero.subtitle') }}</h5>
             </div>
@@ -59,7 +59,7 @@
                 const filterDateInput = document.querySelector('input[name="filter_date"]');
                 const date = filterDateInput && filterDateInput.value ? filterDateInput.value : null;
 
-                let url = `/booking/filter-products?token={{ Session::get('token') }}`;
+                let url = `/shop/filter-products?token={{ Session::get('token') }}`;
 
                 if (filter) {
                     url += `&filter=${filter}`;

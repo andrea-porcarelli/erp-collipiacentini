@@ -39,7 +39,7 @@ return [
     'sidebar' => [
         'know_date_title' => 'Sai già la data?',
         'know_date_subtitle' => 'Visualizza solo le opzioni disponibili per quando verrai',
-        'select_date' => 'Seleziona il giorno',
+        'select_date' => 'Seleziona data',
         'castle_title' => 'Il castello',
         'useful_links_title' => 'Link utili',
         'contacts' => 'Contatti',

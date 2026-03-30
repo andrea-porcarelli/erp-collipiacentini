@@ -17,6 +17,9 @@ use App\Http\Controllers\Backoffice\ProductRelatedController;
 use App\Http\Controllers\Backoffice\ProductAvailabilityController;
 use App\Http\Controllers\Backoffice\ProductPriceVariationController;
 use App\Http\Controllers\Backoffice\ProductCustomerFieldController;
+use App\Http\Controllers\Backoffice\ProductSpecialScheduleController;
+use App\Http\Controllers\Backoffice\ProductClosedPeriodController;
+use App\Http\Controllers\Backoffice\ProductMediaController;
 use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\UserController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +28,7 @@ Route::group(['prefix' => '/shop'], function() {
     Route::get('/',[BookingController::class, 'index'])->middleware('token');
     Route::get('/filter-products',[BookingController::class, 'filterProducts'])->middleware('token');
     Route::get('/product/{productId}/available-times',[BookingController::class, 'getAvailableTimes']);
+    Route::get('/product/{productId}/available-days',[BookingController::class, 'getAvailableDays']);
     Route::post('/cart/add',[BookingController::class, 'addToCart'])->name('booking.cart.add');
     Route::delete('/cart/remove',[BookingController::class, 'removeCart'])->name('booking.cart.remove');
     Route::post('/cart/customer',[BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
@@ -90,6 +94,28 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('products/{product}/schedule', [ProductAvailabilityController::class, 'store'])->name('products.schedule.store');
         Route::put('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'update'])->name('products.schedule.update');
         Route::delete('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'destroy'])->name('products.schedule.destroy');
+
+        // Special schedule
+        Route::get('products/{product}/special-schedule/dates', [ProductSpecialScheduleController::class, 'dates'])->name('products.special-schedule.dates');
+        Route::get('products/{product}/special-schedule/{date}', [ProductSpecialScheduleController::class, 'index'])->name('products.special-schedule.index')->where('date', '\d{4}-\d{2}-\d{2}');
+        Route::post('products/{product}/special-schedule', [ProductSpecialScheduleController::class, 'store'])->name('products.special-schedule.store');
+        Route::delete('products/{product}/special-schedule/{date}/reset', [ProductSpecialScheduleController::class, 'reset'])->name('products.special-schedule.reset')->where('date', '\d{4}-\d{2}-\d{2}');
+        Route::put('products/{product}/special-schedule/{slot}/availability', [ProductSpecialScheduleController::class, 'updateAvailability'])->name('products.special-schedule.availability');
+        Route::delete('products/{product}/special-schedule/{slot}', [ProductSpecialScheduleController::class, 'destroy'])->name('products.special-schedule.destroy');
+        Route::get('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'getVariants'])->name('products.special-schedule.variants.index');
+        Route::post('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'storeVariant'])->name('products.special-schedule.variants.store');
+        Route::put('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'updateVariant'])->name('products.special-schedule.variants.update');
+        Route::delete('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'destroyVariant'])->name('products.special-schedule.variants.destroy');
+
+        // Closed periods
+        Route::post('products/{product}/closed-periods', [ProductClosedPeriodController::class, 'store'])->name('products.closed-periods.store');
+        Route::delete('products/{product}/closed-periods/{period}', [ProductClosedPeriodController::class, 'destroy'])->name('products.closed-periods.destroy');
+
+        // Media gallery
+        Route::post('products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');
+        Route::post('products/{product}/media/reorder', [ProductMediaController::class, 'reorder'])->name('products.media.reorder');
+        Route::delete('products/{product}/media/{media}', [ProductMediaController::class, 'destroy'])->name('products.media.destroy');
+        Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');

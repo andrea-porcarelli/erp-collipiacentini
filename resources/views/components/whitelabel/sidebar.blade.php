@@ -3,8 +3,9 @@
     'date' => true
 ])
 @if($date)
-    <x-card :title="__('whitelabel.sidebar.know_date_title')" :sub_title="__('whitelabel.sidebar.know_date_subtitle')" class="card-spacing">
-        <x-button :label="__('whitelabel.sidebar.select_date')" leading="fa-calendar" status="secondary" emphasis="light" type="resting" size="small" class="btn-open-calendar"/>
+    <x-card :title="__('whitelabel.sidebar.know_date_title')" >
+        <p>{{ __('whitelabel.sidebar.know_date_subtitle') }}</p>
+        <x-button :label="__('whitelabel.sidebar.select_date')" status="Secondary" emphasis="Medium" leading="fa-calendar" class="btn-open-calendar"/>
         <input type="hidden" name="filter_date" />
     </x-card>
 @endif
@@ -43,6 +44,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -89,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     inline: true,
                     mode: 'single',
                     dateFormat: 'Y-m-d',
+                    locale: 'it',
+                    defaultDate: 'today',
                     onChange: function(selectedDates, dateStr, instance) {
                         if (selectedDates.length > 0) {
                             const date = selectedDates[0];
@@ -142,6 +146,23 @@ document.addEventListener('DOMContentLoaded', function() {
 #datepicker .flatpickr-calendar {
     position: static !important;
     box-shadow: none !important;
+}
+#datePickerModal .numInputWrapper {
+    pointer-events: none;
+    opacity: 0.5;
+}
+#datePickerModal .numInputWrapper .arrowUp,
+#datePickerModal .numInputWrapper .arrowDown {
+    display: none;
+}
+#datePickerModal .flatpickr-prev-month,
+#datePickerModal .flatpickr-next-month {
+    display: none;
+}
+#datePickerModal .flatpickr-monthDropdown-months {
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 #datePickerModal .modal-body {
     display: flex;

@@ -141,13 +141,14 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
 
             match ($request->input('section')) {
-                'settings'    => $this->updateSettings($product, $request),
-                'duration'    => $this->updateDuration($product, $request),
-                'categories'  => $this->updateCategories($product, $request),
-                'public'      => $this->updatePublic($product, $request),
-                'description' => $this->updateDescription($product, $request),
-                'occupancy'   => $this->updateOccupancy($product, $request),
-                default       => throw new \Exception('Sezione non valida'),
+                'settings'         => $this->updateSettings($product, $request),
+                'duration'         => $this->updateDuration($product, $request),
+                'categories'       => $this->updateCategories($product, $request),
+                'public'           => $this->updatePublic($product, $request),
+                'description'      => $this->updateDescription($product, $request),
+                'occupancy'        => $this->updateOccupancy($product, $request),
+                'long_description' => $this->updateLongDescription($product, $request),
+                default            => throw new \Exception('Sezione non valida'),
             };
 
             return $this->success();
@@ -205,6 +206,14 @@ class ProductController extends CrudController
         $product->setContentFields([
             'description' => $request->input('description'),
         ]);
+    }
+
+    private function updateLongDescription(Product $product, UpdateProductRequest $request): void
+    {
+        $lang = Language::findOrFail($request->input('language_id'));
+        $product->setContentFields([
+            'long_description' => $request->input('long_description'),
+        ], $lang->iso_code);
     }
 
     private function updateOccupancy(Product $product, UpdateProductRequest $request): void

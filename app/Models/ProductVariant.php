@@ -12,6 +12,7 @@ class ProductVariant extends LogsModel
     public $fillable = [
         'product_id',
         'availability_id',
+        'special_schedule_id',
         'label',
         'description',
         'max_quantity',
@@ -26,6 +27,11 @@ class ProductVariant extends LogsModel
     public function availability(): BelongsTo
     {
         return $this->belongsTo(ProductAvailability::class);
+    }
+
+    public function specialSchedule(): BelongsTo
+    {
+        return $this->belongsTo(ProductSpecialSchedule::class);
     }
 
     public function prices(): HasMany

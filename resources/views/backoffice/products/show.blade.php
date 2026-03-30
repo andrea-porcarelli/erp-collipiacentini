@@ -63,7 +63,7 @@
             <x-backoffice.product.tab-schedule :model="$model" />
             <x-backoffice.product.tab-special-schedule :model="$model" />
             <x-backoffice.product.tab-closed-period :model="$model" />
-            <x-backoffice.product.tab-media :model="$model" />
+            <x-backoffice.product.tab-media :model="$model" :languages="$languages" />
         </div>
     </div>
 
@@ -100,6 +100,59 @@
                 <div class="modal-footer">
                     <x-button size="Small" emphasis="text-only" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
                     <x-button size="Small" emphasis="High" id="btn-confirm-add-slot" label="Aggiungi" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modale: Nuovo orario speciale --}}
+    <div class="modal fade" tabindex="-1" id="modal-add-special-slot">
+        <div class="modal-dialog modal-sm" data-mode="Miticko Light Desktop White">
+            <div class="modal-content modal-miticko">
+                <div class="modal-header">
+                    <h1 class="modal-title">Aggiungi orario speciale</h1>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fa-regular fa-times"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <x-dropdown name="special-slot-hour" :options="Utils::hours()" id="special-slot-hour" />
+                        <span class="fw-medium">e</span>
+                        <x-dropdown name="special-slot-minute" :options="Utils::minutes()" id="special-slot-minute" />
+                    </div>
+                    <x-input name="special-slot-availability" id="special-slot-availability"
+                             label="Capienza" type="number" placeholder="0"
+                             message="Numero massimo di prenotazioni per questo orario" />
+                </div>
+                <div class="modal-footer">
+                    <x-button size="Small" emphasis="text-only" label="Annulla" :dataset="['bs-dismiss' => 'modal']" />
+                    <x-button size="Small" emphasis="High" id="btn-confirm-add-special-slot" label="Aggiungi" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modale: Nuovo periodo di chiusura --}}
+    <div class="modal fade" tabindex="-1" id="modal-closed-period">
+        <div class="modal-dialog" data-mode="Miticko Light Desktop White">
+            <div class="modal-content modal-miticko">
+                <div class="modal-header">
+                    <h1 class="modal-title">Nuova chiusura</h1>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fa-regular fa-times"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">Seleziona il periodo di chiusura dal calendario</p>
+                    <div id="closed-period-flatpickr"></div>
+                    <input type="hidden" id="closed-period-from-val">
+                    <input type="hidden" id="closed-period-to-val">
+                    <p class="mt-3 mb-0 small fw-medium" id="closed-period-range-label">Nessun periodo selezionato</p>
+                </div>
+                <div class="modal-footer">
+                    <x-button size="Small" emphasis="text-only" label="Annulla" :dataset="['bs-dismiss' => 'modal']" />
+                    <x-button size="Small" emphasis="High" id="btn-confirm-closed-period" label="Crea chiusura" />
                 </div>
             </div>
         </div>

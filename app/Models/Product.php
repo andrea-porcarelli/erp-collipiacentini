@@ -65,12 +65,17 @@ class Product extends LogsModel
 
     public function getSharedAvailabilities()
     {
-        // Restituisci tutte le availabilities di questi prodotti
-        return ProductAvailability::where('product_id', $this->id)
-            ->where('availability', '>', 0)
-            ->whereDate('date', '>=', date('Y-m-d'))
-            ->orderBy('date', 'ASC')
-            ->get();
+        $service = app(\App\Services\ProductAvailabilityService::class);
+        $now = now();
+        $dates = [];
+
+        for ($m = 0; $m < 3; $m++) {
+            $ref = $now->copy()->addMonths($m);
+            $days = $service->getAvailableDaysForMonth($this, $ref->year, $ref->month);
+            $dates = array_merge($dates, $days);
+        }
+
+        return collect($dates)->map(fn($d) => (object)['date' => $d]);
     }
 
     public function priceVariations(): HasMany
@@ -115,7 +120,17 @@ class Product extends LogsModel
 
     public function gallery() : MorphMany
     {
-        return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery');
+        return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery')->orderBy('sort_order');
+    }
+
+    public function specialSchedules(): HasMany
+    {
+        return $this->hasMany(ProductSpecialSchedule::class)->orderBy('date')->orderBy('time');
+    }
+
+    public function closedPeriods(): HasMany
+    {
+        return $this->hasMany(ProductClosedPeriod::class)->orderBy('date_from');
     }
 
     public function getProductCodeAttribute() : string
@@ -127,11 +142,21 @@ class Product extends LogsModel
     }
 
     public function getLowestPriceAttribute() : string {
-        return $this->prices()->orderBy('price', 'ASC')->first()->price ?? 0;
+        return ProductVariantPrice::whereHas('variant', fn($q) => $q->where('product_id', $this->id))
+            ->orderBy('price', 'ASC')
+            ->value('price') ?? 0;
     }
 
     public function getIsAvailableAttribute() : bool {
-        return $this->is_active && $this->availabilities()->whereDate('date', '>', date('Y-m-d'))->where('availability', '>', 0)->count();
+        if (!$this->is_active) {
+            return false;
+        }
+        // Has weekly template slots
+        if ($this->availabilities()->whereNotNull('day_of_week')->exists()) {
+            return true;
+        }
+        // Has future special schedule slots
+        return $this->specialSchedules()->where('date', '>=', date('Y-m-d'))->exists();
     }
 
     public function getButtonAttribute() : string {
@@ -143,11 +168,11 @@ class Product extends LogsModel
     }
 
     public function getIntroAttribute() : ?string {
-        return $this->contentField('intro');
+        return $this->contentField('description');
     }
 
     public function getDescriptionAttribute() : ?string {
-        return $this->contentField('description');
+        return $this->contentField('long_description');
     }
 
     public function getMetaTitleAttribute() : ?string {

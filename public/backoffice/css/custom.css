@@ -8,43 +8,7 @@ input.form-control {
     font-family: var(--typography-title-font), serif !important;
 
 }
-.mt-spacing {
-    margin-top:  12px !important;
-}
-.mt-spacing-l {
-    margin-top: var(--spacing-l) !important;
-}
-.mt-spacing-xl {
-    margin-top: var(--spacing-xl) !important;
-}
-.mt-spacing-2xl {
-    margin-top: var(--spacing-2xl) !important;
-}
-.mt-spacing-3xl {
-    margin-top: var(--spacing-3xl) !important;
-}
-.mt-spacing-m {
-    margin-top: var(--spacing-m) !important;
-}
 
-.mb-spacing {
-    margin-bottom: 12px !important;
-}
-.mb-spacing-l {
-    margin-bottom: var(--spacing-l) !important;
-}
-.mb-spacing-xl {
-    margin-bottom: var(--spacing-xl) !important;
-}
-.mb-spacing-2xl {
-    margin-bottom: var(--spacing-2xl) !important;
-}
-.mb-spacing-3xl {
-    margin-bottom: var(--spacing-3xl) !important;
-}
-.mb-spacing-m {
-    margin-bottom: var(--spacing-m) !important;
-}
 
 a {
     font-family: var(--typography-title-font), serif !important;
@@ -918,9 +882,9 @@ span.flatpickr-weekday{
 
 
 
-.slot-item {
+.slot-item,
+.special-slot-item {
     color: var(--text-main, #0D0D0D);
-    border: 1px solid var(--border-color, #E6E6E6);
     background: #fff;
     margin-bottom: 8px;
     overflow: hidden;

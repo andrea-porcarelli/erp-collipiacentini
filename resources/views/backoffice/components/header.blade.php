@@ -17,6 +17,7 @@
         @yield('custom-css')
         @stack('styles')
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/Miticko.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('backoffice/css/helpers.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/custom.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/device.css') }}">
     </head>

@@ -18,6 +18,7 @@ class Media extends Model
         'file_type',
         'file_size',
         'description',
+        'sort_order',
     ];
 
     protected $casts = [

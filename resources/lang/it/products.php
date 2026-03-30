@@ -6,4 +6,8 @@ return [
         'active' => 'Prenotabile',
         'unavailable' => 'Non prenotabile',
     ],
+    'types' => [
+        'guided' => 'Guidata',
+        'free' => 'Libera',
+    ]
 ];

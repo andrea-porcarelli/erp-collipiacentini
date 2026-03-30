@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cart extends LogsModel
 {
@@ -11,23 +12,16 @@ class Cart extends LogsModel
         'customer_id',
         'company_id',
         'product_id',
-        'product_availability_id',
         'date',
         'time',
-        'quantity_full',
-        'quantity_reduced',
-        'quantity_free',
-        'price_full',
-        'price_reduced',
-        'price_free',
+        'slot_type',
+        'slot_id',
+        'applied_price_variation_id',
         'total',
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'price_full' => 'decimal:2',
-        'price_reduced' => 'decimal:2',
-        'price_free' => 'decimal:2',
+        'date'  => 'date',
         'total' => 'decimal:2',
     ];
 
@@ -46,14 +40,19 @@ class Cart extends LogsModel
         return $this->belongsTo(Product::class);
     }
 
-    public function productAvailability(): BelongsTo
+    public function appliedPriceVariation(): BelongsTo
     {
-        return $this->belongsTo(ProductAvailability::class);
+        return $this->belongsTo(ProductPriceVariation::class, 'applied_price_variation_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
     }
 
     public function getTotalQuantityAttribute(): int
     {
-        return $this->quantity_full + $this->quantity_reduced + $this->quantity_free;
+        return $this->items()->sum('quantity');
     }
 
     public static function getBySession(?string $sessionId = null): ?self

@@ -7,7 +7,7 @@
                 <x-whitelabel.sidebar :company="$company" :date="false" />
             </aside>
             <div class="col-12 col-sm-9">
-                <x-card :pre_title="$product->partner->company->company_name" :title="$product->meta_title" class="product-card" h1="true" leading="fa-shield-check">
+                <x-card :pre_title="$product->partner?->company?->company_name" :title="$product->meta_title" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->product_tags !!}
                     <div class="button-progress">
                         <button id="btn-date" data-mode="small secondary" type="button" class="bt-miticko btn-date bt-m-outlined">
@@ -44,27 +44,17 @@
 
 @push('scripts')
 <script>
-    // Date disponibili dal backend (incluse quelle dei prodotti collegati)
     const availableDates = @json($product->getSharedAvailabilities()->pluck('date')->unique()->values()->toArray());
     const productId = @json($product->id);
-
-    // Prezzi dei biglietti
-    const ticketPrices = {
-        full: @json($productPrices->price ?? 0),
-        reduced: @json($productPrices->reduced ?? 0),
-        free: @json($productPrices->free ?? 0)
-    };
 
     // Variabili per memorizzare la selezione
     let selectedDate = null;
     let selectedTime = null;
-    let selectedAvailabilityId = null;
+    let selectedSlotType = null;
+    let selectedSlotId = null;
+    let selectedVariants = [];   // [{id, label, price}] dal server per lo slot scelto
+    let variantQuantities = {};  // {variantId: quantity}
     let maxAvailability = 0;
-    let ticketQuantities = {
-        full: 0,
-        reduced: 0,
-        free: 0
-    };
 </script>
 <style>
     .flatpickr-calendar.inline {
@@ -490,9 +480,11 @@
                 // Reset delle variabili
                 selectedDate = null;
                 selectedTime = null;
-                selectedAvailabilityId = null;
+                selectedSlotType = null;
+                selectedSlotId = null;
+                selectedVariants = [];
+                variantQuantities = {};
                 maxAvailability = 0;
-                ticketQuantities = { full: 0, reduced: 0, free: 0 };
             });
         }
 
@@ -524,7 +516,8 @@
                     }
 
                     // Reset delle quantità biglietti
-                    ticketQuantities = { full: 0, reduced: 0, free: 0 };
+                    variantQuantities = {};
+                    selectedVariants.forEach(v => { variantQuantities[v.id] = 0; });
                 }
             });
         }
@@ -577,39 +570,34 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.times && data.times.length > 0) {
-                        // Mostra gli orari
                         timeSlotsContainer.innerHTML = '';
                         data.times.forEach(timeSlot => {
                             const slotElement = document.createElement('div');
                             slotElement.className = 'time-slot';
-                            slotElement.dataset.id = timeSlot.id;
 
-                            // Aggiungi classe disabled se non disponibile
                             if (!timeSlot.is_available) {
                                 slotElement.classList.add('disabled');
                             }
 
+                            const availLabel = timeSlot.availability === null ? '∞' : timeSlot.availability;
                             slotElement.innerHTML = `
-                                <div class="time">${timeSlot.formatted_time}</div>
-                                <div class="availability"><span class="far fa-user"></span> ${timeSlot.availability} </div>
+                                <div class="time">${timeSlot.time}</div>
+                                <div class="availability"><span class="far fa-user"></span> ${availLabel}</div>
                             `;
 
-                            // Aggiungi evento click solo se disponibile
                             if (timeSlot.is_available) {
                                 slotElement.addEventListener('click', function() {
-                                    // Rimuovi la selezione dagli altri slot
                                     document.querySelectorAll('.time-slot:not(.disabled)').forEach(slot => {
                                         slot.classList.remove('selected');
                                     });
-                                    // Seleziona questo slot
                                     this.classList.add('selected');
 
-                                    // Salva i dati della selezione
-                                    selectedTime = timeSlot.formatted_time;
-                                    selectedAvailabilityId = timeSlot.id;
-                                    maxAvailability = timeSlot.availability;
+                                    selectedTime     = timeSlot.time;
+                                    selectedSlotType = timeSlot.slot_type;
+                                    selectedSlotId   = timeSlot.slot_id;
+                                    selectedVariants = timeSlot.variants;
+                                    maxAvailability  = timeSlot.availability === null ? Infinity : timeSlot.availability;
 
-                                    // Mostra la selezione biglietti
                                     showTicketSelection();
                                 });
                             }
@@ -661,78 +649,32 @@
             }
 
 
-            // Crea i controlli per le diverse tipologie di biglietto
+            // Crea i controlli per ogni variante restituita dall'API
             const quantityContainer = document.getElementById('ticket-quantity');
 
-            let ticketTypesHTML = '';
+            variantQuantities = {};
+            selectedVariants.forEach(v => { variantQuantities[v.id] = 0; });
 
-            // Intero
-            ticketTypesHTML += `
-                <div class="quantity-control">
+            let ticketTypesHTML = selectedVariants.map(v => `
+                <div class="quantity-control" data-variant-id="${v.id}">
                     <div>
-                        <div class="label">Intero</div>
-                        <div class="description">Dai 18 anni in su</div>
+                        <div class="label">${v.label}</div>
                     </div>
                     <div class="controls">
                         <div>
-                            <div class="price">€ ${ticketPrices.full.toFixed(2)}</div>
+                            <div class="price">€ ${parseFloat(v.price).toFixed(2)}</div>
                         </div>
-                        <button class="btn-quantity btn-decrease-full" type="button">
+                        <button class="btn-quantity btn-decrease-variant" type="button" data-variant-id="${v.id}" disabled>
                             <i class="fa-solid fa-minus"></i>
                         </button>
-                        <span class="quantity-value" id="quantity-full">0</span>
-                        <button class="btn-quantity btn-increase-full" type="button">
+                        <span class="quantity-value" id="qty-variant-${v.id}">0</span>
+                        <button class="btn-quantity btn-increase-variant" type="button" data-variant-id="${v.id}">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
                 </div>
-            `;
+            `).join('');
 
-            // Ridotto
-            ticketTypesHTML += `
-                <div class="quantity-control">
-                    <div>
-                        <div class="label">Ridotto</div>
-                        <div class="description">Dai 3 ai 17 anni</div>
-                    </div>
-                    <div class="controls">
-                        <div>
-                            <div class="price">€ ${ticketPrices.reduced.toFixed(2)}</div>
-                        </div>
-                        <button class="btn-quantity btn-decrease-reduced" type="button">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <span class="quantity-value" id="quantity-reduced">0</span>
-                        <button class="btn-quantity btn-increase-reduced" type="button">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            // Gratuito
-            ticketTypesHTML += `
-                <div class="quantity-control">
-                    <div>
-                        <div class="label">Gratuito</div>
-                        <div class="description">0-2 anni / soci FAI con tessera di iscrizione valida</div>
-                    </div>
-                    <div class="controls">
-                        <div>
-                            <div class="price">€ ${ticketPrices.free.toFixed(2)}</div>
-                        </div>
-                        <button class="btn-quantity btn-decrease-free" type="button">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <span class="quantity-value" id="quantity-free">0</span>
-                        <button class="btn-quantity btn-increase-free" type="button">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            // Totale
             ticketTypesHTML += `
                 <div class="total-info">
                     <div class="label">Totale</div>
@@ -741,104 +683,55 @@
                 <button id="btn-purchase" data-mode="small disabled" type="button" class="bt-miticko btn-purchase bt-m-default" disabled>
                     Acquista
                 </button>
-
             `;
 
             quantityContainer.innerHTML = ticketTypesHTML;
 
-            // Reset quantità
-            ticketQuantities = { full: 0, reduced: 0, free: 0 };
+            function getTotalTickets() {
+                return Object.values(variantQuantities).reduce((s, q) => s + q, 0);
+            }
 
-            // Funzione per calcolare il totale
             function calculateTotal() {
-                const total =
-                    (ticketQuantities.full * ticketPrices.full) +
-                    (ticketQuantities.reduced * ticketPrices.reduced) +
-                    (ticketQuantities.free * ticketPrices.free);
+                const total = selectedVariants.reduce((s, v) => s + (variantQuantities[v.id] * parseFloat(v.price)), 0);
                 document.getElementById('total-amount').textContent = `€ ${total.toFixed(2)}`;
             }
 
-            // Funzione per aggiornare i bottoni
             function updateAllButtons() {
-                const totalTickets = ticketQuantities.full + ticketQuantities.reduced + ticketQuantities.free;
-
-                // Aggiorna bottoni Intero
-                document.querySelector('.btn-decrease-full').disabled = ticketQuantities.full <= 0;
-                document.querySelector('.btn-increase-full').disabled = totalTickets >= maxAvailability;
-
-                // Aggiorna bottoni Ridotto
-                document.querySelector('.btn-decrease-reduced').disabled = ticketQuantities.reduced <= 0;
-                document.querySelector('.btn-increase-reduced').disabled = totalTickets >= maxAvailability;
-
-                // Aggiorna bottoni Gratuito
-                document.querySelector('.btn-decrease-free').disabled = ticketQuantities.free <= 0;
-                document.querySelector('.btn-increase-free').disabled = totalTickets >= maxAvailability;
-
-                // Aggiorna bottone Acquista
+                const total = getTotalTickets();
+                document.querySelectorAll('.btn-decrease-variant').forEach(btn => {
+                    btn.disabled = variantQuantities[btn.dataset.variantId] <= 0;
+                });
+                document.querySelectorAll('.btn-increase-variant').forEach(btn => {
+                    btn.disabled = total >= maxAvailability;
+                });
                 const btnPurchase = document.getElementById('btn-purchase');
-                const isDisabled = totalTickets <= 0;
+                const isDisabled = total <= 0;
                 btnPurchase.disabled = isDisabled;
                 btnPurchase.setAttribute('data-mode', isDisabled ? 'small disabled' : 'small');
             }
 
-            // Event listeners per Intero
-            document.querySelector('.btn-decrease-full').addEventListener('click', function() {
-                if (ticketQuantities.full > 0) {
-                    ticketQuantities.full--;
-                    document.getElementById('quantity-full').textContent = ticketQuantities.full;
-                    calculateTotal();
-                    updateAllButtons();
-                }
+            document.querySelectorAll('.btn-decrease-variant').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vid = this.dataset.variantId;
+                    if (variantQuantities[vid] > 0) {
+                        variantQuantities[vid]--;
+                        document.getElementById(`qty-variant-${vid}`).textContent = variantQuantities[vid];
+                        calculateTotal();
+                        updateAllButtons();
+                    }
+                });
             });
 
-            document.querySelector('.btn-increase-full').addEventListener('click', function() {
-                const totalTickets = ticketQuantities.full + ticketQuantities.reduced + ticketQuantities.free;
-                if (totalTickets < maxAvailability) {
-                    ticketQuantities.full++;
-                    document.getElementById('quantity-full').textContent = ticketQuantities.full;
-                    calculateTotal();
-                    updateAllButtons();
-                }
-            });
-
-            // Event listeners per Ridotto
-            document.querySelector('.btn-decrease-reduced').addEventListener('click', function() {
-                if (ticketQuantities.reduced > 0) {
-                    ticketQuantities.reduced--;
-                    document.getElementById('quantity-reduced').textContent = ticketQuantities.reduced;
-                    calculateTotal();
-                    updateAllButtons();
-                }
-            });
-
-            document.querySelector('.btn-increase-reduced').addEventListener('click', function() {
-                const totalTickets = ticketQuantities.full + ticketQuantities.reduced + ticketQuantities.free;
-                if (totalTickets < maxAvailability) {
-                    ticketQuantities.reduced++;
-                    document.getElementById('quantity-reduced').textContent = ticketQuantities.reduced;
-                    calculateTotal();
-                    updateAllButtons();
-                }
-            });
-
-            // Event listeners per Gratuito
-            document.querySelector('.btn-decrease-free').addEventListener('click', function() {
-                if (ticketQuantities.free > 0) {
-                    ticketQuantities.free--;
-                    document.getElementById('quantity-free').textContent = ticketQuantities.free;
-                    calculateTotal();
-                    updateAllButtons();
-                }
-            });
-
-            document.querySelector('.btn-increase-free').addEventListener('click', function() {
-                const totalTickets = ticketQuantities.full + ticketQuantities.reduced + ticketQuantities.free;
-                if (totalTickets < maxAvailability) {
-                    ticketQuantities.free++;
-                    document.getElementById('quantity-free').textContent = ticketQuantities.free;
-                    calculateTotal();
-                    updateAllButtons();
-                }
+            document.querySelectorAll('.btn-increase-variant').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vid = this.dataset.variantId;
+                    if (getTotalTickets() < maxAvailability) {
+                        variantQuantities[vid]++;
+                        document.getElementById(`qty-variant-${vid}`).textContent = variantQuantities[vid];
+                        calculateTotal();
+                        updateAllButtons();
+                    }
+                });
             });
 
             // Event listener per il bottone Acquista
@@ -858,10 +751,11 @@
                     },
                     body: JSON.stringify({
                         product_id: productId,
-                        availability_id: selectedAvailabilityId,
-                        quantity_full: ticketQuantities.full,
-                        quantity_reduced: ticketQuantities.reduced,
-                        quantity_free: ticketQuantities.free
+                        date: selectedDate,
+                        time: selectedTime,
+                        items: Object.entries(variantQuantities)
+                            .filter(([, qty]) => qty > 0)
+                            .map(([vid, qty]) => ({ variant_id: parseInt(vid), quantity: qty }))
                     })
                 })
                 .then(response => response.json())
