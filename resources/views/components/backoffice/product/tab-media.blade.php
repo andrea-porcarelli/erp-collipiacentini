@@ -11,8 +11,7 @@
 
                 <div class="button-card-absolute d-flex gap-2 align-items-center">
                     <input type="file" id="media-file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
-                    <x-button label="Aggiungi immagine +" emphasis="High" leading="fa-plus" class="btn-add-media" />
-                    <x-button label="Salva ordine" emphasis="Resting" leading="fa-floppy-disk" class="btn-save-media-order" />
+                    <x-button label="Aggiungi immagine" emphasis="High" trailing="fa-plus" class="btn-add-media" />
                 </div>
 
                 <div id="media-list">
@@ -39,25 +38,20 @@
                     class="position-relative mt-4">
 
                 <div class="button-card-absolute">
-                    <x-button label="Salva modifiche" emphasis="Resting" leading="fa-floppy-disk" class="btn-save-long-description" />
+                    <x-button label="Salva modifiche" status="Disabled" leading="fa-floppy-disk" class="btn-save-long-description" />
                 </div>
 
                 @if(count($languages) > 0)
-                    <div class="mb-spacing-m">
-                        <select id="long-desc-language-select" class="input-miticko" style="max-width:200px">
-                            @foreach($languages as $lang)
-                                <option value="{{ $lang['id'] }}">
-                                    {{ $lang['label'] }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="col-12 col-sm-3">
+                        <div class="mb-spacing-m">
+                            <x-select name="partner_idlong-desc-language-select" leading="fa-language" placeholder="Seleziona" :options="$languages" />
+                        </div>
                     </div>
                 @endif
 
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <textarea id="long-description-editor" name="long_description" rows="8"
-                                  data-it="{{ $model->contentField('long_description') ?? '' }}"></textarea>
+                        <textarea id="long-description-editor" name="long_description" rows="8" data-it="{{ $model->contentField('long_description') ?? '' }}"></textarea>
                     </div>
                 </div>
                 <div class="text-end mt-1">

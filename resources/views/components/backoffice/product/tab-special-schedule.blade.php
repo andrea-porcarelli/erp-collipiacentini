@@ -162,7 +162,7 @@
         cursor: default;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
     }
     .special-slot-body {
         padding: 16px;
@@ -359,7 +359,7 @@
                 '<span class="fw-medium" style="min-width:52px">' + slot.time + '</span>' +
                 '<span class="special-slot-header-tools">' +
                     '<span class="text-secondary small flex-grow-1">Prenotazioni attive: 0</span>' +
-                    '<button type="button" class="bt-miticko btn-special-slot-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash icon"></i></button>' +
+                    '<button type="button" class="bt-miticko btn-special-slot-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash-can icon"></i></button>' +
                     '<button type="button" class="bt-miticko btn-special-slot-toggle" data-mode="small primary"><i class="fa-regular fa-chevron-down icon"></i></button>' +
                 '</span>'+
             '</div>' +

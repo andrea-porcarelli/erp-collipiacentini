@@ -5,7 +5,7 @@
         <div class="col-12">
             <x-card class="position-relative">
                 <div class="button-card-absolute">
-                    <x-button label="Crea chiusura +" emphasis="High" leading="fa-plus" class="btn-create-closed-period" />
+                    <x-button label="Crea chiusura" emphasis="High" trailing="fa-plus" class="btn-create-closed-period" />
                 </div>
                 <div>
                     <h3 class="mb-0" style="font-size:18px;font-weight:600">Gestisci i periodi di chiusura</h3>
@@ -14,7 +14,7 @@
 
                 <div id="closed-periods-list" class="mt-spacing-xl">
                     @forelse($model->closedPeriods as $period)
-                        <div class="closed-period-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="{{ $period->id }}">
+                        <div class="closed-period-item d-flex align-items-center gap-3" data-id="{{ $period->id }}">
                             <i class="fa-regular fa-lock text-secondary"></i>
                             <span class="flex-grow-1">
                                 {{ $period->date_from->locale('it')->isoFormat('D MMMM YYYY') }}
@@ -22,7 +22,7 @@
                                 {{ $period->date_to->locale('it')->isoFormat('D MMMM YYYY') }}
                             </span>
                             <button type="button" class="bt-miticko btn-closed-period-delete" data-mode="small primary bt-m-text-only">
-                                <i class="fa-regular fa-trash icon"></i>
+                                <i class="fa-regular fa-trash-can icon"></i>
                             </button>
                         </div>
                     @empty
@@ -89,7 +89,7 @@
                         '<i class="fa-regular fa-lock text-secondary"></i>' +
                         '<span class="flex-grow-1">' + period.date_from + ' – ' + period.date_to + '</span>' +
                         '<button type="button" class="bt-miticko btn-closed-period-delete" data-mode="small primary bt-m-text-only">' +
-                            '<i class="fa-regular fa-trash icon"></i>' +
+                            '<i class="fa-regular fa-trash-can icon"></i>' +
                         '</button>' +
                     '</div>';
                 $('#closed-periods-list').append(html);

@@ -621,14 +621,22 @@ div.dt-container .dt-paging .dt-paging-button:active {
     background: var(--primary-onbrand);
 }
 .flatpickr-day.selected.startRange, .flatpickr-day.startRange.startRange, .flatpickr-day.endRange.startRange {
-    border-radius: var(--border-radius-s) 0 0 var(--border-radius-s);
-    background: var(--primary-brand);
-    border-color: var(--primary-onbrandlight);
+    border-radius: var(--border-radius-s, 8px);
+    border: 1px solid var(--brand-secondary-brand, #3948D3);
+    background: var(--brand-secondary-brand, #3948D3);
 }
 .flatpickr-day.selected.endRange, .flatpickr-day.startRange.endRange, .flatpickr-day.endRange.endRange {
-    border-radius: 0 var(--border-radius-s) var(--border-radius-s) 0;
-    background: var(--primary-brand);
-    border-color: var(--primary-onbrandlight);
+    border-radius: var(--border-radius-s, 8px);
+    border: 1px solid var(--brand-secondary-brand, #3948D3);
+    background: var(--brand-secondary-brand, #3948D3);
+}
+.flatpickr-day.inRange {
+    background: var(--brand-secondary-brandlight, #EAEEFA);
+    color: var(--brand-secondary-onbrandlight, #3948D3);
+    font-family: var(--typography-body-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 14px);
+    box-shadow: -5px 0 0 var(--brand-secondary-brandlight, #EAEEFA), 5px 0 0 var(--brand-secondary-brandlight, #EAEEFA);
+    border:none
 }
 span.flatpickr-weekday{
     color: var(--text-secondary);
@@ -675,7 +683,11 @@ span.flatpickr-weekday{
     color: var(--text-disabled);
 }
 .swal-modal {
-    border-radius: var(--border-radius-xl);
+    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color) !important;
+    outline: 0;
+    border-radius: var(--border-radius-xl, 24px) !important;
+    background: var(--background-global-paper1, #FFF);
+    box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
     padding: var(--spacing-xl);
     text-align: left;
 }
@@ -883,7 +895,9 @@ span.flatpickr-weekday{
 
 
 .slot-item,
-.special-slot-item {
+.special-slot-item,
+.closed-period-item,
+.media-item {
     color: var(--text-main, #0D0D0D);
     background: #fff;
     margin-bottom: 8px;
@@ -986,4 +1000,21 @@ span.flatpickr-weekday{
 }
 #form-variants-occupancy .switchery {
     right: 30px !important;
+}
+#modal-closed-period .modal-dialog {
+    width: fit-content;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: var(--bs-modal-color);
+    pointer-events: auto;
+    background-clip: padding-box;
+    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color) !important;
+    outline: 0;
+    border-radius: var(--border-radius-xl, 24px) !important;
+    background: var(--background-global-paper1, #FFF);
+    box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
 }

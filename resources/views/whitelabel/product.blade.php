@@ -10,17 +10,11 @@
                 <x-card :pre_title="$product->partner?->company?->company_name" :title="$product->meta_title" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->product_tags !!}
                     <div class="button-progress">
-                        <button id="btn-date" data-mode="small secondary" type="button" class="bt-miticko btn-date bt-m-outlined">
-                            <i class="fa-regular fa-calendar icon"></i>Data
-                        </button>
+                        <x-button label="Data" id="btn-date" emphasis="MediumLow" class="btn-create-category" size="Small" leading="fa-calendar" class="btn-date " />
                         <div class="progress-connector"></div>
-                        <button id="btn-time" data-mode="small disabled" type="button" class="bt-miticko btn-time bt-m-default" disabled>
-                            <i class="fa-regular fa-clock-three icon"></i>Orario
-                        </button>
+                        <x-button label="Orario" id="btn-time" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
                         <div class="progress-connector"></div>
-                        <button id="btn-visitors" data-mode="small disabled" type="button" class="bt-miticko btn-visitors bt-m-default" disabled>
-                            <i class="fa-regular fa-user icon"></i>Visitatori
-                        </button>
+                        <x-button label="Visitatori" id="btn-visitors" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
                     </div>
                     <div id="calendar-container" class="w-100 mt-3">
                         <div id="calendar" class="w-100"></div>
@@ -552,9 +546,7 @@
             timeSlotsContainer.innerHTML = '<p>Caricamento orari...</p>';
 
             // Aggiorna il bottone Data
-            btnDate.classList.remove('bt-m-outlined');
-            btnDate.classList.add('bt-m-default');
-            btnDate.setAttribute('data-mode', 'small secondary');
+            btnDate.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-Medium  buttonAppearance-Primary');
             // Aggiorna il testo del bottone con la data selezionata
             const dateText = formatDateItalian(date);
             const btnDateIcon = btnDate.querySelector('i');
@@ -606,9 +598,7 @@
                         });
 
                         // Aggiorna il bottone Orario: da disabled a secondary outlined
-                        btnTime.classList.remove('bt-m-default');
-                        btnTime.classList.add('bt-m-outlined');
-                        btnTime.setAttribute('data-mode', 'small secondary');
+                        btnTime.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary');
                         btnTime.removeAttribute('disabled');
                     } else {
                         timeSlotsContainer.innerHTML = '<p>Nessun orario disponibile per questa data.</p>';
@@ -633,18 +623,14 @@
 
             // Aggiorna il bottone Orario
             if (btnTime) {
-                btnTime.classList.remove('bt-m-outlined');
-                btnTime.classList.add('bt-m-default');
-                btnTime.setAttribute('data-mode', 'small secondary');
+                btnTime.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-Medium  buttonAppearance-Primary');
                 // Aggiorna il testo del bottone con l'orario selezionato
                 btnTime.innerHTML = `<i class="fa-regular fa-clock-three icon"></i> ${selectedTime}`;
             }
 
             // Abilita il bottone Visitatori
             if (btnVisitors) {
-                btnVisitors.classList.remove('bt-m-default');
-                btnVisitors.classList.add('bt-m-outlined');
-                btnVisitors.setAttribute('data-mode', 'small secondary');
+                btnVisitors.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary');
                 btnVisitors.removeAttribute('disabled');
             }
 

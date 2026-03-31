@@ -138,21 +138,20 @@
         <div class="modal-dialog" data-mode="Miticko Light Desktop White">
             <div class="modal-content modal-miticko">
                 <div class="modal-header">
-                    <h1 class="modal-title">Nuova chiusura</h1>
+                    <h1 class="modal-title">Seleziona periodo</h1>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span class="fa-regular fa-times"></span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <p class="text-secondary small mb-3">Seleziona il periodo di chiusura dal calendario</p>
-                    <div id="closed-period-flatpickr"></div>
+                <div class="modal-body text-center">
                     <input type="hidden" id="closed-period-from-val">
                     <input type="hidden" id="closed-period-to-val">
                     <p class="mt-3 mb-0 small fw-medium" id="closed-period-range-label">Nessun periodo selezionato</p>
+                    <div id="closed-period-flatpickr"></div>
                 </div>
                 <div class="modal-footer">
-                    <x-button size="Small" emphasis="text-only" label="Annulla" :dataset="['bs-dismiss' => 'modal']" />
-                    <x-button size="Small" emphasis="High" id="btn-confirm-closed-period" label="Crea chiusura" />
+                    <x-button size="Small" emphasis="text-only" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
+                    <x-button size="Small" emphasis="High" id="btn-confirm-closed-period" label="Salva" />
                 </div>
             </div>
         </div>

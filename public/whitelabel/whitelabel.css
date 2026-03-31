@@ -106,12 +106,12 @@ body {
     line-height: var(--typography-body-lineheight-small, 16px); /* 114.286% */
 }
 .card-miticko .card-header h1 {
-    color: var(--card-title);
-    font-family: var(--font-font-1), sans-serif;
-    font-size: var(--typography-title-size-large);
+    color: var(--text-main, #0D0D0D);
+    font-family: var(--typography-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 28px);
     font-style: normal;
-    font-weight: var(--typography-title-weight-large);
-    line-height: var(--typography-title-lineheight-large); /* 133.333% */
+    font-weight: var(--weight, 600);
+    line-height: var(--line-height, 34px); /* 121.429% */
 }
 .card-miticko .card-header h2 {
     color: var(--card-title, #0D0D0D);
@@ -409,10 +409,18 @@ body {
 }
 
 .flatpickr-day.today {
-    border-color: var(--primary-brand);
-    border-radius: 0;
-    background: var(--light-backgroundhover);
-    color: var(--primary-onbrandlight);
+    border-radius: var(--border-radius-0, 0);
+    background: var(--background-global-paper2, #FAFAFA);
+    border: none;
+    color: var(--brand-secondary-brand, #3948D3);
+    text-align: center;
+
+    /* Title */
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
 }
 
 .flatpickr-day:hover {
@@ -688,4 +696,7 @@ body {
     font-style: normal;
     font-weight: var(--weight, 700);
     line-height: var(--line-height, 24px); /* 133.333% */
+}
+#datePickerModal .modal-dialog {
+    width: fit-content;
 }
