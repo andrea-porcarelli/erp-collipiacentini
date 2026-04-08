@@ -36,12 +36,10 @@ class ProductSpecialScheduleController extends Controller
             ->orderBy('time')
             ->get();
 
+        $html = $slots->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
+
         return response()->json([
-            'slots' => $slots->map(fn($s) => [
-                'id'           => $s->id,
-                'time'         => substr($s->time, 0, 5),
-                'availability' => $s->availability,
-            ]),
+            'html'        => $html,
             'is_override' => $slots->isNotEmpty(),
         ]);
     }
@@ -71,20 +69,16 @@ class ProductSpecialScheduleController extends Controller
         $data = $request->validate([
             'date'         => 'required|date_format:Y-m-d',
             'time'         => 'required|date_format:H:i',
-            'availability' => 'required|integer|min:0',
         ]);
 
         $slot = ProductSpecialSchedule::create([
             'product_id'   => $product->id,
             'date'         => $data['date'],
             'time'         => $data['time'],
-            'availability' => $data['availability'],
         ]);
 
         return response()->json([
-            'id'           => $slot->id,
-            'time'         => substr($slot->time, 0, 5),
-            'availability' => $slot->availability,
+            'html' => view('backoffice.products._special_slot_item', ['slot' => $slot])->render(),
         ]);
     }
 
@@ -132,10 +126,11 @@ class ProductSpecialScheduleController extends Controller
         $variants = ProductVariant::where('special_schedule_id', $slot->id)
             ->orderBy('sort_order')
             ->with('prices')
-            ->get()
-            ->map(fn($v) => $this->serializeVariant($v));
+            ->get();
 
-        return response()->json(['variants' => $variants]);
+        $html = $variants->map(fn($v) => $this->renderVariantHtml($v))->join('');
+
+        return response()->json(['html' => $html]);
     }
 
     /**
@@ -175,7 +170,7 @@ class ProductSpecialScheduleController extends Controller
             ]);
         }
 
-        return response()->json(['variant' => $this->serializeVariant($variant->load('prices'))]);
+        return response()->json(['html' => $this->renderVariantHtml($variant->load('prices'))]);
     }
 
     /**
@@ -223,7 +218,26 @@ class ProductSpecialScheduleController extends Controller
             }
         }
 
-        return response()->json(['variant' => $this->serializeVariant($variant->load('prices'))]);
+        return response()->json(['html' => $this->renderVariantHtml($variant->load('prices'))]);
+    }
+
+    /**
+     * Riordina le varianti di uno slot speciale.
+     */
+    public function reorderVariants(Request $request, Product $product, ProductSpecialSchedule $slot): JsonResponse
+    {
+        abort_if($slot->product_id !== $product->id, 403);
+        $this->authorizeAccess($product);
+
+        $request->validate(['ordered_ids' => 'required|array']);
+
+        foreach ($request->ordered_ids as $index => $variantId) {
+            ProductVariant::where('id', $variantId)
+                ->where('special_schedule_id', $slot->id)
+                ->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['ok' => true]);
     }
 
     /**
@@ -241,21 +255,9 @@ class ProductSpecialScheduleController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    private function serializeVariant(ProductVariant $v): array
+    private function renderVariantHtml(ProductVariant $v): string
     {
-        return [
-            'id'           => $v->id,
-            'label'        => $v->label,
-            'description'  => $v->description,
-            'max_quantity' => $v->max_quantity,
-            'full_price'   => $v->full_price,
-            'prices'       => $v->prices->map(fn($p) => [
-                'id'       => $p->id,
-                'label'    => $p->label,
-                'price'    => $p->price,
-                'vat_rate' => $p->vat_rate,
-            ])->values(),
-        ];
+        return view('backoffice.products._special_variant_item', ['variant' => $v])->render();
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductAvailability;
 use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
 use Carbon\Carbon;
@@ -77,6 +78,8 @@ class BookingController extends Controller
             'priceVariations',
             'closedPeriods',
             'gallery',
+            'faqs',
+            'relatedProducts.relatedProduct.partner',
         ])->where('id', $productId)->first();
 
         if (!$product) {
@@ -113,23 +116,19 @@ class BookingController extends Controller
         $variation = $this->availabilityService->getApplicablePriceVariation($product, $date);
         $slots     = $this->availabilityService->getSlotsForDate($product, $date);
 
-        $dayOfWeek = \Carbon\Carbon::parse($date)->isoWeekday();
-
-        $times = $slots->map(function ($slot) use ($product, $variation, $date, $dayOfWeek) {
+        $times = $slots->map(function ($slot) use ($product, $variation, $date) {
             if ($slot['slot_type'] === 'weekly') {
                 $availabilityId = $slot['slot_id'];
+                $variantCollection = $product->variants->where('availability_id', $availabilityId);
+                if ($variantCollection->isEmpty()) {
+                    $variantCollection = $product->variants
+                        ->whereNull('availability_id')
+                        ->whereNull('special_schedule_id');
+                }
             } else {
-                // Special schedule: find the matching weekly template slot (same day + time)
-                $weeklySlot = \App\Models\ProductAvailability::where('product_id', $product->id)
-                    ->where('day_of_week', $dayOfWeek)
-                    ->where('time', 'like', $slot['time'] . '%')
-                    ->first();
-                $availabilityId = $weeklySlot?->id;
+                $variantCollection = $product->variants->where('special_schedule_id', $slot['slot_id']);
             }
 
-            $variantCollection = $availabilityId
-                ? $product->variants->where('availability_id', $availabilityId)
-                : $product->variants;
 
             $variants = $variantCollection->map(fn(ProductVariant $v) => [
                 'id'         => $v->id,
@@ -271,7 +270,7 @@ class BookingController extends Controller
     public function cart(Request $request): View
     {
         $sessionId = session()->getId();
-        $cart = Cart::with(['product.partner', 'product.variants.prices', 'items.variant', 'appliedPriceVariation'])
+        $cart = Cart::with(['product.partner', 'product.variants.prices', 'items.variant', 'appliedPriceVariation', 'product.customerFields.fieldType'])
             ->where('session_id', $sessionId)
             ->first();
 

@@ -36,11 +36,7 @@ class Product extends LogsModel
             return ProductStatus::PENDING;
         }
 
-        $hasFutureAvailability = $this->availabilities()
-            ->where('availability', '>', 0)
-            ->exists();
-
-        return $hasFutureAvailability ? ProductStatus::ACTIVE : ProductStatus::UNAVAILABLE;
+        return $this->is_available ? ProductStatus::ACTIVE : ProductStatus::UNAVAILABLE;
     }
 
     public function partner() : BelongsTo
@@ -69,7 +65,7 @@ class Product extends LogsModel
         $now = now();
         $dates = [];
 
-        for ($m = 0; $m < 3; $m++) {
+        for ($m = 0; $m < 12; $m++) {
             $ref = $now->copy()->addMonths($m);
             $days = $service->getAvailableDaysForMonth($this, $ref->year, $ref->month);
             $dates = array_merge($dates, $days);

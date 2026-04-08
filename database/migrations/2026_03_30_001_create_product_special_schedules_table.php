@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->time('time');
-            $table->unsignedInteger('availability')->nullable();
             $table->timestamps();
 
             $table->index(['product_id', 'date']);

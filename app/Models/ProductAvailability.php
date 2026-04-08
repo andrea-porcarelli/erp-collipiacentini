@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductAvailability extends LogsModel
 {
@@ -18,8 +19,15 @@ class ProductAvailability extends LogsModel
         return $this->belongsTo(Product::class);
     }
 
-    public function variants() : \Illuminate\Database\Eloquent\Relations\HasMany
+    public function variants() : HasMany
     {
         return $this->hasMany(ProductVariant::class, 'availability_id');
+    }
+
+    public function generic_variants() : HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id')
+                    ->whereNull('availability_id')
+                    ->whereNull('special_schedule_id');
     }
 }

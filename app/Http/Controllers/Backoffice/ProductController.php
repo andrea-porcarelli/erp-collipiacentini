@@ -210,10 +210,12 @@ class ProductController extends CrudController
 
     private function updateLongDescription(Product $product, UpdateProductRequest $request): void
     {
-        $lang = Language::findOrFail($request->input('language_id'));
+        $langId = $request->input('language_id');
+        $locale = $langId ? Language::findOrFail($langId)->iso_code : null;
+
         $product->setContentFields([
             'long_description' => $request->input('long_description'),
-        ], $lang->iso_code);
+        ], $locale);
     }
 
     private function updateOccupancy(Product $product, UpdateProductRequest $request): void

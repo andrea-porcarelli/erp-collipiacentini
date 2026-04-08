@@ -121,9 +121,6 @@
                         <span class="fw-medium">e</span>
                         <x-dropdown name="special-slot-minute" :options="Utils::minutes()" id="special-slot-minute" />
                     </div>
-                    <x-input name="special-slot-availability" id="special-slot-availability"
-                             label="Capienza" type="number" placeholder="0"
-                             message="Numero massimo di prenotazioni per questo orario" />
                 </div>
                 <div class="modal-footer">
                     <x-button size="Small" emphasis="text-only" label="Annulla" :dataset="['bs-dismiss' => 'modal']" />

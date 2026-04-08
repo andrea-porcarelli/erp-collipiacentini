@@ -62,8 +62,6 @@ class OrderService
                 ]);
             }
 
-            $this->decrementSlot($cart, $totalQuantity);
-
             return $order;
         });
     }
@@ -84,7 +82,7 @@ class OrderService
     }
 
     /**
-     * Mark order as failed and restore slot availability.
+     * Mark order as failed.
      */
     public function failOrder(Order $order, ?string $errorMessage = null): Order
     {
@@ -92,8 +90,6 @@ class OrderService
             'order_status'  => OrderStatus::FAILED,
             'payment_error' => $errorMessage,
         ]);
-
-        $this->restoreAvailability($order);
 
         return $order->fresh();
     }
@@ -115,24 +111,4 @@ class OrderService
         return "{$prefix}-{$companyId}-{$date}-{$random}";
     }
 
-    protected function decrementSlot(Cart $cart, int $totalQuantity): void
-    {
-        if ($cart->slot_type && $cart->slot_id) {
-            $this->availabilityService->decrementSlot($cart->slot_type, $cart->slot_id, $totalQuantity);
-        }
-    }
-
-    protected function restoreAvailability(Order $order): void
-    {
-        foreach ($order->orderProducts as $orderProduct) {
-            if ($orderProduct->slot_type && $orderProduct->slot_id) {
-                $totalQuantity = $orderProduct->items->sum('quantity');
-                $this->availabilityService->restoreSlot(
-                    $orderProduct->slot_type,
-                    $orderProduct->slot_id,
-                    $totalQuantity
-                );
-            }
-        }
-    }
 }

@@ -104,6 +104,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::delete('products/{product}/special-schedule/{slot}', [ProductSpecialScheduleController::class, 'destroy'])->name('products.special-schedule.destroy');
         Route::get('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'getVariants'])->name('products.special-schedule.variants.index');
         Route::post('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'storeVariant'])->name('products.special-schedule.variants.store');
+        Route::post('products/{product}/special-schedule/{slot}/variants/reorder', [ProductSpecialScheduleController::class, 'reorderVariants'])->name('products.special-schedule.variants.reorder');
         Route::put('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'updateVariant'])->name('products.special-schedule.variants.update');
         Route::delete('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'destroyVariant'])->name('products.special-schedule.variants.destroy');
 

@@ -3,23 +3,23 @@
 @section('content')
     <div class="container mt-5" style="min-height: 600px">
         <div class="row w-100">
-            <div class="col-12 col-sm-6 offset-sm-3">
+            <div class="col-12 col-sm-6 offset-sm-3" style="width: 600px">
                 <div class="row w-100">
                     <div class="col-12 text-center hero ">
                         <h1>Il tuo carrello</h1>
                     </div>
                 </div>
                 @if($cart)
-                    <div class="button-progress">
-                        <button id="btn-step-riepilogo" data-mode="small secondary" type="button" class="bt-miticko bt-m-default">
+                    <div class="button-progress mt-spacing-2xl">
+                        <button id="btn-step-riepilogo" data-mode="buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow" type="button" class="bt-miticko">
                             Riepilogo
                         </button>
                         <div class="progress-connector" id="connector-dati" ></div>
-                        <button id="btn-step-dati" data-mode="small disabled" type="button" class="bt-miticko bt-m-default" disabled>
+                        <button id="btn-step-dati" data-mode="buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High" type="button" class="bt-miticko bt-m-default" disabled>
                             Dati
                         </button>
                         <div class="progress-connector" id="connector-pagamento" ></div>
-                        <button id="btn-step-pagamento" data-mode="small disabled" type="button" class="bt-miticko bt-m-default" disabled>
+                        <button id="btn-step-pagamento" data-mode="buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High" type="button" class="bt-miticko bt-m-default" disabled>
                             Pagamento
                         </button>
                     </div>
@@ -61,24 +61,12 @@
                             </div>
 
                             <div class="cart-tickets">
-                                @if($cart->quantity_full > 0)
+                                @foreach($cart->items as $item)
                                     <div class="ticket-row">
-                                        <span class="ticket-type">{{ $cart->quantity_full }} Intero x {{ Utils::price($cart->price_full) }}</span>
-                                        <span class="ticket-price">{{ Utils::price($cart->price_full * $cart->quantity_full) }}</span>
+                                        <span class="ticket-type">{{ $item->quantity }} {{ $item->variant->label }} x {{ Utils::price($item->unit_price) }}</span>
+                                        <span class="ticket-price">{{ Utils::price($item->subtotal) }}</span>
                                     </div>
-                                @endif
-                                @if($cart->quantity_reduced > 0)
-                                    <div class="ticket-row">
-                                        <span class="ticket-type">{{ $cart->quantity_reduced }} Ridotto x {{ Utils::price($cart->price_reduced) }}</span>
-                                        <span class="ticket-price"> {{ Utils::price($cart->price_reduced * $cart->quantity_reduced) }}</span>
-                                    </div>
-                                @endif
-                                @if($cart->quantity_free > 0)
-                                    <div class="ticket-row">
-                                        <span class="ticket-type">{{ $cart->quantity_free }} Gratuito x {{ Utils::price($cart->price_free) }}</span>
-                                        <span class="ticket-price">{{ Utils::price($cart->price_free * $cart->quantity_free) }}</span>
-                                    </div>
-                                @endif
+                                @endforeach
                                 <div class="ticket-row ticket-subtotal">
                                     <span class="ticket-type">Subtotale</span>
                                     <span class="ticket-quantity"></span>
@@ -87,10 +75,10 @@
                             </div>
 
                             <div class="cart-item-actions">
-                                <a href="{{ $cart->product->route }}" class="bt-miticko bt-m-light text-center" data-mode="small primary">
+                                <a href="{{ $cart->product->route }}" class="bt-miticko border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low">
                                     <i class="fa-regular fa-pen icon"></i> Modifica
                                 </a>
-                                <button type="button" class="bt-miticko bt-m-light btn-remove-cart" data-mode="small primary" id="btn-remove-cart">
+                                <button type="button" class="bt-miticko btn-remove-cart border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low" id="btn-remove-cart">
                                     <i class="fa-regular fa-trash-can icon"></i> Rimuovi
                                 </button>
                             </div>
@@ -104,10 +92,10 @@
                     </div>
 
                     <div class="cart-actions" id="step1-actions">
-                        <a href="{{ $cart->product->route }}" class="bt-miticko bt-m-text-only " data-mode="small secondary">
+                        <a href="{{ $cart->product->route }}" class="bt-miticko border-none text-center" style="padding-left: 15px" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-Low">
                             Torna al sito
                         </a>
-                        <button id="btn-checkout" type="button" class="bt-miticko bt-m-default btn-confirm" data-mode="small">
+                        <button id="btn-checkout" type="button" class="bt-miticko btn-confirm" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-High">
                             Conferma biglietti
                         </button>
                     </div>
@@ -130,53 +118,15 @@
                                     <x-input name="email" label="Email" required />
                                 </div>
 
-                                <div class="form-group">
-                                    <x-input name="address" label="Indirizzo" required />
-                                </div>
-                                <div class="form-row">
+                                @foreach($cart->product->customerFields->sortBy('fieldType.sort_order') as $field)
                                     <div class="form-group">
-                                        <x-input name="zip_code" label="CAP" required />
+                                        <x-input
+                                            name="{{ $field->fieldType->key }}"
+                                            label="{{ $field->fieldType->label }}"
+                                            :required="$field->is_required"
+                                        />
                                     </div>
-                                    <div class="form-group">
-                                        <x-input name="city" label="Città" required />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="country">Paese *</label>
-                                    <div class="country-select-wrapper">
-                                        <span class="country-flag" id="selected-flag">🇮🇹</span>
-                                        <select id="country" name="country" required>
-                                            <option value="IT" data-flag="🇮🇹" selected>Italia</option>
-                                            <option value="DE" data-flag="🇩🇪">Germania</option>
-                                            <option value="FR" data-flag="🇫🇷">Francia</option>
-                                            <option value="ES" data-flag="🇪🇸">Spagna</option>
-                                            <option value="GB" data-flag="🇬🇧">Regno Unito</option>
-                                            <option value="AT" data-flag="🇦🇹">Austria</option>
-                                            <option value="CH" data-flag="🇨🇭">Svizzera</option>
-                                            <option value="BE" data-flag="🇧🇪">Belgio</option>
-                                            <option value="NL" data-flag="🇳🇱">Paesi Bassi</option>
-                                            <option value="PT" data-flag="🇵🇹">Portogallo</option>
-                                            <option value="PL" data-flag="🇵🇱">Polonia</option>
-                                            <option value="SE" data-flag="🇸🇪">Svezia</option>
-                                            <option value="NO" data-flag="🇳🇴">Norvegia</option>
-                                            <option value="DK" data-flag="🇩🇰">Danimarca</option>
-                                            <option value="FI" data-flag="🇫🇮">Finlandia</option>
-                                            <option value="IE" data-flag="🇮🇪">Irlanda</option>
-                                            <option value="GR" data-flag="🇬🇷">Grecia</option>
-                                            <option value="CZ" data-flag="🇨🇿">Repubblica Ceca</option>
-                                            <option value="RO" data-flag="🇷🇴">Romania</option>
-                                            <option value="HU" data-flag="🇭🇺">Ungheria</option>
-                                            <option value="US" data-flag="🇺🇸">Stati Uniti</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <x-input name="phone" label="Cellulare" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <x-input name="fiscal_code" label="Codice fiscale" required />
-                                </div>
+                                @endforeach
 
                                 <div class="form-group">
                                     <label class="checkbox-label">
@@ -197,10 +147,10 @@
                     </div>
 
                     <div class="cart-actions" id="step2-actions" style="display: none;">
-                        <button id="btn-back-step1" type="button" class="bt-miticko bt-m-text-only" data-mode="small secondary">
-                            Indietro
+                        <button id="btn-back-step1" type="button" class="bt-miticko border-none text-center" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low">
+                            indietro
                         </button>
-                        <button id="btn-to-payment" type="button" class="bt-miticko bt-m-default btn-confirm" data-mode="small">
+                        <button id="btn-to-payment" type="button" class="bt-miticko btn-confirm" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-High">
                             Conferma dati
                         </button>
                     </div>
@@ -229,10 +179,10 @@
                     </div>
 
                     <div class="cart-actions" id="step3-actions" style="display: none;">
-                        <button id="btn-back-step2" type="button" class="bt-miticko bt-m-text-only" data-mode="small secondary">
+                        <button id="btn-back-step2" type="button" class="bt-miticko bt-m-text-only" data-mode="buttonAppearance-Secondary buttonSize-Large buttonEmphasis-High">
                             Indietro
                         </button>
-                        <button id="btn-pay" type="button" class="bt-miticko bt-m-default btn-confirm" data-mode="small">
+                        <button id="btn-pay" type="button" class="bt-miticko bt-m-default btn-confirm" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-High">
                             Paga {{ Utils::price($cart->total) }}
                         </button>
                     </div>
@@ -244,7 +194,7 @@
                         Sfoglia i prodotti e aggiungili al carrello
                     </x-card>
 
-                    <a href="{{ url('/shop') }}" class="bt-miticko bt-m-default w-100 mt-4" data-mode="small">
+                    <a href="{{ url('/shop') }}" class="bt-miticko bt-m-default w-100 mt-4" data-mode="buttonAppearance-Primary buttonSize-Small buttonEmphasis-High">
                          Vai ai prodotti <i class="fa-regular fa-arrow-right icon"></i>
                     </a>
                 @endif
@@ -403,11 +353,21 @@
     }
 
     .ticket-row.ticket-subtotal .ticket-type {
-        font-weight: var(--typography-title-weight-small, 600);
+        color: var(--text-secondary, #666);
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: var(--typography-title-size-small, 14px);
+        font-style: normal;
+        font-weight: var(--typography-title-weight-small, 700);
+        line-height: var(--typography-title-line-height-small, 18px); /* 128.571% */
     }
 
     .ticket-row.ticket-subtotal .ticket-price {
-        font-weight: var(--typography-title-weight-small, 600);
+        color: var(--text-secondary, #666);
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: var(--typography-title-size-small, 14px);
+        font-style: normal;
+        font-weight: var(--typography-title-weight-small, 700);
+        line-height: var(--typography-title-line-height-small, 18px); /* 128.571% */
     }
 
     .cart-item-actions {
@@ -418,11 +378,13 @@
 
 
     .ticket-type {
+        color: var(--text-secondary, #666);
+        /* ❌ bodySmall */
         font-family: var(--font-font-2, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-medium, 16px);
-        font-weight: var(--typography-body-weight-medium, 400);
-        color: var(--text-main, #0D0D0D);
-        flex: 1;
+        font-size: var(--typography-body-size-small, 14px);
+        font-style: normal;
+        font-weight: var(--typography-body-weight-small, 300);
+        line-height: var(--typography-body-line-height-small, 16px); /* 114.286% */
     }
 
     .ticket-quantity {
@@ -434,10 +396,12 @@
     }
 
     .ticket-price {
-        font-family: var(--font-font-1, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-medium, 16px);
-        font-weight: var(--typography-body-weight-medium, 500);
-        color: var(--text-main, #0D0D0D);
+        color: var(--text-secondary, #666);
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: var(--typography-body-size-small, 14px);
+        font-style: normal;
+        font-weight: var(--typography-body-weight-small, 300);
+        line-height: var(--typography-body-line-height-small, 16px); /* 114.286% */
         width: 100px;
         text-align: right;
     }
@@ -452,16 +416,21 @@
     }
 
     .total-label {
-        font-family: var(--font-font-1, "DM Sans"), sans-serif;
-        font-size: var(--typography-title-size-medium, 20px);
-        font-weight: var(--typography-title-weight-medium, 600);
         color: var(--text-main, #0D0D0D);
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: var(--typography-title-size-large, 28px);
+        font-style: normal;
+        font-weight: var(--typography-title-weight-large, 600);
+        line-height: var(--typography-title-line-height-large, 34px); /* 121.429% */
     }
 
     .total-amount {
+        color: var(--text-main, #0D0D0D);
         font-family: var(--font-font-1, "DM Sans"), sans-serif;
         font-size: var(--typography-title-size-large, 28px);
-        font-weight: var(--typography-title-weight-large, 700);
+        font-style: normal;
+        font-weight: var(--typography-title-weight-large, 600);
+        line-height: var(--typography-title-line-height-large, 34px); /* 121.429% */
     }
 
     .cart-actions {
@@ -846,7 +815,11 @@
         pointer-events: none;
         opacity: 0.7;
     }
+    .border-none {
+        border: none;
+    }
 </style>
+@if($cart)
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Elementi
@@ -884,17 +857,13 @@
 
             // Aggiorna progress bar: "Riepilogo" completato, "Dati" attivo
             if (btnStepRiepilogo) {
-                btnStepRiepilogo.classList.remove('bt-m-default');
-                btnStepRiepilogo.classList.add('bt-m-outlined');
                 btnStepRiepilogo.removeAttribute('disabled');
-                btnStepRiepilogo.setAttribute('data-mode', 'small secondary');
+                btnStepRiepilogo.setAttribute('data-mode', 'buttonAppearance-Primary buttonSize-Small buttonEmphasis-Medium');
                 btnStepRiepilogo.innerHTML = '<i class="fa fa-check icon"></i> Riepilogo';
             }
             if (btnStepDati) {
-                btnStepDati.classList.remove('bt-m-outlined');
-                btnStepDati.classList.add('bt-m-default');
                 btnStepDati.removeAttribute('disabled');
-                btnStepDati.setAttribute('data-mode', 'small secondary');
+                btnStepDati.setAttribute('data-mode', 'buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow');
             }
         }
 
@@ -1358,4 +1327,5 @@
         };
     });
 </script>
+@endif
 @endpush

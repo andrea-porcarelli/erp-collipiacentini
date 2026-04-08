@@ -267,70 +267,6 @@
         '</select>';
     }
 
-    /* ── Variante: render riga ───────────────────────────── */
-    function renderSsvVariant(v) {
-        var priceLabel = v.full_price !== undefined
-            ? '€ ' + parseFloat(v.full_price).toFixed(2)
-            : '';
-        var maxLabel = v.max_quantity ? v.max_quantity + ' max' : '';
-        var compLabel = v.prices.length + (v.prices.length === 1 ? ' componente' : ' componenti') + ' IVA';
-
-        var priceRowsHtml = v.prices.map(function(p) {
-            return renderEditPriceRow(p);
-        }).join('');
-
-        return '<div class="ss-variant-item" data-variant-id="' + v.id + '">' +
-            '<div class="ss-variant-header">' +
-                '<span class="fw-bold flex-grow-1">' + escHtml(v.label) + '</span>' +
-                (priceLabel ? '<span class="text-secondary small">' + priceLabel + '</span>' : '') +
-                (maxLabel   ? '<span class="text-secondary small"><i class="fa-regular fa-users me-1"></i>' + maxLabel + '</span>' : '') +
-                '<span class="text-secondary small">' + compLabel + '</span>' +
-                '<button type="button" class="bt-miticko outlined danger small btn-ssv-delete"><i class="fa-regular fa-trash-can icon"></i></button>' +
-                '<button type="button" class="bt-miticko outlined secondary small btn-ssv-toggle"><i class="fa-regular fa-chevron-down icon"></i></button>' +
-            '</div>' +
-            '<div class="ss-variant-edit-panel">' +
-                '<div class="row g-3 align-items-start">' +
-                    '<div class="col-12 col-sm-4">' +
-                        '<label class="small fw-medium mb-1 d-block">Nome variante</label>' +
-                        '<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">' +
-                            '<input type="text" class="input-miticko ssv-edit-label" value="' + escAttr(v.label) + '" placeholder="es. Intero">' +
-                        '</div></div>' +
-                    '</div>' +
-                    '<div class="col-12 col-sm-6">' +
-                        '<label class="small fw-medium mb-1 d-block">Descrizione</label>' +
-                        '<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">' +
-                            '<input type="text" class="input-miticko ssv-edit-description" value="' + escAttr(v.description || '') + '" placeholder="es. Biglietto intero per adulti">' +
-                        '</div></div>' +
-                    '</div>' +
-                    '<div class="col-12 col-sm-2">' +
-                        '<label class="small fw-medium mb-1 d-block">Max consentiti</label>' +
-                        '<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">' +
-                            '<input type="number" class="input-miticko ssv-edit-max" value="' + (v.max_quantity || '') + '" placeholder="∞" min="1">' +
-                        '</div></div>' +
-                    '</div>' +
-                '</div>' +
-                '<hr class="my-3" style="color:#E6E6E6">' +
-                '<p class="fw-semibold small mb-2">Componenti IVA</p>' +
-                '<div class="d-flex align-items-center gap-2 mb-2 px-1">' +
-                    '<span class="small fw-semibold flex-grow-1">Servizio *</span>' +
-                    '<span class="small fw-semibold" style="width:160px;flex-shrink:0">Prezzo *</span>' +
-                    '<span class="small fw-semibold" style="width:130px;flex-shrink:0">IVA *</span>' +
-                    '<span style="width:36px;flex-shrink:0"></span>' +
-                '</div>' +
-                '<div class="ssv-edit-prices">' + priceRowsHtml + '</div>' +
-                '<div class="mt-2">' +
-                    '<button type="button" class="bt-miticko bt-m-text-only secondary small btn-ssv-add-price">' +
-                        '<i class="fa-regular fa-plus icon"></i> Aggiungi componente IVA' +
-                    '</button>' +
-                '</div>' +
-                '<div class="d-flex gap-2 justify-content-end mt-3 pt-3 border-top">' +
-                    '<button type="button" class="bt-miticko outlined secondary small btn-ssv-cancel"><i class="fa-regular fa-times icon"></i> Annulla</button>' +
-                    '<button type="button" class="bt-miticko small btn-ssv-save" data-mode="buttonSize-Small buttonEmphasis-High">Salva modifiche</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-    }
-
     function renderEditPriceRow(p) {
         var pid = p && p.id ? p.id : '';
         return '<div class="ss-edit-price-row" data-price-id="' + pid + '">' +
@@ -352,43 +288,6 @@
     function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
 
-    /* ── Slot speciale: render ───────────────────────────── */
-    function renderSpecialSlotItem(slot) {
-        return '<div class="special-slot-item" data-id="' + slot.id + '">' +
-            '<div class="special-slot-header">' +
-                '<span class="fw-medium" style="min-width:52px">' + slot.time + '</span>' +
-                '<span class="special-slot-header-tools">' +
-                    '<span class="text-secondary small flex-grow-1">Prenotazioni attive: 0</span>' +
-                    '<button type="button" class="bt-miticko btn-special-slot-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash-can icon"></i></button>' +
-                    '<button type="button" class="bt-miticko btn-special-slot-toggle" data-mode="small primary"><i class="fa-regular fa-chevron-down icon"></i></button>' +
-                '</span>'+
-            '</div>' +
-            '<div class="special-slot-body d-none" data-loaded="0">' +
-                /* Capienza */
-                '<div class="d-flex align-items-end gap-3 mb-spacing-l">' +
-                    '<div>' +
-                        '<label class="small fw-medium mb-1 d-block">Capienza totale slot</label>' +
-                        '<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting" style="width:120px">' +
-                            '<div class="text-field-container">' +
-                                '<input type="number" class="input-miticko special-slot-avail-input" min="0" value="' + (slot.availability !== null ? slot.availability : '') + '" placeholder="∞">' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<button type="button" class="bt-miticko btn-special-slot-save" data-mode="buttonSize-Small buttonEmphasis-High">Salva capienza</button>' +
-                '</div>' +
-                /* Varianti */
-                '<hr style="color:#E6E6E6" class="mb-spacing-l">' +
-                '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                    '<p class="fw-semibold mb-0">Varianti</p>' +
-                    '<button type="button" class="bt-miticko btn-ssv-open-modal" data-mode="buttonSize-Small buttonEmphasis-High">' +
-                        '<i class="fa-regular fa-plus icon"></i> Aggiungi variante' +
-                    '</button>' +
-                '</div>' +
-                '<div class="ssv-list"><p class="text-secondary small ssv-empty">Caricamento...</p></div>' +
-            '</div>' +
-        '</div>';
-    }
-
     /* ── Carica slots ────────────────────────────────────── */
     function loadSpecialSlots(isoDate) {
         var $list = $('#special-slots-list');
@@ -398,10 +297,10 @@
             path: '/products/' + PRODUCT_ID + '/special-schedule/' + isoDate,
             method: 'get',
             then: function (res) {
-                if (!res.slots || res.slots.length === 0) {
+                if (!res.html) {
                     $list.html('<p class="text-secondary small mb-0" id="special-slots-empty">Nessun orario speciale per questa data. Usa il template settimanale.</p>');
                 } else {
-                    $list.html(res.slots.map(renderSpecialSlotItem).join(''));
+                    $list.html(res.html);
                 }
                 if (res.is_override) { _overrideDates.add(isoDate); }
                 else { _overrideDates.delete(isoDate); }
@@ -422,10 +321,11 @@
             path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants',
             method: 'get',
             then: function (res) {
-                if (!res.variants || res.variants.length === 0) {
+                if (!res.html) {
                     $list.html('<p class="text-secondary small ssv-empty mb-0">Nessuna variante. Aggiungi la prima.</p>');
                 } else {
-                    $list.html(res.variants.map(renderSsvVariant).join(''));
+                    $list.html(res.html);
+                    initSsvSortable($list, slotId);
                 }
                 $body.data('loaded', 1);
             },
@@ -433,6 +333,27 @@
                 $list.html('<p class="text-danger small mb-0">Errore nel caricamento delle varianti.</p>');
             },
         }]);
+    }
+
+    /* ── Sortable varianti slot ──────────────────────────── */
+    function initSsvSortable($list, slotId) {
+        if (!$list.length || typeof Sortable === 'undefined') return;
+        Sortable.create($list[0], {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function () {
+                var ids = [...$list[0].querySelectorAll('.ss-variant-item[data-variant-id]')]
+                    .map(function (el) { return parseInt(el.dataset.variantId); });
+                $(document).trigger('fetch', [{
+                    path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants/reorder',
+                    method: 'post',
+                    data: { ordered_ids: ids },
+                    then: function (res) { toastr.success('Riordinamento effettuato con successo'); },
+                    catch: function (err) { console.log(err); toastr.error('Errore durante il riordinamento'); },
+                }]);
+            },
+        });
     }
 
     /* ── Override dates ──────────────────────────────────── */
@@ -486,19 +407,16 @@
         if (!_selectedDate) return;
         var hour   = String($('#special-slot-hour').val()).padStart(2, '0');
         var minute = String($('#special-slot-minute').val()).padStart(2, '0');
-        var avail  = parseInt($('#special-slot-availability').val());
-        if (isNaN(avail) || avail < 0) { toastr.warning('Inserisci una capienza valida'); return; }
         var $btn = $(this).prop('disabled', true);
 
         $(document).trigger('fetch', [{
             path: '/products/' + PRODUCT_ID + '/special-schedule',
             method: 'post',
-            data: { date: _selectedDate, time: hour + ':' + minute, availability: avail },
-            then: function (slot) {
-                $('#special-slots-empty').remove();
-                $('#special-slots-list').append(renderSpecialSlotItem(slot));
+            data: { date: _selectedDate, time: hour + ':' + minute },
+            then: function () {
                 _overrideDates.add(_selectedDate);
                 renderCalendar();
+                loadSpecialSlots(_selectedDate);
                 $('#modal-add-special-slot').modal('hide');
                 toastr.success('Orario aggiunto');
                 $btn.prop('disabled', false);
@@ -665,7 +583,8 @@
                 var $item = $('#special-slots-list .special-slot-item[data-id="' + slotId + '"]');
                 var $list = $item.find('.ssv-list');
                 $list.find('.ssv-empty').remove();
-                $list.append(renderSsvVariant(res.variant));
+                $list.append(res.html);
+                initSsvSortable($list, slotId);
                 $('#modal-add-special-variant').modal('hide');
                 toastr.success('Variante aggiunta');
                 $btn.prop('disabled', false);
@@ -737,7 +656,9 @@
                 prices:       prices,
             },
             then: function (res) {
-                $v.replaceWith(renderSsvVariant(res.variant));
+                var $list = $v.closest('.ssv-list');
+                $v.replaceWith(res.html);
+                initSsvSortable($list, slotId);
                 toastr.success('Variante aggiornata');
                 $btn.prop('disabled', false);
             },

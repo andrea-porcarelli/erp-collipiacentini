@@ -1122,6 +1122,7 @@ const initLongDescription = async () => {
     _longDescEditor.model.document.on('change:data', () => {
         const len = _longDescEditor.getData().replace(/<[^>]*>/g, '').length;
         $('#long-desc-count').text(len);
+        $('.btn-save-long-description').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Primary');
     });
 
     // Cambio lingua — carica via AJAX
@@ -1139,7 +1140,7 @@ const initLongDescription = async () => {
     // Salva
     $(document).on('click', '.btn-save-long-description', function () {
         const $btn = $(this);
-        if (!_longDescEditor || _longDescLangId === null) return;
+        if (!_longDescEditor) return;
 
         setLoading($btn, true);
         App.ajax({
@@ -1152,6 +1153,7 @@ const initLongDescription = async () => {
             },
         }).then(() => {
             toastr.success('Descrizione salvata con successo');
+            $('.btn-save-long-description').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Disabled');
         }).catch(() => {
             toastr.error('Errore durante il salvataggio');
         }).finally(() => setLoading($btn, false));

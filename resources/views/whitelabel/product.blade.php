@@ -14,7 +14,7 @@
                         <div class="progress-connector"></div>
                         <x-button label="Orario" id="btn-time" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
                         <div class="progress-connector"></div>
-                        <x-button label="Visitatori" id="btn-visitors" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
+                        <x-button label="Visitatori" id="btn-visitors" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-user" class="btn-date " />
                     </div>
                     <div id="calendar-container" class="w-100 mt-3">
                         <div id="calendar" class="w-100"></div>
@@ -30,6 +30,44 @@
                 <x-card title="Descrizione" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->description !!}
                 </x-card>
+                @if($product->relatedProducts->count() > 0)
+                    <x-card title="Altri prodotti" class="product-card" h1="true" leading="fa-shield-check">
+                        <ul class="list-unstyled mb-0">
+                            @foreach($product->relatedProducts as $related)
+                                <li class="border-bottom py-2">
+                                    <a href="{{ $related->relatedProduct->route }}" class="text-decoration-none fw-medium">
+                                        {{ $related->relatedProduct->meta_title }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </x-card>
+                @endif
+                @if($product->faqs->count() > 0)
+                    <x-card title="Domande frequenti" class="product-card" h1="true" leading="fa-shield-check">
+                        <div class="accordion" id="faq-accordion">
+                            @foreach($product->faqs as $faq)
+                                <div class="accordion-item border-0 border-bottom">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed px-0 fw-medium"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#faq-{{ $faq->id }}"
+                                                aria-expanded="false"
+                                                aria-controls="faq-{{ $faq->id }}">
+                                            {{ $faq->contentField('question') }}
+                                        </button>
+                                    </h2>
+                                    <div id="faq-{{ $faq->id }}" class="accordion-collapse collapse" data-bs-parent="#faq-accordion">
+                                        <div class="accordion-body px-0 text-secondary">
+                                            {!! nl2br($faq->contentField('answer')) !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </x-card>
+                @endif
 
             </div>
         </div>
@@ -449,26 +487,21 @@
                 if (ticketSelectionContainer) ticketSelectionContainer.style.display = 'none';
 
                 // Ripristina il bottone Data allo stato iniziale
-                this.classList.remove('bt-m-default');
-                this.classList.add('bt-m-outlined');
-                this.setAttribute('data-mode', 'small secondary');
+                this.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary');
                 this.innerHTML = '<i class="fa-regular fa-calendar icon"></i>Data';
 
                 // Ripristina il bottone Orario a disabled
                 if (btnTime) {
-                    btnTime.classList.remove('bt-m-outlined');
-                    btnTime.classList.add('bt-m-default');
-                    btnTime.setAttribute('data-mode', 'small disabled');
+                    btnTime.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled');
                     btnTime.setAttribute('disabled', 'disabled');
                     btnTime.innerHTML = '<i class="fa-regular fa-clock-three icon"></i>Orario';
                 }
 
                 // Ripristina il bottone Visitatori a disabled
                 if (btnVisitors) {
-                    btnVisitors.classList.remove('bt-m-outlined');
-                    btnVisitors.classList.add('bt-m-default');
-                    btnVisitors.setAttribute('data-mode', 'small disabled');
+                    btnVisitors.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled');
                     btnVisitors.setAttribute('disabled', 'disabled');
+                    btnTime.innerHTML = '<i class="fa-regular fa-user icon"></i>Visitatori';
                 }
 
                 // Reset delle variabili
@@ -497,17 +530,14 @@
                     if (ticketSelectionContainer) ticketSelectionContainer.style.display = 'none';
 
                     // Ripristina il bottone Orario a outlined
-                    this.classList.remove('bt-m-default');
-                    this.classList.add('bt-m-outlined');
                     this.innerHTML = '<i class="fa-regular fa-clock-three icon"></i>Orario';
 
                     // Ripristina il bottone Visitatori a disabled
                     if (btnVisitors) {
-                        btnVisitors.classList.remove('bt-m-outlined');
-                        btnVisitors.classList.add('bt-m-default');
-                        btnVisitors.setAttribute('data-mode', 'small disabled');
+                        btnVisitors.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled');
                         btnVisitors.setAttribute('disabled', 'disabled');
                     }
+                    btnTimeElement.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary');
 
                     // Reset delle quantità biglietti
                     variantQuantities = {};
@@ -639,6 +669,7 @@
             const quantityContainer = document.getElementById('ticket-quantity');
 
             variantQuantities = {};
+            console.log(selectedVariants)
             selectedVariants.forEach(v => { variantQuantities[v.id] = 0; });
 
             let ticketTypesHTML = selectedVariants.map(v => `
@@ -693,7 +724,7 @@
                 const btnPurchase = document.getElementById('btn-purchase');
                 const isDisabled = total <= 0;
                 btnPurchase.disabled = isDisabled;
-                btnPurchase.setAttribute('data-mode', isDisabled ? 'small disabled' : 'small');
+                btnPurchase.setAttribute('data-mode', isDisabled ? 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled' : 'buttonSize-Small buttonEmphasis-High buttonAppearance-Primary');
             }
 
             document.querySelectorAll('.btn-decrease-variant').forEach(btn => {

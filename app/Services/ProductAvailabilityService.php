@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Order;
+use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\ProductAvailability;
 use App\Models\ProductClosedPeriod;
@@ -31,35 +33,47 @@ class ProductAvailabilityService
     public function getSlotsForDate(Product $product, string $date): Collection
     {
         $specials = ProductSpecialSchedule::where('product_id', $product->id)
+            ->with('variants')
             ->where('date', $date)
             ->orderBy('time')
             ->get();
 
         if ($specials->isNotEmpty()) {
-            return $specials->map(fn($s) => [
-                'id'           => $s->id,
-                'time'         => substr($s->time, 0, 5),
-                'availability' => $s->availability,
-                'slot_type'    => 'special',
-                'slot_id'      => $s->id,
-            ]);
+            return $specials->map(function ($s) use ($date) {
+                $maxQty = $s->variants->max('max_quantity');
+                $booked = $this->getBookedQuantity('special', $s->id, $date);
+                return [
+                    'id'           => $s->id,
+                    'time'         => substr($s->time, 0, 5),
+                    'availability' => is_null($maxQty) ? null : max(0, $maxQty - $booked),
+                    'slot_type'    => 'special',
+                    'slot_id'      => $s->id,
+                ];
+            });
         }
 
         // Fall back to weekly template
         $dayOfWeek = Carbon::parse($date)->isoWeekday(); // 1=Mon...7=Sun
         $weekly = ProductAvailability::where('product_id', $product->id)
+            ->with(['variants', 'generic_variants'])
             ->where('day_of_week', $dayOfWeek)
             ->whereNotNull('day_of_week')
             ->orderBy('time')
             ->get();
 
-        return $weekly->map(fn($s) => [
-            'id'           => $s->id,
-            'time'         => substr($s->time, 0, 5),
-            'availability' => $s->availability,
-            'slot_type'    => 'weekly',
-            'slot_id'      => $s->id,
-        ]);
+        return $weekly->map(function ($s) use ($date) {
+            $maxQty = $s->variants->count()
+                ? $s->variants->max('max_quantity')
+                : $s->generic_variants->max('max_quantity');
+            $booked = $this->getBookedQuantity('weekly', $s->id, $date);
+            return [
+                'id'           => $s->id,
+                'time'         => substr($s->time, 0, 5),
+                'availability' => is_null($maxQty) ? null : max(0, $maxQty - $booked),
+                'slot_type'    => 'weekly',
+                'slot_id'      => $s->id,
+            ];
+        });
     }
 
     /**
@@ -77,31 +91,16 @@ class ProductAvailabilityService
     }
 
     /**
-     * Decrement availability for a slot after booking.
+     * Count confirmed bookings for a slot on a given date.
+     * Excludes failed, cancelled, and refunded orders.
      */
-    public function decrementSlot(string $slotType, int $slotId, int $quantity): void
+    public function getBookedQuantity(string $slotType, int $slotId, string $date): int
     {
-        if ($slotType === 'special') {
-            ProductSpecialSchedule::where('id', $slotId)
-                ->whereNotNull('availability')
-                ->decrement('availability', $quantity);
-        } else {
-            ProductAvailability::where('id', $slotId)
-                ->whereNotNull('availability')
-                ->decrement('availability', $quantity);
-        }
-    }
-
-    /**
-     * Restore availability for a slot (e.g. after failed payment).
-     */
-    public function restoreSlot(string $slotType, int $slotId, int $quantity): void
-    {
-        if ($slotType === 'special') {
-            ProductSpecialSchedule::where('id', $slotId)->increment('availability', $quantity);
-        } else {
-            ProductAvailability::where('id', $slotId)->increment('availability', $quantity);
-        }
+        return (int) OrderProduct::whereHas('order', fn($q) => $q->whereNotIn('order_status', ['failed', 'cancelled', 'refunded']))
+            ->where('slot_type', $slotType)
+            ->where('slot_id', $slotId)
+            ->where('booking_date', $date)
+            ->sum('quantity');
     }
 
     /**
@@ -152,19 +151,19 @@ class ProductAvailabilityService
         // Days with special overrides that have availability
         $specialDays = ProductSpecialSchedule::where('product_id', $product->id)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->where(fn($q) => $q->whereNull('availability')->orWhere('availability', '>', 0))
+            ->whereHas('variants', fn($q) => $q->where('max_quantity', '>', 0))
             ->distinct()
             ->pluck('date')
             ->map(fn($d) => $d->format('Y-m-d'))
             ->toArray();
 
-        // Days that are fully overridden (all special slots have availability=0): exclude them
+        // Days that are fully overridden (no variant with max_quantity > 0): exclude them
         $closedSpecialDays = ProductSpecialSchedule::where('product_id', $product->id)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->selectRaw('DATE(date) as day, SUM(COALESCE(availability, 1)) as total_avail')
-            ->groupBy('day')
-            ->havingRaw('total_avail = 0')
-            ->pluck('day')
+            ->whereDoesntHave('variants', fn($q) => $q->where('max_quantity', '>', 0))
+            ->distinct()
+            ->pluck('date')
+            ->map(fn($d) => $d->format('Y-m-d'))
             ->toArray();
 
         // Weekly template: which day_of_week values have any slot

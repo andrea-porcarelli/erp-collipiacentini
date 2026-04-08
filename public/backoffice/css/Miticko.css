@@ -1,5 +1,5 @@
 /* Figma Variables Export */
-/* Generated on 2026-03-17T21:38:19.961Z */
+/* Generated on 2026-03-31T16:19:15.057Z */
 /* All Modes */
 
 /* Mode: Dark */
@@ -3356,6 +3356,16 @@
   --border-width: var(--chip-resting-border-width);
 }
 
+/* Mode: dialogAppearance-Default */
+[data-mode*="dialogAppearance-Default"] {
+  --border-width: ;
+  --corner-radius: var(--corner-radius-xl);
+  --padding: var(--spacing-xl);
+  --spacing: var(--spacing-2xl);
+  --background: var(--background-global-paper1);
+  --border-color: var(--colors-primitives-grey-scale-transparent);
+}
+
 /* Mode: divider-Default */
 [data-mode*="divider-Default"] {
   --border-color: var(--divider-background);
@@ -3468,7 +3478,7 @@
 }
 
 /* Mode: iconbuttonSize-Large */
-[data-mode*="iconButtonSize-Large"] {
+[data-mode*="iconbuttonSize-Large"] {
   --borderoff: ;
   --borderon: 1px;
   --corner-radius: var(--icon-button-large-corner-radius);
@@ -3479,7 +3489,7 @@
 }
 
 /* Mode: iconbuttonSize-Medium */
-[data-mode*="iconButtonSize-Medium"] {
+[data-mode*="iconbuttonSize-Medium"] {
   --borderoff: ;
   --borderon: 1px;
   --corner-radius: var(--icon-button-medium-corner-radius);
@@ -3490,7 +3500,7 @@
 }
 
 /* Mode: iconbuttonSize-Small */
-[data-mode*="iconButtonSize-Small"] {
+[data-mode*="iconbuttonSize-Small"] {
   --borderoff: ;
   --borderon: 1px;
   --corner-radius: var(--icon-button-small-corner-radius);
@@ -3548,6 +3558,16 @@
   --border-color: var(--label-warning-border-color);
   --foreground: var(--label-warning-foreground);
   --border-width: var(--label-warning-border-width);
+}
+
+/* Mode: modalAppearance-Default */
+[data-mode*="modalAppearance-Default"] {
+  --border-width: ;
+  --corner-radius: var(--corner-radius-xl);
+  --padding: var(--spacing-xl);
+  --spacing: var(--spacing-2xl);
+  --background: var(--background-global-paper1);
+  --border-color: var(--colors-primitives-grey-scale-transparent);
 }
 
 /* Mode: snackbarAppearance-Error */
@@ -3744,18 +3764,18 @@
 
 /* Mode: toggleAppearance-Default */
 [data-mode*="toggleAppearance-Default"] {
-  --toggle-zz-off-background: var(--toggle-off-default-background);
-  --toggle-zz-off-foreground: var(--toggle-off-default-foreground);
-  --toggle-zz-on-background: var(--toggle-on-default-background);
-  --toggle-zz-on-foreground: var(--toggle-on-default-foreground);
+  --toggle-off-background: var(--toggle-off-default-background);
+  --toggle-off-foreground: var(--toggle-off-default-foreground);
+  --toggle-on-background: var(--toggle-on-default-background);
+  --toggle-on-foreground: var(--toggle-on-default-foreground);
 }
 
 /* Mode: toggleAppearance-Disabled */
 [data-mode*="toggleAppearance-Disabled"] {
-  --toggle-zz-off-background: var(--toggle-off-disabled-background);
-  --toggle-zz-off-foreground: var(--toggle-off-disabled-foreground);
-  --toggle-zz-on-background: var(--toggle-on-disabled-background);
-  --toggle-zz-on-foreground: var(--toggle-on-disabled-foreground);
+  --toggle-off-background: var(--toggle-off-disabled-background);
+  --toggle-off-foreground: var(--toggle-off-disabled-foreground);
+  --toggle-on-background: var(--toggle-on-disabled-background);
+  --toggle-on-foreground: var(--toggle-on-disabled-foreground);
 }
 
 /* Mode: typoBody-Large */
