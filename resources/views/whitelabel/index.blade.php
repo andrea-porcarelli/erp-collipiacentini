@@ -1,16 +1,16 @@
-@extends('whitelabel.layout', compact('company'))
+@extends('whitelabel.layout')
 
 @section('content')
     <div class="container mt-5">
         <div class="row w-100">
             <div class="col-12 text-center hero mt-spacing-3xl mb-spacing-3xl">
-                <h1>{{ __('whitelabel.hero.title', ['company' => $company->company_name]) }}</h1>
+                <h1>{{ __('whitelabel.hero.title', ['partner' => $partner->partner_name]) }}</h1>
                 <h5>{{ __('whitelabel.hero.subtitle') }}</h5>
             </div>
         </div>
         <div class="row w-100">
             <aside class="col-12 col-sm-3 sidebar">
-                <x-whitelabel.sidebar :company="$company" />
+                <x-whitelabel.sidebar :partner="$partner" />
             </aside>
             <div class="col-12 col-sm-9">
                 <x-whitelabel.filters />
@@ -59,7 +59,7 @@
                 const filterDateInput = document.querySelector('input[name="filter_date"]');
                 const date = filterDateInput && filterDateInput.value ? filterDateInput.value : null;
 
-                let url = `/shop/filter-products?token={{ Session::get('token') }}`;
+                let url = `/shop/filter-products`;
 
                 if (filter) {
                     url += `&filter=${filter}`;

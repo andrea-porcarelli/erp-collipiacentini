@@ -17,6 +17,7 @@ class Partner extends LogsModel
         'is_active',
         'sale_method',
         'domain_name',
+        'slug_name',
         'commission_presale_low',
         'commission_presale_high',
         'commission_miticko_fixed',

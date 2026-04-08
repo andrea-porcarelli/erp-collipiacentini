@@ -15,12 +15,30 @@ class Token
         $token = $request->input('token') ?? $request->header('token') ?? $request->bearerToken();
 
         if (!$token) {
-            if (!self::checkHost($request, $next)) {
-                return response()->json([
-                    'error' => 'Token mancante',
-                    'message' => 'Il parametro token è richiesto'
-                ], 401);
+            $host = $request->getHost();
+
+            $partner = Partner::where('domain_name', $host)->first();
+            if ($partner) {
+                Session::put('partner', $partner);
+                $request->merge(['partner' => $partner]);
+                return $next($request);
             }
+
+
+            // Get the current path
+            $path = $request->path();
+
+            $partner = Partner::where('slug_name', $path)->first();
+            if ($partner) {
+                Session::put('partner', $partner);
+                $request->merge(['partner' => $partner]);
+                return $next($request);
+            }
+
+            return response()->json([
+                'error' => 'Token mancante',
+                'message' => 'Il parametro token è richiesto'
+            ], 401);
         }
 
         $company = Company::where('token', $token)->first();
@@ -37,29 +55,5 @@ class Token
         $request->merge(['company' => $company]);
 
         return $next($request);
-    }
-
-    private function checkHost($request, $next)
-    {
-        // Get the current host
-        $host = $request->getHost();
-
-        $partner = Partner::where('domain_name', $host)->first();
-        if ($partner) {
-            Session::put('partner', $partner);
-            return $next($request);
-        }
-
-
-        // Get the current path
-        $path = $request->path();
-
-        $partner = Partner::where('slug_name', $path)->first();
-        if ($partner) {
-            Session::put('partner', $partner);
-            return $next($request);
-        }
-
-        return false;
     }
 }

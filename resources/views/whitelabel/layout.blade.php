@@ -24,7 +24,7 @@
 </head>
 
 <body data-mode="Miticko Light Desktop White">
-    <x-whitelabel.header :company="$company" />
+    <x-whitelabel.header />
     @yield('content')
     <x-whitelabel.footer />
     <!-- Bootstrap 5 JS -->

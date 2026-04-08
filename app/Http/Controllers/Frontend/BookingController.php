@@ -24,21 +24,23 @@ class BookingController extends Controller
 
     public function index(Request $request): View
     {
-        $company  = $request->company;
+        $partner  = $request->partner;
         $products = Product::where('is_active', 1)
+            ->where('partner_id', $partner->id)
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
             ->get();
 
-        return view('whitelabel.index', compact('products', 'company'));
+        return view('whitelabel.index', compact('products', 'partner'));
     }
 
     public function filterProducts(Request $request): JsonResponse
     {
-        $company = $request->company;
+        $partner  = $request->partner;
         $filter  = $request->get('filter', 'all');
         $date    = $request->get('date'); // Y-m-d or null
 
         $products = Product::where('is_active', 1)
+            ->where('partner_id', $partner->id)
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
             ->when($filter !== 'all', fn($q) => $q->where('product_type', $filter))
             ->get()

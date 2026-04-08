@@ -94,12 +94,12 @@ class Utils
         })->toArray();
     }
 
-    public static function company_slug(): string {
-        $company = Session::get('company');
-        if (empty($company)) {
+    public static function partner_path(): string {
+        $partner = Session::get('partner');
+        if (empty($partner)) {
             return '';
         }
-        return Str::slug($company->company_name);
+        return Str::slug($partner->partner_name);
     }
 
     public static function hours() : array {

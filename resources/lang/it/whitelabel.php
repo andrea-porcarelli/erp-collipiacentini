@@ -15,7 +15,7 @@ return [
 
     // Hero section
     'hero' => [
-        'title' => 'Biglietteria online di :company',
+        'title' => 'Biglietteria online di :partner',
         'subtitle' => 'Acquista online le visite disponibili per il Castello di Grazzano visconti',
     ],
 

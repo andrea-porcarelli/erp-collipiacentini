@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="logo">
-                <img src="{{ asset('whitelabel/companies/' . Utils::company_slug() . '/logo.png') }}" />
+                <img src="{{ asset('whitelabel/companies/' . Utils::partner_path() . '/logo.png') }}" />
             </div>
             <div class="languages">
                 <div class="dropdown">

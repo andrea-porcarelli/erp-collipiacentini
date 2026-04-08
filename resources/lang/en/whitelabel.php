@@ -15,7 +15,7 @@ return [
 
     // Hero section
     'hero' => [
-        'title' => 'Online ticketing for :company',
+        'title' => 'Online ticketing for :partner',
         'subtitle' => 'Buy online the available visits for Grazzano Visconti Castle',
     ],
 
