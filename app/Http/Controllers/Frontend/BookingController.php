@@ -67,7 +67,7 @@ class BookingController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function product(Request $request, $slugPartner, $slugProduct, $productCode): View
+    public function product(Request $request, $productCode): View
     {
         $productCode_ex = explode('-', $productCode);
         $productId = (int) substr($productCode_ex[count($productCode_ex) - 1], 2);
