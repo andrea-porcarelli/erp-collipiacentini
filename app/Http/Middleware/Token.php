@@ -18,7 +18,6 @@ class Token
 
         if (!$token) {
             $host = $request->getHost();
-            Log::info("HOST " . $host);
             $partner = Partner::where('domain_name', $host)->first();
             if ($partner) {
                 Session::put('partner', $partner);
@@ -26,8 +25,6 @@ class Token
                 return $next($request);
             }
 
-            Log::info("PATH " . $host);
-            Utils::queryLog(Partner::where('slug_name', $host));
             $partner = Partner::where('slug_name', $host)->first();
             if ($partner) {
                 Session::put('partner', $partner);

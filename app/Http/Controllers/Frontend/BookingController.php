@@ -12,6 +12,7 @@ use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,6 +86,7 @@ class BookingController extends Controller
         ])->where('id', $productId)->first();
 
         if (!$product) {
+            Log::info(__METHOD__ . ': ' . __LINE__ . ' Product not found');
             abort(404);
         }
 
