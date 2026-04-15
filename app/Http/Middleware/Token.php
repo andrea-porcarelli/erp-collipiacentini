@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\Utils;
 use App\Models\Company;
 use App\Models\Partner;
 use Closure;
@@ -29,7 +30,7 @@ class Token
             // Get the current path
             $path = $request->path();
             Log::info("PATH " . $path);
-
+            Utils::queryLog(Partner::where('slug_name', $path));
             $partner = Partner::where('slug_name', $path)->first();
             if ($partner) {
                 Session::put('partner', $partner);
