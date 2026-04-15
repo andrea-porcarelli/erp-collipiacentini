@@ -33,7 +33,7 @@ Route::group(['prefix' => '/shop'], function() {
     Route::delete('/cart/remove',[BookingController::class, 'removeCart'])->name('booking.cart.remove');
     Route::post('/cart/customer',[BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
     Route::get('/cart',[BookingController::class, 'cart'])->name('booking.cart');
-    Route::get('/{slugPartner}/{slugProduct}-{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
+    Route::get('/{slugProduct}-{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
 
     // Payment routes
     Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
