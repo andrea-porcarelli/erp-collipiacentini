@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Partner;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class Token
@@ -16,7 +17,7 @@ class Token
 
         if (!$token) {
             $host = $request->getHost();
-
+            Log::info("HOST " . $host);
             $partner = Partner::where('domain_name', $host)->first();
             if ($partner) {
                 Session::put('partner', $partner);
@@ -27,6 +28,7 @@ class Token
 
             // Get the current path
             $path = $request->path();
+            Log::info("PATH " . $path);
 
             $partner = Partner::where('slug_name', $path)->first();
             if ($partner) {
