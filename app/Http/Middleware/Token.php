@@ -26,12 +26,9 @@ class Token
                 return $next($request);
             }
 
-
-            // Get the current path
-            $path = $request->path();
-            Log::info("PATH " . $path);
-            Utils::queryLog(Partner::where('slug_name', $path));
-            $partner = Partner::where('slug_name', $path)->first();
+            Log::info("PATH " . $host);
+            Utils::queryLog(Partner::where('slug_name', $host));
+            $partner = Partner::where('slug_name', $host)->first();
             if ($partner) {
                 Session::put('partner', $partner);
                 $request->merge(['partner' => $partner]);
