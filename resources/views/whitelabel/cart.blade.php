@@ -117,6 +117,53 @@
                                 <div class="form-group">
                                     <x-input name="email" label="Email" required />
                                 </div>
+                                <div class="form-group">
+                                    <x-input name="address" label="Indirizzo" required />
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <x-input name="zip_code" label="CAP" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <x-input name="city" label="Città" required />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">Paese *</label>
+                                    <div class="country-select-wrapper">
+                                        <span class="country-flag" id="selected-flag">🇮🇹</span>
+                                        <select id="country" name="country" required>
+                                            <option value="IT" data-flag="🇮🇹" selected>Italia</option>
+                                            <option value="DE" data-flag="🇩🇪">Germania</option>
+                                            <option value="FR" data-flag="🇫🇷">Francia</option>
+                                            <option value="ES" data-flag="🇪🇸">Spagna</option>
+                                            <option value="GB" data-flag="🇬🇧">Regno Unito</option>
+                                            <option value="AT" data-flag="🇦🇹">Austria</option>
+                                            <option value="CH" data-flag="🇨🇭">Svizzera</option>
+                                            <option value="BE" data-flag="🇧🇪">Belgio</option>
+                                            <option value="NL" data-flag="🇳🇱">Paesi Bassi</option>
+                                            <option value="PT" data-flag="🇵🇹">Portogallo</option>
+                                            <option value="PL" data-flag="🇵🇱">Polonia</option>
+                                            <option value="SE" data-flag="🇸🇪">Svezia</option>
+                                            <option value="NO" data-flag="🇳🇴">Norvegia</option>
+                                            <option value="DK" data-flag="🇩🇰">Danimarca</option>
+                                            <option value="FI" data-flag="🇫🇮">Finlandia</option>
+                                            <option value="IE" data-flag="🇮🇪">Irlanda</option>
+                                            <option value="GR" data-flag="🇬🇷">Grecia</option>
+                                            <option value="CZ" data-flag="🇨🇿">Repubblica Ceca</option>
+                                            <option value="RO" data-flag="🇷🇴">Romania</option>
+                                            <option value="HU" data-flag="🇭🇺">Ungheria</option>
+                                            <option value="US" data-flag="🇺🇸">Stati Uniti</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <x-input name="phone" label="Cellulare" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <x-input name="fiscal_code" label="Codice fiscale" required />
+                                </div>
 
                                 @foreach($cart->product->customerFields->sortBy('fieldType.sort_order') as $field)
                                     <div class="form-group">
