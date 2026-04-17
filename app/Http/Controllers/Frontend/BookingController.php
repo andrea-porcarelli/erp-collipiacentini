@@ -69,6 +69,7 @@ class BookingController extends Controller
 
     public function product(Request $request, $productCode): View
     {
+        Log::info("Product Code: " . $productCode);
         $productCode_ex = explode('-', $productCode);
         $productId = (int) substr($productCode_ex[count($productCode_ex) - 1], 2);
 
