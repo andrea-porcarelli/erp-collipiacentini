@@ -1,1 +1,1 @@
-<x-label :icon="$icon ?? null" :status="$status">{{ $label }}</x-label>
+<x-label :icon="$icon ?? null" :appearance="$status">{{ $label }}</x-label>

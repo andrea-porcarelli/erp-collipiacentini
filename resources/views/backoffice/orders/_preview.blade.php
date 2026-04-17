@@ -4,30 +4,30 @@
 
 <div class="order-preview">
     <div class="order-preview-section">
-        <h6 class="order-preview-title">Dettagli ordine</h6>
+        <div class="order-preview-title mt-spacing-2xl mb-spacing-xl">Dettagli ordine</div>
         <div class="order-preview-grid">
             <div>
-                <div class="order-preview-label">Numero ordine</div>
-                <div class="order-preview-value">{{ $order->product_label }}</div>
+                <div class="order-preview-label mb-spacing-l">Numero ordine</div>
+                <div class="order-preview-value">{{ $order->order_number }}</div>
             </div>
             <div>
-                <div class="order-preview-label">Effettuato il</div>
+                <div class="order-preview-label mb-spacing-l">Effettuato il</div>
                 <div class="order-preview-value">
                     {{ $effettuatoIl?->translatedFormat('d F Y') }} @ {{ $effettuatoIl?->format('H:i') }}
                 </div>
             </div>
             <div class="order-preview-status">
+                <div class="order-preview-label mb-spacing-l">Stato</div>
                 @include('backoffice.components.label', [
-                    'icon' => $order->order_status->icon(),
                     'status' => $order->order_status->status(),
                     'label' => $order->order_status->label(),
                 ])
             </div>
         </div>
     </div>
-
+    <hr style="background: var(--border-color)" />
     <div class="order-preview-section">
-        <h6 class="order-preview-title">Dettagli vendita</h6>
+        <div class="order-preview-title">Dettagli vendita</div>
         <table class="order-preview-table">
             <thead>
                 <tr>
@@ -39,7 +39,7 @@
             <tbody>
                 @foreach($order->orderProducts as $op)
                     <tr class="order-preview-product">
-                        <td colspan="3"><strong>{{ $op->product->label }}</strong></td>
+                        <td colspan="3">{{ $op->product->label }}</td>
                     </tr>
                     @foreach($op->items as $item)
                         <tr>
@@ -52,26 +52,31 @@
             </tbody>
             <tfoot>
                 <tr class="order-preview-total">
-                    <td colspan="2" class="text-end"><strong>Totale</strong></td>
-                    <td class="text-end"><strong>{{ number_format($order->amount, 2, ',', '.') }}€</strong></td>
+                    <td colspan="2" class="text-end">Totale</td>
+                    <td class="text-end">{{ number_format($order->amount, 2, ',', '.') }}€</td>
                 </tr>
             </tfoot>
         </table>
     </div>
 
     <div class="order-preview-section">
-        <h6 class="order-preview-title">Dettagli cliente</h6>
+        <div class="order-preview-title">Dettagli cliente</div>
         <div class="order-preview-customer">
-            {{ $order->customer->full_name }}
+            <span>{{ $order->customer->full_name }}</span>
             @if($order->customer->phone)
-                <span class="order-preview-phone">{{ $order->customer->prefix_phone }} {{ $order->customer->phone }}</span>
+                <span class="order-preview-phone">{{ trim($order->customer->prefix_phone . ' ' . $order->customer->phone) }}</span>
             @endif
         </div>
     </div>
 
     <div class="order-preview-actions">
-        <a href="{{ route('orders.show', $order) }}" class="btn btn-primary">
-            Vai all'ordine <i class="fa-regular fa-arrow-right ms-1"></i>
-        </a>
+        <x-button
+            :href="route('orders.show', $order)"
+            label="Vai all'ordine"
+            status="Primary"
+            emphasis="High"
+            size="Small"
+            trailing="fa-chevron-right"
+        />
     </div>
 </div>

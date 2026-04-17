@@ -49,7 +49,7 @@
         @endforeach
         </ul>
     </x-modal>
-    <x-modal id="order-detail" title="Riepilogo ordine" width="450px">
+    <x-modal id="order-detail" title="Riepilogo ordine">
         <div id="order-detail-body"></div>
     </x-modal>
 @endsection
@@ -73,7 +73,7 @@
                         {data: 'details'},
                         {data: 'type'},
                         {data: 'status'},
-                        {data: 'options', class: 'text-end'},
+                        {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',
                     drawCallback: function(api) {

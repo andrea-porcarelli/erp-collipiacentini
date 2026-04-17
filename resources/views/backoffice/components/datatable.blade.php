@@ -19,4 +19,24 @@
                 :dataset="['route' => $route, 'id' => $item->id, 'is-active' => $item->is_active]"
             />
     @endif
+    @if (in_array('preview', $options))
+            <x-button
+                class="btn-preview-order"
+                size="Small"
+                emphasis="Low"
+                leading="fa-eye"
+                :dataset="['order-id' => $item->id]"
+            />
+    @endif
+    @if (in_array('detail', $options))
+            <a href="{{ route( $route . '.show', $item->id) }}" title="Modifica">
+            <x-button
+                status="Primary"
+                size="Small"
+                emphasis="Medium"
+                size="Small"
+                leading="fa-chevron-right"
+            />
+            </a>
+    @endif
 </div>

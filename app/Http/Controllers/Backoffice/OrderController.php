@@ -49,7 +49,7 @@ class OrderController extends Controller
                 $elements->where('partner_id', $user->partner_id);
             }
 
-            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
+            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['preview', 'detail', ])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data($item->product_data);
                 })
@@ -70,10 +70,7 @@ class OrderController extends Controller
                 })
                 ->addColumn('status', function ($item) {
                     $order_status = $item->order_status;
-                    return view('backoffice.components.label', ['icon' => $order_status->icon(), 'status' => $order_status->status(), 'label' => $order_status->label()])->render();
-                })
-                ->addColumn('options', function ($item) {
-                    return '<button type="button" class="btn-preview-order" data-order-id="'.$item->id.'"><i class="fa-regular fa-chevron-right"></i></button>';
+                    return view('backoffice.components.label', ['status' => $order_status->status(), 'label' => $order_status->label()])->render();
                 })
                 ->rawColumns(['status', 'options'])
                 ->toJson();

@@ -32,12 +32,12 @@ enum OrderStatus: string
     public function status(): string
     {
         return match($this) {
-            self::PENDING => 'warning',
-            self::PAID => 'success',
-            self::COMPLETED => 'success',
-            self::FAILED => 'danger',
-            self::CANCELLED => 'danger',
-            self::REFUNDED => 'disabled',
+            self::PENDING => 'Warning',
+            self::PAID => 'Success',
+            self::COMPLETED => 'Success',
+            self::FAILED => 'Danger',
+            self::CANCELLED => 'Danger',
+            self::REFUNDED => 'Disabled',
         };
     }
 
