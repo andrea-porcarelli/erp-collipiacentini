@@ -9,7 +9,7 @@ class Order extends LogsModel
 {
     public $fillable = [
         'customer_id',
-        'company_id',
+        'partner_id',
         'order_number',
         'amount',
         'order_status',
@@ -26,9 +26,9 @@ class Order extends LogsModel
         'amount' => 'decimal:2',
     ];
 
-    public function company(): BelongsTo
+    public function partner(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Partner::class);
     }
 
     public function customer(): BelongsTo

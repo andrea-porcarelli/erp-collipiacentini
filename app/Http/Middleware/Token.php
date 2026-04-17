@@ -18,14 +18,9 @@ class Token
 
         if (!$token) {
             $host = $request->getHost();
-            $partner = Partner::where('domain_name', $host)->first();
-            if ($partner) {
-                Session::put('partner', $partner);
-                $request->merge(['partner' => $partner]);
-                return $next($request);
-            }
-            Utils::queryLog(Partner::where('slug_name', $host));
-            $partner = Partner::where('slug_name', $host)->first();
+            $partner = Partner::where('domain_name', $host)->first()
+                ?? Partner::where('slug_name', $host)->first();
+
             if ($partner) {
                 Session::put('partner', $partner);
                 $request->merge(['partner' => $partner]);

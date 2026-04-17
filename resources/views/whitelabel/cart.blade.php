@@ -1,4 +1,4 @@
-@extends('whitelabel.layout', compact('company'))
+@extends('whitelabel.layout', compact('partner'))
 
 @section('content')
     <div class="container mt-5" style="min-height: 600px">

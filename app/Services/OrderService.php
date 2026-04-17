@@ -25,11 +25,12 @@ class OrderService
         ?string $stripePaymentMethod = null
     ): Order {
         return DB::transaction(function () use ($cart, $customer, $stripePaymentIntentId, $stripePaymentMethod) {
-            $orderNumber = $this->generateOrderNumber($cart->company_id);
+            $cart->loadMissing('partner');
+            $orderNumber = $this->generateOrderNumber($cart->partner->partner_code);
 
             $order = Order::create([
                 'customer_id'               => $customer->id,
-                'company_id'                => $cart->company_id,
+                'partner_id'                => $cart->partner_id,
                 'order_number'              => $orderNumber,
                 'amount'                    => $cart->total,
                 'order_status'              => OrderStatus::PENDING,
@@ -102,13 +103,13 @@ class OrderService
         return Order::where('stripe_payment_intent_id', $paymentIntentId)->first();
     }
 
-    protected function generateOrderNumber(int $companyId): string
+    protected function generateOrderNumber(string $partnerCode): string
     {
         $prefix = 'ORD';
         $date   = now()->format('Ymd');
         $random = strtoupper(Str::random(4));
 
-        return "{$prefix}-{$companyId}-{$date}-{$random}";
+        return "{$prefix}-{$partnerCode}-{$date}-{$random}";
     }
 
 }

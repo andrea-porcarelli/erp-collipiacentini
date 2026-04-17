@@ -36,7 +36,14 @@
                                 <x-input :model="$model" name="partner_name" label="Nome partner" required />
                             </div>
                             <div class="col-12 col-sm-4">
-                                <x-input :model="$model" name="partner_code" label="Codice partner" required />
+                                <x-input
+                                    :model="$model"
+                                    name="partner_code"
+                                    label="Codice partner"
+                                    required
+                                    :disabled="$hasOrders"
+                                    :message="$hasOrders ? 'Non modificabile: esistono ordini registrati' : null"
+                                />
                             </div>
                             <div class="col-12 col-sm-4">
                                 <x-input :model="$model" name="email_notify" label="Email notifiche" />

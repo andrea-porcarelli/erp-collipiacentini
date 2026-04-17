@@ -9,6 +9,7 @@ class Customer extends LogsModel
     public $fillable = [
         'country_id',
         'company_id',
+        'partner_id',
         'name',
         'surname',
         'email',

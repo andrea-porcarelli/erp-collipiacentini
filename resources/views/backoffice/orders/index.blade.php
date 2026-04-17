@@ -5,7 +5,7 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto">
+                <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto" brelative="true">
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Data" type="daterange" name="dates" />
@@ -48,6 +48,9 @@
             </li>
         @endforeach
         </ul>
+    </x-modal>
+    <x-modal id="order-detail" title="Seleziona periodo" primary="Chiudi" secondary="annulla" width="350px">
+
     </x-modal>
 @endsection
 

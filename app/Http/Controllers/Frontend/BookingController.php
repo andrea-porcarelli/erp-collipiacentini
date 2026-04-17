@@ -100,9 +100,9 @@ class BookingController extends Controller
             abort(404);
         }
 
-        $company = $request->company;
+        $partner = $request->partner;
 
-        return view('whitelabel.product', compact('product', 'company'));
+        return view('whitelabel.product', compact('product', 'partner'));
     }
 
     /**
@@ -254,7 +254,7 @@ class BookingController extends Controller
 
             $cart = Cart::create([
                 'session_id'                => $sessionId,
-                'company_id'                => $request->company?->id,
+                'partner_id'                => $request->partner?->id ?? $product->partner_id,
                 'product_id'                => $product->id,
                 'date'                      => $validated['date'],
                 'time'                      => $validated['time'],
@@ -288,9 +288,9 @@ class BookingController extends Controller
             ->where('session_id', $sessionId)
             ->first();
 
-        $company = $request->company;
+        $partner = $request->partner;
 
-        return view('whitelabel.cart', compact('cart', 'company'));
+        return view('whitelabel.cart', compact('cart', 'partner'));
     }
 
     public function removeCart(Request $request): JsonResponse
@@ -328,7 +328,7 @@ class BookingController extends Controller
         ]);
 
         $sessionId = session()->getId();
-        $cart = Cart::with('product.partner')->where('session_id', $sessionId)->first();
+        $cart = Cart::with('partner')->where('session_id', $sessionId)->first();
 
         if (!$cart) {
             return response()->json(['error' => 'Carrello non trovato'], 404);
@@ -345,8 +345,8 @@ class BookingController extends Controller
                     'email'            => $validated['email'],
                     'password'         => Hash::make(Str::random(16)),
                     'role'             => 'customer',
-                    'company_id'       => $cart->company_id,
-                    'partner_id'       => $cart->product->partner_id,
+                    'company_id'       => $cart->partner?->company_id,
+                    'partner_id'       => $cart->partner_id,
                     'address'          => $validated['address'],
                     'zip_code'         => $validated['zip_code'],
                     'city'             => $validated['city'],

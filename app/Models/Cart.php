@@ -10,7 +10,7 @@ class Cart extends LogsModel
     public $fillable = [
         'session_id',
         'customer_id',
-        'company_id',
+        'partner_id',
         'product_id',
         'date',
         'time',
@@ -30,9 +30,9 @@ class Cart extends LogsModel
         return $this->belongsTo(Customer::class);
     }
 
-    public function company(): BelongsTo
+    public function partner(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Partner::class);
     }
 
     public function product(): BelongsTo

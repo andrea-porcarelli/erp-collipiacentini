@@ -24,9 +24,9 @@ use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => '/shop'], function() {
-    Route::get('/',[BookingController::class, 'index'])->middleware('token');
-    Route::get('/filter-products',[BookingController::class, 'filterProducts'])->middleware('token');
+Route::group(['prefix' => '/shop', 'middleware' => 'token'], function() {
+    Route::get('/',[BookingController::class, 'index']);
+    Route::get('/filter-products',[BookingController::class, 'filterProducts']);
     Route::get('/product/{productId}/available-times',[BookingController::class, 'getAvailableTimes']);
     Route::get('/product/{productId}/available-days',[BookingController::class, 'getAvailableDays']);
     Route::post('/cart/add',[BookingController::class, 'addToCart'])->name('booking.cart.add');

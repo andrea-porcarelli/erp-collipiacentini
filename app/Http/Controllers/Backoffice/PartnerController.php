@@ -34,6 +34,15 @@ class PartnerController extends CrudController
             ->with('path', $this->path);
     }
 
+    public function show(int $id): View
+    {
+        $model = $this->interface->find($id);
+        $hasOrders = $model->orders()->exists();
+
+        return view('backoffice.' . $this->path . '.show', compact('model', 'hasOrders'))
+            ->with('path', $this->path);
+    }
+
     public function store(StorePartnerRequest $request): JsonResponse
     {
         $partner = $this->interface->store([
@@ -85,9 +94,16 @@ class PartnerController extends CrudController
             'domain_name.unique' => 'Il dominio inserito è già associato a un altro partner',
         ]);
 
+        $hasOrders = $partner->orders()->exists();
+        $newCode = $request->input('partner_code');
+
+        if ($hasOrders && $newCode !== $partner->partner_code) {
+            throw new \Exception('Il codice partner non può essere modificato: esistono già ordini registrati.');
+        }
+
         $this->interface->edit($partner, [
             'partner_name'  => $request->input('partner_name'),
-            'partner_code'  => $request->input('partner_code'),
+            'partner_code'  => $hasOrders ? $partner->partner_code : $newCode,
             'email_notify'  => $request->input('email_notify'),
             'sale_method'   => $request->input('sale_method'),
             'domain_name'   => $request->input('domain_name') ?: null,

@@ -1,5 +1,5 @@
 @props([
-    'company' => null,
+    'partner' => null,
     'date' => true
 ])
 @if($date)
@@ -11,8 +11,8 @@
 @endif
 <div class="d-none d-sm-block">
     <x-card :title="__('whitelabel.sidebar.castle_title')" class="card-spacing">
-        @isset($company)
-            {{ $company->company_name }}
+        @isset($partner)
+            {{ $partner->partner_name }}
         @endisset
     </x-card>
 

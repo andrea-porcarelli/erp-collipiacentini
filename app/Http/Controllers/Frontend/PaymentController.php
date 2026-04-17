@@ -139,11 +139,11 @@ class PaymentController extends Controller
     public function success_payment(string $orderNumber): View
     {
         $order = Order::where('order_number', $orderNumber)
-            ->with(['customer', 'orderProducts.product', 'company'])
+            ->with(['customer', 'orderProducts.product', 'partner'])
             ->firstOrFail();
 
-        $company = $order->company;
+        $partner = $order->partner;
 
-        return view('whitelabel.order-success', compact('order', 'company'));
+        return view('whitelabel.order-success', compact('order', 'partner'));
     }
 }

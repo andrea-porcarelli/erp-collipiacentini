@@ -32,7 +32,7 @@ class StripePaymentService
             'metadata' => [
                 'cart_id' => $cart->id,
                 'product_id' => $cart->product_id,
-                'company_id' => $cart->company_id,
+                'partner_id' => $cart->partner_id,
                 'session_id' => $cart->session_id,
             ],
         ];
