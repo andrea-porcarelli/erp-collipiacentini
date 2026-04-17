@@ -98,7 +98,7 @@
                 </x-card>
 
                 <div class="order-actions">
-                    <x-button label="Torna ai prodotti" status="Primary" emphasis="High" size="Large" class="btn-create-product" class="w-100" trailing="fa-arrow-right" :href="url('/shop')" />
+                    <x-button label="Torna ai prodotti" status="Primary" emphasis="High" size="Large"  class="w-100" trailing="fa-chevron-right" :href="url('/shop')" />
                 </div>
             </div>
         </div>
