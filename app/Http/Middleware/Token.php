@@ -24,7 +24,7 @@ class Token
                 $request->merge(['partner' => $partner]);
                 return $next($request);
             }
-
+            Utils::queryLog(Partner::where('slug_name', $host));
             $partner = Partner::where('slug_name', $host)->first();
             if ($partner) {
                 Session::put('partner', $partner);
