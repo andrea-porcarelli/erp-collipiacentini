@@ -26,7 +26,7 @@
         </div>
     </div>
     <hr style="background: var(--border-color)" />
-    <div class="order-preview-section">
+    <div class="order-preview-section mb-spacing-2xl">
         <div class="order-preview-title mb-spacing-xl">Dettagli vendita</div>
         <table class="order-preview-table">
             <thead>
@@ -58,9 +58,9 @@
             </tfoot>
         </table>
     </div>
-    <hr style="background: var(--border-color)" />
-    <div class="order-preview-section">
-        <div class="order-preview-title">Dettagli cliente</div>
+    <hr style="background: var(--border-color); margin: 0" />
+    <div class="order-preview-section mt-spacing-2xl">
+        <div class="order-preview-title mb-spacing-xl">Dettagli cliente</div>
         <div class="order-preview-customer">
             <span>{{ $order->customer->full_name }}</span>
             @if($order->customer->phone)
