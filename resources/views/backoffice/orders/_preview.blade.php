@@ -68,13 +68,13 @@
             @endif
         </div>
     </div>
-
+    <hr style="background: var(--border-color); margin: 0" />\
     <div class="order-preview-actions">
         <x-button
             :href="route('orders.show', $order)"
             label="Vai all'ordine"
             status="Primary"
-            emphasis="High"
+            emphasis="Medium"
             size="Small"
             trailing="fa-chevron-right"
         />

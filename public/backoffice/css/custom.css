@@ -692,9 +692,6 @@ div.dt-container .dt-paging .dt-paging-button:active {
     color: var(--text-secondary, #8A8A8A);
     margin-left: var(--spacing-sm);
 }
-.order-preview .order-preview-actions {
-    padding-top: var(--spacing-md);
-}
 .order-preview .order-preview-status {
     text-align: right;
 }
