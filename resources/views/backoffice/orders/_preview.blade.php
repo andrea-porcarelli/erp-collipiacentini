@@ -69,7 +69,7 @@
         </div>
     </div>
     <hr style="background: var(--border-color); margin: 0" />
-    <div class="order-preview-actions">
+    <div class="order-preview-actions mt-spacing-2xl">
         <x-button
             :href="route('orders.show', $order)"
             label="Vai all'ordine"
