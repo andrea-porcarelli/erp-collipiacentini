@@ -67,7 +67,7 @@ class BookingController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function product(Request $request, $productCode): View
+    public function product(Request $request, string $slugProduct, string $productCode): View
     {
         Log::info("Product Code: " . $productCode);
         $productCode_ex = explode('-', $productCode);
