@@ -16,7 +16,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-lg-8">
+        <div class="col-12">
             <x-card title="Riepilogo ordine">
                 @include('backoffice.orders._preview', ['order' => $order, 'hideCta' => true])
             </x-card>
