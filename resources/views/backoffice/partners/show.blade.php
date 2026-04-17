@@ -23,8 +23,9 @@
                             </div>
                         </div>
                     </form>
+
                     <div class="button-card-absolute">
-                        <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                        <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                     </div>
                 </x-card>
 
@@ -60,7 +61,7 @@
                         </div>
                     </form>
                     <div class="button-card-absolute">
-                        <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                        <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                     </div>
                 </x-card>
 
@@ -91,15 +92,15 @@
                         </div>
                     </form>
                     <div class="button-card-absolute">
-                        <x-button class="btn-save-card" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                        <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                     </div>
                 </x-card>
 
                 <x-card title="Gestione account" class="mt-4 position-relative">
                     <x-backoffice.partner.users :model="$model" />
                     <div class="button-card-absolute">
-                        <x-button class="btn-user-add" emphasis="light" label="Aggiungi account" leading="fa-plus" />
-                        <x-button class="btn-save-users" emphasis="default" label="Salva modifiche" leading="fa-save" status="disabled" />
+                        <x-button class="btn-user-add"  status="Secondary" emphasis="MediumLow"  label="Aggiungi account" leading="fa-plus" />
+                        <x-button class="btn-save-users" label="Salva modifiche" leading="fa-save" status="Disabled" />
                     </div>
                 </x-card>
 

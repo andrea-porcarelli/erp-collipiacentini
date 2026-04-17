@@ -94,7 +94,7 @@ const saveForm = (formId, btn) => {
     }).then(() => {
         toastr.success(config.successMessage);
         setLoading(btn, false);
-        btn.attr('data-mode', 'medium disabled');
+        btn.attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium  buttonAppearance-Disabled');
     }).catch((errors) => {
         setLoading(btn, false);
         if (errors.responseJSON) {
@@ -154,28 +154,28 @@ const renderUserRow = (user) => {
     <div class="user-item py-1" data-id="${user.id}">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-sm-3">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <input class="input-miticko" name="name" value="${name}">
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-3">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <input class="input-miticko" name="email" type="email" value="${email}">
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-3">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <input class="input-miticko" name="password" type="password" placeholder="Nuova password...">
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-2">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         ${renderRoleSelect(role)}
                     </div>
@@ -191,9 +191,9 @@ const renderUserRow = (user) => {
 const updateSaveUsersButton = () => {
     const hasDirty = $('#users-list .user-item[data-dirty]').length > 0;
     if (hasDirty) {
-        $('.btn-save-users').attr('data-mode', 'medium primary').removeClass('btn-m-primary').addClass('btn-m-default');
+        $('.btn-save-users').attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary').removeClass('btn-m-primary').addClass('btn-m-default');
     } else {
-        $('.btn-save-users').attr('data-mode', 'medium disabled').removeClass('btn-m-default').addClass('btn-m-primary');
+        $('.btn-save-users').attr('data-mode', 'buttonSize-Medium buttonEmphasis-Medium  buttonAppearance-Disabled').removeClass('btn-m-default').addClass('btn-m-primary');
     }
 };
 
@@ -323,7 +323,7 @@ const initDeletePartner = () => {
 // ---------------------------------------------------------------------------
 const init = () => {
     $(document).on('input change', 'form :input:not([disabled])', function () {
-        $(this).closest('.card-miticko').find('.btn-save-card').attr('data-mode', 'medium primary');
+        $(this).closest('.card-miticko').find('.btn-save-card').attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
     });
 
     $(document).on('click', '.btn-save-card', function () {

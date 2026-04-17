@@ -5,9 +5,9 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Partner" class="position-relative" sub_title="I nostri Partner">
+                <x-card title="Partner" class="position-relative" brelative="true" sub_title="I nostri Partner">
                     <div class="position-absolute" style="top: -70px; right: 0">
-                        <x-button label="Aggiungi partner" status="primary" emphasis="light" class="btn-create-partner" size="small" leading="fa-plus" />
+                        <x-button label="Aggiungi partner" status="Primary" class="btn-create-partner" leading="fa-plus" />
                     </div>
                     <x-table-header>
                         <span class="table-header-total" > - </span>

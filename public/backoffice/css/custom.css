@@ -847,6 +847,7 @@ span.flatpickr-weekday{
 .actions {
     display: flex;
     justify-content: end;
+    gap: 5px;
 }
 .dropdown-field {
     display: flex;
