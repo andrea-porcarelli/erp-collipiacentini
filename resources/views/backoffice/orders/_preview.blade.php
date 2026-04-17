@@ -59,7 +59,7 @@
         </table>
     </div>
     <hr style="background: var(--border-color); margin: 0" />
-    <div class="order-preview-section mt-spacing-2xl">
+    <div class="order-preview-section mt-spacing-2xl mb-spacing-2xl">
         <div class="order-preview-title mb-spacing-xl">Dettagli cliente</div>
         <div class="order-preview-customer">
             <span>{{ $order->customer->full_name }}</span>
@@ -68,7 +68,7 @@
             @endif
         </div>
     </div>
-    <hr style="background: var(--border-color); margin: 0" />\
+    <hr style="background: var(--border-color); margin: 0" />
     <div class="order-preview-actions">
         <x-button
             :href="route('orders.show', $order)"
