@@ -86,7 +86,7 @@ class BookingController extends Controller
         ])->where('id', $productId)->first();
 
         if (!$product) {
-            Log::info(__METHOD__ . ': ' . __LINE__ . ' Product not found');
+            Log::info(__METHOD__ . ': ' . __LINE__ . ' Product not found ' . $productId);
             abort(404);
         }
 
