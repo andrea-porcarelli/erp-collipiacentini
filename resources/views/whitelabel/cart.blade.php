@@ -930,19 +930,19 @@
             if (btnStepRiepilogo) {
                 btnStepRiepilogo.classList.remove('bt-m-outlined');
                 btnStepRiepilogo.classList.add('bt-m-default');
-                btnStepRiepilogo.setAttribute('data-mode', 'small secondary');
+                btnStepRiepilogo.setAttribute('data-mode', 'buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow');
                 btnStepRiepilogo.innerHTML = 'Riepilogo';
             }
             if (btnStepDati) {
                 btnStepDati.classList.remove('bt-m-default');
                 btnStepDati.classList.add('bt-m-outlined');
                 btnStepDati.setAttribute('disabled', 'disabled');
-                btnStepDati.setAttribute('data-mode', 'small disabled');
+                btnStepDati.setAttribute('data-mode', 'buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High');
                 btnStepDati.innerHTML = 'Dati';
             }
             if (btnStepPagamento) {
                 btnStepPagamento.setAttribute('disabled', 'disabled');
-                btnStepPagamento.setAttribute('data-mode', 'small disabled');
+                btnStepPagamento.setAttribute('data-mode', 'buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High');
             }
         }
 
@@ -960,13 +960,14 @@
             if (btnStepDati) {
                 btnStepDati.classList.remove('bt-m-default');
                 btnStepDati.classList.add('bt-m-outlined');
+                btnStepDati.setAttribute('data-mode', 'buttonAppearance-Primary buttonSize-Small buttonEmphasis-Medium');
                 btnStepDati.innerHTML = '<i class="fa fa-check icon"></i> Dati';
             }
             if (btnStepPagamento) {
                 btnStepPagamento.classList.remove('bt-m-outlined');
                 btnStepPagamento.classList.add('bt-m-default');
                 btnStepPagamento.removeAttribute('disabled');
-                btnStepPagamento.setAttribute('data-mode', 'small secondary');
+                btnStepPagamento.setAttribute('data-mode', 'buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow');
             }
         }
 
@@ -985,12 +986,13 @@
                 btnStepDati.classList.remove('bt-m-outlined');
                 btnStepDati.classList.add('bt-m-default');
                 btnStepDati.innerHTML = 'Dati';
+                btnStepPagamento.setAttribute('data-mode', 'buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow');
             }
             if (btnStepPagamento) {
                 btnStepPagamento.classList.remove('bt-m-default');
                 btnStepPagamento.classList.add('bt-m-outlined');
                 btnStepPagamento.setAttribute('disabled', 'disabled');
-                btnStepPagamento.setAttribute('data-mode', 'small disabled');
+                btnStepPagamento.setAttribute('data-mode', 'buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High');
             }
         }
 

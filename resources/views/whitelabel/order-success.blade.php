@@ -98,9 +98,7 @@
                 </x-card>
 
                 <div class="order-actions">
-                    <a href="{{ url('/shop') }}" class="bt-miticko bt-m-default w-100" data-mode="small">
-                        Torna ai prodotti <i class="fa-regular fa-arrow-right icon"></i>
-                    </a>
+                    <x-button label="Torna ai prodotti" status="Primary" class="btn-create-product" trailing="fa-arrow-right" :href="url('/shop')" />
                 </div>
             </div>
         </div>

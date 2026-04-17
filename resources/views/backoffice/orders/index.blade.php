@@ -49,8 +49,8 @@
         @endforeach
         </ul>
     </x-modal>
-    <x-modal id="order-detail" title="Seleziona periodo" primary="Chiudi" secondary="annulla" width="350px">
-
+    <x-modal id="order-detail" title="Riepilogo ordine" width="450px">
+        <div id="order-detail-body"></div>
     </x-modal>
 @endsection
 
@@ -83,6 +83,22 @@
                     }
                 }])
             })
+
+            $(document).on('click', '.btn-preview-order', function() {
+                const orderId = $(this).data('order-id');
+                $.ajax({
+                    url: `/orders/${orderId}/preview`,
+                    method: 'GET',
+                    dataType: 'json',
+                }).done(function(res) {
+                    $('#order-detail-body').html(res.response);
+                    $('#order-detail').modal('show');
+                }).fail(function() {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Errore nel caricamento del riepilogo ordine');
+                    }
+                });
+            });
         })
     </script>
 @endsection

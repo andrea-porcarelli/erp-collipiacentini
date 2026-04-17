@@ -59,6 +59,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::resource('orders', OrderController::class);
         Route::resource('products', ProductController::class);
         Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');

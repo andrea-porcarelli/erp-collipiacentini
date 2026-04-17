@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
+use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -72,10 +73,32 @@ class OrderController extends Controller
                     return view('backoffice.components.label', ['icon' => $order_status->icon(), 'status' => $order_status->status(), 'label' => $order_status->label()])->render();
                 })
                 ->addColumn('options', function ($item) {
-                    return ' > ';
+                    return '<button type="button" class="btn-preview-order" data-order-id="'.$item->id.'"><i class="fa-regular fa-chevron-right"></i></button>';
                 })
-                ->rawColumns(['status'])
+                ->rawColumns(['status', 'options'])
                 ->toJson();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function preview(Order $order): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+
+            if ($user->role === 'company' && $order->partner?->company_id !== $user->company_id) {
+                abort(403);
+            }
+            if ($user->role === 'partner' && $order->partner_id !== $user->partner_id) {
+                abort(403);
+            }
+
+            $order->load(['customer', 'orderProducts.product', 'orderProducts.items.variant']);
+
+            return $this->success([
+                'response' => view('backoffice.orders._preview', compact('order'))->render(),
+            ]);
         } catch (\Exception $e) {
             return $this->exception($e);
         }
