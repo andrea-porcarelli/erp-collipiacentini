@@ -70,13 +70,14 @@
     </div>
     <hr style="background: var(--border-color); margin: 0" />
     <div class="order-preview-actions mt-spacing-2xl">
-        <x-button
-            :href="route('orders.show', $order)"
-            label="Vai all'ordine"
-            status="Primary"
-            emphasis="Medium"
-            size="Small"
-            trailing="fa-chevron-right"
-        />
+        <a href="{{ route('orders.show', $order) }}">
+            <x-button
+                label="Vai all'ordine"
+                status="Primary"
+                emphasis="Medium"
+                size="Small"
+                trailing="fa-chevron-right"
+            />
+        </a>
     </div>
 </div>

@@ -82,14 +82,7 @@ class OrderController extends Controller
     public function preview(Order $order): JsonResponse
     {
         try {
-            $user = Auth::user();
-
-            if ($user->role === 'company' && $order->partner?->company_id !== $user->company_id) {
-                abort(403);
-            }
-            if ($user->role === 'partner' && $order->partner_id !== $user->partner_id) {
-                abort(403);
-            }
+            $this->authorizeOrderAccess($order);
 
             $order->load(['customer', 'orderProducts.product', 'orderProducts.items.variant']);
 
@@ -98,6 +91,28 @@ class OrderController extends Controller
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);
+        }
+    }
+
+    public function show(Order $order): View
+    {
+        $this->authorizeOrderAccess($order);
+
+        $order->load(['customer', 'partner', 'orderProducts.product', 'orderProducts.items.variant']);
+
+        return view('backoffice.' . $this->path . '.show', ['model' => $order])
+            ->with('path', $this->path);
+    }
+
+    private function authorizeOrderAccess(Order $order): void
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'company' && $order->partner?->company_id !== $user->company_id) {
+            abort(403);
+        }
+        if ($user->role === 'partner' && $order->partner_id !== $user->partner_id) {
+            abort(403);
         }
     }
 }
