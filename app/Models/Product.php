@@ -190,7 +190,6 @@ class Product extends LogsModel
             $productCode = $this->product_code;
 
             return route('booking.product', [
-                'slugPartner' => $slugPartner,
                 'slugProduct' => $slugProduct,
                 'productCode' => $productCode,
             ]);
