@@ -27,7 +27,7 @@
     </div>
     <hr style="background: var(--border-color)" />
     <div class="order-preview-section">
-        <div class="order-preview-title">Dettagli vendita</div>
+        <div class="order-preview-title mb-spacing-xl">Dettagli vendita</div>
         <table class="order-preview-table">
             <thead>
                 <tr>
@@ -39,11 +39,11 @@
             <tbody>
                 @foreach($order->orderProducts as $op)
                     <tr class="order-preview-product">
-                        <td colspan="3">{{ $op->product->label }}</td>
+                        <td colspan="3"><b>{{ $op->product->label }}</b></td>
                     </tr>
                     @foreach($op->items as $item)
                         <tr>
-                            <td class="ps-3">{{ $item->variant?->label }}</td>
+                            <td>{{ $item->variant?->label }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
                             <td class="text-end">{{ number_format($item->subtotal, 2, ',', '.') }}€</td>
                         </tr>

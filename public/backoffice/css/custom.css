@@ -666,7 +666,6 @@ div.dt-container .dt-paging .dt-paging-button:active {
     font-family: var(--typography-title-font, "DM Sans"), sans-serif;
     font-size: var(--size, 14px);
     font-style: normal;
-    font-weight: var(--weight, 700);
     line-height: var(--line-height, 18px); /* 128.571% */
 }
 .order-preview .order-preview-table .order-preview-product td {
