@@ -130,6 +130,12 @@ Route::domain('admin.miticko.com')->group(function () {
     });
 });
 Route::fallback(function () {
+    \Log::warning('Fallback hit', [
+        'host' => request()->getHost(),
+        'method' => request()->getMethod(),
+        'full_url' => request()->fullUrl(),
+        'path' => request()->path(),
+    ]);
     if (request()->getHost() !== 'admin.miticko.com') {
         return redirect('/shop');
     }

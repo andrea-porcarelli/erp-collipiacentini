@@ -185,7 +185,6 @@ class Product extends LogsModel
 
     public function getRouteAttribute() : string {
         try {
-            $slugPartner = Str::slug($this->partner->partner_name ?? 'partner');
             $slugProduct = Str::slug($this->meta_title ?? $this->label ?? 'product');
             $productCode = $this->product_code;
 
