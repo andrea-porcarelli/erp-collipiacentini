@@ -69,9 +69,14 @@ class BookingController extends Controller
 
     public function product(Request $request, string $slugProduct, string $productCode): View
     {
-        Log::info("Product Code: " . $productCode);
-        $productCode_ex = explode('-', $productCode);
-        $productId = (int) substr($productCode_ex[count($productCode_ex) - 1], 2);
+        // productCode format (see Product::getProductCodeAttribute):
+        // {category_code}-{partner_code}{5-digit-zero-padded-id}
+        // Example: "V-ROCCA00005" → category_code="V", partner_code="ROCCA", id=5
+        [$categoryCode, $remainder] = array_pad(explode('-', $productCode, 2), 2, '');
+        $productId = (int) substr($remainder, -5);
+        $partnerCode = substr($remainder, 0, -5);
+
+        Log::info('Product lookup', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
 
         $product = Product::with([
             'partner',
@@ -84,10 +89,14 @@ class BookingController extends Controller
             'gallery',
             'faqs',
             'relatedProducts.relatedProduct.partner',
-        ])->where('id', $productId)->first();
+        ])
+            ->where('id', $productId)
+            ->whereHas('category', fn($q) => $q->where('category_code', $categoryCode))
+            ->whereHas('partner', fn($q) => $q->where('partner_code', $partnerCode))
+            ->first();
 
         if (!$product) {
-            Log::info(__METHOD__ . ': ' . __LINE__ . ' Product not found ' . $productId);
+            Log::info(__METHOD__ . ': Product not found', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
             abort(404);
         }
 
