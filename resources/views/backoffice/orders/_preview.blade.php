@@ -52,13 +52,13 @@
             </tbody>
             <tfoot>
                 <tr class="order-preview-total">
-                    <td colspan="2" class="text-end">Totale</td>
+                    <td colspan="2" class="text-end"> </td>
                     <td class="text-end">{{ number_format($order->amount, 2, ',', '.') }}€</td>
                 </tr>
             </tfoot>
         </table>
     </div>
-
+    <hr style="background: var(--border-color)" />
     <div class="order-preview-section">
         <div class="order-preview-title">Dettagli cliente</div>
         <div class="order-preview-customer">
