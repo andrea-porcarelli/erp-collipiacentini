@@ -5,9 +5,9 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Categorie prodotti" class="position-relative" sub_title="Gestisci le categorie dei prodotti">
+                <x-card title="Categorie prodotti" class="position-relative" brelative="true" sub_title="Gestisci le categorie dei prodotti">
                     <div class="position-absolute" style="top: -70px; right: 0">
-                        <x-button label="Aggiungi categoria" status="primary" emphasis="light" class="btn-create-category" size="small" leading="fa-plus" />
+                        <x-button label="Aggiungi categoria" status="Primary"  class="btn-create-category" leading="fa-plus" />
                     </div>
                     <x-table-header>
                         <div class="filters-miticko">
