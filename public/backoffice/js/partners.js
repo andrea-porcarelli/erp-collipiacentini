@@ -34,6 +34,13 @@ const formConfigs = {
         successMessage: 'Commissioni aggiornate con successo',
         validate: () => ({}),
     },
+    'form-partner-billing': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'billing',
+        successMessage: 'Dati di fatturazione aggiornati con successo',
+        validate: () => ({}),
+    },
 };
 
 // ---------------------------------------------------------------------------

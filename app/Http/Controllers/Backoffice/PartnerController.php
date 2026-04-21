@@ -7,6 +7,7 @@ use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StorePartnerRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\PartnerInterface;
+use App\Models\PartnerBilling;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Validation\Rule;
@@ -37,6 +38,7 @@ class PartnerController extends CrudController
     public function show(int $id): View
     {
         $model = $this->interface->find($id);
+        $model->loadMissing('billing');
         $hasOrders = $model->orders()->exists();
 
         return view('backoffice.' . $this->path . '.show', compact('model', 'hasOrders'))
@@ -74,6 +76,15 @@ class PartnerController extends CrudController
                     'commission_miticko_variable'  => $request->input('commission_miticko_variable'),
                     'commission_payment'           => $request->input('commission_payment'),
                 ]),
+                'billing' => PartnerBilling::updateOrCreate(
+                    ['partner_id' => $partner->id],
+                    $request->only([
+                        'legal_name', 'vat_number', 'tax_code',
+                        'street_address', 'postal_code', 'city', 'province', 'country',
+                        'pec_email', 'sdi_code',
+                        'iban', 'tax_regime',
+                    ]),
+                ),
                 default => throw new \Exception('Sezione non valida'),
             };
 

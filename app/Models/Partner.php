@@ -5,6 +5,7 @@ use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -47,6 +48,11 @@ class Partner extends LogsModel
     public function users() : HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function billing() : HasOne
+    {
+        return $this->hasOne(PartnerBilling::class);
     }
 
     public static function active() : Builder {
