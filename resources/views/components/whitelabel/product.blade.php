@@ -2,9 +2,15 @@
     'product' => null
 ])
 <x-card class="card-product">
+    @php
+        $productImage = $product->cover->first() ?? $product->gallery->first();
+        $productImageUrl = $productImage
+            ? asset('storage/' . $productImage->file_path)
+            : asset('whitelabel/images/product.jpg');
+    @endphp
     <div class="card-product-container @if(!$product->is_available) is-unavailable @endif">
         <figure>
-            <img title="Product" alt="Product" src="{{ asset('whitelabel/images/product.jpg') }}">
+            <img title="{{ $product->label }}" alt="{{ $product->label }}" src="{{ $productImageUrl }}">
         </figure>
         <section>
             <div class="product-detail">

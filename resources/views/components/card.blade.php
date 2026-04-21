@@ -18,7 +18,7 @@
                     @isset($leading)
                         <i class="fa-regular {{ $leading }} icon"></i>
                     @endif
-                        {{ $pre_title }}
+                        {!! html_entity_decode($pre_title, ENT_QUOTES | ENT_HTML5, 'UTF-8') !!}
                 </small>
             @endisset
             @isset($title)

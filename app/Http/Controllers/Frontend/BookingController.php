@@ -28,7 +28,7 @@ class BookingController extends Controller
         $partner  = $request->partner;
         $products = Product::where('is_active', 1)
             ->where('partner_id', $partner->id)
-            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
+            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->get();
 
         return view('whitelabel.index', compact('products', 'partner'));
@@ -42,7 +42,7 @@ class BookingController extends Controller
 
         $products = Product::where('is_active', 1)
             ->where('partner_id', $partner->id)
-            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities'])
+            ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->when($filter !== 'all', fn($q) => $q->where('product_type', $filter))
             ->get()
             ->when($date !== null, function ($collection) use ($date) {
@@ -141,6 +141,11 @@ class BookingController extends Controller
                 }
             } else {
                 $variantCollection = $product->variants->where('special_schedule_id', $slot['slot_id']);
+                if ($variantCollection->isEmpty()) {
+                    $variantCollection = $product->variants
+                        ->whereNull('availability_id')
+                        ->whereNull('special_schedule_id');
+                }
             }
 
 
