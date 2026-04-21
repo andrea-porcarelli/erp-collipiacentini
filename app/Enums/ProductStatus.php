@@ -27,9 +27,9 @@ enum ProductStatus: int
     public function status(): string
     {
         return match($this) {
-            self::PENDING     => 'disabled',
-            self::ACTIVE      => 'success',
-            self::UNAVAILABLE => 'warning',
+            self::PENDING     => 'Disabled',
+            self::ACTIVE      => 'Success',
+            self::UNAVAILABLE => 'Warning',
         };
     }
 }
