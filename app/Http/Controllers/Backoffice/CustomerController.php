@@ -46,7 +46,7 @@ class CustomerController extends Controller
                     $q->where('partner_id', $partnerId);
                 });
             }
-
+            Utils::queryLog($elements);
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data_long($item->created_at);
