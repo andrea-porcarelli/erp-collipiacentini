@@ -12,7 +12,9 @@
             <x-navigation-item label="Gestione Aziende" icon="fa fa-buildings" route="companies.index" :is_active="$active === 'companies'" />
             <x-navigation-item label="Gestione Partner" icon="fa fa-buildings" route="partners.index" :is_active="$active === 'partners'" />
         @endif
-        <x-navigation-item label="Gestione utenti" icon="fa fa-user-group" route="users.index" :is_active="$active === 'users'" />
+        @if(in_array(Auth::user()->role, ['god', 'admin']))
+            <x-navigation-item label="Gestione utenti" icon="fa fa-user-group" route="users.index" :is_active="$active === 'users'" />
+        @endif
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
         @endif
