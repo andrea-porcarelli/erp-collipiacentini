@@ -42,9 +42,9 @@ class UserController extends CrudController
 
         $roles = [
             ['id' => 'god', 'label' => 'God'],
-            ['id' => 'admin', 'label' => 'Admin'],
-            ['id' => 'operator', 'label' => 'Operatore'],
-            ['id' => 'partner', 'label' => 'Partner'],
+            ['id' => 'operator', 'label' => 'Operatore interno Miticko'],
+            ['id' => 'admin', 'label' => 'Proprietario Partner'],
+            ['id' => 'partner', 'label' => 'Collaboratore Partner'],
         ];
 
         return view('backoffice.' . $this->path . '.index', compact('companies', 'partners', 'roles'))

@@ -40,9 +40,6 @@
                     <div id="partner-select-container" style="display: none;">
                         <x-select name="partner_id" label="Partner" placeholder="Seleziona il partner" :options="$partners" />
                     </div>
-                    <div id="company-select-container" style="display: none;">
-                        <x-select name="company_id" label="Azienda" placeholder="Seleziona l'azienda" :options="$companies" />
-                    </div>
                 </div>
             </form>
         </div>
@@ -90,8 +87,7 @@
 
             $(document).on('change', '#create-user select[name="role"]', function () {
                 const role = $(this).val();
-                $(`#partner-select-container`).toggle(role === 'partner');
-                $(`#company-select-container`).toggle(role === 'company');
+                $(`#partner-select-container`).toggle(role === 'partner' || role === 'admin');
             });
 
             $(document).on('click', '#create-user .btn-success', function () {
