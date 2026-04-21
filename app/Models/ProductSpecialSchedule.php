@@ -24,4 +24,11 @@ class ProductSpecialSchedule extends Model
     {
         return $this->HasMany(ProductVariant::class, 'special_schedule_id', 'id');
     }
+
+    public function generic_variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id')
+                    ->whereNull('availability_id')
+                    ->whereNull('special_schedule_id');
+    }
 }

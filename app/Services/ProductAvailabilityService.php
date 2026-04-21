@@ -33,14 +33,16 @@ class ProductAvailabilityService
     public function getSlotsForDate(Product $product, string $date): Collection
     {
         $specials = ProductSpecialSchedule::where('product_id', $product->id)
-            ->with('variants')
+            ->with(['variants', 'generic_variants'])
             ->where('date', $date)
             ->orderBy('time')
             ->get();
 
         if ($specials->isNotEmpty()) {
             return $specials->map(function ($s) use ($date) {
-                $maxQty = $s->variants->max('max_quantity');
+                $maxQty = $s->variants->count()
+                    ? $s->variants->max('max_quantity')
+                    : $s->generic_variants->max('max_quantity');
                 $booked = $this->getBookedQuantity('special', $s->id, $date);
                 return [
                     'id'           => $s->id,
@@ -148,19 +150,40 @@ class ProductAvailabilityService
             ->where('date_to', '>=', $start->toDateString())
             ->get();
 
-        // Days with special overrides that have availability
+        // Product-level default variants act as fallback when a special schedule
+        // has no variants of its own (availability_id = NULL AND special_schedule_id = NULL).
+        $hasGenericVariants = $product->variants()
+            ->whereNull('availability_id')
+            ->whereNull('special_schedule_id')
+            ->where('max_quantity', '>', 0)
+            ->exists();
+
+        // Days with special overrides that have availability (own variants or inherited defaults)
         $specialDays = ProductSpecialSchedule::where('product_id', $product->id)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->whereHas('variants', fn($q) => $q->where('max_quantity', '>', 0))
+            ->where(function ($q) use ($hasGenericVariants) {
+                $q->whereHas('variants', fn($qq) => $qq->where('max_quantity', '>', 0));
+                if ($hasGenericVariants) {
+                    $q->orWhereDoesntHave('variants');
+                }
+            })
             ->distinct()
             ->pluck('date')
             ->map(fn($d) => $d->format('Y-m-d'))
             ->toArray();
 
-        // Days that are fully overridden (no variant with max_quantity > 0): exclude them
+        // Days that are fully overridden (no variant with max_quantity > 0 and no generic fallback): exclude them
         $closedSpecialDays = ProductSpecialSchedule::where('product_id', $product->id)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->whereDoesntHave('variants', fn($q) => $q->where('max_quantity', '>', 0))
+            ->where(function ($q) use ($hasGenericVariants) {
+                if ($hasGenericVariants) {
+                    // Closed only if own variants exist but none have capacity
+                    $q->whereHas('variants')
+                      ->whereDoesntHave('variants', fn($qq) => $qq->where('max_quantity', '>', 0));
+                } else {
+                    $q->whereDoesntHave('variants', fn($qq) => $qq->where('max_quantity', '>', 0));
+                }
+            })
             ->distinct()
             ->pluck('date')
             ->map(fn($d) => $d->format('Y-m-d'))
