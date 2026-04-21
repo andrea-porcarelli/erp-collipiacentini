@@ -60,7 +60,8 @@ class ProductController extends CrudController
             $user = Auth::user();
             $filters = $request->get('filters') ?? [];
 
-            $elements = $this->interface->filters($filters);
+            $elements = $this->interface->filters($filters)
+                ->with(['variants.prices']);
 
             if (in_array($user->role, ['partner', 'admin'])) {
                 $elements->where('partner_id', $user->partner_id);
@@ -83,7 +84,16 @@ class ProductController extends CrudController
                     return $item->category->label ?? ' - ';
                 })
                 ->addColumn('pricing', function ($item) {
-                    return "0 0 0";
+                    $main = $item->variants
+                        ->whereNull('availability_id')
+                        ->whereNull('special_schedule_id');
+
+                    $variants = $main->isNotEmpty() ? $main : $item->variants;
+
+                    return $variants
+                        ->sortBy('sort_order')
+                        ->map(fn($v) => ($v->label ?? 'Variante') . ' ' . Utils::price($v->full_price))
+                        ->implode(', ') ?: ' - ';
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';
