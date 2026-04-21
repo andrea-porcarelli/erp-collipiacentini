@@ -5,7 +5,7 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista clienti" sub_title="visualizza i clienti">
+                <x-card title="Lista clienti" class="position-relative" brelative="true" sub_title="visualizza i clienti">
                     <x-table-header>
                         <div class="filters-miticko">
                         </div>
