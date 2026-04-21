@@ -39,7 +39,9 @@ class OrderController extends Controller
             $user = Auth::user();
             $filters = $request->get('filters') ?? [];
 
-            $elements = $this->interface->filters($filters)->orderBy('created_at', 'desc');
+            $elements = $this->interface->filters($filters)
+                ->with(['orderProducts.items.variant'])
+                ->orderBy('created_at', 'desc');
 
             if ($user->role === 'company') {
                 $elements->whereHas('partner', function ($q) use ($user) {
@@ -66,7 +68,15 @@ class OrderController extends Controller
                     return $item->product_label;
                 })
                 ->addColumn('type', function ($item) {
-                    return "2 completi + 1 ridotto";
+                    return $item->orderProducts
+                        ->flatMap->items
+                        ->groupBy('product_variant_id')
+                        ->map(function ($group) {
+                            $label = $group->first()->variant?->label ?? 'Variante';
+                            $qty   = $group->sum('quantity');
+                            return "{$qty} × {$label}";
+                        })
+                        ->implode(', ');
                 })
                 ->addColumn('status', function ($item) {
                     $order_status = $item->order_status;
