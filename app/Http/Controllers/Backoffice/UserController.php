@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class UserController extends CrudController
@@ -70,6 +71,106 @@ class UserController extends CrudController
         $user = $this->interface->store($data);
 
         return $this->success(['redirect' => route($this->path . '.show', $user->id)]);
+    }
+
+    public function show(int $id): View|RedirectResponse
+    {
+        $model       = $this->interface->find($id);
+        $currentUser = Auth::user();
+
+        if ($currentUser->role === 'god') {
+            $partners = Utils::map_collection(Partner::active());
+            $roles = [
+                ['id' => 'god',      'label' => 'God'],
+                ['id' => 'admin',    'label' => 'Admin'],
+                ['id' => 'operator', 'label' => 'Operatore'],
+                ['id' => 'partner',  'label' => 'Partner'],
+                ['id' => 'company',  'label' => 'Company'],
+            ];
+        } else {
+            $partners = null;
+            $roles = [
+                ['id' => 'admin',   'label' => 'Proprietario'],
+                ['id' => 'partner', 'label' => 'Collaboratore'],
+            ];
+        }
+
+        return view('backoffice.' . $this->path . '.show', compact('model', 'partners', 'roles'))
+            ->with('path', $this->path);
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $user    = $this->interface->find($id);
+            $current = Auth::user();
+            $isGod          = $current->role === 'god';
+            $isAdminPartner = $current->role === 'admin' && !is_null($current->partner_id);
+
+            match ($request->input('section')) {
+                'info' => $this->updateInfo($user, $request),
+                'partner_role' => $this->updatePartnerRole($user, $request, $isGod, $isAdminPartner, $current),
+                'password' => $this->updatePassword($user, $request, $isGod || $isAdminPartner),
+                default => throw new \Exception('Sezione non valida'),
+            };
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    private function updateInfo($user, Request $request): void
+    {
+        $this->validate($request, [
+            'name'  => ['required', 'string'],
+            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+        ]);
+
+        $this->interface->edit($user, [
+            'name'  => $request->input('name'),
+            'email' => $request->input('email'),
+        ]);
+    }
+
+    private function updatePartnerRole($user, Request $request, bool $isGod, bool $isAdminPartner, $current): void
+    {
+        if (!$isGod && !$isAdminPartner) {
+            abort(403);
+        }
+
+        $allowedRoles = $isGod
+            ? ['god', 'admin', 'operator', 'partner', 'company']
+            : ['admin', 'partner'];
+
+        $role = $request->input('role');
+        if (!in_array($role, $allowedRoles, true)) {
+            abort(403, 'Ruolo non permesso');
+        }
+
+        $partnerId = $isGod
+            ? $request->input('partner_id')
+            : $current->partner_id;
+
+        $this->interface->edit($user, [
+            'role'       => $role,
+            'partner_id' => $partnerId,
+        ]);
+    }
+
+    private function updatePassword($user, Request $request, bool $allowed): void
+    {
+        if (!$allowed) {
+            abort(403);
+        }
+
+        $this->validate($request, [
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $this->interface->edit($user, [
+            'password' => Hash::make($request->input('password')),
+        ]);
     }
 
     public function data(Request $request) : JsonResponse {
