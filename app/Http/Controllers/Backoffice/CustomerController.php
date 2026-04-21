@@ -42,8 +42,11 @@ class CustomerController extends Controller
                 $elements->where('company_id', $user->company_id);
             } elseif (in_array($user->role, ['partner', 'admin'])) {
                 $partnerId = $user->partner_id;
-                $elements->whereHas('orders.orderProducts.product', function ($q) use ($partnerId) {
-                    $q->where('partner_id', $partnerId);
+                $elements->where(function ($q) use ($partnerId) {
+                    $q->where('partner_id', $partnerId)
+                      ->orWhereHas('orders.orderProducts.product', function ($sub) use ($partnerId) {
+                          $sub->where('partner_id', $partnerId);
+                      });
                 });
             }
             Utils::queryLog($elements);
