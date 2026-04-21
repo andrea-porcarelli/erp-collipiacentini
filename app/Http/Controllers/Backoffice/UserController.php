@@ -79,7 +79,8 @@ class UserController extends CrudController
             $elements = $this->interface->filters($filters)
             ->when(!in_array(Auth::user()->role, ['god']), function($q) {
                 if (Auth::user()->role == 'admin') {
-                    $q->whereIn('role', ['admin','partner']);
+                    $q->whereIn('role', ['admin','partner'])
+                        ->where('partner_id', Auth::user()->partner_id);
                 }
             });
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
