@@ -79,7 +79,7 @@ class UserController extends CrudController
                     return ucfirst($item->role);
                 })
                 ->addColumn('association', function ($item) {
-                    if ($item->role === 'partner' && $item->partner) {
+                    if (in_array($item->role, ['partner', 'admin']) && $item->partner) {
                         return $item->partner->partner_name;
                     }
                     if ($item->role === 'company' && $item->company) {
