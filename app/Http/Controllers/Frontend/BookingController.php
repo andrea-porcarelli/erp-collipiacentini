@@ -206,7 +206,7 @@ class BookingController extends Controller
             'items.*.quantity'     => 'required|integer|min:1',
         ]);
 
-        $product = Product::with('variants.prices')->findOrFail($validated['product_id']);
+        $product = Product::with(['variants.prices', 'partner'])->findOrFail($validated['product_id']);
 
         // Check closed periods
         if ($this->availabilityService->isDateClosed($product, $validated['date'])) {
@@ -242,6 +242,7 @@ class BookingController extends Controller
             }
 
             $unitPrice = $this->availabilityService->applyPriceVariation($variant->full_price, $variation);
+            $unitPrice += $product->partner?->resolvePresaleCommission($unitPrice) ?? 0;
             $cartItemsData[] = [
                 'product_variant_id' => $variant->id,
                 'quantity'           => $item['quantity'],

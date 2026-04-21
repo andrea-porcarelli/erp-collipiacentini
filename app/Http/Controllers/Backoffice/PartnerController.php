@@ -67,11 +67,12 @@ class PartnerController extends CrudController
                 ]),
                 'info' => $this->validateAndEdit($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
-                    'commission_presale_low'      => $request->input('commission_presale_low'),
-                    'commission_presale_high'     => $request->input('commission_presale_high'),
-                    'commission_miticko_fixed'    => $request->input('commission_miticko_fixed'),
-                    'commission_miticko_variable' => $request->input('commission_miticko_variable'),
-                    'commission_payment'          => $request->input('commission_payment'),
+                    'commission_presale_low'       => $request->input('commission_presale_low'),
+                    'commission_presale_high'      => $request->input('commission_presale_high'),
+                    'commission_presale_threshold' => $request->input('commission_presale_threshold'),
+                    'commission_miticko_fixed'     => $request->input('commission_miticko_fixed'),
+                    'commission_miticko_variable'  => $request->input('commission_miticko_variable'),
+                    'commission_payment'           => $request->input('commission_payment'),
                 ]),
                 default => throw new \Exception('Sezione non valida'),
             };

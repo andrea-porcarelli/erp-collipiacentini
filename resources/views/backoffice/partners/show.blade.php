@@ -79,10 +79,14 @@
                                 A carico del cliente
                             </div>
                             <div class="col-12 col-sm-6">
-                                <x-input :model="$model" name="commission_presale_low" label="Prevendita (sotto 6,99 €)" />
+                                <x-input :model="$model" name="commission_presale_threshold" label="Soglia prevendita (€)" />
+                            </div>
+                            <div class="col-12 col-sm-6"></div>
+                            <div class="col-12 col-sm-6">
+                                <x-input :model="$model" name="commission_presale_low" label="Prevendita sotto soglia" />
                             </div>
                             <div class="col-12 col-sm-6">
-                                <x-input :model="$model" name="commission_presale_high" label="Prevendita (sopra 7,00 €)" />
+                                <x-input :model="$model" name="commission_presale_high" label="Prevendita sopra soglia" />
                             </div>
                             <div class="col-12 mb-2 mt-4">
                                 A carico del Partner

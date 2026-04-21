@@ -20,6 +20,7 @@ class Partner extends LogsModel
         'slug_name',
         'commission_presale_low',
         'commission_presale_high',
+        'commission_presale_threshold',
         'commission_miticko_fixed',
         'commission_miticko_variable',
         'commission_payment',
@@ -72,5 +73,18 @@ class Partner extends LogsModel
     public function gallery() : MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery');
+    }
+
+    public function resolvePresaleCommission(float $unitPrice) : float
+    {
+        if (is_null($this->commission_presale_threshold)) {
+            return 0.0;
+        }
+
+        $commission = $unitPrice < (float) $this->commission_presale_threshold
+            ? $this->commission_presale_low
+            : $this->commission_presale_high;
+
+        return (float) ($commission ?? 0);
     }
 }
