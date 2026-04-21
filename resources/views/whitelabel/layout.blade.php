@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('whitelabel.page_title') }}</title>
+    @hasSection('head')
+        @yield('head')
+    @else
+        <title>{{ __('whitelabel.page_title') }}</title>
+    @endif
     <link href="{{ asset('backoffice/css/Miticko.css') }}" rel="stylesheet">
     <link href="{{ asset('backoffice/css/helpers.css') }}" rel="stylesheet">
     <!-- Bootstrap 5 CSS -->

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductPriceVariation extends LogsModel
 {
+    use InvalidatesProductSeoCache;
+
     protected $fillable = [
         'product_id',
         'date_from',

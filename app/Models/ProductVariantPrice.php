@@ -2,10 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductVariantPrice extends LogsModel
 {
+    use InvalidatesProductSeoCache;
+
+    public function productSeoCacheIds(): array
+    {
+        $productId = $this->variant()->first()?->product_id
+            ?? ProductVariant::whereKey($this->product_variant_id)->value('product_id');
+
+        return array_filter([$productId]);
+    }
+
     public $fillable = [
         'product_variant_id',
         'label',

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductAvailability;
 use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
+use App\Services\ProductSeoService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +22,10 @@ use Illuminate\View\View;
 
 class BookingController extends Controller
 {
-    public function __construct(private ProductAvailabilityService $availabilityService) {}
+    public function __construct(
+        private ProductAvailabilityService $availabilityService,
+        private ProductSeoService $seoService,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -31,7 +35,9 @@ class BookingController extends Controller
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->get();
 
-        return view('whitelabel.index', compact('products', 'partner'));
+        $seo = $this->seoService->forListing($partner, $products);
+
+        return view('whitelabel.index', compact('products', 'partner', 'seo'));
     }
 
     public function filterProducts(Request $request): JsonResponse
@@ -101,8 +107,9 @@ class BookingController extends Controller
         }
 
         $partner = $request->partner;
+        $seo     = $this->seoService->forProduct($product);
 
-        return view('whitelabel.product', compact('product', 'partner'));
+        return view('whitelabel.product', compact('product', 'partner', 'seo'));
     }
 
     /**

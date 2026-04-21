@@ -1,11 +1,14 @@
 <?php
 namespace App\Models;
 
+use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductAvailability extends LogsModel
 {
+    use InvalidatesProductSeoCache;
+
     public $fillable = [
         'product_id',
         'day_of_week',

@@ -3,6 +3,7 @@ namespace App\Models;
 use App\Enums\ProductStatus;
 use App\Models\ProductPriceVariation;
 use App\Traits\HasLanguageContent;
+use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,13 @@ use Illuminate\Support\Str;
 
 class Product extends LogsModel
 {
-    use HasLanguageContent;
+    use HasLanguageContent, InvalidatesProductSeoCache;
+
+    public function productSeoCacheIds(): array
+    {
+        return [$this->id];
+    }
+
     public $fillable = [
         'partner_id',
         'category_id',

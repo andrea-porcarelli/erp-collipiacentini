@@ -1,5 +1,9 @@
 @extends('whitelabel.layout')
 
+@section('head')
+    @include('whitelabel.partials.seo', ['seo' => $seo])
+@endsection
+
 @section('content')
     <div class="container mt-5">
         <div class="row w-100">

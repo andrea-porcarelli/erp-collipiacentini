@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Traits\HasLanguageContent;
+use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductVariant extends LogsModel
 {
-    use HasLanguageContent;
+    use HasLanguageContent, InvalidatesProductSeoCache;
+
     public $fillable = [
         'product_id',
         'availability_id',
