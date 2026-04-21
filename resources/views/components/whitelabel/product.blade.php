@@ -32,7 +32,7 @@
             </div>
             <div class="d-none d-sm-block">
                 <div class="price">
-                    <b>{{ Utils::price($product->lowest_price) }}</b>
+                    <b>{{ Utils::price($product->lowest_price_with_commission) }}</b>
                     <x-button
                         label="Acquista"
                         emphasis="High"
@@ -52,7 +52,7 @@
                 <x-supporting-text icon="fa-regular fa-clock-three" :message="$product->duration . ' min'" />
             </div>
             <div class="price">
-                <b>{{ Utils::price($product->lowest_price) }}</b>
+                <b>{{ Utils::price($product->lowest_price_with_commission) }}</b>
                 <x-button
                     label="Acquista"
                     trailing="fa-ticket-perforated"

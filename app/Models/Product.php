@@ -143,6 +143,11 @@ class Product extends LogsModel
             ->value('price') ?? 0;
     }
 
+    public function getLowestPriceWithCommissionAttribute() : float {
+        $base = (float) $this->lowest_price;
+        return $base + ($this->partner?->resolvePresaleCommission($base) ?? 0);
+    }
+
     public function getIsAvailableAttribute() : bool {
         if (!$this->is_active) {
             return false;

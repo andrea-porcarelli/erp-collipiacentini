@@ -117,7 +117,7 @@ class BookingController extends Controller
             return response()->json(['error' => 'Data non specificata'], 400);
         }
 
-        $product = Product::with('variants.prices')->find($productId);
+        $product = Product::with(['variants.prices', 'partner'])->find($productId);
 
         if (!$product) {
             return response()->json(['error' => 'Prodotto non trovato'], 404);
@@ -149,12 +149,19 @@ class BookingController extends Controller
             }
 
 
-            $variants = $variantCollection->map(fn(ProductVariant $v) => [
-                'id'         => $v->id,
-                'label'      => $v->label,
-                'base_price' => $v->full_price,
-                'price'      => $this->availabilityService->applyPriceVariation($v->full_price, $variation),
-            ])->values();
+            $variants = $variantCollection->map(function (ProductVariant $v) use ($product, $variation) {
+                $basePrice = (float) $v->full_price;
+                $price     = $this->availabilityService->applyPriceVariation($basePrice, $variation);
+                $baseCommission  = $product->partner?->resolvePresaleCommission($basePrice) ?? 0;
+                $priceCommission = $product->partner?->resolvePresaleCommission($price) ?? 0;
+
+                return [
+                    'id'         => $v->id,
+                    'label'      => $v->label,
+                    'base_price' => $basePrice + $baseCommission,
+                    'price'      => $price + $priceCommission,
+                ];
+            })->values();
 
             return [
                 'time'         => $slot['time'],
