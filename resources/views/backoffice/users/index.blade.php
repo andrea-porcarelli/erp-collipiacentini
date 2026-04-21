@@ -5,7 +5,7 @@
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Lista utenti" class="position-relative" sub_title="Gli utenti del pannello di controllo">
+                <x-card title="Lista utenti" class="position-relative" brelative="true" sub_title="Gli utenti del pannello di controllo">
                     <div class="position-absolute" style="top: -70px; right: 0">
                         <x-button label="Aggiungi utente" status="Primary" emphasis="light" class="btn-create-user" leading="fa-plus" />
                     </div>
