@@ -85,6 +85,12 @@ class UserController extends CrudController
             });
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
                 ->addColumn('role', function ($item) {
+                    if ($item->role === 'partner') {
+                        return "Collaboratore";
+                    }
+                    if ($item->role === 'admin') {
+                        return "Proprietario";
+                    }
                     return ucfirst($item->role);
                 })
                 ->addColumn('association', function ($item) {
