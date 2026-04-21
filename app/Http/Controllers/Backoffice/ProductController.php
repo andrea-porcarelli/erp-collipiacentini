@@ -90,10 +90,12 @@ class ProductController extends CrudController
 
                     $variants = $main->isNotEmpty() ? $main : $item->variants;
 
-                    return $variants
+                    $rows = $variants
                         ->sortBy('sort_order')
-                        ->map(fn($v) => ($v->label ?? 'Variante') . ' ' . Utils::price($v->full_price))
-                        ->implode(', ') ?: ' - ';
+                        ->map(fn($v) => e(($v->label ?? 'Variante') . ' ' . Utils::price($v->full_price)))
+                        ->implode('<br>');
+
+                    return $rows ? '<small>' . $rows . '</small>' : ' - ';
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';
@@ -101,7 +103,7 @@ class ProductController extends CrudController
                 ->addColumn('status', function ($item) {
                     return view('backoffice.components.label', ['status' => $item->status()->status(), 'label' => $item->status()->label()])->render();
                 })
-                ->rawColumns(['status'])
+                ->rawColumns(['status', 'pricing'])
                 ->toJson();
         } catch (\Exception $e) {
             return $this->exception($e);
