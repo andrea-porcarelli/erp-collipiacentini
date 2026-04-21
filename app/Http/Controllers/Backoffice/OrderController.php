@@ -45,7 +45,7 @@ class OrderController extends Controller
                 $elements->whereHas('partner', function ($q) use ($user) {
                     $q->where('company_id', $user->company_id);
                 });
-            } elseif ($user->role === 'partner') {
+            } elseif (in_array($user->role, ['partner', 'admin'])) {
                 $elements->where('partner_id', $user->partner_id);
             }
 

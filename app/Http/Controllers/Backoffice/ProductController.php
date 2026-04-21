@@ -62,7 +62,7 @@ class ProductController extends CrudController
 
             $elements = $this->interface->filters($filters);
 
-            if ($user->role === 'partner') {
+            if (in_array($user->role, ['partner', 'admin'])) {
                 $elements->where('partner_id', $user->partner_id);
             }
 
