@@ -7,7 +7,7 @@
             <div class="col-12">
                 <x-card title="Lista utenti" class="position-relative" sub_title="Gli utenti del pannello di controllo">
                     <div class="position-absolute" style="top: -70px; right: 0">
-                        <x-button label="Aggiungi utente" status="primary" emphasis="light" class="btn-create-user" size="small" leading="fa-plus" />
+                        <x-button label="Aggiungi utente" status="Primary" emphasis="light" class="btn-create-user" leading="fa-plus" />
                     </div>
                     <x-table-header>
                         <span class="table-header-total" > - </span>
