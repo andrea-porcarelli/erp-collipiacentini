@@ -10,6 +10,7 @@ use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -27,8 +28,11 @@ class UserController extends CrudController
         $this->path = 'users';
     }
 
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
+        if (Auth::user()->role == 'partner') {
+            return back()->withErrors('Unauthorized access');
+        }
         $companies = Company::where('is_active', 1)->get()->map(function ($item) {
             return ['id' => $item->id, 'label' => $item->company_name];
         })->values()->toArray();
@@ -73,7 +77,11 @@ class UserController extends CrudController
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters)
-            ->when(!in_array(Auth::user()->role, ['god']), fn($q) => $q->where('role', 'partner'));
+            ->when(!in_array(Auth::user()->role, ['god']), function($q) {
+                if (Auth::user()->role == 'admin') {
+                    $q->whereIn('role', ['admin','partner']);
+                }
+            });
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
                 ->addColumn('role', function ($item) {
                     return ucfirst($item->role);
