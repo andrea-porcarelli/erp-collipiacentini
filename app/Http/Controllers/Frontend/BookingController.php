@@ -94,6 +94,7 @@ class BookingController extends Controller
             'closedPeriods',
             'gallery',
             'faqs',
+            'features',
             'relatedProducts.relatedProduct.partner',
         ])
             ->where('id', $productId)

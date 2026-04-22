@@ -1,4 +1,4 @@
-@props(['model', 'categories', 'languages', 'fieldTypes' => collect()])
+@props(['model', 'categories', 'languages', 'fieldTypes' => collect(), 'features' => collect()])
 
 <div class="tab-pane fade show active" id="info-panel" role="tabpanel" aria-labelledby="info-tab">
     <div class="row">
@@ -52,6 +52,7 @@
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                 </div>
             </x-card>
+            <x-backoffice.product.features :model="$model" :features="$features" />
             <x-card title="Impostazioni prodotto pubbliche" class="mt-4 mb-5 position-relative" sub_title="titolo e descrizione che vedranno gli utenti su Google e sul sito">
                 <form id="form-info-public">
                     <div class="row">

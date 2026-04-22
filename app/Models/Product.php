@@ -56,6 +56,11 @@ class Product extends LogsModel
         return $this->belongsToMany(Company::class)->withTimestamps();
     }
 
+    public function features(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductFeature::class)->withTimestamps();
+    }
+
     public function category() : BelongsTo
     {
         return $this->belongsTo(Category::class);

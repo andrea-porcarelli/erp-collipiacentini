@@ -16,6 +16,7 @@ use App\Models\Media;
 use App\Models\OrderProduct;
 use App\Models\Partner;
 use App\Models\ProductCustomerField;
+use App\Models\ProductFeature;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\ProductFaq;
@@ -134,6 +135,8 @@ class ProductController extends CrudController
     {
         $model = $this->interface->find($id);
         $this->authorizeAccess($model);
+        $model->loadMissing('features');
+
         $categories = Utils::map_collection(Category::where('is_active', 1));
         $languages = Language::where('is_active', 1)
             ->get()
@@ -141,8 +144,9 @@ class ProductController extends CrudController
             ->values()
             ->toArray();
         $fieldTypes = CustomerFieldType::orderBy('sort_order')->get();
+        $features = ProductFeature::orderBy('category')->orderBy('sort_order')->get()->groupBy('category');
 
-        return view('backoffice.' . $this->path . '.show', compact('model', 'categories', 'languages', 'fieldTypes'))
+        return view('backoffice.' . $this->path . '.show', compact('model', 'categories', 'languages', 'fieldTypes', 'features'))
             ->with('path', $this->path);
     }
 
@@ -160,6 +164,7 @@ class ProductController extends CrudController
                 'description'      => $this->updateDescription($product, $request),
                 'occupancy'        => $this->updateOccupancy($product, $request),
                 'long_description' => $this->updateLongDescription($product, $request),
+                'features'         => $this->updateFeatures($product, $request),
                 default            => throw new \Exception('Sezione non valida'),
             };
 
@@ -237,6 +242,12 @@ class ProductController extends CrudController
             'occupancy_for_price'  => $request->boolean('occupancy_for_price'),
             'free_occupancy_rule'  => $request->boolean('free_occupancy_rule'),
         ]);
+    }
+
+    private function updateFeatures(Product $product, UpdateProductRequest $request): void
+    {
+        $ids = array_map('intval', (array) $request->input('features', []));
+        $product->features()->sync($ids);
     }
 
     public function destroy(int $id): JsonResponse

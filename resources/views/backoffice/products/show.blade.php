@@ -58,7 +58,7 @@
         </div>
         {{-- Tabs Content --}}
         <div class="tab-content mt-spacing-xl" id="productTabsContent">
-            <x-backoffice.product.tab-info :model="$model" :categories="$categories" :languages="$languages" :fieldTypes="$fieldTypes" />
+            <x-backoffice.product.tab-info :model="$model" :categories="$categories" :languages="$languages" :fieldTypes="$fieldTypes" :features="$features" />
             <x-backoffice.product.tab-variants :model="$model" />
             <x-backoffice.product.tab-schedule :model="$model" />
             <x-backoffice.product.tab-special-schedule :model="$model" />

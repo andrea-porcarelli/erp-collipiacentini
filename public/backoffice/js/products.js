@@ -153,6 +153,10 @@ const saveForm = (formId, btn) => {
     const selector = `#${formId}`;
     const { data, form } = App.serialize(selector);
 
+    if (config.collect) {
+        Object.assign(data, config.collect());
+    }
+
     if (config.validate) {
         const errors = config.validate(data);
         if (Object.keys(errors).length > 0) {

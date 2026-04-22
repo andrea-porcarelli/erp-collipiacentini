@@ -34,6 +34,28 @@
                 <x-card title="Descrizione" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->description !!}
                 </x-card>
+                @if($product->features->count() > 0)
+                    @php($grouped = $product->features->groupBy('category'))
+                    <x-card title="Caratteristiche dell'esperienza" class="product-card" h1="true" leading="fa-shield-check">
+                        <div class="row">
+                            @foreach(\App\Models\ProductFeature::CATEGORIES as $category => $categoryLabel)
+                                @if(isset($grouped[$category]))
+                                    <div class="col-12 col-sm-6 mb-3">
+                                        <h6 class="text-uppercase small text-secondary mb-2">{{ $categoryLabel }}</h6>
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach($grouped[$category]->sortBy('sort_order') as $feature)
+                                                <li class="d-flex align-items-center gap-2 py-1">
+                                                    <i class="fa-regular {{ $feature->icon ?? 'fa-check' }} text-success"></i>
+                                                    <span>{{ $feature->translated_label }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </x-card>
+                @endif
                 @if($product->relatedProducts->count() > 0)
                     <x-card title="Altri prodotti" class="product-card" h1="true" leading="fa-shield-check">
                         <ul class="list-unstyled mb-0">
