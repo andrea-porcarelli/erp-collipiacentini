@@ -23,7 +23,7 @@
             </div>
             <div class="logo">
                 <a href="/shop">
-                    <img src="{{ asset(Utils::partner_path()) }}" />
+                    <img src="{{ asset('storage/' . Utils::partner_path()) }}" />
                 </a>
             </div>
             <div class="languages">
