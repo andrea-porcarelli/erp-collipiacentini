@@ -45,7 +45,7 @@
                                         <ul class="list-unstyled mb-0">
                                             @foreach($grouped[$category]->sortBy('sort_order') as $feature)
                                                 <li class="d-flex align-items-center gap-2 py-1">
-                                                    <i class="fa-regular {{ $feature->icon ?? 'fa-check' }} text-success"></i>
+                                                    <i class="fa-solid {{ $feature->icon ?? 'fa-check' }} text-success"></i>
                                                     <span>{{ $feature->translated_label }}</span>
                                                 </li>
                                             @endforeach
