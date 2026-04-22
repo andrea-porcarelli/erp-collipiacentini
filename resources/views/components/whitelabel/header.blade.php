@@ -23,7 +23,7 @@
             </div>
             <div class="logo">
                 <a href="/shop">
-                    <img src="{{ asset('whitelabel/companies/' . Utils::partner_path() . '/logo.png') }}" />
+                    <img src="{{ asset(Utils::partner_path()) }}" />
                 </a>
             </div>
             <div class="languages">
