@@ -45,6 +45,18 @@ const formConfigs = {
         successMessage: 'Categoria aggiornata con successo',
         validate: () => ({}),
     },
+    'form-info-features': {
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'features',
+        successMessage: 'Caratteristiche aggiornate con successo',
+        validate: () => ({}),
+        collect: () => ({
+            features: $('#form-info-features input[name="features"]:checked')
+                .map(function () { return $(this).val(); })
+                .get(),
+        }),
+    },
     'form-info-public': {
         endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',

@@ -15,7 +15,7 @@
                         <label class="d-flex align-items-center gap-2 mb-1" style="cursor: pointer;">
                             <input
                                 type="checkbox"
-                                name="features[]"
+                                name="features"
                                 value="{{ $feature->id }}"
                                 @checked(in_array($feature->id, $selectedIds))
                             >
