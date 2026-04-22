@@ -24,6 +24,27 @@
                         </div>
                     </form>
 
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <label class="form-label small text-secondary mb-2">Logo partner</label>
+                            <div class="d-flex align-items-center gap-3" id="partner-logo-wrapper">
+                                <div id="partner-logo-preview" class="d-flex align-items-center justify-content-center border rounded bg-light" style="min-width:160px;height:88px;padding:4px;overflow:hidden">
+                                    @if($model->logo)
+                                        <img src="{{ asset('storage/' . $model->logo->file_path) }}" alt="Logo {{ $model->partner_name }}" style="max-height:80px;width:auto;object-fit:contain">
+                                    @else
+                                        <span class="text-secondary small">Nessun logo</span>
+                                    @endif
+                                </div>
+                                <div class="d-flex flex-column gap-2">
+                                    <input type="file" id="partner-logo-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="d-none">
+                                    <x-button class="btn-logo-upload" label="Carica logo" leading="fa-upload" emphasis="Medium" size="Small" />
+                                    <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="outlined" status="danger" size="Small" :style="$model->logo ? '' : 'display:none'" />
+                                </div>
+                            </div>
+                            <p class="text-secondary small mt-2 mb-0">Formato consigliato orizzontale. Altezza massima di visualizzazione: 80px. Max 2MB.</p>
+                        </div>
+                    </div>
+
                     <div class="button-card-absolute">
                         <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                     </div>
@@ -170,7 +191,7 @@
                 </x-card>
 
                 <x-card title="Elimina partner" class="mt-4 position-relative">
-                    <x-button emphasis="outlined" status="danger" label="Elimina partner" leading="fa-trash" class="btn-delete-partner" />
+                    <x-button status="Error" emphasis="MediumLow" label="Elimina partner" leading="fa-trash-can" class="btn-delete-partner" />
                 </x-card>
             </div>
         </div>

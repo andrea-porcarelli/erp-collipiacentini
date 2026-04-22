@@ -120,6 +120,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
+        Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
+        Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
         Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
         Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');

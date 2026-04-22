@@ -300,6 +300,58 @@ const initUsers = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Logo partner
+// ---------------------------------------------------------------------------
+const initLogo = () => {
+    $(document).on('click', '.btn-logo-upload', () => {
+        $('#partner-logo-input').val('').trigger('click');
+    });
+
+    $(document).on('change', '#partner-logo-input', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const $btn = $('.btn-logo-upload');
+        setLoading($btn, true);
+
+        const fd = new FormData();
+        fd.append('image', file);
+
+        $.ajax({
+            url: `/partners/${window.PARTNER_ID}/logo`,
+            method: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+        }).then((media) => {
+            $('#partner-logo-preview').html(
+                `<img src="${media.url}" alt="Logo" style="max-height:80px;width:auto;object-fit:contain">`
+            );
+            $('.btn-logo-delete').show();
+            toastr.success('Logo aggiornato con successo');
+        }).catch((err) => {
+            toastr.error(err?.responseJSON?.message || 'Errore durante il caricamento');
+        }).always(() => setLoading($btn, false));
+    });
+
+    $(document).on('click', '.btn-logo-delete', function () {
+        const $btn = $(this);
+        App.sweetConfirm('Vuoi rimuovere il logo del partner?', () => {
+            setLoading($btn, true);
+            App.ajax({ path: `/partners/${window.PARTNER_ID}/logo`, method: 'delete' })
+                .then(() => {
+                    $('#partner-logo-preview').html('<span class="text-secondary small">Nessun logo</span>');
+                    $btn.hide();
+                    toastr.success('Logo rimosso');
+                })
+                .catch(() => toastr.error('Errore durante la rimozione'))
+                .finally(() => setLoading($btn, false));
+        }, null, 'Rimuovi logo');
+    });
+};
+
+// ---------------------------------------------------------------------------
 // Elimina partner
 // ---------------------------------------------------------------------------
 const initDeletePartner = () => {
@@ -341,6 +393,7 @@ const init = () => {
     });
 
     initUsers();
+    initLogo();
     initDeletePartner();
 };
 

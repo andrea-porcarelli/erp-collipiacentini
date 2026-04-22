@@ -7,12 +7,15 @@ use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StorePartnerRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\PartnerInterface;
+use App\Models\Media;
+use App\Models\Partner;
 use App\Models\PartnerBilling;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -38,11 +41,52 @@ class PartnerController extends CrudController
     public function show(int $id): View
     {
         $model = $this->interface->find($id);
-        $model->loadMissing('billing');
+        $model->loadMissing('billing', 'logo');
         $hasOrders = $model->orders()->exists();
 
         return view('backoffice.' . $this->path . '.show', compact('model', 'hasOrders'))
             ->with('path', $this->path);
+    }
+
+    public function uploadLogo(Request $request, Partner $partner): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
+        ]);
+
+        if ($existing = $partner->logo()->first()) {
+            Storage::disk('public')->delete($existing->file_path);
+            $existing->delete();
+        }
+
+        $file = $request->file('image');
+        $path = $file->store("partners/{$partner->id}", 'public');
+
+        $media = Media::create([
+            'mediable_type' => Partner::class,
+            'mediable_id'   => $partner->id,
+            'media_type'    => 'logo',
+            'file_name'     => $file->getClientOriginalName(),
+            'file_path'     => $path,
+            'file_type'     => $file->getMimeType(),
+            'file_size'     => $file->getSize(),
+        ]);
+
+        return response()->json([
+            'id'        => $media->id,
+            'file_name' => $media->file_name,
+            'url'       => asset('storage/' . $media->file_path),
+        ]);
+    }
+
+    public function deleteLogo(Partner $partner): JsonResponse
+    {
+        if ($logo = $partner->logo()->first()) {
+            Storage::disk('public')->delete($logo->file_path);
+            $logo->delete();
+        }
+
+        return response()->json(['ok' => true]);
     }
 
     public function store(StorePartnerRequest $request): JsonResponse

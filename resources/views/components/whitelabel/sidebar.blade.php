@@ -2,6 +2,15 @@
     'partner' => null,
     'date' => true
 ])
+@if($partner && $partner->logo)
+    <div class="partner-logo mb-spacing-lg text-center">
+        <a href="/shop">
+            <img src="{{ asset('storage/' . $partner->logo->file_path) }}"
+                 alt="{{ $partner->partner_name }}"
+                 style="max-height:80px;width:auto;object-fit:contain">
+        </a>
+    </div>
+@endif
 @if($date)
     <x-card :title="__('whitelabel.sidebar.know_date_title')" >
         <p>{{ __('whitelabel.sidebar.know_date_subtitle') }}</p>
