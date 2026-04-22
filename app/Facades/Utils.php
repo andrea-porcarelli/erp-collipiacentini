@@ -96,10 +96,12 @@ class Utils
 
     public static function partner_path(): string {
         $partner = Session::get('partner');
+        if($partner && $partner->logo) {
+            return $partner->logo->file_path;
+        }
         if (empty($partner)) {
             return '';
         }
-        return Str::slug($partner->partner_name);
     }
 
     public static function hours() : array {

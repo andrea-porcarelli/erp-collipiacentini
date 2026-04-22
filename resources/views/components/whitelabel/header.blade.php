@@ -22,13 +22,9 @@
                 </div>
             </div>
             <div class="logo">
-                @if($partner && $partner->logo)
-                    <a href="/shop">
-                        <img src="{{ asset('storage/' . $partner->logo->file_path) }}"
-                             alt="{{ $partner->partner_name }}"
-                             style="max-height:80px;width:auto;object-fit:contain">
-                    </a>
-                @endif
+                <a href="/shop">
+                    <img src="{{ asset('whitelabel/companies/' . Utils::partner_path() . '/logo.png') }}" />
+                </a>
             </div>
             <div class="languages">
                 <div class="dropdown">
