@@ -330,7 +330,7 @@
                 $body.data('loaded', 1);
             },
             catch: function () {
-                $list.html('<p class="text-danger small mb-0">Errore nel caricamento delle varianti.</p>');
+                $list.html('<p class="text-secondary small mb-0">Si applicano le varianti prodotto presenti nel tab "Varianti e prezzi".</p>');
             },
         }]);
     }

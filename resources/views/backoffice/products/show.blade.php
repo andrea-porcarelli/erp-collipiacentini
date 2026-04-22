@@ -13,8 +13,7 @@
         </div>
         <div class="d-flex gap-3 align-items-center">
             <div class="d-flex gap-1 product-status align-items-center">
-                <span class="small-icon"></span>
-                {{ $model->status()->label() }}
+                @include('backoffice.components.label', ['status' => $item->status()->status(), 'label' => $item->status()->label()])
             </div>
             <div>
                 <a href="{{ $model->public_url }}" target="_blank" rel="noopener">
