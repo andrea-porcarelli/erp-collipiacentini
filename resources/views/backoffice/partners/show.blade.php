@@ -16,16 +16,13 @@
         <div class="row">
             <div class="col-12">
                 <x-card title="Stato partner" class="position-relative">
-                    <form id="form-partner-status">
-                        <div class="row mt-3">
-                            <div class="col-12 col-sm-2">
+                    <div class="row mt-3">
+                        <div class="col-12 col-md-4">
+                            <form id="form-partner-status">
                                 <x-select name="is_active" label="Stato partner" placeholder="Stato partner" required :options="[['id' => 1, 'label' => 'Abilitato'],['id' => 0, 'label' => 'Non Abilitato']]" icon="fa-regular fa-lock-open" :model="$model" />
-                            </div>
+                            </form>
                         </div>
-                    </form>
-
-                    <div class="row mt-4">
-                        <div class="col-12">
+                        <div class="col-12 col-md-8 mt-3 mt-md-0">
                             <label class="form-label small text-secondary mb-2">Logo partner</label>
                             <div class="d-flex align-items-center gap-3" id="partner-logo-wrapper">
                                 <div id="partner-logo-preview" class="d-flex align-items-center justify-content-center border rounded bg-light" style="min-width:160px;height:88px;padding:4px;overflow:hidden">
