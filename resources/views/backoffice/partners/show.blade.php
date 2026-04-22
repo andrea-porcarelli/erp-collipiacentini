@@ -25,7 +25,7 @@
                         <div class="col-12 col-md-8 mt-3 mt-md-0">
                             <div class="text-field" data-mode="textfieldSize-Medium">
                                 <label>Logo partner</label>
-                                <div>
+                                <div class="mt-spacing-s mb-spacing-s">
                                     <div id="partner-logo-preview" class="d-flex align-items-center justify-content-center border rounded bg-light" style="min-width:160px;height:88px;padding:4px;overflow:hidden">
                                         @if($model->logo)
                                             <img src="{{ asset('storage/' . $model->logo->file_path) }}" alt="Logo {{ $model->partner_name }}" style="max-height:80px;width:auto;object-fit:contain">
@@ -33,10 +33,10 @@
                                             <span class="text-secondary small">Nessun logo</span>
                                         @endif
                                     </div>
-                                    <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex mt-spacing-m gap-2">
                                         <input type="file" id="partner-logo-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="d-none">
                                         <x-button class="btn-logo-upload" label="Carica logo" leading="fa-upload" emphasis="Medium" size="Small" />
-                                        <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="outlined" status="danger" size="Small" :style="$model->logo ? '' : 'display:none'" />
+                                        <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="Low" status="Error" size="Small" :style="$model->logo ? '' : 'display:none'" />
                                     </div>
                                     <p class="text-secondary small mt-2 mb-0">Formato consigliato orizzontale. Altezza massima di visualizzazione: 80px. Max 2MB.</p>
                                 </div>
