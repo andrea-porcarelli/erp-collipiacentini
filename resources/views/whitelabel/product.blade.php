@@ -203,11 +203,11 @@
         max-width: 14.28% !important;
     }
 
-    /* Stile per date non disponibili */
-    .flatpickr-calendar .flatpickr-day.flatpickr-disabled,
-    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:hover,
-    .flatpickr-calendar .flatpickr-day.prevMonthDay,
-    .flatpickr-calendar .flatpickr-day.nextMonthDay {
+    /* Stile per date non disponibili (escluso il giorno corrente) */
+    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today),
+    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today):hover,
+    .flatpickr-calendar .flatpickr-day.prevMonthDay:not(.today),
+    .flatpickr-calendar .flatpickr-day.nextMonthDay:not(.today) {
         color: var(--text-disabled, #999) !important;
         text-align: center !important;
         font-family: var(--font-font-2, "DM Sans"), sans-serif !important;
@@ -218,21 +218,11 @@
         cursor: not-allowed !important;
     }
 
-    /* Stile per il giorno corrente */
-    .flatpickr-calendar .flatpickr-day.today {
-        position: relative !important;
-    }
-
-    .flatpickr-calendar .flatpickr-day.today::after {
-        content: '' !important;
-        position: absolute !important;
-        bottom: 4px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 8px !important;
-        height: 8px !important;
-        background-color: var(--secondary-brand, #2A3493);
-        border-radius: 50% !important;
+    /* Giorno corrente senza disponibilità: mantiene lo stile "today" e aggiunge solo il tratto */
+    .flatpickr-calendar .flatpickr-day.today.flatpickr-disabled,
+    .flatpickr-calendar .flatpickr-day.today.flatpickr-disabled:hover {
+        text-decoration-line: line-through !important;
+        cursor: not-allowed !important;
     }
 
     /* Linea di progresso tra i bottoni */

@@ -409,11 +409,11 @@ body {
 }
 
 .flatpickr-day.today {
-    border-radius: var(--border-radius-0, 0);
-    background: var(--background-global-paper2, #FAFAFA);
-    border: none;
-    color: var(--brand-secondary-brand, #3948D3);
-    text-align: center;
+    border-radius: var(--border-radius-0, 0) !important;
+    background: var(--background-global-paper2, #FAFAFA) !important;
+    border: none !important;
+    color: var(--brand-secondary-brand, #3948D3) !important;
+    text-align: center !important;
 
     /* Title */
     font-family: var(--typography-title-font, "DM Sans");
