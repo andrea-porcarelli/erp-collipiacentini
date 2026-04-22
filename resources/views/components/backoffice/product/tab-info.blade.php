@@ -18,7 +18,7 @@
                             <x-select :model="$model"  name="is_active" label="Stato prodotto" required :options="[['id' => 1, 'label' => 'Pubblicato'],['id' => 0, 'label' => 'Non Pubblicato']]" icon="fa-regular fa-circle-info" message="Questo campo è solo per uso interno e non visibile al pubblico" />
                         </div>
                         <div class="col-12 col-sm-6">
-                            <x-input :value="$model->route" name="slug" label="URL" disabled required message="Non è possibile modificare l'URL" icon="fa-regular fa-circle-info" />
+                            <x-input :value="$model->public_url" name="slug" label="URL" disabled required message="Non è possibile modificare l'URL" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
@@ -69,7 +69,7 @@
                                     <img src="{{ asset('favicon.ico') }}" class="google-preview-favicon" alt="" onerror="this.style.display='none'">
                                     <span class="google-preview-sitename">{{ config('app.name') }}</span>
                                 </div>
-                                <div class="google-preview-url">{{ $model->route }}</div>
+                                <div class="google-preview-url">{{ $model->public_url }}</div>
                                 <div class="google-preview-title" id="preview-meta-title">{{ $model->meta_title ?? $model->label }}</div>
                                 <div class="google-preview-description" id="preview-meta-description">{{ $model->meta_description }}</div>
                             </div>

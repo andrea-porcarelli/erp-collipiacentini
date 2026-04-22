@@ -16,6 +16,11 @@
                 <span class="small-icon"></span>
                 {{ $model->status()->label() }}
             </div>
+            <div>
+                <a href="{{ $model->public_url }}" target="_blank" rel="noopener">
+                    <x-button label="Apri pagina prodotto" emphasis="outlined" size="small" leading="fa-arrow-up-right-from-square" />
+                </a>
+            </div>
             @if($model->partner?->company?->has_woocommerce && $model->partner?->company?->endpoint_woocommerce)
                 <div>
                     <x-button label="Sincronizza WooCommerce" status="warning" emphasis="outlined" size="small" leading="fa-rotate" class="btn-sync-woocommerce" />

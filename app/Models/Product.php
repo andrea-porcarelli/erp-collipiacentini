@@ -214,6 +214,20 @@ class Product extends LogsModel
         }
     }
 
+    public function getPublicUrlAttribute() : string {
+        $domain = $this->partner?->domain_name;
+        if (!$domain) {
+            return $this->route;
+        }
+
+        try {
+            $slugProduct = Str::slug($this->meta_title ?? $this->label ?? 'product');
+            return 'https://' . $domain . '/shop/' . $slugProduct . '/' . $this->product_code . '.html';
+        } catch (\Exception $e) {
+            return $this->route;
+        }
+    }
+
     public function getProductTagsAttribute() : ?string {
         return view('whitelabel.products.product_tags', ['product' => $this])->render();
     }
