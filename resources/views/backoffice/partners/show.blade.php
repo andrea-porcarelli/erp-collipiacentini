@@ -36,7 +36,7 @@
                                     <div class="d-flex mt-spacing-m gap-2">
                                         <input type="file" id="partner-logo-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="d-none">
                                         <x-button class="btn-logo-upload" label="Carica logo" leading="fa-upload" emphasis="Medium" size="Small" />
-                                        <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="Low" status="Error" size="Small" :style="$model->logo ? '' : 'display:none'" />
+                                        <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="MediumLow" status="Error" size="Small" :style="$model->logo ? '' : 'display:none'" />
                                     </div>
                                     <p class="text-secondary small mt-2 mb-0">Formato consigliato orizzontale. Altezza massima di visualizzazione: 80px. Max 2MB.</p>
                                 </div>
