@@ -25,7 +25,7 @@
                         <div class="col-12 col-md-8 mt-3 mt-md-0">
                             <div class="text-field" data-mode="textfieldSize-Medium">
                                 <label>Logo partner</label>
-                                <div class="text-field-container">
+                                <div>
                                     <div id="partner-logo-preview" class="d-flex align-items-center justify-content-center border rounded bg-light" style="min-width:160px;height:88px;padding:4px;overflow:hidden">
                                         @if($model->logo)
                                             <img src="{{ asset('storage/' . $model->logo->file_path) }}" alt="Logo {{ $model->partner_name }}" style="max-height:80px;width:auto;object-fit:contain">
