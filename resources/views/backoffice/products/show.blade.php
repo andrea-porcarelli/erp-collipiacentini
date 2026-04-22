@@ -18,7 +18,7 @@
             </div>
             <div>
                 <a href="{{ $model->public_url }}" target="_blank" rel="noopener">
-                    <x-button label="Apri pagina prodotto" emphasis="outlined" size="Small" leading="fa-arrow-up-right-from-square" />
+                    <x-button label="Apri pagina prodotto" emphasis="Low" size="Small" leading="fa-arrow-up-right-from-square" />
                 </a>
             </div>
             @if($model->partner?->company?->has_woocommerce && $model->partner?->company?->endpoint_woocommerce)
