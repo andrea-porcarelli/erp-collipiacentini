@@ -112,7 +112,7 @@ class ProductSeoService
 
     private function buildListingJsonLd(Partner $partner, Collection $products): array
     {
-        $items = $products->values()->map(function (Product $p, int $i) {
+        $items = $products->values()->map(function (Product $p, int $i) use ($partner) {
             $price = (float) ($p->lowest_price_with_commission ?? 0);
 
             return [
