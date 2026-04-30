@@ -150,9 +150,10 @@ class Product extends LogsModel
     }
 
     public function getLowestPriceAttribute() : string {
-        return ProductVariantPrice::whereHas('variant', fn($q) => $q->where('product_id', $this->id))
-            ->orderBy('price', 'ASC')
-            ->value('price') ?? 0;
+        return $this->variants
+            ->map(fn(ProductVariant $v) => (float) $v->full_price)
+            ->sort()
+            ->first() ?? 0;
     }
 
     public function getLowestPriceWithCommissionAttribute() : float {
