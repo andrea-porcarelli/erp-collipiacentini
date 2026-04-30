@@ -47,13 +47,17 @@ class ProductClosedPeriodController extends Controller
         return response()->json($this->serialize($period));
     }
 
-    public function destroy(Product $product, ProductClosedPeriod $period): JsonResponse
+    public function destroy(Request $request, Product $product, ProductClosedPeriod $period): JsonResponse
     {
-        abort_if($period->product_id !== $product->id, 403);
-        $this->authorizeAccess($product);
+        try {
+            abort_if((int) $period->product_id !== (int) $product->id, 403);
+            $this->authorizeAccess($product);
 
-        $period->delete();
+            $period->delete();
 
-        return response()->json(['ok' => true]);
+            return response()->json(['ok' => true]);
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
     }
 }
