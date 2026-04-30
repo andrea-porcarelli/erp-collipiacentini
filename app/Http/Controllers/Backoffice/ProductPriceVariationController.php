@@ -68,7 +68,7 @@ class ProductPriceVariationController extends Controller
 
     public function update(Request $request, Product $product, ProductPriceVariation $variation): JsonResponse
     {
-        abort_if($variation->product_id !== $product->id, 403);
+        abort_if((int) $variation->product_id !== (int) $product->id, 403);
 
         $data = $request->validate([
             'date_from' => 'required|date',
@@ -91,7 +91,7 @@ class ProductPriceVariationController extends Controller
 
     public function destroy(Product $product, ProductPriceVariation $variation): JsonResponse
     {
-        abort_if($variation->product_id !== $product->id, 403);
+        abort_if((int) $variation->product_id !== (int) $product->id, 403);
         $variation->delete();
 
         return response()->json(['ok' => true]);

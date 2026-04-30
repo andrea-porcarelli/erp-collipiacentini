@@ -74,13 +74,13 @@ class Product extends LogsModel
     public function getSharedAvailabilities()
     {
         $service = app(\App\Services\ProductAvailabilityService::class);
-        $now = now();
+        $ref = now()->startOfMonth();
         $dates = [];
 
         for ($m = 0; $m < 12; $m++) {
-            $ref = $now->copy()->addMonths($m);
             $days = $service->getAvailableDaysForMonth($this, $ref->year, $ref->month);
             $dates = array_merge($dates, $days);
+            $ref->addMonth();
         }
 
         return collect($dates)->map(fn($d) => (object)['date' => $d]);
