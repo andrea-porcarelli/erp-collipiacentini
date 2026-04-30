@@ -205,9 +205,7 @@
 
     /* Stile per date non disponibili (escluso il giorno corrente) */
     .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today),
-    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today):hover,
-    .flatpickr-calendar .flatpickr-day.prevMonthDay:not(.today),
-    .flatpickr-calendar .flatpickr-day.nextMonthDay:not(.today) {
+    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today):hover {
         color: var(--text-disabled, #999) !important;
         text-align: center !important;
         font-family: var(--font-font-2, "DM Sans"), sans-serif !important;

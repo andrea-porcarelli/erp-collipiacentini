@@ -74,25 +74,16 @@ class Product extends LogsModel
     public function getSharedAvailabilities()
     {
         $service = app(\App\Services\ProductAvailabilityService::class);
-        $start = now()->startOfDay();
-        $end   = $start->copy()->addDays(40);
+        $ref = now()->startOfMonth();
         $dates = [];
 
-        $ref = $start->copy()->startOfMonth();
-        while ($ref <= $end) {
+        for ($m = 0; $m < 12; $m++) {
             $days = $service->getAvailableDaysForMonth($this, $ref->year, $ref->month);
             $dates = array_merge($dates, $days);
             $ref->addMonth();
         }
 
-        $startStr = $start->toDateString();
-        $endStr   = $end->toDateString();
-
-        return collect($dates)
-            ->unique()
-            ->filter(fn($d) => $d >= $startStr && $d <= $endStr)
-            ->values()
-            ->map(fn($d) => (object)['date' => $d]);
+        return collect($dates)->map(fn($d) => (object)['date' => $d]);
     }
 
     public function priceVariations(): HasMany
