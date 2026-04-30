@@ -45,4 +45,9 @@ class ProductVariant extends LogsModel
     {
         return $this->prices()->sum('price');
     }
+
+    public function getEffectiveMaxQuantityAttribute(): ?int
+    {
+        return $this->max_quantity ?? $this->product?->occupancy;
+    }
 }
