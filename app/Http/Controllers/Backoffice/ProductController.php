@@ -250,7 +250,7 @@ class ProductController extends CrudController
         $product->features()->sync($ids);
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
         try {
             $product = $this->interface->find($id);
@@ -261,22 +261,29 @@ class ProductController extends CrudController
                 return $this->error(['message' => 'Non è possibile eliminare il prodotto perché sono presenti prenotazioni associate.']);
             }
 
-            // Relazioni morph (nessun FK cascade — eliminazione esplicita)
-            LanguageContent::where('entity_type', Product::class)->where('entity_id', $id)->delete();
-            Media::where('mediable_type', Product::class)->where('mediable_id', $id)->delete();
+            \DB::transaction(function () use ($id, $product) {
+                $linkIds    = ProductLink::where('product_id', $id)->pluck('id');
+                $faqIds     = ProductFaq::where('product_id', $id)->pluck('id');
+                $variantIds = ProductVariant::where('product_id', $id)->pluck('id');
 
-            // Relazioni dirette (eliminazione esplicita come garanzia, indipendentemente dal cascade FK)
-            ProductLink::where('product_id', $id)->delete();
-            ProductFaq::where('product_id', $id)->delete();
-            ProductRelated::where('product_id', $id)->orWhere('related_product_id', $id)->delete();
-            ProductCustomerField::where('product_id', $id)->delete();
+                LanguageContent::where('entity_type', Product::class)->where('entity_id', $id)->delete();
+                LanguageContent::where('entity_type', ProductLink::class)->whereIn('entity_id', $linkIds)->delete();
+                LanguageContent::where('entity_type', ProductFaq::class)->whereIn('entity_id', $faqIds)->delete();
+                LanguageContent::where('entity_type', ProductVariant::class)->whereIn('entity_id', $variantIds)->delete();
 
-            // Elimina il prodotto (cascade FK gestisce eventuali altre tabelle collegate)
-            $this->interface->remove($id);
+                Media::where('mediable_type', Product::class)->where('mediable_id', $id)->delete();
+
+                ProductLink::where('product_id', $id)->delete();
+                ProductFaq::where('product_id', $id)->delete();
+                ProductRelated::where('product_id', $id)->orWhere('related_product_id', $id)->delete();
+                ProductCustomerField::where('product_id', $id)->delete();
+
+                $product->delete();
+            });
 
             return $this->success(['redirect' => route($this->path . '.index')]);
         } catch (\Exception $e) {
-            return $this->exception($e);
+            return $this->exception($e, $request);
         }
     }
 

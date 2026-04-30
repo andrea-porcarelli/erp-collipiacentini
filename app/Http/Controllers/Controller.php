@@ -23,8 +23,11 @@ abstract class Controller
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, Translatable;
 
     public function exception(Exception $e, $request = null) : JsonResponse|View {
-        Log::info($request->expectsJson() . ' : ' . ((Auth::check() ? '[User ID: ' . Auth::id() . '] ' : '[Session ID: ' . Session::getId() . '] ') . ': ' . $e->getMessage()) . ' in ' . $e->getFile() . ' at line ' . $e->getLine());
-        if (!is_null($request) && $request->expectsJson()) {
+        $expectsJson = !is_null($request) ? $request->expectsJson() : request()?->expectsJson() ?? false;
+        $who = Auth::check() ? '[User ID: ' . Auth::id() . ']' : '[Session ID: ' . Session::getId() . ']';
+        Log::error($who . ' ' . $e->getMessage() . ' in ' . $e->getFile() . ' at line ' . $e->getLine() . PHP_EOL . $e->getTraceAsString());
+
+        if ($expectsJson) {
             return response()->json([
                 'message' => $e->getMessage() . ' in ' . $e->getFile() . ' at line ' . $e->getLine(),
                 'errors' => isset($e->validator) ? $e->validator->getMessageBag() : '',

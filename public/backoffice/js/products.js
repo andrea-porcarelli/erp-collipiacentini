@@ -534,44 +534,56 @@ const initFaqs = () => {
         updateSaveFaqsButton();
     });
 
-    // Salva tutte le righe modificate
-    $(document).on('click', '.btn-save-faq', function () {
+    // Salva tutte le righe modificate (sequenziale per evitare race condition sul session lock)
+    $(document).on('click', '.btn-save-faq', async function () {
         const $btn = $(this);
         const $dirtyItems = $('#faqs-list .faq-item[data-dirty]');
         if ($dirtyItems.length === 0) return;
 
         const langId = parseInt($('#faq-language-select').val());
+        if (!langId) {
+            toastr.error('Seleziona una lingua prima di salvare');
+            return;
+        }
 
         setLoading($btn, true);
-        let pending = $dirtyItems.length;
-        let hasError = false;
+        const errors = [];
 
-        $dirtyItems.each(function () {
-            const $item = $(this);
+        for (const item of $dirtyItems.toArray()) {
+            const $item = $(item);
             const id = $item.data('id');
-            const question = $item.find('input[name="question"]').val();
-            const answer   = faqEditors.get(String(id))?.getData() ?? '';
+            const question = ($item.find('input[name="question"]').val() ?? '').trim();
+            const editor = faqEditors.get(String(id));
+            const answerRaw = editor ? editor.getData() : ($item.find('textarea[name="answer"]').val() ?? '');
+            const answer = (answerRaw ?? '').trim();
 
-            App.ajax({
-                path: `/products/${window.PRODUCT_ID}/faqs/${id}`,
-                method: 'put',
-                data: { question, answer, language_id: langId },
-            })
-                .then(() => { $item.removeAttr('data-dirty'); })
-                .catch(() => { hasError = true; })
-                .finally(() => {
-                    pending--;
-                    if (pending === 0) {
-                        setLoading($btn, false);
-                        if (hasError) {
-                            toastr.error('Alcune FAQ non sono state salvate. Riprova.');
-                        } else {
-                            toastr.success('FAQ aggiornate con successo');
-                        }
-                        updateSaveFaqsButton();
-                    }
+            if (!question || !answer) {
+                errors.push(id);
+                continue;
+            }
+
+            try {
+                await App.ajax({
+                    path: `/products/${window.PRODUCT_ID}/faqs/${id}`,
+                    method: 'put',
+                    data: { question, answer, language_id: langId },
                 });
-        });
+                $item.removeAttr('data-dirty');
+            } catch (err) {
+                errors.push(id);
+                console.error('FAQ save failed', id, err?.responseJSON ?? err);
+            }
+        }
+
+        setLoading($btn, false);
+        if (errors.length === 0) {
+            toastr.success('FAQ aggiornate con successo');
+        } else if (errors.length === $dirtyItems.length) {
+            toastr.error('Errore nel salvataggio delle FAQ');
+        } else {
+            toastr.warning(`${errors.length} FAQ non salvate. Riprova.`);
+        }
+        updateSaveFaqsButton();
     });
 
     // Cambio lingua — sempre AJAX, italiano incluso
