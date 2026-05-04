@@ -57,8 +57,12 @@
             onChange: function (dates) {
                 if (dates.length === 2) {
                     const fmt = (d) => d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-                    $('#closed-period-from-val').val(dates[0].toISOString().slice(0, 10));
-                    $('#closed-period-to-val').val(dates[1].toISOString().slice(0, 10));
+                    const toIsoLocal = (d) =>
+                        d.getFullYear() + '-' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(d.getDate()).padStart(2, '0');
+                    $('#closed-period-from-val').val(toIsoLocal(dates[0]));
+                    $('#closed-period-to-val').val(toIsoLocal(dates[1]));
                     $('#closed-period-range-label').text(fmt(dates[0]) + ' – ' + fmt(dates[1]));
                 }
             },
@@ -85,7 +89,7 @@
             then: function (period) {
                 $('#closed-periods-empty').remove();
                 var html =
-                    '<div class="closed-period-item d-flex align-items-center gap-3 py-2 border-bottom" data-id="' + period.id + '">' +
+                    '<div class="closed-period-item d-flex align-items-center gap-3" data-id="' + period.id + '">' +
                         '<i class="fa-regular fa-lock text-secondary"></i>' +
                         '<span class="flex-grow-1">' + period.date_from + ' – ' + period.date_to + '</span>' +
                         '<button type="button" class="bt-miticko btn-closed-period-delete" data-mode="small primary bt-m-text-only">' +
