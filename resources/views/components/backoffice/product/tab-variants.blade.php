@@ -147,7 +147,7 @@
                                 </div>
 
                                 <div class="mt-2">
-                                    <x-button class=" "
+                                    <x-button class="btn-edit-add-price"
                                               emphasis="Low"
                                               status="Primary"
                                               size="Small"

@@ -831,6 +831,8 @@ const initVariants = () => {
         const $prices = $(this).closest('.variant-edit-prices');
         if ($prices.find('.edit-price-row').length > 1) {
             $(this).closest('.edit-price-row').remove();
+        } else {
+            toastr.warning('La variante deve avere almeno una componente IVA. Aggiungine un’altra prima di eliminare questa.');
         }
     });
 
@@ -870,11 +872,19 @@ const initVariants = () => {
                 max_quantity: $panel.find('[name="edit_max_quantity"]').val() || null,
                 prices,
             },
-        }).then(() => {
+        }).then((response) => {
             $item.find('.variant-label-text').text(label);
             const count = prices.length;
             $item.find('.variant-prices-count').text(count + (count === 1 ? ' componente IVA' : ' componenti IVA'));
-            closeVariantEdit($item);
+
+            const savedPrices = response?.data?.prices ?? response?.prices;
+            if (Array.isArray(savedPrices)) {
+                const $rows = $panel.find('.edit-price-row');
+                savedPrices.forEach((p, i) => {
+                    if ($rows.eq(i).length) $rows.eq(i).attr('data-price-id', p.id);
+                });
+            }
+
             toastr.success('Variante aggiornata');
         }).catch(err => {
             toastr.error(err?.responseJSON?.message || 'Errore durante il salvataggio');

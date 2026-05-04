@@ -353,6 +353,7 @@ class ProductController extends CrudController
             $keptIds = collect($data['prices'])->pluck('id')->filter()->values();
             $variant->prices()->whereNotIn('id', $keptIds)->delete();
 
+            $savedPrices = [];
             foreach ($data['prices'] as $row) {
                 if (!empty($row['id'])) {
                     ProductVariantPrice::where('id', $row['id'])->update([
@@ -360,16 +361,18 @@ class ProductController extends CrudController
                         'price'    => $row['price'],
                         'vat_rate' => $row['vat_rate'],
                     ]);
+                    $savedPrices[] = ['id' => (int) $row['id']];
                 } else {
-                    $variant->prices()->create([
+                    $newPrice = $variant->prices()->create([
                         'label'    => $row['label'],
                         'price'    => $row['price'],
                         'vat_rate' => $row['vat_rate'],
                     ]);
+                    $savedPrices[] = ['id' => $newPrice->id];
                 }
             }
 
-            return $this->success();
+            return $this->success(['response' => 'success', 'prices' => $savedPrices]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }
