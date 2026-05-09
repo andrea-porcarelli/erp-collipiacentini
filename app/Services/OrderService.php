@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\OrderProductItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -21,7 +23,7 @@ class OrderService
     public function createOrderFromCart(
         Cart $cart,
         Customer $customer,
-        string $stripePaymentIntentId,
+        ?string $stripePaymentIntentId = null,
         ?string $stripePaymentMethod = null
     ): Order {
         return DB::transaction(function () use ($cart, $customer, $stripePaymentIntentId, $stripePaymentMethod) {
@@ -72,6 +74,8 @@ class OrderService
      */
     public function completeOrder(Order $order, ?string $paymentMethod = null): Order
     {
+        $alreadyPaid = $order->order_status === OrderStatus::PAID;
+
         $effectivePaymentMethod = $paymentMethod ?? $order->stripe_payment_method;
 
         $cardBrand = null;
@@ -95,7 +99,27 @@ class OrderService
             'payment_error'         => null,
         ]);
 
-        return $order->fresh();
+        $order = $order->fresh();
+
+        // Invio email di conferma solo alla prima transizione verso PAID
+        // (evita doppio invio quando webhook + confirm passano entrambi qui).
+        if (!$alreadyPaid) {
+            $this->sendConfirmationEmail($order);
+        }
+
+        return $order;
+    }
+
+    protected function sendConfirmationEmail(Order $order): void
+    {
+        try {
+            $order->loadMissing(['customer', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
+            if ($order->customer?->email) {
+                Mail::to($order->customer->email)->send(new OrderConfirmationMail($order));
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /**

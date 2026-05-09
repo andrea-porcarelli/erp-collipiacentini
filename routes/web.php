@@ -38,6 +38,7 @@ Route::group(['prefix' => '/shop', 'middleware' => 'token'], function() {
     // Payment routes
     Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
     Route::post('/payment/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
+    Route::post('/order/complete-free', [PaymentController::class, 'completeFree'])->name('order.complete-free');
     Route::get('/order/success/{orderNumber}', [PaymentController::class, 'success_payment'])->name('order.success');
 });
 

@@ -134,6 +134,56 @@ class PaymentController extends Controller
     }
 
     /**
+     * Crea direttamente l'ordine quando il carrello è gratuito (total = 0)
+     * — niente Stripe, niente PaymentIntent.
+     */
+    public function completeFree(Request $request): JsonResponse
+    {
+        $cart = Cart::getBySession();
+
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Carrello non trovato',
+            ], 404);
+        }
+
+        if (!$cart->customer_id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Dati cliente mancanti',
+            ], 400);
+        }
+
+        if ((float) $cart->total > 0) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Il carrello non è gratuito, completare il pagamento',
+            ], 400);
+        }
+
+        try {
+            $order = $this->orderService->createOrderFromCart($cart, $cart->customer);
+            $this->orderService->completeOrder($order);
+
+            $cart->delete();
+
+            return response()->json([
+                'success' => true,
+                'order_number' => $order->order_number,
+                'redirect_url' => route('order.success', $order->order_number),
+            ]);
+        } catch (\Exception $e) {
+            report($e);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Errore nella creazione della prenotazione: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Pagina di successo ordine
      */
     public function success_payment(string $orderNumber): View

@@ -9,8 +9,9 @@
                         <h1>Il tuo carrello</h1>
                     </div>
                 </div>
+                @php($isFree = (float) $cart->total <= 0)
                 @if($cart)
-                    <div class="button-progress mt-spacing-2xl">
+                    <div class="button-progress mt-spacing-2xl" data-is-free="{{ $isFree ? '1' : '0' }}">
                         <button id="btn-step-riepilogo" data-mode="buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow" type="button" class="bt-miticko">
                             Riepilogo
                         </button>
@@ -18,10 +19,12 @@
                         <button id="btn-step-dati" data-mode="buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High" type="button" class="bt-miticko bt-m-default" disabled>
                             Dati
                         </button>
-                        <div class="progress-connector" id="connector-pagamento" ></div>
-                        <button id="btn-step-pagamento" data-mode="buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High" type="button" class="bt-miticko bt-m-default" disabled>
-                            Pagamento
-                        </button>
+                        @unless($isFree)
+                            <div class="progress-connector" id="connector-pagamento" ></div>
+                            <button id="btn-step-pagamento" data-mode="buttonAppearance-Disabled buttonSize-Small buttonEmphasis-High" type="button" class="bt-miticko bt-m-default" disabled>
+                                Pagamento
+                            </button>
+                        @endunless
                     </div>
                     <div id="step1-card">
                     <x-card class="cart-card" h1="true" leading="fa-shopping-cart">
@@ -197,8 +200,8 @@
                         <button id="btn-back-step1" type="button" class="bt-miticko border-none text-center" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low">
                             indietro
                         </button>
-                        <button id="btn-to-payment" type="button" class="bt-miticko btn-confirm" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-High">
-                            Conferma dati
+                        <button id="btn-to-payment" type="button" class="bt-miticko btn-confirm" data-mode="buttonAppearance-Primary buttonSize-Large buttonEmphasis-High" data-is-free="{{ $isFree ? '1' : '0' }}">
+                            {{ $isFree ? 'Completa prenotazione' : 'Conferma dati' }}
                         </button>
                     </div>
 
@@ -1123,19 +1126,46 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        goToStep3();
-                    } else {
+                    if (!data.success) {
                         alert(data.error || 'Errore durante il salvataggio dei dati');
+                        btn.disabled = false;
+                        btn.innerHTML = btn.dataset.isFree === '1' ? 'Completa prenotazione' : 'Conferma dati';
+                        return;
                     }
+
+                    // Carrello gratuito: crea direttamente l'ordine senza Stripe
+                    if (btn.dataset.isFree === '1') {
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creazione prenotazione...';
+                        return fetch('/shop/order/complete-free', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res.success && res.redirect_url) {
+                                window.location.href = res.redirect_url;
+                            } else {
+                                alert(res.error || 'Errore durante la creazione della prenotazione');
+                                btn.disabled = false;
+                                btn.innerHTML = 'Completa prenotazione';
+                            }
+                        });
+                    }
+
+                    // Flusso normale (a pagamento): vai allo step 3
+                    goToStep3();
                     btn.disabled = false;
-                    btn.innerHTML = 'Procedi al pagamento';
+                    btn.innerHTML = 'Conferma dati';
                 })
                 .catch(error => {
                     console.error('Errore:', error);
                     alert('Errore durante il salvataggio dei dati');
                     btn.disabled = false;
-                    btn.innerHTML = 'Procedi al pagamento';
+                    btn.innerHTML = btn.dataset.isFree === '1' ? 'Completa prenotazione' : 'Conferma dati';
                 });
             });
         }
