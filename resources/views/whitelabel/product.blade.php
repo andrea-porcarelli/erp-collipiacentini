@@ -515,7 +515,7 @@
                 if (btnVisitors) {
                     btnVisitors.setAttribute('data-mode', 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled');
                     btnVisitors.setAttribute('disabled', 'disabled');
-                    btnTime.innerHTML = '<i class="fa-regular fa-user icon"></i>Visitatori';
+                    btnVisitors.innerHTML = '<i class="fa-regular fa-user icon"></i>Visitatori';
                 }
 
                 // Reset delle variabili
