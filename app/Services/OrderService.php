@@ -72,10 +72,26 @@ class OrderService
      */
     public function completeOrder(Order $order, ?string $paymentMethod = null): Order
     {
+        $effectivePaymentMethod = $paymentMethod ?? $order->stripe_payment_method;
+
+        $cardBrand = null;
+        $cardLast4 = null;
+        if ($effectivePaymentMethod) {
+            try {
+                $pm = app(StripePaymentService::class)->retrievePaymentMethod($effectivePaymentMethod);
+                $cardBrand = $pm->card->brand ?? null;
+                $cardLast4 = $pm->card->last4 ?? null;
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $order->update([
             'order_status'          => OrderStatus::PAID,
             'paid_at'               => now(),
-            'stripe_payment_method' => $paymentMethod ?? $order->stripe_payment_method,
+            'stripe_payment_method' => $effectivePaymentMethod,
+            'card_brand'            => $cardBrand ?? $order->card_brand,
+            'card_last4'            => $cardLast4 ?? $order->card_last4,
             'payment_error'         => null,
         ]);
 

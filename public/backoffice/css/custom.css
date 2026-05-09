@@ -195,34 +195,14 @@ a.text-small {
     font-size: var(--typography-body-size-small);
     font-style: normal;
     font-weight: var(--typography-body-weight-small);
-    line-height: var(--typography-body-lineheight-small);
+    line-height: var(--line-height);
+    color: var(--supporting-text-default);
 }
-.supporting-text.success {
-    color: var(--success-brand);
-}
-.supporting-text.warning {
-    color: var(--warning-brand);
-}
-.supporting-text.danger {
-    color: var(--error-brand);
-}
+
 .supporting-text-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.supporting-text.danger:before {
-    font-family: "Font Awesome 6 Free"; /* Font Awesome */
-    font-weight: 400;                   /* regular */
-    content: "\f057";                   /* fa-circle-xmark */
-    color: var(--error-brand);
-}
-.supporting-text.success:before {
-    font-family: "Font Awesome 6 Free"; /* Font Awesome */
-    font-weight: 600;                   /* regular */
-    content: "\f00c";                   /* fa-check */
-    color: var(--success-brand);
 }
 
 .sidebar {
@@ -1127,3 +1107,240 @@ span.flatpickr-weekday{
     background: var(--background-global-paper1, #FFF);
     box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
 }
+
+/* =========================================================================
+   /orders/{id} — Show page (desktop + mobile responsive)
+   ========================================================================= */
+
+.order-show-meta {
+    color: var(--text-secondary, #666);
+    font-size: var(--typography-body-size-small, 13px);
+    margin-top: 4px;
+}
+
+/* --- Stat strip --- */
+.order-stat-strip .card-miticko {
+    padding: var(--spacing-l, 16px) var(--spacing-xl, 20px);
+    height: 100%;
+}
+.order-stat-strip .card-body {
+    padding: 0;
+}
+.order-stat-strip .stat-label {
+    color: var(--text-secondary, #666);
+    font-family: var(--typography-label-font, "DM Sans");
+    font-size: var(--size, 12px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 11px); /* 91.667% */
+}
+.order-stat-strip .stat-value {
+    color: var(--text-main, #0D0D0D);
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 28px);
+    font-style: normal;
+    font-weight: var(--weight, 600);
+    line-height: var(--line-height, 34px); /* 121.429% */
+    padding-bottom: var(--spacing-s);
+    padding-top: var(--spacing-s);
+}
+.order-stat-strip .stat-sub {
+    color: var(--text-secondary, #666);
+    /* Body */
+    font-family: var(--typography-body-font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 300);
+    line-height: var(--line-height, 16px); /* 114.286% */
+}
+.order-stat-strip .text-field {
+    margin: 0;
+}
+
+/* --- Detail card body --- */
+.order-divider {
+    background: var(--border-light, #E6E6E6);
+    border: 0;
+    height: 1px;
+    margin: var(--spacing-xl, 20px) 0;
+    opacity: 1;
+}
+.order-detail-grid .detail-label,
+.notes-block .detail-label,
+.customer-block .detail-label {
+    color: var(--text-secondary, #666);
+    font-family: var(--typography-label-font, "DM Sans");
+    font-size: var(--size, 12px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 11px); /* 91.667% */
+}
+.order-detail-grid .detail-value,
+.customer-block .detail-value {
+    color: var(--text-main, #0D0D0D);
+    /* Title */
+    font-family: var(--typography-title-Font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
+}
+
+.notes-block .detail-label {
+    color: var(--text-main, #0D0D0D);
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
+}
+.notes-block .detail-value {
+    color: var(--text-secondary, #666);
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 18px); /* 128.571% */
+    margin-top: var(--spacing-m);
+    margin-bottom:  var(--spacing-xl);
+}
+.order-detail-grid .detail-value {
+    font-weight: 700;
+}
+.notes-block .notes-content {
+    font-weight: 400;
+    color: var(--text-secondary, #666);
+    white-space: pre-wrap;
+}
+.order-detail-grid .detail-value,
+.customer-block .detail-value {
+    margin-top: var(--spacing-m);
+    margin-bottom: var(--spacing-xl);
+}
+.customer-block .detail-value i {
+    margin-right: 6px;
+    color: var(--text-main, #0D0D0D);
+}
+.detail-link {
+    color: var(--color, #3948D3);
+    font-family: var(--typography-body-font, "DM Sans");
+    font-size: var(--size, 16px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
+}
+.detail-link {
+    color: var(--color, #3948D3) !important;
+    font-family: var(--typography-body-font, "DM Sans") !important;
+    font-size: var(--size, 16px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
+}
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Tickets table --- */
+.order-detail-tickets-wrap .tickets-title {
+    color: var(--text-main, #0D0D0D);
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
+}
+table.order-detail-tickets {
+    width: 100%;
+    border-collapse: collapse;
+}
+table.order-detail-tickets thead th {
+    color: var(--heading-text-color, #666);
+    font-family: var(--heading-font-type, "DM Sans");
+    font-size: var(--heading-font-size, 14px);
+    font-style: normal;
+    font-weight: var(--heading-font-weight, 700);
+    line-height: var(--heading-font-line-height, 18px); /* 128.571% */
+    border-radius: var(--heading-border-radius, 8px) var(--heading-border-radius, 8px) 0 0;
+    background: var(--heading-background-color, #FAFAFA);
+    padding: var(--spacing-l,16px) var(--spacing-m,12px);
+    border-bottom: 1px solid var(--border-light, #E6E6E6);
+}
+table.order-detail-tickets tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-light, #E6E6E6);
+    font-size: 14px;
+    color: var(--text-main, #0D0D0D);
+}
+table.order-detail-tickets tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Totals block --- */
+.order-detail-totals {
+    padding: var(--spacing-l, 16px) 0 0;
+    border-top: 1px solid var(--border-light, #E6E6E6);
+    gap: 14px;
+    display: flex;
+    flex-direction: column;
+}
+.order-detail-totals .totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+.order-detail-totals .totals-section-label {
+    color: var(--text-secondary, #666);
+    font-family: var(--typography-label-Font, "DM Sans");
+    font-size: var(--size, 12px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 11px); /* 91.667% */
+}
+.order-detail-totals .totals-sub {
+    color: var(--text-secondary, #666);
+    font-size: 13px;
+}
+.order-detail-totals .totals-final {
+    border-top: 1px solid var(--border-color, #E6E6E6);;
+    color: var(--text-main, #0D0D0D);
+    font-family: var(--typography-title-font, "DM Sans");
+    font-size: var(--size, 18px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px); /* 133.333% */
+    padding-top: 14px;
+}
+
+/* --- Footer actions card column --- */
+.order-show-footer-actions .bt-miticko {
+    flex: 1;
+}
+.order-show-footer-actions .bt-miticko[id="btn-refund"] {
+    color: var(--brand-error-brand, #C62828);
+    border-color: var(--brand-error-brand, #C62828);
+}
+
+/* --- Responsive (mobile) --- */
+@media (max-width: 767.98px) {
+    .order-show-header {
+        align-items: flex-start;
+    }
+    .order-stat-strip .stat-value {
+        font-size: 18px;
+    }
+    .order-detail-totals .totals-row {
+        font-size: 13px;
+    }
+    .order-show-footer-actions {
+        flex-direction: column;
+    }
+    .order-show-footer-actions > * {
+        width: 100%;
+    }
+    .order-show-footer-actions .bt-miticko {
+        width: 100%;
+    }
+}
+

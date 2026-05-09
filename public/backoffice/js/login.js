@@ -3,18 +3,21 @@ import App from "./app.js";
 const login = () => {
     const serialized = App.serialize('.form-login');
     App.ajax({path: `/login`, method: 'post', data: serialized.data}).then(response => {
-        $('.form-login').find("input:last")
+        const supporting_text = $('.form-login')
+            .find("input:last")
             .parent()
             .parent()
-            .find(".supporting-text")
-            .removeClass('danger')
-            .addClass("success")
+            .find(".supporting-text");
+        const container = supporting_text.parent();
+        container.attr('data-mode', 'SupptextAppearance-Success');
+        supporting_text
             .show()
             .html('Login effettuato con successo');
         setTimeout(() => {
             location.href = response.url
         }, 1000)
     }).catch(errors => {
+        console.error(errors);
         App.renderErrors(errors, $('.form-login'))
     })
 }

@@ -17,7 +17,7 @@
                                     </div>
                                     <div class="d-flex flex-column gap-spacing-l mt-spacing-2xl">
                                         <x-input leading="fa-envelope" leading_style="regular" name="email" placeholder="Email" />
-                                        <x-input leading="fa-lock"  name="password" type="password" placeholder="Password" />
+                                        <x-input leading="fa-lock"  name="password" type="password" placeholder="Password" message="" />
                                     </div>
                                     <div class="col-12 mt-spacing-2xl">
                                         <x-button label="Accedi" class="w-100 btn-login" emphasis="High"/>

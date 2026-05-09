@@ -6,11 +6,15 @@ RUN apt-get update && apt-get install -y \
     libsasl2-modules \
     libssl-dev \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype-dev \
     zip
 
 
-RUN docker-php-ext-install pdo pdo_mysql zip exif
-RUN docker-php-ext-enable exif
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql zip exif gd
+RUN docker-php-ext-enable exif gd
 
 RUN curl -sS https://getcomposer.org/installer | php -- \
         --install-dir=/usr/local/bin --filename=composer

@@ -1,14 +1,15 @@
 @props([
     'icon' => null,
-    'alert' => 'default',
+    'appearance' => 'Default',
     'message' => '',
     'id' => null,
     'extra_class' => null,
 ])
-
-<div class="supporting-text {{ $alert }} {{ $extra_class }}" @if($id) id="{{ $id }}" @endif>
-    @isset($icon)
-        <i class="{{ $icon }}"></i>
-    @endisset
-    {{ $message }}
+<div data-mode="SupptextAppearance-{{ $appearance }}">
+    <div class="supporting-text {{ $extra_class }}" @if($id) id="{{ $id }}" @endif>
+        @isset($icon)
+            <i class="{{ $icon }}"></i>
+        @endisset
+        {{ $message }}
+    </div>
 </div>

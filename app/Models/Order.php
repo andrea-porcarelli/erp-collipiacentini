@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Enums\CustomerStatus;
 use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,8 +14,13 @@ class Order extends LogsModel
         'order_number',
         'amount',
         'order_status',
+        'customer_status',
+        'customer_note',
+        'internal_note',
         'stripe_payment_intent_id',
         'stripe_payment_method',
+        'card_brand',
+        'card_last4',
         'paid_at',
         'payment_error',
     ];
@@ -22,6 +28,7 @@ class Order extends LogsModel
 
     protected $casts = [
         'order_status' => OrderStatus::class,
+        'customer_status' => CustomerStatus::class,
         'paid_at' => 'datetime',
         'amount' => 'decimal:2',
     ];

@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\Customer;
 use Stripe\PaymentIntent;
+use Stripe\PaymentMethod;
+use Stripe\Refund;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
@@ -70,5 +72,26 @@ class StripePaymentService
     {
         $paymentIntent = $this->retrievePaymentIntent($paymentIntentId);
         return $paymentIntent->status === 'succeeded';
+    }
+
+    /**
+     * Recupera un PaymentMethod (per leggere brand/last4 della carta)
+     */
+    public function retrievePaymentMethod(string $paymentMethodId): PaymentMethod
+    {
+        return PaymentMethod::retrieve($paymentMethodId);
+    }
+
+    /**
+     * Crea un rimborso (totale o parziale) su un PaymentIntent
+     */
+    public function refund(string $paymentIntentId, ?int $amount = null): Refund
+    {
+        $params = ['payment_intent' => $paymentIntentId];
+        if ($amount !== null) {
+            $params['amount'] = $amount;
+        }
+
+        return Refund::create($params);
     }
 }

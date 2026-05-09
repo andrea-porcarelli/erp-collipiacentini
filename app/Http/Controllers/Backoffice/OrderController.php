@@ -4,14 +4,23 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Enums\OrderStatus;
 use App\Facades\Utils;
+use App\Http\Controllers\Backoffice\Requests\Orders\UpdateBookingRequest;
+use App\Http\Controllers\Backoffice\Requests\Orders\UpdateCustomerRequest;
+use App\Http\Controllers\Backoffice\Requests\Orders\UpdateCustomerStatusRequest;
+use App\Http\Controllers\Backoffice\Requests\Orders\UpdateNotesRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
+use App\Services\StripePaymentService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -108,10 +117,137 @@ class OrderController extends Controller
     {
         $this->authorizeOrderAccess($order);
 
-        $order->load(['customer', 'partner', 'orderProducts.product', 'orderProducts.items.variant']);
+        $order->load([
+            'customer.country',
+            'partner',
+            'orderProducts.product.category',
+            'orderProducts.items.variant',
+        ]);
 
-        return view('backoffice.' . $this->path . '.show', ['model' => $order])
-            ->with('path', $this->path);
+        // Lazy backfill di card_brand/card_last4 per ordini precedenti.
+        if (!$order->card_brand && $order->stripe_payment_method) {
+            try {
+                $pm = app(StripePaymentService::class)->retrievePaymentMethod($order->stripe_payment_method);
+                $order->update([
+                    'card_brand' => $pm->card->brand ?? null,
+                    'card_last4' => $pm->card->last4 ?? null,
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $commissionPaymentRate = (float) ($order->partner?->commission_payment ?? 0);
+        $commissionServiceRate = (float) ($order->partner?->commission_miticko_variable ?? 0);
+        $amount = (float) $order->amount;
+        $commissionPaymentAmount = round($amount * $commissionPaymentRate / 100, 2);
+        $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
+
+        return view('backoffice.' . $this->path . '.show', [
+            'model' => $order,
+            'commissionPaymentRate'   => $commissionPaymentRate,
+            'commissionServiceRate'   => $commissionServiceRate,
+            'commissionPaymentAmount' => $commissionPaymentAmount,
+            'commissionServiceAmount' => $commissionServiceAmount,
+        ])->with('path', $this->path);
+    }
+
+    public function updateCustomerStatus(UpdateCustomerStatusRequest $request, Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $order->update($request->validated());
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function updateNotes(UpdateNotesRequest $request, Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $order->update($request->validated());
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function updateCustomer(UpdateCustomerRequest $request, Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $order->customer->update($request->validated());
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function updateBooking(UpdateBookingRequest $request, Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $orderProduct = $order->orderProducts()->first();
+            if (!$orderProduct) {
+                return $this->error(['response' => 'Nessun prodotto associato all\'ordine']);
+            }
+            $orderProduct->update($request->validated());
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function sendEmail(Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $order->load(['customer', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
+
+            if (!$order->customer?->email) {
+                return $this->error(['response' => 'Il cliente non ha un\'email valida']);
+            }
+
+            Mail::to($order->customer->email)->send(new OrderConfirmationMail($order));
+
+            return $this->success(['response' => 'Email inviata correttamente']);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function downloadReceipt(Order $order): Response
+    {
+        $this->authorizeOrderAccess($order);
+        $order->load(['customer.country', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
+
+        $pdf = Pdf::loadView('backoffice.orders._receipt', ['order' => $order]);
+
+        return $pdf->download("ricevuta-{$order->order_number}.pdf");
+    }
+
+    public function refund(Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+
+            if (!$order->stripe_payment_intent_id) {
+                return $this->error(['response' => 'PaymentIntent Stripe non disponibile per questo ordine']);
+            }
+            if ($order->order_status === OrderStatus::REFUNDED) {
+                return $this->error(['response' => 'Ordine già rimborsato']);
+            }
+
+            app(StripePaymentService::class)->refund($order->stripe_payment_intent_id);
+
+            $order->update(['order_status' => OrderStatus::REFUNDED]);
+
+            return $this->success(['response' => 'Rimborso eseguito correttamente']);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
     }
 
     private function authorizeOrderAccess(Order $order): void
