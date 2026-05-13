@@ -58,7 +58,7 @@
                                         </div>
                                         <div class="meta-item">
                                             <i class="fa-regular fa-flag-swallowtail"></i>
-                                            <span>{{ $cart->product->type }}</span>
+                                            <span>{{ $cart->product->category->label }}</span>
                                         </div>
                                     </div>
                                 </div>
