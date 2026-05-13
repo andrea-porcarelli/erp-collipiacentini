@@ -23,9 +23,16 @@ class UpdateProductRequest extends FormRequest
                 'is_active' => ['nullable', Rule::in(['0', '1'])],
             ],
             'duration' => [
-                'duration_days'    => ['nullable', 'integer', 'min:0'],
-                'duration_hours'   => ['nullable', 'integer', 'min:0', 'max:23'],
-                'duration_minutes' => ['nullable', 'integer', 'min:0', 'max:59'],
+                'duration_days'          => ['nullable', 'integer', 'min:0'],
+                'duration_hours'         => ['nullable', 'integer', 'min:0', 'max:23'],
+                'duration_minutes'       => ['nullable', 'integer', 'min:0', 'max:59'],
+                'booking_deadline_hours' => ['nullable', 'integer', 'min:0', 'max:65535'],
+            ],
+            'occupancy' => [
+                'occupancy'               => ['required', 'integer', 'min:1'],
+                'occupancy_for_price'     => ['nullable'],
+                'free_occupancy_rule'     => ['nullable'],
+                'max_tickets_per_session' => ['nullable', 'integer', 'min:1', 'max:65535'],
             ],
             'categories' => [
                 'category_id' => ['nullable', 'exists:categories,id'],

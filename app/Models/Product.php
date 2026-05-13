@@ -32,6 +32,8 @@ class Product extends LogsModel
         'occupancy',
         'occupancy_for_price',
         'free_occupancy_rule',
+        'max_tickets_per_session',
+        'booking_deadline_hours',
     ];
 
     protected $casts = [];

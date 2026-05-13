@@ -191,11 +191,14 @@ class ProductController extends CrudController
 
         $duration = ($days * 1440) + ($hours * 60) + $minutes;
 
+        $bookingDeadline = $request->input('booking_deadline_hours');
+
         $this->interface->edit($product, [
-            'duration'         => $duration,
-            'duration_days'    => $days,
-            'duration_hours'   => $hours,
-            'duration_minutes' => $minutes,
+            'duration'               => $duration,
+            'duration_days'          => $days,
+            'duration_hours'         => $hours,
+            'duration_minutes'       => $minutes,
+            'booking_deadline_hours' => $bookingDeadline === null || $bookingDeadline === '' ? null : (int) $bookingDeadline,
         ]);
     }
 
@@ -237,10 +240,13 @@ class ProductController extends CrudController
 
     private function updateOccupancy(Product $product, UpdateProductRequest $request): void
     {
+        $maxTickets = $request->input('max_tickets_per_session');
+
         $this->interface->edit($product, [
-            'occupancy'            => (int) $request->input('occupancy'),
-            'occupancy_for_price'  => $request->boolean('occupancy_for_price'),
-            'free_occupancy_rule'  => $request->boolean('free_occupancy_rule'),
+            'occupancy'                => (int) $request->input('occupancy'),
+            'occupancy_for_price'      => $request->boolean('occupancy_for_price'),
+            'free_occupancy_rule'      => $request->boolean('free_occupancy_rule'),
+            'max_tickets_per_session'  => $maxTickets === null || $maxTickets === '' ? null : (int) $maxTickets,
         ]);
     }
 

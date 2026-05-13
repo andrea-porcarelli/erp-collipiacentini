@@ -9,6 +9,9 @@
                         <div class="col-12">
                             <x-input :model="$model" name="occupancy" label="Capienza massima per fascia oraria" required message="Ogni biglietto venduto influirà sulla capienza indicata, indipendentemente dalla variante" trailing="fa-users"/>
                         </div>
+                        <div class="col-12 mt-3">
+                            <x-input :model="$model" name="max_tickets_per_session" type="number" min="1" label="Numero massimo di biglietti per acquisto" message="Numero massimo di biglietti che un singolo utente può acquistare in un'unica prenotazione. Lascia vuoto per nessun limite." trailing="fa-ticket"/>
+                        </div>
                     </div>
                     <div class="row mt-3 switch-container">
                         <div class="col-12">

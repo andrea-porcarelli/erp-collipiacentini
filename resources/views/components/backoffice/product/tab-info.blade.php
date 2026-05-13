@@ -42,6 +42,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                            <x-input :model="$model" name="booking_deadline_hours" label="Prenotabile fino a (ore prima)" type="number" min="0" message="Ore prima dell'inizio dello slot entro cui è possibile prenotare. Es: 1 = prenotazioni chiuse 1 ora prima. Lascia vuoto per nessun limite." icon="fa-regular fa-circle-info"/>
+                        </div>
                     </div>
                 </form>
                 <div class="button-card-absolute">
