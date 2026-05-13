@@ -16,8 +16,11 @@
                         <table class="table-miticko datatable">
                             <thead>
                             <tr>
-                                <th style="width: 10%">#codice</th>
-                                <th>Partner</th>
+                                <th style="width: 8%">#codice</th>
+                                <th style="width: 18%">Partner</th>
+                                <th style="width: 16%">Dominio</th>
+                                <th style="width: 24%">Contatti</th>
+                                <th style="width: 26%">Commissioni</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -52,6 +55,9 @@
                     columns: [
                         {data: 'partner_code', type: 'string'},
                         {data: 'partner_name'},
+                        {data: 'domain'},
+                        {data: 'contacts'},
+                        {data: 'commissions'},
                         {data: 'action', class: 'text-end'},
                     ],
                     path: '{{ route($path . '.data') }}',

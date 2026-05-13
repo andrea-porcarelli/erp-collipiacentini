@@ -170,15 +170,69 @@ class PartnerController extends CrudController
         try {
             $filters = $request->get('filters') ?? [];
 
-            $elements = $this->interface->filters($filters);
+            $elements = $this->interface->filters($filters)
+                ->with('billing')
+                ->orderByDesc('id');
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('partner_code', function ($item) {
                     return (string) $item->partner_code;
                 })
-                ->rawColumns(['status'])
+                ->addColumn('domain', function ($item) {
+                    return e($item->domain_name ?: '—');
+                })
+                ->addColumn('contacts', function ($item) {
+                    $lines = [];
+                    if ($item->email_notify) {
+                        $lines[] = '<i class="fa-regular fa-envelope text-secondary me-1"></i>' . e($item->email_notify);
+                    }
+                    if ($item->billing?->pec_email) {
+                        $lines[] = '<i class="fa-regular fa-shield-check text-secondary me-1"></i>' . e($item->billing->pec_email) . ' <span class="text-secondary small">(PEC)</span>';
+                    }
+                    $addressParts = array_filter([
+                        $item->billing?->street_address,
+                        trim(($item->billing?->postal_code ?? '') . ' ' . ($item->billing?->city ?? '')),
+                        $item->billing?->province,
+                    ]);
+                    if (!empty($addressParts)) {
+                        $lines[] = '<i class="fa-regular fa-location-dot text-secondary me-1"></i>' . e(implode(', ', $addressParts));
+                    }
+                    return empty($lines) ? '—' : implode('<br>', $lines);
+                })
+                ->addColumn('commissions', function ($item) {
+                    $rows = [];
+                    $threshold = $item->commission_presale_threshold;
+                    if (!is_null($item->commission_presale_low) || !is_null($item->commission_presale_high) || !is_null($threshold)) {
+                        $rows[] = 'Presale: '
+                            . '<span title="sotto soglia">'  . self::fmtEuro($item->commission_presale_low)  . '</span>'
+                            . ' / '
+                            . '<span title="sopra soglia">' . self::fmtEuro($item->commission_presale_high) . '</span>'
+                            . ' <span class="text-secondary small">soglia ' . self::fmtEuro($threshold) . '</span>';
+                    }
+                    if (!is_null($item->commission_miticko_fixed) || !is_null($item->commission_miticko_variable)) {
+                        $rows[] = 'Miticko: '
+                            . self::fmtEuro($item->commission_miticko_fixed) . ' fissa + '
+                            . self::fmtPercent($item->commission_miticko_variable) . ' var.';
+                    }
+                    if (!is_null($item->commission_payment)) {
+                        $rows[] = 'Pagamento: ' . self::fmtPercent($item->commission_payment);
+                    }
+                    return empty($rows) ? '<span class="text-secondary">—</span>' : implode('<br>', $rows);
+                })
+                ->rawColumns(['status', 'contacts', 'commissions'])
                 ->toJson();
         } catch (\Exception $e) {
             return $this->exception($e);
         }
+    }
+
+    private static function fmtEuro($value): string
+    {
+        return is_null($value) ? '—' : number_format((float) $value, 2, ',', '.') . ' €';
+    }
+
+    private static function fmtPercent($value): string
+    {
+        return is_null($value) ? '—' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',') . ' %';
     }
 }
