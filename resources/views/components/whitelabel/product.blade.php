@@ -22,7 +22,7 @@
                 <h3 class="mt-2">{{ $product->label }}</h3>
                 <div class=" d-none d-sm-block">
                     <div class="details">
-                        <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->type" />
+                        <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->category->label" />
                         <x-supporting-text icon="fa-regular fa-clock-three" :message="$product->duration . ' min'" />
                     </div>
                 </div>

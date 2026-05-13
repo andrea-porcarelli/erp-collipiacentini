@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductAvailability;
@@ -36,9 +37,15 @@ class BookingController extends Controller
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->get();
 
+        $categories = Category::whereHas('products', fn($q) => $q
+                ->where('partner_id', $partner->id)
+                ->where('is_active', 1))
+            ->orderBy('label')
+            ->get();
+
         $seo = $this->seoService->forListing($partner, $products);
 
-        return view('whitelabel.index', compact('products', 'partner', 'seo'));
+        return view('whitelabel.index', compact('products', 'partner', 'seo', 'categories'));
     }
 
     public function filterProducts(Request $request): JsonResponse
@@ -50,7 +57,7 @@ class BookingController extends Controller
         $products = Product::where('is_active', 1)
             ->where('partner_id', $partner->id)
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
-            ->when($filter !== 'all', fn($q) => $q->where('product_type', $filter))
+            ->when($filter !== 'all', fn($q) => $q->where('category_id', $filter))
             ->get()
             ->when($date !== null, function ($collection) use ($date) {
                 return $collection->filter(function (Product $product) use ($date) {

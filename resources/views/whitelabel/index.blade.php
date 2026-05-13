@@ -17,7 +17,7 @@
                 <x-whitelabel.sidebar :partner="$partner" />
             </aside>
             <div class="col-12 col-sm-9">
-                <x-whitelabel.filters />
+                <x-whitelabel.filters :categories="$categories" />
                 <div class="d-flex mt-3">
                     <div class="col-12 products-list">
                         @if($products->count() === 0)
@@ -63,15 +63,10 @@
                 const filterDateInput = document.querySelector('input[name="filter_date"]');
                 const date = filterDateInput && filterDateInput.value ? filterDateInput.value : null;
 
-                let url = `/shop/filter-products`;
-
-                if (filter) {
-                    url += `&filter=${filter}`;
-                }
-
-                if (date) {
-                    url += `&date=${date}`;
-                }
+                const params = new URLSearchParams();
+                if (filter) params.set('filter', filter);
+                if (date) params.set('date', date);
+                const url = `/shop/filter-products${params.toString() ? '?' + params.toString() : ''}`;
 
                 fetch(url, {
                     method: 'GET',
