@@ -1344,3 +1344,100 @@ table.order-detail-tickets tbody tr:last-child td {
     }
 }
 
+/* --- Mobile topbar + sidebar off-canvas --- */
+.mobile-topbar {
+    display: none;
+}
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 56px;
+        padding: 0 12px;
+        background: var(--neutral-black, #000);
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1040;
+    }
+    .mobile-topbar .mobile-topbar-toggle {
+        background: transparent;
+        border: 0;
+        color: #fff;
+        font-size: 22px;
+        line-height: 1;
+        padding: 6px 10px;
+        cursor: pointer;
+    }
+    .mobile-topbar .mobile-topbar-logo {
+        height: 28px;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform .2s ease-in-out;
+        width: 240px;
+    }
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+    body.sidebar-open .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .45);
+        z-index: 99;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 16px;
+    }
+
+    /* I bottoni "Aggiungi" in alto-destra escono dal viewport su mobile */
+    .position-absolute[style*="top: -70px"],
+    .position-absolute[style*="top:-70px"] {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        margin-bottom: 12px;
+    }
+
+    /* Header pagina: titolo + azioni in colonna */
+    .d-flex.justify-content-between {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .d-flex.justify-content-between > .d-flex {
+        flex-wrap: wrap;
+    }
+
+    /* DataTables: paginazione e info su righe separate */
+    .dt-layout-row,
+    div.dt-container .dt-layout-row {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+    div.dt-container .dt-info {
+        font-size: 12px;
+    }
+
+    /* Modali a tutta larghezza su mobile */
+    .modal-dialog {
+        margin: 8px;
+        max-width: calc(100vw - 16px) !important;
+    }
+
+    /* Impersonate bar wrappable */
+    .impersonate-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
