@@ -179,7 +179,15 @@ class PartnerController extends CrudController
                     return (string) $item->partner_code;
                 })
                 ->addColumn('domain', function ($item) {
-                    return e($item->domain_name ?: '—');
+                    if (!$item->domain_name) {
+                        return '—';
+                    }
+                    $url = preg_match('#^https?://#i', $item->domain_name)
+                        ? $item->domain_name
+                        : 'https://' . $item->domain_name;
+                    return '<a href="' . e($url) . '" target="_blank" rel="noopener noreferrer">'
+                        . e($item->domain_name)
+                        . ' <i class="fa-regular fa-arrow-up-right-from-square ms-1 small"></i></a>';
                 })
                 ->addColumn('contacts', function ($item) {
                     $lines = [];
@@ -219,7 +227,7 @@ class PartnerController extends CrudController
                     }
                     return empty($rows) ? '<span class="text-secondary">—</span>' : implode('<br>', $rows);
                 })
-                ->rawColumns(['status', 'contacts', 'commissions'])
+                ->rawColumns(['status', 'domain', 'contacts', 'commissions'])
                 ->toJson();
         } catch (\Exception $e) {
             return $this->exception($e);
