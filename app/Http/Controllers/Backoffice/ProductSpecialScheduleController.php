@@ -10,7 +10,6 @@ use App\Models\ProductVariantPrice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class ProductSpecialScheduleController extends Controller
 {
@@ -20,7 +19,7 @@ class ProductSpecialScheduleController extends Controller
         if (in_array($user->role, ['god', 'admin'])) {
             return;
         }
-        if ($user->role === 'partner' && $product->partner_id !== $user->partner_id) {
+        if ($user->role === 'partner' && (int) $product->partner_id !== (int) $user->partner_id) {
             abort(403);
         }
     }
@@ -88,29 +87,11 @@ class ProductSpecialScheduleController extends Controller
      */
     public function destroy(Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
-        Log::info('special-schedule destroy: enter', [
-            'product_id' => $product->id,
-            'slot_id'    => $slot->id,
-            'slot_product_id' => $slot->product_id,
-            'user_id'    => Auth::id(),
-            'user_role'  => Auth::user()?->role,
-        ]);
-
-        abort_if($slot->product_id !== $product->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
-        try {
-            $slot->delete();
-        } catch (\Throwable $e) {
-            Log::error('special-schedule destroy: delete failed', [
-                'slot_id' => $slot->id,
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        $slot->delete();
 
-        Log::info('special-schedule destroy: ok', ['slot_id' => $slot->id]);
         return response()->json(['ok' => true]);
     }
 
@@ -119,7 +100,7 @@ class ProductSpecialScheduleController extends Controller
      */
     public function updateAvailability(Request $request, Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
         $data = $request->validate([
@@ -139,7 +120,7 @@ class ProductSpecialScheduleController extends Controller
      */
     public function getVariants(Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
         $variants = ProductVariant::where('special_schedule_id', $slot->id)
@@ -157,7 +138,7 @@ class ProductSpecialScheduleController extends Controller
      */
     public function storeVariant(Request $request, Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
         $data = $request->validate([
@@ -197,8 +178,8 @@ class ProductSpecialScheduleController extends Controller
      */
     public function updateVariant(Request $request, Product $product, ProductSpecialSchedule $slot, ProductVariant $variant): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
-        abort_if($variant->special_schedule_id !== $slot->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
+        abort_if((int) $variant->special_schedule_id !== $slot->id, 403);
         $this->authorizeAccess($product);
 
         $data = $request->validate([
@@ -245,7 +226,7 @@ class ProductSpecialScheduleController extends Controller
      */
     public function reorderVariants(Request $request, Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
         $request->validate(['ordered_ids' => 'required|array']);
@@ -264,8 +245,8 @@ class ProductSpecialScheduleController extends Controller
      */
     public function destroyVariant(Product $product, ProductSpecialSchedule $slot, ProductVariant $variant): JsonResponse
     {
-        abort_if($slot->product_id !== $product->id, 403);
-        abort_if($variant->special_schedule_id !== $slot->id, 403);
+        abort_if((int) $slot->product_id !== $product->id, 403);
+        abort_if((int) $variant->special_schedule_id !== $slot->id, 403);
         $this->authorizeAccess($product);
 
         $variant->prices()->delete();
