@@ -528,6 +528,7 @@ div.dt-container .dt-paging .dt-paging-button:active {
     position:relative;
     width: 100%;
     padding: 0;
+    height: 40px;
 }
 .modal-miticko .modal-header .close {
     position: absolute;
