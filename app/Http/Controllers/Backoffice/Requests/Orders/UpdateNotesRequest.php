@@ -15,7 +15,6 @@ class UpdateNotesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_note' => ['nullable', 'string', 'max:5000'],
             'internal_note' => ['nullable', 'string', 'max:5000'],
         ];
     }
