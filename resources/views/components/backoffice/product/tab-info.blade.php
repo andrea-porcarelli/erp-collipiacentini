@@ -30,9 +30,17 @@
                 <form id="form-info-duration">
                     <div class="row">
                         <div class="col-12 col-sm-4" style="display: flex; gap: 10px">
-                            <x-input :model="$model" name="duration_days" label="Giorni" type="number" required message="inserisci il valore in giorni" icon="fa-regular fa-circle-info"/>
-                            <x-input :model="$model" name="duration_hours" label="Ore" type="number" max="23" required message="inserisci il valore in ore" icon="fa-regular fa-circle-info"/>
-                            <x-input :model="$model" name="duration_minutes" label="Minuti" type="number" max="59" required message="inserisci il valore in minuti" icon="fa-regular fa-circle-info"/>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_days" label="Giorni" type="number" required message="inserisci il valore in giorni" icon="fa-regular fa-circle-info"/>
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_hours" label="Ore" type="number" max="23" required message="inserisci il valore in ore" icon="fa-regular fa-circle-info"/>
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_minutes" label="Minuti" type="number" max="59" required message="inserisci il valore in minuti" icon="fa-regular fa-circle-info"/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
