@@ -25,6 +25,7 @@ return [
     // Products
     'products' => [
         'no_availability' => 'No availability found',
+        'free'            => 'FREE',
     ],
 
     // Filters

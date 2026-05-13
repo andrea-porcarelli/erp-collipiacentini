@@ -164,6 +164,13 @@ class Product extends LogsModel
         return $base + ($this->partner?->resolvePresaleCommission($base) ?? 0);
     }
 
+    public function getIsFreeAttribute() : bool {
+        $variants = $this->variants
+            ->whereNull('availability_id')
+            ->whereNull('special_schedule_id');
+        return $variants->isNotEmpty() && $variants->every(fn($v) => (float) $v->full_price <= 0);
+    }
+
     public function getIsAvailableAttribute() : bool {
         if (!$this->is_active) {
             return false;
