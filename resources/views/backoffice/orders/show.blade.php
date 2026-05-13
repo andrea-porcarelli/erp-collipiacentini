@@ -75,18 +75,6 @@
                 <div class="stat-value">{{ number_format($order->amount, 2, ',', '.') }} €</div>
             </x-card>
         </div>
-        <div class="col-12 col-md-6 col-xl">
-            <x-card>
-                <div class="stat-label">STATO CLIENTE</div>
-                <x-select
-                    name="customer_status"
-                    :value="$order->customer_status?->value ?? 'booked'"
-                    :options="collect(\App\Enums\CustomerStatus::statuses())->map(fn($l, $v) => ['id' => $v, 'label' => $l])->values()->all()"
-                    trailing="fa-chevron-down"
-                    trailing_style="solid"
-                />
-            </x-card>
-        </div>
     </div>
 
     {{-- BODY GRID --}}
