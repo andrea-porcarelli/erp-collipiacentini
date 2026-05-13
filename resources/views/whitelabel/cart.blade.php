@@ -36,8 +36,9 @@
 
                             <div class="cart-item-details">
                                 <div class="cart-product-image">
-                                    @if($cart->product->cover->first())
-                                        <img src="{{ asset('storage/' . $cart->product->cover->first()->file_path) }}" alt="{{ $cart->product->meta_title }}">
+                                    @php($cartProductImage = $cart->product->cover->first() ?? $cart->product->gallery->first())
+                                    @if($cartProductImage)
+                                        <img src="{{ asset('storage/' . $cartProductImage->file_path) }}" alt="{{ $cart->product->meta_title }}">
                                     @else
                                         <div class="no-image">
                                             <i class="fa-regular fa-image"></i>
@@ -79,10 +80,10 @@
 
                             <div class="cart-item-actions">
                                 <a href="{{ $cart->product->route }}" class="bt-miticko border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low">
-                                    <i class="fa-regular fa-pen icon"></i> Modifica
+                                    <i class="fa-regular fa-pen"></i> Modifica
                                 </a>
                                 <button type="button" class="bt-miticko btn-remove-cart border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low" id="btn-remove-cart">
-                                    <i class="fa-regular fa-trash-can icon"></i> Rimuovi
+                                    <i class="fa-regular fa-trash-can"></i> Rimuovi
                                 </button>
                             </div>
 
