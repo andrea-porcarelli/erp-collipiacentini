@@ -530,10 +530,24 @@ div.dt-container .dt-paging .dt-paging-button:active {
     padding: 0;
 }
 .modal-miticko .modal-header .close {
-    position:absolute;
+    position: absolute;
+    top: 0;
     right: 0;
-    border:none;
+    border: none;
     background: none;
+    padding: 8px 12px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-main, #000);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-miticko .modal-header .close:hover {
+    opacity: .7;
 }
 .modal-miticko .modal-header .modal-title {
     color: var(--text-main);

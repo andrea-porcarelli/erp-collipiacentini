@@ -22,7 +22,7 @@
             </div>
             <div class="modal-footer">
                 @isset($secondary)
-                    <x-button :label="$secondary" class="btn-cancel" type="default" emphasis="Low"/>
+                    <x-button :label="$secondary" class="btn-cancel" type="default" emphasis="Low" :dataset="['bs-dismiss' => 'modal']"/>
                 @endisset
                 @isset($primary)
                     <x-button :label="$primary" class="btn-success" emphasis="High" />
