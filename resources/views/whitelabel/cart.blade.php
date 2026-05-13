@@ -349,9 +349,12 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        font-family: var(--font-font-2, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-small, 14px);
-        color: var(--text-secondary, #666);
+        color: var(--foreground-text, #0D0D0D);
+        font-family: var(--typography-body-font, "DM Sans"), sans-serif;
+        font-size: var(--size, 14px);
+        font-style: normal;
+        font-weight: var(--weight, 300);
+        line-height: var(--line-height, 16px); /* 114.286% */
     }
 
     @media (max-width: 576px) {
