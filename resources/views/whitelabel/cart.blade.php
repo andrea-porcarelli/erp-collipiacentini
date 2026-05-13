@@ -354,10 +354,6 @@
         color: var(--text-secondary, #666);
     }
 
-    .meta-item i {
-        color: var(--secondary-brand, #2A3493);
-    }
-
     @media (max-width: 576px) {
         .cart-item-details {
             flex-direction: column;
