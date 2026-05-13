@@ -80,7 +80,7 @@
 
                             <div class="cart-item-actions">
                                 <a href="{{ $cart->product->route }}" class="bt-miticko border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low">
-                                    <i class="fa-regular fa-pen"></i> Modifica
+                                    <i class="fa-regular fa-pen-to-square"></i> Modifica
                                 </a>
                                 <button type="button" class="bt-miticko btn-remove-cart border-none" data-mode="buttonAppearance-Primary buttonSize-Medium buttonEmphasis-Low" id="btn-remove-cart">
                                     <i class="fa-regular fa-trash-can"></i> Rimuovi
