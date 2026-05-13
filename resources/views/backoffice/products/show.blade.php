@@ -29,7 +29,7 @@
     </div>
     <div class="w-100 mt-spacing-2xl">
         {{-- Tabs Navigation --}}
-        <div class="d-flex gap-2" id="productTabs" role="tablist">
+        <div class="d-flex gap-2 product-tabs-scroll" id="productTabs" role="tablist">
             <x-chip
                 label="Informazioni"
                 :dataset="['tab-target' => '#info-panel']"

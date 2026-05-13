@@ -1344,6 +1344,25 @@ table.order-detail-tickets tbody tr:last-child td {
     }
 }
 
+/* Tab della scheda prodotto: scroll orizzontale (mobile e desktop quando overflow) */
+.product-tabs-scroll {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+}
+.product-tabs-scroll > * {
+    flex: 0 0 auto;
+}
+.product-tabs-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+.product-tabs-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, .2);
+    border-radius: 4px;
+}
+
 /* --- Mobile topbar + sidebar off-canvas --- */
 .mobile-topbar {
     display: none;
