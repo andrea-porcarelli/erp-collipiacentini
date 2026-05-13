@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -73,7 +74,7 @@ class BookingController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function product(Request $request, string $slugProduct, string $productCode): View
+    public function product(Request $request, string $slugProduct, string $productCode): View|RedirectResponse
     {
         // productCode format (see Product::getProductCodeAttribute):
         // {category_code}-{partner_code}{5-digit-zero-padded-id}
@@ -105,6 +106,10 @@ class BookingController extends Controller
         if (!$product) {
             Log::info(__METHOD__ . ': Product not found', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
             abort(404);
+        }
+
+        if (!$product->is_active) {
+            return redirect('/shop', 301);
         }
 
         $partner = $request->partner;

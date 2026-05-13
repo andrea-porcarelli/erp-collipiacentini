@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between">
         <div class="d-flex gap-3 align-items-center">
             <div>
-                <x-button  class="btn-success" emphasis="outlined"  leading="fa-arrow-left" />
+                <x-button :href="route('products.index')" class="btn-success" emphasis="outlined" leading="fa-arrow-left" />
             </div>
             <div>
                 <x-breadcrumb :first="['Prodotti', 'products.index']" :second="[$model->label]" />

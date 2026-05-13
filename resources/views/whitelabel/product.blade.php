@@ -482,6 +482,17 @@
                     dayContainer.style.minWidth = '';
                     dayContainer.style.maxWidth = '';
                 }
+
+                // Salta al mese della prima data disponibile (>= oggi)
+                if (availableDates.length > 0) {
+                    const todayStr = instance.formatDate(new Date(), "Y-m-d");
+                    const firstAvailable = availableDates
+                        .filter(d => d >= todayStr)
+                        .sort()[0];
+                    if (firstAvailable) {
+                        instance.jumpToDate(firstAvailable);
+                    }
+                }
             }
         });
 
