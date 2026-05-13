@@ -1395,6 +1395,7 @@ table.order-detail-tickets tbody tr:last-child td {
     }
     .mobile-topbar .mobile-topbar-logo {
         height: 28px;
+        margin-left: auto;
     }
 
     .sidebar {
@@ -1457,6 +1458,20 @@ table.order-detail-tickets tbody tr:last-child td {
     .impersonate-bar {
         flex-wrap: wrap;
         gap: 8px;
+    }
+
+    /* "Salva modifiche" in alto a destra delle card del prodotto: size Small */
+    .button-card-absolute [data-mode*="buttonSize-Medium"] {
+        --button-corner-radius: var(--button-small-corner-radius);
+        --button-font-line-height: var(--button-small-font-line-height);
+        --button-font-size: var(--button-small-font-size);
+        --button-font-weight: var(--button-small-font-weight);
+        --button-icon: var(--button-small-icon);
+        --button-paddingbottom: var(--button-small-paddingbottom);
+        --button-paddingleft: var(--button-small-paddingleft);
+        --button-paddingright: var(--button-small-paddingright);
+        --button-paddingtop: var(--button-small-paddingtop);
+        --button-spacing: var(--button-small-spacing);
     }
 }
 

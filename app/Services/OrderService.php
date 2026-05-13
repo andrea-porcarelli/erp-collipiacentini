@@ -56,12 +56,26 @@ class OrderService
                 'total'                      => $cart->total,
             ]);
 
+            // Snapshot delle commissioni del partner sull'item: serve a congelare
+            // le condizioni economiche al momento della prenotazione anche se in
+            // futuro le commissioni del partner verranno modificate.
+            $partner = $cart->partner;
+            $commissionSnapshot = (float) $cart->total > 0 && $partner ? [
+                'partner_commission_presale_low'        => $partner->commission_presale_low,
+                'partner_commission_presale_high'       => $partner->commission_presale_high,
+                'partner_commission_presale_threshold'  => $partner->commission_presale_threshold,
+                'partner_commission_miticko_fixed'      => $partner->commission_miticko_fixed,
+                'partner_commission_miticko_variable'   => $partner->commission_miticko_variable,
+                'partner_commission_payment'            => $partner->commission_payment,
+            ] : [];
+
             foreach ($cart->items as $item) {
                 OrderProductItem::create([
                     'order_product_id'  => $orderProduct->id,
                     'product_variant_id' => $item->product_variant_id,
                     'quantity'           => $item->quantity,
                     'unit_price'         => $item->unit_price,
+                    ...$commissionSnapshot,
                 ]);
             }
 
