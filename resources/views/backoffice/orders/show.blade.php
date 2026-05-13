@@ -214,6 +214,28 @@
         </div>
 
         <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+            @php($participants = $order->participants()->with('orderProductItem.variant')->orderBy('id')->get())
+            <x-card class="position-relative" title="Partecipanti" :sub_title="$participants->count() . ' biglietti'">
+                @if($participants->isEmpty())
+                    <div class="text-secondary">Nessun partecipante per questo ordine.</div>
+                @else
+                    <div class="participants-list d-flex flex-column gap-2">
+                        @foreach($participants as $i => $participant)
+                            <div class="participant-row d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-secondary small" style="min-width:24px">#{{ $i + 1 }}</span>
+                                    <span><i class="fa-regular fa-ticket me-1 text-secondary"></i>{{ $participant->orderProductItem?->variant?->label ?? '—' }}</span>
+                                </div>
+                                @include('backoffice.components.label', [
+                                    'status' => 'success',
+                                    'label'  => $participant->status_label,
+                                ])
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </x-card>
+
             <x-card class="position-relative" title="Note">
                 <div class="button-card-absolute">
                     <x-button

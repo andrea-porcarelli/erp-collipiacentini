@@ -48,6 +48,11 @@ class Order extends LogsModel
         return $this->hasMany(OrderProduct::class);
     }
 
+    public function participants(): HasMany
+    {
+        return $this->hasMany(OrderParticipant::class);
+    }
+
     public function getProductTimeAttribute() : string
     {
         return isset($this->orderProducts()->first()->booking_time) ? substr($this->orderProducts()->first()->booking_time, 0 , 5) : '';

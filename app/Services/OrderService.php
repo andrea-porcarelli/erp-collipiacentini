@@ -7,6 +7,7 @@ use App\Mail\OrderConfirmationMail;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderParticipant;
 use App\Models\OrderProduct;
 use App\Models\OrderProductItem;
 use Illuminate\Support\Facades\DB;
@@ -70,13 +71,22 @@ class OrderService
             ] : [];
 
             foreach ($cart->items as $item) {
-                OrderProductItem::create([
+                $opi = OrderProductItem::create([
                     'order_product_id'  => $orderProduct->id,
                     'product_variant_id' => $item->product_variant_id,
                     'quantity'           => $item->quantity,
                     'unit_price'         => $item->unit_price,
                     ...$commissionSnapshot,
                 ]);
+
+                // Una riga participant per ogni biglietto, stato di default "Prenotato".
+                for ($i = 0; $i < (int) $item->quantity; $i++) {
+                    OrderParticipant::create([
+                        'order_id'              => $order->id,
+                        'order_product_item_id' => $opi->id,
+                        'status'                => 'booked',
+                    ]);
+                }
             }
 
             return $order;
