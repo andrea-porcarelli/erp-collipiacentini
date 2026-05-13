@@ -37,7 +37,7 @@
                             <div class="cart-item-details">
                                 <div class="cart-product-image">
                                     @php
-                                        $productImage = $product->cover->first() ?? $cart->product->gallery->first();
+                                        $productImage = $cart->product->cover->first() ?? $cart->product->gallery->first();
                                         $productImageUrl = $productImage
                                             ? asset('storage/' . $productImage->file_path)
                                             : asset('whitelabel/images/product.jpg');
