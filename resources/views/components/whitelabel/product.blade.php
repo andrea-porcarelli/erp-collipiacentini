@@ -36,9 +36,8 @@
                     <x-button
                         label="Acquista"
                         emphasis="High"
-                        :status="!$product->is_available ? 'Disabled' : 'Primary'"
+                        status="Primary"
                         trailing="fa-ticket-perforated"
-                        :disabled="!$product->is_available"
                         :href="$product->route"
                     />
                 </div>
@@ -56,7 +55,6 @@
                 <x-button
                     label="Acquista"
                     trailing="fa-ticket-perforated"
-                    :disabled="!$product->is_available"
                     :href="$product->route"
                 />
             </div>
