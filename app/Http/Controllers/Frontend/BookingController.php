@@ -83,8 +83,6 @@ class BookingController extends Controller
         $productId = (int) substr($remainder, -5);
         $partnerCode = substr($remainder, 0, -5);
 
-        Log::info('Product lookup', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
-
         $product = Product::with([
             'partner',
             'partner.media',

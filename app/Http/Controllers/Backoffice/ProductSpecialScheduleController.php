@@ -10,6 +10,7 @@ use App\Models\ProductVariantPrice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ProductSpecialScheduleController extends Controller
 {
@@ -87,11 +88,29 @@ class ProductSpecialScheduleController extends Controller
      */
     public function destroy(Product $product, ProductSpecialSchedule $slot): JsonResponse
     {
+        Log::info('special-schedule destroy: enter', [
+            'product_id' => $product->id,
+            'slot_id'    => $slot->id,
+            'slot_product_id' => $slot->product_id,
+            'user_id'    => Auth::id(),
+            'user_role'  => Auth::user()?->role,
+        ]);
+
         abort_if($slot->product_id !== $product->id, 403);
         $this->authorizeAccess($product);
 
-        $slot->delete();
+        try {
+            $slot->delete();
+        } catch (\Throwable $e) {
+            Log::error('special-schedule destroy: delete failed', [
+                'slot_id' => $slot->id,
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
 
+        Log::info('special-schedule destroy: ok', ['slot_id' => $slot->id]);
         return response()->json(['ok' => true]);
     }
 
