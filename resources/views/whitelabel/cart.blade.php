@@ -36,8 +36,14 @@
 
                             <div class="cart-item-details">
                                 <div class="cart-product-image">
+                                    @php
+                                        $productImage = $product->cover->first() ?? $cart->product->gallery->first();
+                                        $productImageUrl = $productImage
+                                            ? asset('storage/' . $productImage->file_path)
+                                            : asset('whitelabel/images/product.jpg');
+                                    @endphp
                                     @if($cart->product->cover->first())
-                                        <img src="{{ asset('storage/' . $cart->product->cover->first()->file_path) }}" alt="{{ $cart->product->meta_title }}">
+                                        <img src="{{ $productImageUrl }}" alt="{{ $cart->product->meta_title }}">
                                     @else
                                         <div class="no-image">
                                             <i class="fa-regular fa-image"></i>
@@ -57,7 +63,7 @@
                                         </div>
                                         <div class="meta-item">
                                             <i class="fa-regular fa-flag-swallowtail"></i>
-                                            <span>{{ $cart->product->type }}</span>
+                                            <span>{{ $cart->product->category->label }}</span>
                                         </div>
                                     </div>
                                 </div>
