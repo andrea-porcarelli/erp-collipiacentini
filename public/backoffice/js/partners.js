@@ -21,7 +21,8 @@ const formConfigs = {
             if (!data.partner_name || data.partner_name.trim() === '') {
                 errors.partner_name = ['Il nome partner è obbligatorio'];
             }
-            if (!data.partner_code || data.partner_code.trim() === '') {
+            const codeDisabled = $('#form-partner-info [name="partner_code"]').prop('disabled');
+            if (!codeDisabled && (!data.partner_code || data.partner_code.trim() === '')) {
                 errors.partner_code = ['Il codice partner è obbligatorio'];
             }
             return errors;

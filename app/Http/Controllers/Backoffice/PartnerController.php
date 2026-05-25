@@ -153,7 +153,7 @@ class PartnerController extends CrudController
         $hasOrders = $partner->orders()->exists();
         $newCode = $request->input('partner_code');
 
-        if ($hasOrders && $newCode !== $partner->partner_code) {
+        if ($hasOrders && $request->has('partner_code') && $newCode !== $partner->partner_code) {
             throw new \Exception('Il codice partner non può essere modificato: esistono già ordini registrati.');
         }
 
