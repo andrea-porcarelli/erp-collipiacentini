@@ -61,6 +61,7 @@ Route::domain('admin.miticko.com')->group(function () {
     Route::group(['middleware' => ['auth']], function () {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
         // Ticket scanner (FAB)
         Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');

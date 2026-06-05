@@ -272,6 +272,16 @@ a.text-small {
     border-radius: var(--border-radius-s);
     background: var(--neutral-grey-80);
 }
+.sidebar .navigation-bar form.item {
+    margin: 0;
+    padding: 0;
+}
+.sidebar .navigation-bar .item button.nav-item {
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
 .main-content {
     margin-left: 200px;
     min-height: 100vh;
@@ -412,12 +422,12 @@ a.text-small {
 
 .table-miticko thead tr th {
     padding: var(--spacing-l) var(--spacing-m) !important;
-    color: var(--text-secondary);
-    font-family: var(--typography-title-font), sans-serif;
-    font-size: var(--typography-title-size-small);
+    color: var(--heading-text-color, #666);
+    font-family: var(--heading-font-type, "DM Sans");
+    font-size: var(--heading-font-size, 14px);
     font-style: normal;
-    font-weight: var(--typography-title-weight-small) !important;
-    line-height: var(--typography-title-lineheight-small); /* 128.571% */
+    font-weight: var(--heading-font-weight, 700);
+    line-height: var(--heading-font-line-height, 18px); /* 128.571% */
     border-radius: var(--heading-border-radius, 8px) var(--heading-border-radius, 8px) 0 0;
     background: var(--heading-background-color, #FAFAFA);
 }
@@ -425,34 +435,16 @@ a.text-small {
     padding: var(--spacing-l) var(--spacing-m) !important;
 }
 .table-miticko > tbody > tr > td {
-    color: var(--text-main);
-    font-family: var(--font-font-2), sans-serif;
-    font-size: var(--typography-body-size-medium);
+    color: var(--text-main, #0D0D0D);
+
+    font-family: var(--typography-web-title-font, "DM Sans");
+    font-size: var(--size, 14px);
     font-style: normal;
-    font-weight: var(--typography-body-weight-medium);
-    line-height: var(--typography-body-lineheight-medium);
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
 }
 
-/* Dalla prima alla seconda colonna */
-.table-miticko > tbody > tr > td:nth-child(-n+2) {
-    color: var(--text-main);
-    font-family: var(--typography-title-font), sans-serif;
-    font-size: var(--typography-title-size-small);
-    font-style: normal;
-    font-weight: var(--typography-title-weight-small);
-    line-height: var(--typography-title-lineheight-small); /* 128.571% */
-}
-/* Dalla prima alla seconda colonna */
-.table-miticko > tbody > tr > td:nth-child(n+5) {
-    overflow: hidden;
-    color: var(--text-secondary);
-    text-overflow: ellipsis;
-    font-family: var(--font-font-2), sans-serif;
-    font-size: var(--typography-body-size-medium);
-    font-style: normal;
-    font-weight: var(--typography-body-weight-medium);
-    line-height: var(--typography-body-lineheight-medium);
-}
+
 .dt-length {
     display: flex;
     align-items: center;
@@ -466,25 +458,31 @@ a.text-small {
     text-transform: uppercase;
 }
 .dt-length .dt-input {
-    border-radius: var(--border-radius-s) !important;
-    border: 1px solid var(--border-default) !important;
-    color: var(--text-main);
+    display: flex;
+    padding: var(--dropdown-paddingvertical, 16px) var(--dropdown-paddinghorizontal, 16px);
+    align-items: center;
+    gap: var(--dropdown-item-spacing, 8px);
+    align-self: stretch;
+    border-radius: var(--dropdown-cornerradius, 12px);
+    border: var(--dropdown-empty-borderwidth, 1px) solid var(--dropdown-filled-border, #E6E6E6);
+    background: var(--dropdown-filled-background, #FFF);
+    color: var(--text-secondary, #666);
 
-    /* labelLarge */
-    font-family: var(--font-font-2), sans-serif;
-    font-size: var(--typography-label-size-large);
+    /* Body */
+    font-family: var(--typography-web-body-font, "DM Sans");
+    font-size: var(--size, 14px);
     font-style: normal;
-    font-weight: var(--typography-label-weight-large);
-    line-height: var(--typography-label-lineheight-large); /* 91.667% */
-    text-transform: uppercase;
+    font-weight: var(--weight, 300);
+    line-height: var(--line-height, 16px); /* 114.286% */
 }
-.dt-info {
-    color: var(--text-secondary) !important;
-    font-family: var(--font-font-2), sans-serif;
-    font-size: var(--typography-body-size-medium);
+.dt-length  label {
+    color: var(--text-secondary, #666);
+    font-family: var(--typography-web-body-font, "DM Sans");
+    font-size: var(--size, 14px);
     font-style: normal;
-    font-weight: var(--typography-body-weight-medium);
-    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+    font-weight: var(--weight, 300);
+    line-height: var(--line-height, 16px); /* 114.286% */
+    text-transform: lowercase;
 }
 div.dt-container div.dt-layout-row {
     margin: 0.25em 0;

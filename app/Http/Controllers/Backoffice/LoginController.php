@@ -9,6 +9,8 @@ use App\Interfaces\UserInterface;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -45,10 +47,16 @@ class LoginController extends Controller
         }
     }
 
-    public function logout() : JsonResponse {
+    public function logout(Request $request) : JsonResponse|RedirectResponse {
         Session::flush();
         Auth::logout();
-        return response()->json(['response' => 'ok']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if ($request->expectsJson()) {
+            return response()->json(['response' => 'ok']);
+        }
+        return redirect()->route('login');
     }
 
     public function change_password() : View {

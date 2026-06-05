@@ -18,5 +18,12 @@
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
         @endif
+        <form method="POST" action="{{ route('logout') }}" class="item">
+            @csrf
+            <button type="submit" class="nav-item nav-item-logout">
+                <span class="fa fa-arrow-right-from-bracket"></span>
+                Logout
+            </button>
+        </form>
     </div>
 </nav>

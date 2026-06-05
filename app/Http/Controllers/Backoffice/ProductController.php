@@ -63,7 +63,8 @@ class ProductController extends CrudController
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters)
-                ->with(['variants.prices']);
+                ->with(['variants.prices'])
+                ->orderBy('created_at', 'desc');
 
             if (in_array($user->role, ['partner', 'admin'])) {
                 $elements->where('partner_id', $user->partner_id);

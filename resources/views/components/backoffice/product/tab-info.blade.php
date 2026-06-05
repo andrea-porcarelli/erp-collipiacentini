@@ -72,25 +72,25 @@
                                 <div class="flex-grow-1">
                                     <x-input :model="$model" maxlength="70" name="title" label="Titolo pubblico" message="Titolo del prodoto usato dalla scheda del browser" icon="fa-regular fa-circle-info" />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="title" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="medium primary" data-field="title" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
                                     <x-input :model="$model" maxlength="55" name="meta_title" label="Nome prodotto pubblico (meta title)" required />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_title" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="medium primary" data-field="meta_title" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
                                     <x-textarea :model="$model" maxlength="150" name="meta_description" label="Descrizione breve (meta description)" required />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_description" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="medium primary" data-field="meta_description" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
                                     <x-input :model="$model" maxlength="500" name="meta_keywords" label="Keywords" placeholder="es. visite guidate, degustazioni, vino" message="Parole chiave separate da virgola" icon="fa-regular fa-circle-info" />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="medium primary" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6">
