@@ -104,6 +104,34 @@
                 </div>
             </x-card>
 
+            <x-card title="Personalizza informazioni per la visita inviate via Email in formato PDF" class="mt-4 mb-5 position-relative" sub_title="Le informazioni che inserisci qui verranno visualizzate nel PDF di riepilogo per l'accesso all'esperienza che i clienti ricevono via email">
+                <form id="form-info-visit">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex align-items-start gap-2">
+                                <div class="flex-grow-1">
+                                    <x-textarea
+                                        name="visit_info"
+                                        :value="$model->contentField('visit_info') ?? ''"
+                                        maxlength="600"
+                                        rows="4"
+                                        label="Informazioni importanti sulla visita"
+                                        placeholder="Inserisci le informazioni più importanti per l'accesso all'esperienza es. &quot;presentati 15 minuti prima in biglietteria, il parcheggio si trova dietro&quot;"
+                                    />
+                                </div>
+                                <button type="button" data-mode="medium primary" class="bt-miticko btn-visit-info-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 mt-4">
+                            <x-input :model="$model" name="support_email" type="email" label="Email contatto per assistenza clienti" leading="fa-envelope" placeholder="inserisci email..." />
+                        </div>
+                    </div>
+                </form>
+                <div class="button-card-absolute">
+                    <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
+                </div>
+            </x-card>
+
             <x-card title="Link Utili" class="mt-4 mb-5 position-relative" sub_title="Inserisci solamente i link che potrebbero essere utili agli utenti o obbligatori per legge, verranno mostrati nella barra laterale (sidebar) della pagina prodotto.">
                 <x-backoffice.product.links :model="$model" :languages="$languages" />
                 <div class="button-card-absolute">

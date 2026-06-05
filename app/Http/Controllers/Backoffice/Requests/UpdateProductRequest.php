@@ -41,6 +41,10 @@ class UpdateProductRequest extends FormRequest
                 'meta_title'       => ['required', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
             ],
+            'visit' => [
+                'visit_info'    => ['nullable', 'string', 'max:600'],
+                'support_email' => ['nullable', 'email', 'max:255'],
+            ],
             default => [],
         };
     }
@@ -54,6 +58,8 @@ class UpdateProductRequest extends FormRequest
             'duration_minutes.max'    => 'I minuti non possono superare 59',
             'meta_title.required'     => 'Il nome prodotto pubblico è obbligatorio',
             'category_id.exists'      => 'La categoria selezionata non è valida',
+            'visit_info.max'          => 'Le informazioni sulla visita non possono superare 600 caratteri',
+            'support_email.email'     => 'Inserisci un indirizzo email valido',
         ];
     }
 }

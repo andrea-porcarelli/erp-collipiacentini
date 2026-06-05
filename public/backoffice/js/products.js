@@ -77,6 +77,20 @@ const formConfigs = {
         successMessage: 'Descrizione aggiornata con successo',
         validate: () => ({}),
     },
+    'form-info-visit': {
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'visit',
+        successMessage: 'Informazioni per la visita aggiornate con successo',
+        validate: (data) => {
+            const errors = {};
+            const email = (data.support_email || '').trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.support_email = ['Inserisci un indirizzo email valido'];
+            }
+            return errors;
+        },
+    },
     'form-variants-occupancy': {
         endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
@@ -107,6 +121,9 @@ const translationFields = {
     variant: [
         { name: 'label',       label: 'Nome variante',   type: 'input',    placeholder: 'es. Intero' },
         { name: 'description', label: 'Descrizione breve', type: 'input',  placeholder: 'es. Biglietto intero per adulti' },
+    ],
+    'visit-info': [
+        { name: 'visit_info', label: 'Informazioni importanti sulla visita', type: 'textarea', placeholder: 'Inserisci le informazioni più importanti per l\'accesso all\'esperienza' },
     ],
 };
 
@@ -207,11 +224,13 @@ const renderTranslationBody = (data, entityType) => {
         return '<p class="text-secondary small  mb-0">Nessuna lingua disponibile nel sistema.</p>';
     }
 
-
+    const headerCols = fields.map(f => {
+        const style = f.name === 'label' ? 'max-width:35%' : '';
+        return `<div class="col" style="${style}"><span class="small fw-semibold">${escapeHtml(f.label)}</span></div>`;
+    }).join('');
     const headerRow = `<div class="row g-2 align-items-center mb-1">
         <div class="col-auto" style="width:64px"></div>
-        <div class="col"><span class="small fw-semibold">Nome variante *</span></div>
-        <div class="col"><span class="small fw-semibold">Descrizione breve *</span></div>
+        ${headerCols}
     </div>`;
 
     const rowsHtml = data.map(lang => {
@@ -250,9 +269,10 @@ const renderTranslationBody = (data, entityType) => {
 const openTranslationsModal = (entityType, id) => {
     const $modal = $('#modal-translations');
     const paths = {
-        link:    `/products/${window.PRODUCT_ID}/links/${id}/translations`,
-        faq:     `/products/${window.PRODUCT_ID}/faqs/${id}/translations`,
-        variant: `/products/${window.PRODUCT_ID}/variants/${id}/translations`,
+        link:         `/products/${window.PRODUCT_ID}/links/${id}/translations`,
+        faq:          `/products/${window.PRODUCT_ID}/faqs/${id}/translations`,
+        variant:      `/products/${window.PRODUCT_ID}/variants/${id}/translations`,
+        'visit-info': `/products/${window.PRODUCT_ID}/visit-info/translations`,
     };
     const path = paths[entityType];
 
@@ -1221,6 +1241,10 @@ const init = () => {
 
     $(document).on('click', '.btn-save-translations', function () {
         saveTranslations();
+    });
+
+    $(document).on('click', '.btn-visit-info-translations', function () {
+        openTranslationsModal('visit-info', window.PRODUCT_ID);
     });
 
     initCategorySelect();

@@ -165,6 +165,7 @@ class ProductController extends CrudController
                 'occupancy'        => $this->updateOccupancy($product, $request),
                 'long_description' => $this->updateLongDescription($product, $request),
                 'features'         => $this->updateFeatures($product, $request),
+                'visit'            => $this->updateVisit($product, $request),
                 default            => throw new \Exception('Sezione non valida'),
             };
 
@@ -254,6 +255,58 @@ class ProductController extends CrudController
     {
         $ids = array_map('intval', (array) $request->input('features', []));
         $product->features()->sync($ids);
+    }
+
+    private function updateVisit(Product $product, UpdateProductRequest $request): void
+    {
+        $this->interface->edit($product, [
+            'support_email' => $request->input('support_email') ?: null,
+        ]);
+
+        $product->setContentFields([
+            'visit_info' => $request->input('visit_info') ?? '',
+        ]);
+    }
+
+    public function getVisitInfoTranslations(int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+            $languages = Language::where('is_active', 1)->get();
+
+            $data = $languages->map(fn($lang) => [
+                'language_id' => $lang->id,
+                'language'    => $lang->label,
+                'iso_code'    => $lang->iso_code,
+                'visit_info'  => $product->contentField('visit_info', $lang->iso_code) ?? '',
+            ]);
+
+            return $this->success(['data' => $data]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function saveVisitInfoTranslations(Request $request, int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            foreach ($request->input('translations', []) as $translation) {
+                $lang = Language::find($translation['language_id']);
+                if (!$lang) continue;
+
+                $product->setContentFields([
+                    'visit_info' => $translation['visit_info'] ?? '',
+                ], $lang->iso_code);
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
     }
 
     public function destroy(Request $request, int $id): JsonResponse

@@ -19,9 +19,14 @@ class OrderConfirmationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: "Conferma ordine #{$this->order->order_number}",
-        );
+        $partnerName = $this->order->partner?->partner_name;
+        $subject = "Conferma ordine #{$this->order->order_number}";
+
+        if ($partnerName) {
+            $subject = "{$partnerName} - {$subject}";
+        }
+
+        return new Envelope(subject: $subject);
     }
 
     public function content(): Content

@@ -19,6 +19,7 @@ use App\Http\Controllers\Backoffice\ProductPriceVariationController;
 use App\Http\Controllers\Backoffice\ProductRelatedController;
 use App\Http\Controllers\Backoffice\ProductSpecialScheduleController;
 use App\Http\Controllers\Backoffice\StatisticsController;
+use App\Http\Controllers\Backoffice\TicketScannerController;
 use App\Http\Controllers\Backoffice\UserController;
 use App\Http\Controllers\Frontend\BookingController;
 use App\Http\Controllers\Frontend\PaymentController;
@@ -61,6 +62,11 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Ticket scanner (FAB)
+        Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');
+        Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
+        Route::patch('tickets/{participant}/status', [TicketScannerController::class, 'updateStatus'])->name('tickets.updateStatus');
+
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
         Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');
@@ -76,6 +82,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'update'])->name('products.price-variations.update');
         Route::delete('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'destroy'])->name('products.price-variations.destroy');
         Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
+        Route::get('products/{product}/visit-info/translations', [ProductController::class, 'getVisitInfoTranslations'])->name('products.visit-info.translations.get');
+        Route::put('products/{product}/visit-info/translations', [ProductController::class, 'saveVisitInfoTranslations'])->name('products.visit-info.translations.save');
         Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
         Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
         Route::put('products/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('products.variants.update');

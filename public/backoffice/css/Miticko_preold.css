@@ -1,5 +1,5 @@
 /* Figma Variables Export */
-/* Generated on 2026-06-03T09:29:47.306Z */
+/* Generated on 2026-03-31T16:19:15.057Z */
 /* All Modes */
 
 /* Mode: Dark */
@@ -513,14 +513,6 @@
   --label-warning-background: var(--colors-primitives-grey-scale-transparent);
   --label-warning-border-color: var(--colors-brand-warning-dark-mode-brand);
   --label-warning-foreground: var(--colors-brand-warning-dark-mode-brand);
-  --tag-primary-default-default-background: var(--colors-brand-primary-dark-mode-brand);
-  --tag-primary-default-default-foreground: var(--colors-brand-primary-dark-mode-onbrand);
-  --tag-primary-light-default-background: var(--colors-brand-primary-dark-mode-brandlight);
-  --tag-primary-light-default-foreground: var(--colors-brand-primary-dark-mode-onbrandlight);
-  --tag-secondary-default-default-background: var(--colors-brand-secondary-dark-mode-brand);
-  --tag-secondary-default-default-foreground: var(--colors-brand-secondary-dark-mode-onbrand);
-  --tag-secondary-light-default-background: var(--colors-brand-secondary-dark-mode-brandlight);
-  --tag-secondary-light-default-foreground: var(--colors-brand-secondary-dark-mode-onbrandlight);
   --text-editor-active-background: var(--background-global-default);
   --text-editor-active-foreground: var(--text-main);
   --text-editor-disabled-background: var(--colors-primitives-grey-scale-black-95);
@@ -745,30 +737,22 @@
   --corner-radius-xs: var(--corner-radius-xs);
   --corner-radius-rounded: var(--corner-radius-rounded);
   --drag-handle-padding: var(--spacing-xs---desktop);
-  --dropdown-item-font-line-height: var(--typography-web-body-size-medium);
-  --dropdown-item-font-size: var(--typography-web-body-size-medium);
-  --dropdown-item-font-weight: var(--typography-web-body-weight-medium);
+  --dropdown-item-font-line-height: var(--typography-body-size-medium);
+  --dropdown-item-font-size: var(--typography-body-size-medium);
+  --dropdown-item-font-weight: var(--typography-body-weight-medium);
   --dropdown-item-corner-radius: var(--corner-radius-s);
-  --dropdown-item-icon: var(--typography-web-body-size-medium);
-  --dropdown-item-paddingbottom: var(--spacing-m---desktop);
-  --dropdown-item-paddingleft: var(--spacing-m---desktop);
-  --dropdown-item-paddingright: var(--spacing-m---desktop);
-  --dropdown-item-paddingtop: var(--spacing-m---desktop);
+  --dropdown-item-icon: var(--typography-body-size-medium);
+  --dropdown-item-paddingbottom: var(--spacing-s---desktop);
+  --dropdown-item-paddingleft: var(--spacing-s---desktop);
+  --dropdown-item-paddingright: var(--spacing-s---desktop);
+  --dropdown-item-paddingtop: var(--spacing-s---desktop);
   --dropdown-item-spacing: var(--spacing-s---desktop);
   --dropdown-list-corner-radius: var(--corner-radius-m);
   --dropdown-list-padding: var(--spacing-s---desktop);
   --dropdown-list-spacing: var(--spacing-xs---desktop);
-  --dropdownstatus-font-line-height: var(--typography-web-label-line-height-large);
-  --dropdownstatus-font-size: var(--typography-web-label-size-large);
-  --dropdownstatus-font-weight: var(--typography-web-label-weight-large);
-  --dropdownstatus-iconleading: 10px;
-  --dropdownstatus-icontrailing: 12px;
-  --dropdownstatus-paddinghorizontal: var(--spacing-l---desktop);
-  --dropdownstatus-paddingvertical: var(--spacing-m---desktop);
-  --dropdownstatus-spacing: var(--spacing-xs---desktop);
   --filter-borderradius: var(--corner-radius-s);
   --filter-borderwidth: 1px;
-  --filter-icon: var(--typography-web-body-size-small);
+  --filter-icon: var(--typography-body-size-small);
   --filter-paddingbottom: var(--spacing-xs---desktop);
   --filter-paddingleft: var(--spacing-s---desktop);
   --filter-paddingright: var(--spacing-s---desktop);
@@ -784,10 +768,10 @@
   --icon-button-small-icon: var(--icon-button-size-small-icon---desktop);
   --icon-button-small-padding: var(--icon-button-size-small-padding---desktop);
   --label-border-radius: var(--corner-radius-xs);
-  --label-font-line-height: var(--typography-web-label-line-height-small);
-  --label-font-size: var(--typography-web-label-size-small);
-  --label-font-weight: var(--typography-web-label-weight-small);
-  --label-icon-size: var(--typography-web-label-size-small);
+  --label-font-line-height: var(--typography-label-line-height-small);
+  --label-font-size: var(--typography-label-size-small);
+  --label-font-weight: var(--typography-label-weight-small);
+  --label-icon-size: var(--typography-label-size-small);
   --label-min-height: 18px;
   --label-padding-bottom: var(--spacing-xs---desktop);
   --label-padding-left: var(--spacing-xs---desktop);
@@ -813,84 +797,45 @@
   --spacing-s: var(--spacing-s---desktop);
   --spacing-xl: var(--spacing-xl---desktop);
   --spacing-xs: var(--spacing-xs---desktop);
-  --typography-print-body-line-height-large: var(--typography-print-body-large-line-height---desktop);
-  --typography-print-body-line-height-medium: var(--typography-print-body-medium-line-height---desktop);
-  --typography-print-body-line-height-small: var(--typography-print-body-small-line-height---desktop);
-  --typography-print-body-size-large: var(--typography-print-body-large-size---desktop);
-  --typography-print-body-size-medium: var(--typography-print-body-medium-size---desktop);
-  --typography-print-body-size-small: var(--typography-print-body-small-size---desktop);
-  --typography-print-body-weight-large: var(--typography-print-body-large-weight---desktop);
-  --typography-print-body-weight-medium: var(--typography-print-body-medium-weight---desktop);
-  --typography-print-body-weight-small: var(--typography-print-body-small-weight---desktop);
-  --typography-print-button-lineheight-large: var(--typography-print-button-large-line-height---desktop);
-  --typography-print-button-lineheight-medium: var(--typography-print-button-medium-line-height---desktop);
-  --typography-print-button-lineheight-small: var(--typography-print-button-small-line-height---desktop);
-  --typography-print-button-size-large: var(--typography-print-button-large-size---desktop);
-  --typography-print-button-size-medium: var(--typography-print-button-medium-size---desktop);
-  --typography-print-button-size-small: var(--typography-print-button-small-size---desktop);
-  --typography-print-button-weight-large: var(--typography-print-button-large-weight---desktop);
-  --typography-print-button-weight-medium: var(--typography-print-button-medium-weight---desktop);
-  --typography-print-button-weight-small: var(--typography-print-button-small-weight---desktop);
-  --typography-print-heading-line-height-medium: var(--typography-print-heading-medium-line-height---desktop);
-  --typography-print-heading-size-medium: var(--typography-print-heading-medium-size---desktop);
-  --typography-print-heading-weight-medium: var(--typography-print-heading-medium-weight---desktop);
-  --typography-print-title-line-height-large: var(--typography-print-title-large-line-height---desktop);
-  --typography-print-title-line-height-medium: var(--typography-print-title-medium-line-height---desktop);
-  --typography-print-title-line-height-small: var(--typography-print-title-small-line-height---desktop);
-  --typography-print-title-size-large: var(--typography-print-title-large-size---desktop);
-  --typography-print-title-size-medium: var(--typography-print-title-medium-size---desktop);
-  --typography-print-title-size-small: var(--typography-print-title-small-size---desktop);
-  --typography-print-title-weight-large: var(--typography-print-title-large-weight---desktop);
-  --typography-print-title-weight-medium: var(--typography-print-title-medium-weight---desktop);
-  --typography-print-title-weight-small: var(--typography-print-title-small-weight---desktop);
-  --typography-print-label-line-height-large: var(--typography-print-label-large-line-height---desktop);
-  --typography-print-label-line-height-medium: var(--typography-print-label-medium-line-height---desktop);
-  --typography-print-label-line-height-small: var(--typography-print-label-small-line-height---desktop);
-  --typography-print-label-size-large: var(--typography-print-label-large-size---desktop);
-  --typography-print-label-size-medium: var(--typography-print-label-medium-size---desktop);
-  --typography-print-label-size-small: var(--typography-print-label-small-size---desktop);
-  --typography-print-label-weight-large: var(--typography-print-label-large-weight---desktop);
-  --typography-print-label-weight-medium: var(--typography-print-label-medium-weight---desktop);
-  --typography-print-label-weight-small: var(--typography-print-label-small-weight---desktop);
-  --typography-web-body-line-height-large: var(--typography-web-body-large-line-height---desktop);
-  --typography-web-body-line-height-medium: var(--typography-web-body-medium-line-height---desktop);
-  --typography-web-body-line-height-small: var(--typography-web-body-small-line-height---desktop);
-  --typography-web-body-size-large: var(--typography-web-body-large-size---desktop);
-  --typography-web-body-size-medium: var(--typography-web-body-medium-size---desktop);
-  --typography-web-body-size-small: var(--typography-web-body-small-size---desktop);
-  --typography-web-body-weight-large: var(--typography-web-body-large-weight---desktop);
-  --typography-web-body-weight-medium: var(--typography-web-body-medium-weight---desktop);
-  --typography-web-body-weight-small: var(--typography-web-body-small-weight---desktop);
-  --typography-web-button-lineheight-large: var(--typography-web-button-large-line-height---desktop);
-  --typography-web-button-lineheight-medium: var(--typography-web-button-medium-line-height---desktop);
-  --typography-web-button-lineheight-small: var(--typography-web-button-small-line-height---desktop);
-  --typography-web-button-size-large: var(--typography-web-button-large-size---desktop);
-  --typography-web-button-size-medium: var(--typography-web-button-medium-size---desktop);
-  --typography-web-button-size-small: var(--typography-web-button-small-size---desktop);
-  --typography-web-button-weight-large: var(--typography-web-button-large-weight---desktop);
-  --typography-web-button-weight-medium: var(--typography-web-button-medium-weight---desktop);
-  --typography-web-button-weight-small: var(--typography-web-button-small-weight---desktop);
-  --typography-web-heading-line-height-medium: var(--typography-web-heading-medium-line-height---desktop);
-  --typography-web-heading-size-medium: var(--typography-web-heading-medium-size---desktop);
-  --typography-web-heading-weigth-medium: var(--typography-web-heading-medium-weight---desktop);
-  --typography-web-title-line-height-large: var(--typography-web-title-large-line-height---desktop);
-  --typography-web-title-line-height-medium: var(--typography-web-title-medium-line-height---desktop);
-  --typography-web-title-line-height-small: var(--typography-web-title-small-line-height---desktop);
-  --typography-web-title-size-large: var(--typography-web-title-large-size---desktop);
-  --typography-web-title-size-medium: var(--typography-web-title-medium-size---desktop);
-  --typography-web-title-size-small: var(--typography-web-title-small-size---desktop);
-  --typography-web-title-weight-large: var(--typography-web-title-large-weight---desktop);
-  --typography-web-title-weight-medium: var(--typography-web-title-medium-weight---desktop);
-  --typography-web-title-weight-small: var(--typography-web-title-small-weight---desktop);
-  --typography-web-label-line-height-large: var(--typography-web-label-large-line-height---desktop);
-  --typography-web-label-line-height-medium: var(--typography-web-label-medium-line-height---desktop);
-  --typography-web-label-line-height-small: var(--typography-web-label-small-line-height---desktop);
-  --typography-web-label-size-large: var(--typography-web-label-large-size---desktop);
-  --typography-web-label-size-medium: var(--typography-web-label-medium-size---desktop);
-  --typography-web-label-size-small: var(--typography-web-label-small-size---desktop);
-  --typography-web-label-weight-large: var(--typography-web-label-large-weight---desktop);
-  --typography-web-label-weight-medium: var(--typography-web-label-medium-weight---desktop);
-  --typography-web-label-weight-small: var(--typography-web-label-small-weight---desktop);
+  --typography-body-line-height-large: 24px;
+  --typography-body-line-height-medium: 22px;
+  --typography-body-line-height-small: 16px;
+  --typography-body-size-large: 18px;
+  --typography-body-size-medium: 16px;
+  --typography-body-size-small: 14px;
+  --typography-body-weight-large: 400;
+  --typography-body-weight-medium: 400;
+  --typography-body-weight-small: 300;
+  --typography-button-lineheight-large: 18px;
+  --typography-button-lineheight-medium: 16px;
+  --typography-button-lineheight-small: 12px;
+  --typography-button-size-large: 20px;
+  --typography-button-size-medium: 16px;
+  --typography-button-size-small: 14px;
+  --typography-button-weight-large: 600;
+  --typography-button-weight-medium: 600;
+  --typography-button-weight-small: 600;
+  --typography-heading-line-height-medium: var(--typography-heading-medium-line-height---desktop);
+  --typography-heading-size-medium: var(--typography-heading-medium-size---desktop);
+  --typography-heading-weight-medium: var(--typography-heading-medium-weight---desktop);
+  --typography-title-line-height-large: var(--typography-title-large-line-height---desktop);
+  --typography-title-line-height-medium: var(--typography-title-medium-line-height---desktop);
+  --typography-title-line-height-small: var(--typography-title-small-line-height---desktop);
+  --typography-title-size-large: var(--typography-title-large-size---desktop);
+  --typography-title-size-medium: var(--typography-title-medium-size---desktop);
+  --typography-title-size-small: var(--typography-title-small-size---desktop);
+  --typography-title-weight-large: var(--typography-title-large-weight---desktop);
+  --typography-title-weight-medium: var(--typography-title-medium-weight---desktop);
+  --typography-title-weight-small: var(--typography-title-small-weight---desktop);
+  --typography-label-line-height-large: 11px;
+  --typography-label-line-height-medium: 12px;
+  --typography-label-line-height-small: 7px;
+  --typography-label-size-large: 12px;
+  --typography-label-size-medium: 12px;
+  --typography-label-size-small: 10px;
+  --typography-label-weight-large: 400;
+  --typography-label-weight-medium: 400;
+  --typography-label-weight-small: 500;
   --wl---page-horizontal-gap: var(--spacing-l---desktop);
   --wl---page-page-container: 1200px;
   --wl---page-sidebar-maxwidth: 283px;
@@ -900,9 +845,8 @@
   --wl---page-padding-right: var(--spacing-0---desktop);
   --wl---page-padding-top: var(--spacing-2xl---desktop);
   --device: "Desktop";
-  --dropdown-item-font: var(--typography-font-2);
-  --dropdownstatus-font: var(--typography-font-2);
-  --label-font-family: var(--typography-font-2);
+  --dropdown-item-font: var(--typography-font-family-font-2);
+  --label-font-family: var(--typography-font-family-font-2);
   --be---page-overlay: var(--background-global-overlay);
   --menu-label-background: var(--colors-primitives-grey-scale-transparent);
   --menu-label-backgroundactive: var(--colors-primitives-grey-scale-transparent);
@@ -1425,14 +1369,6 @@
   --label-warning-background: var(--colors-brand-warning-light-mode-brandlight);
   --label-warning-border-color: var(--colors-primitives-grey-scale-transparent);
   --label-warning-foreground: var(--colors-brand-warning-light-mode-onbrandlight);
-  --tag-primary-default-default-background: var(--colors-brand-primary-light-mode-brand);
-  --tag-primary-default-default-foreground: var(--colors-brand-primary-light-mode-onbrand);
-  --tag-primary-light-default-background: var(--colors-brand-primary-light-mode-brandlight);
-  --tag-primary-light-default-foreground: var(--colors-brand-primary-light-mode-onbrandlight);
-  --tag-secondary-default-default-background: var(--colors-brand-secondary-light-mode-brand);
-  --tag-secondary-default-default-foreground: var(--colors-brand-secondary-light-mode-onbrand);
-  --tag-secondary-light-default-background: var(--colors-brand-secondary-light-mode-brandlight);
-  --tag-secondary-light-default-foreground: var(--colors-brand-secondary-light-mode-onbrandlight);
   --text-editor-active-background: var(--background-light-global-paper1);
   --text-editor-active-foreground: var(--text-main);
   --text-editor-disabled-background: var(--colors-primitives-grey-scale-black-2);
@@ -1654,10 +1590,10 @@
   --colors-brand-primary-light-mode-onbrandlight: var(--colors-primitives-a-light-a-7);
   --colors-brand-secondary-dark-mode-brand: var(--colors-primitives-b-dark-b-5);
   --colors-brand-secondary-dark-mode-brandhover: var(--colors-primitives-b-dark-b-3);
-  --colors-brand-secondary-dark-mode-brandlight: var(--colors-primitives-b-dark-b-9);
-  --colors-brand-secondary-dark-mode-brandlighthover: var(--colors-primitives-b-dark-b-8);
+  --colors-brand-secondary-dark-mode-brandlight: var(--colors-primitives-b-dark-b-1);
+  --colors-brand-secondary-dark-mode-brandlighthover: var(--colors-primitives-b-dark-b-2);
   --colors-brand-secondary-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-secondary-dark-mode-onbrandlight: var(--colors-primitives-b-dark-b-4);
+  --colors-brand-secondary-dark-mode-onbrandlight: var(--colors-primitives-b-dark-b-7);
   --colors-brand-secondary-light-mode-brand: var(--colors-primitives-b-light-b-6);
   --colors-brand-secondary-light-mode-brandhover: var(--colors-primitives-b-light-b-7);
   --colors-brand-secondary-light-mode-brandlight: var(--colors-primitives-b-light-b-1);
@@ -1787,32 +1723,26 @@
   --colors-primitives-yellow-yellow-7: #cab302;
   --colors-primitives-yellow-yellow-8: #a99501;
   --colors-primitives-yellow-yellow-9: #887801;
-  --typography-color: #ffffff;
-  --brand: "Miticko";
-  --button-font: var(--typography-font-2);
-  --icon-button-font: var(--typography-font-2);
-  --typography-font-1: "DM Sans";
-  --typography-font-2: "DM Sans";
-  --typography-print-body-font: var(--typography-font-2);
-  --typography-print-button-font: var(--typography-font-2);
-  --typography-print-heading-font: var(--typography-font-1);
-  --typography-print-label-font: var(--typography-font-2);
-  --typography-print-title-font: var(--typography-font-1);
-  --typography-web-body-font: var(--typography-font-2);
-  --typography-web-button-font: var(--typography-font-2);
-  --typography-web-heading-font: var(--typography-font-1);
-  --typography-web-label-font: var(--typography-font-2);
-  --typography-web-title-font: var(--typography-font-1);
+  --button-font: var(--typography-font-family-font-2);
+  --icon-button-font: var(--typography-font-family-font-2);
+  --typography-body-font: var(--typography-font-family-font-2);
+  --typography-button-font: var(--typography-font-family-font-2);
+  --typography-heading-font: var(--typography-font-family-font-1);
+  --typography-label-font: var(--typography-font-family-font-2);
+  --typography-title-font: var(--typography-font-family-font-1);
+  --typography-font-family-font-1: "DM Sans";
+  --typography-font-family-font-2: "DM Sans";
+  --blablablafe: "String value";
   --button-size-large-corner-radius---desktop: var(--corner-radius-m);
   --button-size-large-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-large-font-line-height---desktop: var(--typography-web-button-large-line-height---desktop);
-  --button-size-large-font-line-height---mobile: var(--typography-web-button-large-line-height---mobile);
-  --button-size-large-font-size---desktop: var(--typography-web-button-large-size---desktop);
-  --button-size-large-font-size---mobile: var(--typography-web-button-large-size---mobile);
-  --button-size-large-font-weight---desktop: var(--typography-web-button-large-weight---desktop);
-  --button-size-large-font-weight---mobile: var(--typography-web-button-large-weight---mobile);
-  --button-size-large-icon---desktop: var(--typography-web-button-large-size---desktop);
-  --button-size-large-icon---mobile: var(--typography-web-button-large-size---mobile);
+  --button-size-large-font-line-height---desktop: var(--typography-button-large-line-height---desktop);
+  --button-size-large-font-line-height---mobile: var(--typography-button-large-line-height---mobile);
+  --button-size-large-font-size---desktop: var(--typography-button-large-size---desktop);
+  --button-size-large-font-size---mobile: var(--typography-button-large-size---mobile);
+  --button-size-large-font-weight---desktop: var(--typography-button-large-weight---desktop);
+  --button-size-large-font-weight---mobile: var(--typography-button-large-weight---mobile);
+  --button-size-large-icon---desktop: var(--typography-button-large-size---desktop);
+  --button-size-large-icon---mobile: var(--typography-button-large-size---mobile);
   --button-size-large-paddingbottom---desktop: var(--spacing-l---desktop);
   --button-size-large-paddingbottom---mobile: var(--spacing-l---mobile);
   --button-size-large-paddingleft---desktop: var(--spacing-xl---desktop);
@@ -1825,14 +1755,14 @@
   --button-size-large-spacing---mobile: var(--spacing-m---mobile);
   --button-size-medium-corner-radius---desktop: var(--corner-radius-m);
   --button-size-medium-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-medium-font-line-height---desktop: var(--typography-web-button-medium-line-height---desktop);
-  --button-size-medium-font-line-height---mobile: var(--typography-web-button-medium-line-height---mobile);
-  --button-size-medium-font-size---desktop: var(--typography-web-button-medium-size---desktop);
-  --button-size-medium-font-size---mobile: var(--typography-web-button-medium-size---mobile);
-  --button-size-medium-font-weight---desktop: var(--typography-web-button-medium-weight---desktop);
-  --button-size-medium-font-weight---mobile: var(--typography-web-button-medium-weight---mobile);
-  --button-size-medium-icon---desktop: var(--typography-web-button-medium-size---desktop);
-  --button-size-medium-icon---mobile: var(--typography-web-button-medium-size---mobile);
+  --button-size-medium-font-line-height---desktop: var(--typography-button-medium-line-height---desktop);
+  --button-size-medium-font-line-height---mobile: var(--typography-button-medium-line-height---mobile);
+  --button-size-medium-font-size---desktop: var(--typography-button-medium-size---desktop);
+  --button-size-medium-font-size---mobile: var(--typography-button-medium-size---mobile);
+  --button-size-medium-font-weight---desktop: var(--typography-button-medium-weight---desktop);
+  --button-size-medium-font-weight---mobile: var(--typography-button-medium-weight---mobile);
+  --button-size-medium-icon---desktop: var(--typography-button-medium-size---desktop);
+  --button-size-medium-icon---mobile: var(--typography-button-medium-size---mobile);
   --button-size-medium-paddingbottom---desktop: var(--spacing-m---desktop);
   --button-size-medium-paddingbottom---mobile: var(--spacing-m---mobile);
   --button-size-medium-paddingleft---desktop: var(--spacing-l---desktop);
@@ -1845,14 +1775,14 @@
   --button-size-medium-spacing---mobile: var(--spacing-s----mobile);
   --button-size-small-corner-radius---desktop: var(--corner-radius-m);
   --button-size-small-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-small-font-line-height---desktop: var(--typography-web-button-small-line-height---desktop);
-  --button-size-small-font-line-height---mobile: var(--typography-web-button-small-line-height---mobile);
-  --button-size-small-font-size---desktop: var(--typography-web-button-small-size---desktop);
-  --button-size-small-font-size---mobile: var(--typography-web-button-small-size---mobile);
-  --button-size-small-font-weight---desktop: var(--typography-web-button-small-weight---desktop);
-  --button-size-small-font-weight---mobile: var(--typography-web-button-small-weight---mobile);
-  --button-size-small-icon---desktop: var(--typography-web-button-small-size---desktop);
-  --button-size-small-icon---mobile: var(--typography-web-button-small-size---mobile);
+  --button-size-small-font-line-height---desktop: var(--typography-button-small-line-height---desktop);
+  --button-size-small-font-line-height---mobile: var(--typography-button-small-line-height---mobile);
+  --button-size-small-font-size---desktop: var(--typography-button-small-size---desktop);
+  --button-size-small-font-size---mobile: var(--typography-button-small-size---mobile);
+  --button-size-small-font-weight---desktop: var(--typography-button-small-weight---desktop);
+  --button-size-small-font-weight---mobile: var(--typography-button-small-weight---mobile);
+  --button-size-small-icon---desktop: var(--typography-button-small-size---desktop);
+  --button-size-small-icon---mobile: var(--typography-button-small-size---mobile);
   --button-size-small-paddingbottom---desktop: var(--spacing-s---desktop);
   --button-size-small-paddingbottom---mobile: var(--spacing-s----mobile);
   --button-size-small-paddingleft---desktop: var(--spacing-m---desktop);
@@ -1874,20 +1804,20 @@
   --corner-radius-rounded: 9999px;
   --icon-button-size-large-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-large-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-large-icon---desktop: var(--typography-web-button-large-size---desktop);
-  --icon-button-size-large-icon---mobile: var(--typography-web-button-large-size---mobile);
+  --icon-button-size-large-icon---desktop: var(--typography-button-large-size---desktop);
+  --icon-button-size-large-icon---mobile: var(--typography-button-large-size---mobile);
   --icon-button-size-large-padding---desktop: var(--spacing-l---desktop);
   --icon-button-size-large-padding---mobile: var(--spacing-l---mobile);
   --icon-button-size-medium-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-medium-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-medium-icon---desktop: var(--typography-web-button-medium-size---desktop);
-  --icon-button-size-medium-icon---mobile: var(--typography-web-button-medium-size---mobile);
+  --icon-button-size-medium-icon---desktop: var(--typography-button-medium-size---desktop);
+  --icon-button-size-medium-icon---mobile: var(--typography-button-medium-size---mobile);
   --icon-button-size-medium-padding---desktop: var(--spacing-m---desktop);
   --icon-button-size-medium-padding---mobile: var(--spacing-m---mobile);
   --icon-button-size-small-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-small-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-small-icon---desktop: var(--typography-web-button-small-size---desktop);
-  --icon-button-size-small-icon---mobile: var(--typography-web-button-small-size---mobile);
+  --icon-button-size-small-icon---desktop: var(--typography-button-small-size---desktop);
+  --icon-button-size-small-icon---mobile: var(--typography-button-small-size---mobile);
   --icon-button-size-small-padding---desktop: var(--spacing-s---desktop);
   --icon-button-size-small-padding---mobile: var(--spacing-s----mobile);
   --spacing-0---desktop: ;
@@ -1916,123 +1846,84 @@
   --spacing-xl---mobile: 16px;
   --spacing-xs----mobile: 4px;
   --spacing-xs---desktop: 4px;
-  --typography-print-body-large-line-height---desktop: 12px;
-  --typography-print-body-large-size---desktop: 12px;
-  --typography-print-body-large-weight---desktop: 400;
-  --typography-print-body-medium-line-height---desktop: 10px;
-  --typography-print-body-medium-size---desktop: 10px;
-  --typography-print-body-medium-weight---desktop: 400;
-  --typography-print-body-small-line-height---desktop: 8px;
-  --typography-print-body-small-size---desktop: 8px;
-  --typography-print-body-small-weight---desktop: 400;
-  --typography-print-button-large-line-height---desktop: 14px;
-  --typography-print-button-large-size---desktop: 14px;
-  --typography-print-button-large-weight---desktop: 600;
-  --typography-print-button-medium-line-height---desktop: 10px;
-  --typography-print-button-medium-size---desktop: 10px;
-  --typography-print-button-medium-weight---desktop: 600;
-  --typography-print-button-small-line-height---desktop: 8px;
-  --typography-print-button-small-size---desktop: 8px;
-  --typography-print-button-small-weight---desktop: 600;
-  --typography-print-heading-medium-line-height---desktop: 24px;
-  --typography-print-heading-medium-size---desktop: 24px;
-  --typography-print-heading-medium-weight---desktop: 600;
-  --typography-print-label-large-line-height---desktop: 12px;
-  --typography-print-label-large-size---desktop: 12px;
-  --typography-print-label-large-weight---desktop: 400;
-  --typography-print-label-medium-line-height---desktop: 10px;
-  --typography-print-label-medium-size---desktop: 10px;
-  --typography-print-label-medium-weight---desktop: 400;
-  --typography-print-label-small-line-height---desktop: 8px;
-  --typography-print-label-small-size---desktop: 8px;
-  --typography-print-label-small-weight---desktop: 500;
-  --typography-print-title-large-line-height---desktop: 18px;
-  --typography-print-title-large-size---desktop: 18px;
-  --typography-print-title-large-weight---desktop: 600;
-  --typography-print-title-medium-line-height---desktop: 16px;
-  --typography-print-title-medium-size---desktop: 16px;
-  --typography-print-title-medium-weight---desktop: 600;
-  --typography-print-title-small-line-height---desktop: 14px;
-  --typography-print-title-small-size---desktop: 14px;
-  --typography-print-title-small-weight---desktop: 600;
-  --typography-web-body-large-line-height---desktop: 24px;
-  --typography-web-body-large-line-height---mobile: 24px;
-  --typography-web-body-large-size---desktop: 18px;
-  --typography-web-body-large-size---mobile: 18px;
-  --typography-web-body-large-weight---desktop: 400;
-  --typography-web-body-large-weight---mobile: 400;
-  --typography-web-body-medium-line-height---desktop: 22px;
-  --typography-web-body-medium-line-height---mobile: 22px;
-  --typography-web-body-medium-size---desktop: 16px;
-  --typography-web-body-medium-size---mobile: 16px;
-  --typography-web-body-medium-weight---desktop: 400;
-  --typography-web-body-medium-weight---mobile: 400;
-  --typography-web-body-small-line-height---desktop: 16px;
-  --typography-web-body-small-line-height---mobile: 16px;
-  --typography-web-body-small-size---desktop: 14px;
-  --typography-web-body-small-size---mobile: 14px;
-  --typography-web-body-small-weight---desktop: 300;
-  --typography-web-body-small-weight---mobile: 300;
-  --typography-web-button-large-line-height---desktop: 18px;
-  --typography-web-button-large-line-height---mobile: 18px;
-  --typography-web-button-large-size---desktop: 20px;
-  --typography-web-button-large-size---mobile: 18px;
-  --typography-web-button-large-weight---desktop: 600;
-  --typography-web-button-large-weight---mobile: 600;
-  --typography-web-button-medium-line-height---desktop: 16px;
-  --typography-web-button-medium-line-height---mobile: 16px;
-  --typography-web-button-medium-size---desktop: 16px;
-  --typography-web-button-medium-size---mobile: 16px;
-  --typography-web-button-medium-weight---desktop: 600;
-  --typography-web-button-medium-weight---mobile: 600;
-  --typography-web-button-small-line-height---desktop: 12px;
-  --typography-web-button-small-line-height---mobile: 14px;
-  --typography-web-button-small-size---desktop: 14px;
-  --typography-web-button-small-size---mobile: 14px;
-  --typography-web-button-small-weight---desktop: 600;
-  --typography-web-button-small-weight---mobile: 600;
-  --typography-web-heading-medium-line-height---desktop: 48px;
-  --typography-web-heading-medium-line-height---mobile: 32px;
-  --typography-web-heading-medium-size---desktop: 48px;
-  --typography-web-heading-medium-size---mobile: 32px;
-  --typography-web-heading-medium-weight---desktop: 500;
-  --typography-web-heading-medium-weight---mobile: 500;
-  --typography-web-label-large-line-height---desktop: 11px;
-  --typography-web-label-large-line-height---mobile: 11px;
-  --typography-web-label-large-size---desktop: 12px;
-  --typography-web-label-large-size---mobile: 12px;
-  --typography-web-label-large-weight---desktop: 400;
-  --typography-web-label-large-weight---mobile: 400;
-  --typography-web-label-medium-line-height---desktop: 12px;
-  --typography-web-label-medium-line-height---mobile: 12px;
-  --typography-web-label-medium-size---desktop: 12px;
-  --typography-web-label-medium-size---mobile: 12px;
-  --typography-web-label-medium-weight---desktop: 400;
-  --typography-web-label-medium-weight---mobile: 400;
-  --typography-web-label-small-line-height---desktop: 7px;
-  --typography-web-label-small-line-height---mobile: 7px;
-  --typography-web-label-small-size---desktop: 10px;
-  --typography-web-label-small-size---mobile: 10px;
-  --typography-web-label-small-weight---desktop: 500;
-  --typography-web-label-small-weight---mobile: 500;
-  --typography-web-title-large-line-height---desktop: 34px;
-  --typography-web-title-large-line-height---mobile: 30px;
-  --typography-web-title-large-size---desktop: 28px;
-  --typography-web-title-large-size---mobile: 24px;
-  --typography-web-title-large-weight---desktop: 600;
-  --typography-web-title-large-weight---mobile: 600;
-  --typography-web-title-medium-line-height---desktop: 24px;
-  --typography-web-title-medium-line-height---mobile: 20px;
-  --typography-web-title-medium-size---desktop: 18px;
-  --typography-web-title-medium-size---mobile: 16px;
-  --typography-web-title-medium-weight---desktop: 700;
-  --typography-web-title-medium-weight---mobile: 600;
-  --typography-web-title-small-line-height---desktop: 18px;
-  --typography-web-title-small-line-height---mobile: 18px;
-  --typography-web-title-small-size---desktop: 14px;
-  --typography-web-title-small-size---mobile: 14px;
-  --typography-web-title-small-weight---desktop: 700;
-  --typography-web-title-small-weight---mobile: 700;
+  --typography-body-large-line-height---desktop: 24px;
+  --typography-body-large-line-height---mobile: 24px;
+  --typography-body-large-size---desktop: 18px;
+  --typography-body-large-size---mobile: 18px;
+  --typography-body-large-weight---desktop: 400;
+  --typography-body-large-weight---mobile: 400;
+  --typography-body-medium-line-height---desktop: 22px;
+  --typography-body-medium-line-height---mobile: 22px;
+  --typography-body-medium-size---desktop: 16px;
+  --typography-body-medium-size---mobile: 16px;
+  --typography-body-medium-weight---desktop: 400;
+  --typography-body-medium-weight---mobile: 400;
+  --typography-body-small-line-height---desktop: 16px;
+  --typography-body-small-line-height---mobile: 16px;
+  --typography-body-small-size---desktop: 14px;
+  --typography-body-small-size---mobile: 14px;
+  --typography-body-small-weight---desktop: 300;
+  --typography-body-small-weight---mobile: 300;
+  --typography-button-large-line-height---desktop: 18px;
+  --typography-button-large-line-height---mobile: 18px;
+  --typography-button-large-size---desktop: 20px;
+  --typography-button-large-size---mobile: 18px;
+  --typography-button-large-weight---desktop: 600;
+  --typography-button-large-weight---mobile: 600;
+  --typography-button-medium-line-height---desktop: 16px;
+  --typography-button-medium-line-height---mobile: 16px;
+  --typography-button-medium-size---desktop: 16px;
+  --typography-button-medium-size---mobile: 16px;
+  --typography-button-medium-weight---desktop: 600;
+  --typography-button-medium-weight---mobile: 600;
+  --typography-button-small-line-height---desktop: 12px;
+  --typography-button-small-line-height---mobile: 14px;
+  --typography-button-small-size---desktop: 14px;
+  --typography-button-small-size---mobile: 14px;
+  --typography-button-small-weight---desktop: 600;
+  --typography-button-small-weight---mobile: 600;
+  --typography-heading-medium-line-height---desktop: 48px;
+  --typography-heading-medium-line-height---mobile: 32px;
+  --typography-heading-medium-size---desktop: 48px;
+  --typography-heading-medium-size---mobile: 32px;
+  --typography-heading-medium-weight---desktop: 500;
+  --typography-heading-medium-weight---mobile: 500;
+  --typography-label-large-line-height---desktop: 11px;
+  --typography-label-large-line-height---mobile: 11px;
+  --typography-label-large-size---desktop: 12px;
+  --typography-label-large-size---mobile: 12px;
+  --typography-label-large-weight---desktop: 400;
+  --typography-label-large-weight---mobile: 400;
+  --typography-label-medium-line-height---desktop: 12px;
+  --typography-label-medium-line-height---mobile: 12px;
+  --typography-label-medium-size---desktop: 12px;
+  --typography-label-medium-size---mobile: 12px;
+  --typography-label-medium-weight---desktop: 400;
+  --typography-label-medium-weight---mobile: 400;
+  --typography-label-small-line-height---desktop: 7px;
+  --typography-label-small-line-height---mobile: 7px;
+  --typography-label-small-size---desktop: 10px;
+  --typography-label-small-size---mobile: 10px;
+  --typography-label-small-weight---desktop: 500;
+  --typography-label-small-weight---mobile: 500;
+  --typography-title-large-line-height---desktop: 34px;
+  --typography-title-large-line-height---mobile: 30px;
+  --typography-title-large-size---desktop: 28px;
+  --typography-title-large-size---mobile: 24px;
+  --typography-title-large-weight---desktop: 600;
+  --typography-title-large-weight---mobile: 600;
+  --typography-title-medium-line-height---desktop: 24px;
+  --typography-title-medium-line-height---mobile: 20px;
+  --typography-title-medium-size---desktop: 18px;
+  --typography-title-medium-size---mobile: 16px;
+  --typography-title-medium-weight---desktop: 700;
+  --typography-title-medium-weight---mobile: 600;
+  --typography-title-small-line-height---desktop: 18px;
+  --typography-title-small-line-height---mobile: 18px;
+  --typography-title-small-size---desktop: 14px;
+  --typography-title-small-size---mobile: 14px;
+  --typography-title-small-weight---desktop: 700;
+  --typography-title-small-weight---mobile: 700;
 }
 
 /* Mode: Mobile */
@@ -2041,7 +1932,7 @@
   --be---page-padding-bottom: var(--spacing-l---mobile);
   --be---page-padding-left: var(--spacing-l---mobile);
   --be---page-padding-right: var(--spacing-l---mobile);
-  --be---page-padding-top: var(--spacing-0---mobile);
+  --be---page-padding-top: var(--spacing-l---mobile);
   --be---page-page-min-height: 844px;
   --be---page-spacing: var(--spacing-xl---mobile);
   --button-large-corner-radius: var(--button-size-large-corner-radius---mobile);
@@ -2090,11 +1981,11 @@
   --corner-radius-xs: var(--corner-radius-xs);
   --corner-radius-rounded: var(--corner-radius-rounded);
   --drag-handle-padding: var(--spacing-m---mobile);
-  --dropdown-item-font-line-height: var(--typography-web-body-size-medium);
-  --dropdown-item-font-size: var(--typography-web-body-size-medium);
-  --dropdown-item-font-weight: var(--typography-web-body-weight-medium);
+  --dropdown-item-font-line-height: var(--typography-body-size-medium);
+  --dropdown-item-font-size: var(--typography-body-size-medium);
+  --dropdown-item-font-weight: var(--typography-body-weight-medium);
   --dropdown-item-corner-radius: var(--corner-radius-s);
-  --dropdown-item-icon: var(--typography-web-body-size-medium);
+  --dropdown-item-icon: var(--typography-body-size-medium);
   --dropdown-item-paddingbottom: var(--spacing-m---mobile);
   --dropdown-item-paddingleft: var(--spacing-m---mobile);
   --dropdown-item-paddingright: var(--spacing-m---mobile);
@@ -2103,17 +1994,9 @@
   --dropdown-list-corner-radius: var(--corner-radius-m);
   --dropdown-list-padding: var(--spacing-m---mobile);
   --dropdown-list-spacing: var(--spacing-s----mobile);
-  --dropdownstatus-font-line-height: var(--typography-web-label-line-height-large);
-  --dropdownstatus-font-size: var(--typography-web-label-size-large);
-  --dropdownstatus-font-weight: var(--typography-web-label-weight-large);
-  --dropdownstatus-iconleading: 10px;
-  --dropdownstatus-icontrailing: 12px;
-  --dropdownstatus-paddinghorizontal: var(--spacing-l---mobile);
-  --dropdownstatus-paddingvertical: var(--spacing-m---mobile);
-  --dropdownstatus-spacing: var(--spacing-m---mobile);
   --filter-borderradius: var(--corner-radius-s);
   --filter-borderwidth: 1px;
-  --filter-icon: var(--typography-web-body-size-small);
+  --filter-icon: var(--typography-body-size-small);
   --filter-paddingbottom: var(--spacing-m---mobile);
   --filter-paddingleft: var(--spacing-l---mobile);
   --filter-paddingright: var(--spacing-l---mobile);
@@ -2129,10 +2012,10 @@
   --icon-button-small-icon: var(--icon-button-size-small-icon---mobile);
   --icon-button-small-padding: var(--icon-button-size-small-padding---mobile);
   --label-border-radius: var(--corner-radius-xs);
-  --label-font-line-height: var(--typography-web-label-line-height-small);
-  --label-font-size: var(--typography-web-label-size-small);
-  --label-font-weight: var(--typography-web-label-weight-small);
-  --label-icon-size: var(--typography-web-label-size-small);
+  --label-font-line-height: var(--typography-label-line-height-small);
+  --label-font-size: var(--typography-label-size-small);
+  --label-font-weight: var(--typography-label-weight-small);
+  --label-icon-size: var(--typography-label-size-small);
   --label-min-height: 18px;
   --label-padding-bottom: var(--spacing-xs----mobile);
   --label-padding-left: var(--spacing-xs----mobile);
@@ -2158,84 +2041,45 @@
   --spacing-s: var(--spacing-s----mobile);
   --spacing-xl: var(--spacing-xl---mobile);
   --spacing-xs: var(--spacing-xs----mobile);
-  --typography-print-body-line-height-large: var(--typography-print-body-large-line-height---desktop);
-  --typography-print-body-line-height-medium: var(--typography-print-body-medium-line-height---desktop);
-  --typography-print-body-line-height-small: var(--typography-print-body-small-line-height---desktop);
-  --typography-print-body-size-large: var(--typography-print-body-large-size---desktop);
-  --typography-print-body-size-medium: var(--typography-print-body-medium-size---desktop);
-  --typography-print-body-size-small: var(--typography-print-body-small-size---desktop);
-  --typography-print-body-weight-large: var(--typography-print-body-large-weight---desktop);
-  --typography-print-body-weight-medium: var(--typography-print-body-medium-weight---desktop);
-  --typography-print-body-weight-small: var(--typography-print-body-small-weight---desktop);
-  --typography-print-button-lineheight-large: var(--typography-print-button-large-line-height---desktop);
-  --typography-print-button-lineheight-medium: var(--typography-print-button-medium-line-height---desktop);
-  --typography-print-button-lineheight-small: var(--typography-print-button-small-line-height---desktop);
-  --typography-print-button-size-large: var(--typography-print-button-large-size---desktop);
-  --typography-print-button-size-medium: var(--typography-print-button-medium-size---desktop);
-  --typography-print-button-size-small: var(--typography-print-button-small-size---desktop);
-  --typography-print-button-weight-large: var(--typography-print-button-large-weight---desktop);
-  --typography-print-button-weight-medium: var(--typography-print-button-medium-weight---desktop);
-  --typography-print-button-weight-small: var(--typography-print-button-small-weight---desktop);
-  --typography-print-heading-line-height-medium: var(--typography-print-heading-medium-line-height---desktop);
-  --typography-print-heading-size-medium: var(--typography-print-heading-medium-size---desktop);
-  --typography-print-heading-weight-medium: var(--typography-print-heading-medium-weight---desktop);
-  --typography-print-title-line-height-large: var(--typography-print-title-large-line-height---desktop);
-  --typography-print-title-line-height-medium: var(--typography-print-title-medium-line-height---desktop);
-  --typography-print-title-line-height-small: var(--typography-print-title-small-line-height---desktop);
-  --typography-print-title-size-large: var(--typography-print-title-large-size---desktop);
-  --typography-print-title-size-medium: var(--typography-print-title-medium-size---desktop);
-  --typography-print-title-size-small: var(--typography-print-title-small-size---desktop);
-  --typography-print-title-weight-large: var(--typography-print-title-large-weight---desktop);
-  --typography-print-title-weight-medium: var(--typography-print-title-medium-weight---desktop);
-  --typography-print-title-weight-small: var(--typography-print-title-small-weight---desktop);
-  --typography-print-label-line-height-large: var(--typography-print-label-large-line-height---desktop);
-  --typography-print-label-line-height-medium: var(--typography-print-label-medium-line-height---desktop);
-  --typography-print-label-line-height-small: var(--typography-print-label-small-line-height---desktop);
-  --typography-print-label-size-large: var(--typography-print-label-large-size---desktop);
-  --typography-print-label-size-medium: var(--typography-print-label-medium-size---desktop);
-  --typography-print-label-size-small: var(--typography-print-label-small-size---desktop);
-  --typography-print-label-weight-large: var(--typography-print-label-large-weight---desktop);
-  --typography-print-label-weight-medium: var(--typography-print-label-medium-weight---desktop);
-  --typography-print-label-weight-small: var(--typography-print-label-small-weight---desktop);
-  --typography-web-body-line-height-large: var(--typography-web-body-large-line-height---mobile);
-  --typography-web-body-line-height-medium: var(--typography-web-body-medium-line-height---mobile);
-  --typography-web-body-line-height-small: var(--typography-web-body-small-line-height---mobile);
-  --typography-web-body-size-large: var(--typography-web-body-large-size---mobile);
-  --typography-web-body-size-medium: var(--typography-web-body-medium-size---mobile);
-  --typography-web-body-size-small: var(--typography-web-body-small-size---mobile);
-  --typography-web-body-weight-large: var(--typography-web-body-large-weight---mobile);
-  --typography-web-body-weight-medium: var(--typography-web-body-medium-weight---mobile);
-  --typography-web-body-weight-small: var(--typography-web-body-small-weight---mobile);
-  --typography-web-button-lineheight-large: var(--typography-web-button-large-line-height---mobile);
-  --typography-web-button-lineheight-medium: var(--typography-web-button-medium-line-height---mobile);
-  --typography-web-button-lineheight-small: var(--typography-web-button-small-line-height---mobile);
-  --typography-web-button-size-large: var(--typography-web-button-large-size---mobile);
-  --typography-web-button-size-medium: var(--typography-web-button-medium-size---mobile);
-  --typography-web-button-size-small: var(--typography-web-button-small-size---mobile);
-  --typography-web-button-weight-large: var(--typography-web-button-large-weight---mobile);
-  --typography-web-button-weight-medium: var(--typography-web-button-medium-weight---mobile);
-  --typography-web-button-weight-small: var(--typography-web-button-small-weight---mobile);
-  --typography-web-heading-line-height-medium: var(--typography-web-heading-medium-line-height---mobile);
-  --typography-web-heading-size-medium: var(--typography-web-heading-medium-size---mobile);
-  --typography-web-heading-weigth-medium: var(--typography-web-heading-medium-weight---mobile);
-  --typography-web-title-line-height-large: var(--typography-web-title-large-line-height---mobile);
-  --typography-web-title-line-height-medium: var(--typography-web-title-medium-line-height---mobile);
-  --typography-web-title-line-height-small: var(--typography-web-title-small-line-height---mobile);
-  --typography-web-title-size-large: var(--typography-web-title-large-size---mobile);
-  --typography-web-title-size-medium: var(--typography-web-title-medium-size---mobile);
-  --typography-web-title-size-small: var(--typography-web-title-small-size---mobile);
-  --typography-web-title-weight-large: var(--typography-web-title-large-weight---mobile);
-  --typography-web-title-weight-medium: var(--typography-web-title-medium-weight---mobile);
-  --typography-web-title-weight-small: var(--typography-web-title-small-weight---mobile);
-  --typography-web-label-line-height-large: var(--typography-web-label-large-line-height---mobile);
-  --typography-web-label-line-height-medium: var(--typography-web-label-medium-line-height---mobile);
-  --typography-web-label-line-height-small: var(--typography-web-label-small-line-height---mobile);
-  --typography-web-label-size-large: var(--typography-web-label-large-size---mobile);
-  --typography-web-label-size-medium: var(--typography-web-label-medium-size---mobile);
-  --typography-web-label-size-small: var(--typography-web-label-small-size---mobile);
-  --typography-web-label-weight-large: var(--typography-web-label-large-weight---mobile);
-  --typography-web-label-weight-medium: var(--typography-web-label-medium-weight---mobile);
-  --typography-web-label-weight-small: var(--typography-web-label-small-weight---mobile);
+  --typography-body-line-height-large: 24px;
+  --typography-body-line-height-medium: 22px;
+  --typography-body-line-height-small: 16px;
+  --typography-body-size-large: 18px;
+  --typography-body-size-medium: 16px;
+  --typography-body-size-small: 14px;
+  --typography-body-weight-large: 400;
+  --typography-body-weight-medium: 400;
+  --typography-body-weight-small: 300;
+  --typography-button-lineheight-large: 18px;
+  --typography-button-lineheight-medium: 16px;
+  --typography-button-lineheight-small: 14px;
+  --typography-button-size-large: 18px;
+  --typography-button-size-medium: 16px;
+  --typography-button-size-small: 14px;
+  --typography-button-weight-large: 600;
+  --typography-button-weight-medium: 600;
+  --typography-button-weight-small: 600;
+  --typography-heading-line-height-medium: var(--typography-heading-medium-line-height---mobile);
+  --typography-heading-size-medium: var(--typography-heading-medium-size---mobile);
+  --typography-heading-weight-medium: var(--typography-heading-medium-weight---mobile);
+  --typography-title-line-height-large: var(--typography-title-large-line-height---mobile);
+  --typography-title-line-height-medium: var(--typography-title-medium-line-height---mobile);
+  --typography-title-line-height-small: var(--typography-title-small-line-height---mobile);
+  --typography-title-size-large: var(--typography-title-large-size---mobile);
+  --typography-title-size-medium: var(--typography-title-medium-size---mobile);
+  --typography-title-size-small: var(--typography-title-small-size---mobile);
+  --typography-title-weight-large: var(--typography-title-large-weight---mobile);
+  --typography-title-weight-medium: var(--typography-title-medium-weight---mobile);
+  --typography-title-weight-small: var(--typography-title-small-weight---mobile);
+  --typography-label-line-height-large: 11px;
+  --typography-label-line-height-medium: 12px;
+  --typography-label-line-height-small: 7px;
+  --typography-label-size-large: 12px;
+  --typography-label-size-medium: 12px;
+  --typography-label-size-small: 10px;
+  --typography-label-weight-large: 400;
+  --typography-label-weight-medium: 400;
+  --typography-label-weight-small: 500;
   --wl---page-horizontal-gap: var(--spacing-l---mobile);
   --wl---page-page-container: ;
   --wl---page-sidebar-maxwidth: ;
@@ -2245,9 +2089,8 @@
   --wl---page-padding-right: var(--spacing-l---mobile);
   --wl---page-padding-top: var(--spacing-l---mobile);
   --device: "Mobile";
-  --dropdown-item-font: var(--typography-font-2);
-  --dropdownstatus-font: var(--typography-font-2);
-  --label-font-family: var(--typography-font-2);
+  --dropdown-item-font: var(--typography-font-family-font-2);
+  --label-font-family: var(--typography-font-family-font-2);
   --be---page-overlay: var(--background-global-overlay);
   --menu-label-background: var(--colors-primitives-grey-scale-transparent);
   --menu-label-backgroundactive: var(--colors-primitives-grey-scale-transparent);
@@ -2284,132 +2127,132 @@
   --supporting-text-default: var(--brand-warning-brand);
 }
 
-/* Mode: Veleia */
-[data-mode*="Veleia"] {
-  --background-dark-be-background: var(--colors-primitives-grey-scale-black-95);
-  --background-dark-global-background: var(--colors-primitives-grey-scale-black-95);
-  --background-dark-global-overlay: #000000cc;
-  --background-dark-global-paper1: var(--colors-primitives-grey-scale-black-90);
-  --background-dark-global-paper2: var(--colors-primitives-grey-scale-black-85);
-  --background-dark-global-paper3: var(--colors-primitives-grey-scale-black-80);
-  --background-light-be-background: #f7f4f2;
-  --background-light-global-background: #f7f4f2;
-  --background-light-global-overlay: #00000066;
+/* Mode: Vigoleno */
+[data-mode*="Vigoleno"] {
+  --background-dark-be-background: #f2f3f7;
+  --background-dark-global-background: #f2f3f7;
+  --background-dark-global-overlay: var(--colors-primitives-grey-scale-black-5);
+  --background-dark-global-paper1: var(--colors-primitives-grey-scale-black-0);
+  --background-dark-global-paper2: var(--colors-primitives-grey-scale-black-2);
+  --background-dark-global-paper3: var(--colors-primitives-grey-scale-black-5);
+  --background-light-be-background: #f2f3f7;
+  --background-light-global-background: #f2f3f7;
+  --background-light-global-overlay: #f2f2f2;
   --background-light-global-paper1: var(--colors-primitives-grey-scale-black-0);
   --background-light-global-paper2: var(--colors-primitives-grey-scale-black-2);
   --background-light-global-paper3: var(--colors-primitives-grey-scale-black-5);
-  --colors-brand-error-dark-mode-brand: var(--colors-primitives-red-red-4);
-  --colors-brand-error-dark-mode-brandhover: var(--colors-primitives-red-red-3);
-  --colors-brand-error-dark-mode-brandlight: var(--colors-primitives-red-red-10);
-  --colors-brand-error-dark-mode-brandlighthover: var(--colors-primitives-red-red-9);
-  --colors-brand-error-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-100);
-  --colors-brand-error-dark-mode-onbrandlight: var(--colors-primitives-red-red-2);
+  --colors-brand-error-dark-mode-brand: var(--colors-primitives-red-red-6);
+  --colors-brand-error-dark-mode-brandhover: var(--colors-primitives-red-red-7);
+  --colors-brand-error-dark-mode-brandlight: var(--colors-primitives-red-red-1);
+  --colors-brand-error-dark-mode-brandlighthover: var(--colors-primitives-red-red-2);
+  --colors-brand-error-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-error-dark-mode-onbrandlight: var(--colors-primitives-red-red-7);
   --colors-brand-error-light-mode-brand: var(--colors-primitives-red-red-6);
   --colors-brand-error-light-mode-brandhover: var(--colors-primitives-red-red-7);
   --colors-brand-error-light-mode-brandlight: var(--colors-primitives-red-red-1);
   --colors-brand-error-light-mode-brandlighthover: var(--colors-primitives-red-red-2);
   --colors-brand-error-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
   --colors-brand-error-light-mode-onbrandlight: var(--colors-primitives-red-red-7);
-  --colors-brand-neutral-dark-mode-brand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-neutral-dark-mode-brandhover: var(--colors-primitives-grey-scale-black-10);
-  --colors-brand-neutral-dark-mode-brandlight: var(--colors-primitives-grey-scale-black-60);
-  --colors-brand-neutral-dark-mode-brandlighthover: var(--colors-primitives-grey-scale-black-50);
-  --colors-brand-neutral-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-100);
-  --colors-brand-neutral-dark-mode-onbrandlight: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-neutral-dark-mode-brand: var(--colors-primitives-grey-scale-black-100);
+  --colors-brand-neutral-dark-mode-brandhover: var(--colors-primitives-grey-scale-black-80);
+  --colors-brand-neutral-dark-mode-brandlight: var(--colors-primitives-grey-scale-black-10);
+  --colors-brand-neutral-dark-mode-brandlighthover: var(--colors-primitives-grey-scale-black-20);
+  --colors-brand-neutral-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-neutral-dark-mode-onbrandlight: var(--colors-primitives-transparent-black-black-95);
   --colors-brand-neutral-light-mode-brand: var(--colors-primitives-grey-scale-black-100);
   --colors-brand-neutral-light-mode-brandhover: var(--colors-primitives-grey-scale-black-80);
   --colors-brand-neutral-light-mode-brandlight: var(--colors-primitives-grey-scale-black-10);
   --colors-brand-neutral-light-mode-brandlighthover: var(--colors-primitives-grey-scale-black-20);
   --colors-brand-neutral-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-neutral-light-mode-onbrandlight: var(--colors-primitives-grey-scale-black-100);
-  --colors-brand-primary-dark-mode-brand: var(--colors-primitives-a-dark-a-6);
-  --colors-brand-primary-dark-mode-brandhover: var(--colors-primitives-a-dark-a-4);
-  --colors-brand-primary-dark-mode-brandlight: var(--colors-primitives-a-dark-a-2);
-  --colors-brand-primary-dark-mode-brandlighthover: var(--colors-primitives-a-dark-a-1);
+  --colors-brand-neutral-light-mode-onbrandlight: var(--colors-primitives-transparent-black-black-95);
+  --colors-brand-primary-dark-mode-brand: var(--colors-primitives-a-light-a-7);
+  --colors-brand-primary-dark-mode-brandhover: var(--colors-primitives-a-light-a-8);
+  --colors-brand-primary-dark-mode-brandlight: var(--colors-primitives-a-light-a-1);
+  --colors-brand-primary-dark-mode-brandlighthover: var(--colors-primitives-a-light-a-2);
   --colors-brand-primary-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-primary-dark-mode-onbrandlight: var(--colors-primitives-a-dark-a-6);
-  --colors-brand-primary-light-mode-brand: var(--colors-primitives-a-light-a-6);
+  --colors-brand-primary-dark-mode-onbrandlight: var(--colors-primitives-a-light-a-7);
+  --colors-brand-primary-light-mode-brand: var(--colors-primitives-a-light-a-7);
   --colors-brand-primary-light-mode-brandhover: var(--colors-primitives-a-light-a-8);
-  --colors-brand-primary-light-mode-brandlight: var(--colors-primitives-a-light-a-2);
-  --colors-brand-primary-light-mode-brandlighthover: var(--colors-primitives-a-light-a-4);
+  --colors-brand-primary-light-mode-brandlight: var(--colors-primitives-a-light-a-1);
+  --colors-brand-primary-light-mode-brandlighthover: var(--colors-primitives-a-light-a-2);
   --colors-brand-primary-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-primary-light-mode-onbrandlight: var(--colors-primitives-a-light-a-10);
-  --colors-brand-secondary-dark-mode-brand: var(--colors-primitives-b-dark-b-5);
-  --colors-brand-secondary-dark-mode-brandhover: var(--colors-primitives-b-dark-b-3);
-  --colors-brand-secondary-dark-mode-brandlight: var(--colors-primitives-b-dark-b-1);
-  --colors-brand-secondary-dark-mode-brandlighthover: var(--colors-primitives-b-dark-b-2);
+  --colors-brand-primary-light-mode-onbrandlight: var(--colors-primitives-a-light-a-7);
+  --colors-brand-secondary-dark-mode-brand: var(--colors-primitives-b-light-b-6);
+  --colors-brand-secondary-dark-mode-brandhover: var(--colors-primitives-b-light-b-7);
+  --colors-brand-secondary-dark-mode-brandlight: var(--colors-primitives-b-light-b-1);
+  --colors-brand-secondary-dark-mode-brandlighthover: var(--colors-primitives-b-light-b-2);
   --colors-brand-secondary-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-secondary-dark-mode-onbrandlight: var(--colors-primitives-b-dark-b-7);
+  --colors-brand-secondary-dark-mode-onbrandlight: var(--colors-primitives-b-light-b-6);
   --colors-brand-secondary-light-mode-brand: var(--colors-primitives-b-light-b-6);
   --colors-brand-secondary-light-mode-brandhover: var(--colors-primitives-b-light-b-7);
   --colors-brand-secondary-light-mode-brandlight: var(--colors-primitives-b-light-b-1);
   --colors-brand-secondary-light-mode-brandlighthover: var(--colors-primitives-b-light-b-2);
   --colors-brand-secondary-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
   --colors-brand-secondary-light-mode-onbrandlight: var(--colors-primitives-b-light-b-6);
-  --colors-brand-success-dark-mode-brand: var(--colors-primitives-green-green-4);
-  --colors-brand-success-dark-mode-brandhover: var(--colors-primitives-green-green-3);
-  --colors-brand-success-dark-mode-brandlight: var(--colors-primitives-green-green-2);
-  --colors-brand-success-dark-mode-brandlighthover: var(--colors-primitives-green-green-1);
-  --colors-brand-success-dark-mode-onbrand: var(--colors-primitives-green-green-10);
-  --colors-brand-success-dark-mode-onbrandlight: var(--colors-primitives-green-green-8);
-  --colors-brand-success-light-mode-brand: var(--colors-primitives-green-green-7);
-  --colors-brand-success-light-mode-brandhover: var(--colors-primitives-green-green-8);
-  --colors-brand-success-light-mode-brandlight: var(--colors-primitives-green-green-1);
-  --colors-brand-success-light-mode-brandlighthover: var(--colors-primitives-green-green-2);
+  --colors-brand-success-dark-mode-brand: var(--colors-primitives-green-green-3);
+  --colors-brand-success-dark-mode-brandhover: var(--colors-primitives-green-green-4);
+  --colors-brand-success-dark-mode-brandlight: var(--colors-primitives-green-green-6);
+  --colors-brand-success-dark-mode-brandlighthover: var(--colors-primitives-green-green-7);
+  --colors-brand-success-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-success-dark-mode-onbrandlight: var(--colors-primitives-green-green-1);
+  --colors-brand-success-light-mode-brand: var(--colors-primitives-green-green-4);
+  --colors-brand-success-light-mode-brandhover: var(--colors-primitives-green-green-3);
+  --colors-brand-success-light-mode-brandlight: var(--colors-primitives-green-green-6);
+  --colors-brand-success-light-mode-brandlighthover: var(--colors-primitives-green-green-7);
   --colors-brand-success-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
-  --colors-brand-success-light-mode-onbrandlight: var(--colors-primitives-green-green-7);
+  --colors-brand-success-light-mode-onbrandlight: var(--colors-primitives-green-green-1);
   --colors-brand-warning-dark-mode-brand: var(--colors-primitives-yellow-yellow-6);
-  --colors-brand-warning-dark-mode-brandhover: var(--colors-primitives-yellow-yellow-3);
-  --colors-brand-warning-dark-mode-brandlight: var(--colors-primitives-yellow-yellow-2);
-  --colors-brand-warning-dark-mode-brandlighthover: var(--colors-primitives-yellow-yellow-4);
-  --colors-brand-warning-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-100);
-  --colors-brand-warning-dark-mode-onbrandlight: var(--colors-primitives-yellow-yellow-10);
-  --colors-brand-warning-light-mode-brand: var(--colors-primitives-yellow-yellow-5);
+  --colors-brand-warning-dark-mode-brandhover: var(--colors-primitives-yellow-yellow-7);
+  --colors-brand-warning-dark-mode-brandlight: var(--colors-primitives-yellow-yellow-1);
+  --colors-brand-warning-dark-mode-brandlighthover: var(--colors-primitives-yellow-yellow-2);
+  --colors-brand-warning-dark-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-warning-dark-mode-onbrandlight: var(--colors-primitives-yellow-yellow-7);
+  --colors-brand-warning-light-mode-brand: var(--colors-primitives-yellow-yellow-6);
   --colors-brand-warning-light-mode-brandhover: var(--colors-primitives-yellow-yellow-7);
   --colors-brand-warning-light-mode-brandlight: var(--colors-primitives-yellow-yellow-1);
   --colors-brand-warning-light-mode-brandlighthover: var(--colors-primitives-yellow-yellow-2);
-  --colors-brand-warning-light-mode-onbrand: var(--colors-primitives-grey-scale-black-90);
-  --colors-brand-warning-light-mode-onbrandlight: var(--colors-primitives-yellow-yellow-10);
-  --colors-primitives-a-dark-a-1: #f7f4eb;
-  --colors-primitives-a-dark-a-10: #4d4119;
-  --colors-primitives-a-dark-a-2: #ebe4cf;
-  --colors-primitives-a-dark-a-3: #dbcfa9;
-  --colors-primitives-a-dark-a-4: #cab982;
-  --colors-primitives-a-dark-a-5: #baa45c;
-  --colors-primitives-a-dark-a-6: #ab9038;
-  --colors-primitives-a-dark-a-7: #917a30;
-  --colors-primitives-a-dark-a-8: #796628;
-  --colors-primitives-a-dark-a-9: #615220;
-  --colors-primitives-a-light-a-1: #f7f4eb;
-  --colors-primitives-a-light-a-10: #4d4119;
-  --colors-primitives-a-light-a-2: #ebe4cf;
-  --colors-primitives-a-light-a-3: #dbcfa9;
-  --colors-primitives-a-light-a-4: #cab982;
-  --colors-primitives-a-light-a-5: #baa45c;
-  --colors-primitives-a-light-a-6: #ab9038;
-  --colors-primitives-a-light-a-7: #917a30;
-  --colors-primitives-a-light-a-8: #796628;
-  --colors-primitives-a-light-a-9: #615220;
-  --colors-primitives-b-dark-b-1: #e7e8e8;
-  --colors-primitives-b-dark-b-10: #05090b;
-  --colors-primitives-b-dark-b-2: #c4c7c8;
-  --colors-primitives-b-dark-b-3: #969a9c;
-  --colors-primitives-b-dark-b-4: #656b6d;
-  --colors-primitives-b-dark-b-5: #373e42;
-  --colors-primitives-b-dark-b-6: #0b1418;
-  --colors-primitives-b-dark-b-7: #091114;
-  --colors-primitives-b-dark-b-8: #080e11;
-  --colors-primitives-b-dark-b-9: #060b0e;
-  --colors-primitives-b-light-b-1: #e7e8e8;
-  --colors-primitives-b-light-b-10: #05090b;
-  --colors-primitives-b-light-b-2: #c4c7c8;
-  --colors-primitives-b-light-b-3: #969a9c;
-  --colors-primitives-b-light-b-4: #656b6d;
-  --colors-primitives-b-light-b-5: #373e42;
-  --colors-primitives-b-light-b-6: #0b1418;
-  --colors-primitives-b-light-b-7: #091114;
-  --colors-primitives-b-light-b-8: #080e11;
-  --colors-primitives-b-light-b-9: #060b0e;
+  --colors-brand-warning-light-mode-onbrand: var(--colors-primitives-grey-scale-black-0);
+  --colors-brand-warning-light-mode-onbrandlight: var(--colors-primitives-yellow-yellow-7);
+  --colors-primitives-a-dark-a-1: #fbe6f7;
+  --colors-primitives-a-dark-a-10: #580048;
+  --colors-primitives-a-dark-a-2: #f1b0e5;
+  --colors-primitives-a-dark-a-3: #ea8acd;
+  --colors-primitives-a-dark-a-4: #e154be;
+  --colors-primitives-a-dark-a-5: #db33b9;
+  --colors-primitives-a-dark-a-6: #d11a9d;
+  --colors-primitives-a-dark-a-7: #d200b2;
+  --colors-primitives-a-dark-a-8: #a3008d;
+  --colors-primitives-a-dark-a-9: #74006a;
+  --colors-primitives-a-light-a-1: #fbe6f7;
+  --colors-primitives-a-light-a-10: #580048;
+  --colors-primitives-a-light-a-2: #f1b0e5;
+  --colors-primitives-a-light-a-3: #ea8acd;
+  --colors-primitives-a-light-a-4: #e154be;
+  --colors-primitives-a-light-a-5: #db33b9;
+  --colors-primitives-a-light-a-6: #d11a9d;
+  --colors-primitives-a-light-a-7: #d200b2;
+  --colors-primitives-a-light-a-8: #a3008d;
+  --colors-primitives-a-light-a-9: #74006a;
+  --colors-primitives-b-dark-b-1: #ebfbed;
+  --colors-primitives-b-dark-b-10: #1b5918;
+  --colors-primitives-b-dark-b-2: #c2f1ce;
+  --colors-primitives-b-dark-b-3: #a4eba9;
+  --colors-primitives-b-dark-b-4: #7ae291;
+  --colors-primitives-b-dark-b-5: #61dc69;
+  --colors-primitives-b-dark-b-6: #39d341;
+  --colors-primitives-b-dark-b-7: #34c050;
+  --colors-primitives-b-dark-b-8: #2e9628;
+  --colors-primitives-b-dark-b-9: #1f742f;
+  --colors-primitives-b-light-b-1: #ebfbed;
+  --colors-primitives-b-light-b-10: #1b5918;
+  --colors-primitives-b-light-b-2: #c2f1ce;
+  --colors-primitives-b-light-b-3: #a4eba9;
+  --colors-primitives-b-light-b-4: #7ae291;
+  --colors-primitives-b-light-b-5: #61dc69;
+  --colors-primitives-b-light-b-6: #39d341;
+  --colors-primitives-b-light-b-7: #34c050;
+  --colors-primitives-b-light-b-8: #2e9628;
+  --colors-primitives-b-light-b-9: #1f742f;
   --colors-primitives-grey-scale-transparent: #ffffff00;
   --colors-primitives-grey-scale-black-0: #ffffff;
   --colors-primitives-grey-scale-black-10: #e6e6e6;
@@ -2469,32 +2312,26 @@
   --colors-primitives-yellow-yellow-7: #cab302;
   --colors-primitives-yellow-yellow-8: #a99501;
   --colors-primitives-yellow-yellow-9: #887801;
-  --typography-color: #ffffff;
-  --brand: "Veleia";
-  --button-font: var(--typography-font-2);
-  --icon-button-font: var(--typography-font-2);
-  --typography-font-1: "Work Sans";
-  --typography-font-2: "Work Sans";
-  --typography-print-body-font: var(--typography-font-2);
-  --typography-print-button-font: var(--typography-font-2);
-  --typography-print-heading-font: var(--typography-font-1);
-  --typography-print-label-font: var(--typography-font-2);
-  --typography-print-title-font: var(--typography-font-1);
-  --typography-web-body-font: var(--typography-font-2);
-  --typography-web-button-font: var(--typography-font-2);
-  --typography-web-heading-font: var(--typography-font-1);
-  --typography-web-label-font: var(--typography-font-2);
-  --typography-web-title-font: var(--typography-font-1);
+  --button-font: var(--typography-font-family-font-2);
+  --icon-button-font: var(--typography-font-family-font-2);
+  --typography-body-font: var(--typography-font-family-font-2);
+  --typography-button-font: var(--typography-font-family-font-2);
+  --typography-heading-font: var(--typography-font-family-font-1);
+  --typography-label-font: var(--typography-font-family-font-2);
+  --typography-title-font: var(--typography-font-family-font-1);
+  --typography-font-family-font-1: "Roboto";
+  --typography-font-family-font-2: "Roboto";
+  --blablablafe: "String value";
   --button-size-large-corner-radius---desktop: var(--corner-radius-m);
   --button-size-large-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-large-font-line-height---desktop: var(--typography-web-button-large-line-height---desktop);
-  --button-size-large-font-line-height---mobile: var(--typography-web-button-large-line-height---mobile);
-  --button-size-large-font-size---desktop: var(--typography-web-button-large-size---desktop);
-  --button-size-large-font-size---mobile: var(--typography-web-button-large-size---mobile);
-  --button-size-large-font-weight---desktop: var(--typography-web-button-large-weight---desktop);
-  --button-size-large-font-weight---mobile: var(--typography-web-button-large-weight---mobile);
-  --button-size-large-icon---desktop: var(--typography-web-button-large-size---desktop);
-  --button-size-large-icon---mobile: var(--typography-web-button-large-size---mobile);
+  --button-size-large-font-line-height---desktop: var(--typography-button-large-line-height---desktop);
+  --button-size-large-font-line-height---mobile: var(--typography-button-large-line-height---mobile);
+  --button-size-large-font-size---desktop: var(--typography-button-large-size---desktop);
+  --button-size-large-font-size---mobile: var(--typography-button-large-size---mobile);
+  --button-size-large-font-weight---desktop: var(--typography-button-large-weight---desktop);
+  --button-size-large-font-weight---mobile: var(--typography-button-large-weight---mobile);
+  --button-size-large-icon---desktop: var(--typography-button-large-size---desktop);
+  --button-size-large-icon---mobile: var(--typography-button-large-size---mobile);
   --button-size-large-paddingbottom---desktop: var(--spacing-l---desktop);
   --button-size-large-paddingbottom---mobile: var(--spacing-l---mobile);
   --button-size-large-paddingleft---desktop: var(--spacing-xl---desktop);
@@ -2507,14 +2344,14 @@
   --button-size-large-spacing---mobile: var(--spacing-m---mobile);
   --button-size-medium-corner-radius---desktop: var(--corner-radius-m);
   --button-size-medium-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-medium-font-line-height---desktop: var(--typography-web-button-medium-line-height---desktop);
-  --button-size-medium-font-line-height---mobile: var(--typography-web-button-medium-line-height---mobile);
-  --button-size-medium-font-size---desktop: var(--typography-web-button-medium-size---desktop);
-  --button-size-medium-font-size---mobile: var(--typography-web-button-medium-size---mobile);
-  --button-size-medium-font-weight---desktop: var(--typography-web-button-medium-weight---desktop);
-  --button-size-medium-font-weight---mobile: var(--typography-web-button-medium-weight---mobile);
-  --button-size-medium-icon---desktop: var(--typography-web-button-medium-size---desktop);
-  --button-size-medium-icon---mobile: var(--typography-web-button-medium-size---mobile);
+  --button-size-medium-font-line-height---desktop: var(--typography-button-medium-line-height---desktop);
+  --button-size-medium-font-line-height---mobile: var(--typography-button-medium-line-height---mobile);
+  --button-size-medium-font-size---desktop: var(--typography-button-medium-size---desktop);
+  --button-size-medium-font-size---mobile: var(--typography-button-medium-size---mobile);
+  --button-size-medium-font-weight---desktop: var(--typography-button-medium-weight---desktop);
+  --button-size-medium-font-weight---mobile: var(--typography-button-medium-weight---mobile);
+  --button-size-medium-icon---desktop: var(--typography-button-medium-size---desktop);
+  --button-size-medium-icon---mobile: var(--typography-button-medium-size---mobile);
   --button-size-medium-paddingbottom---desktop: var(--spacing-m---desktop);
   --button-size-medium-paddingbottom---mobile: var(--spacing-m---mobile);
   --button-size-medium-paddingleft---desktop: var(--spacing-l---desktop);
@@ -2527,14 +2364,14 @@
   --button-size-medium-spacing---mobile: var(--spacing-s----mobile);
   --button-size-small-corner-radius---desktop: var(--corner-radius-m);
   --button-size-small-corner-radius---mobile: var(--corner-radius-m);
-  --button-size-small-font-line-height---desktop: var(--typography-web-button-small-line-height---desktop);
-  --button-size-small-font-line-height---mobile: var(--typography-web-button-small-line-height---mobile);
-  --button-size-small-font-size---desktop: var(--typography-web-button-small-size---desktop);
-  --button-size-small-font-size---mobile: var(--typography-web-button-small-size---mobile);
-  --button-size-small-font-weight---desktop: var(--typography-web-button-small-weight---desktop);
-  --button-size-small-font-weight---mobile: var(--typography-web-button-small-weight---mobile);
-  --button-size-small-icon---desktop: var(--typography-web-button-small-size---desktop);
-  --button-size-small-icon---mobile: var(--typography-web-button-small-size---mobile);
+  --button-size-small-font-line-height---desktop: var(--typography-button-small-line-height---desktop);
+  --button-size-small-font-line-height---mobile: var(--typography-button-small-line-height---mobile);
+  --button-size-small-font-size---desktop: var(--typography-button-small-size---desktop);
+  --button-size-small-font-size---mobile: var(--typography-button-small-size---mobile);
+  --button-size-small-font-weight---desktop: var(--typography-button-small-weight---desktop);
+  --button-size-small-font-weight---mobile: var(--typography-button-small-weight---mobile);
+  --button-size-small-icon---desktop: var(--typography-button-small-size---desktop);
+  --button-size-small-icon---mobile: var(--typography-button-small-size---mobile);
   --button-size-small-paddingbottom---desktop: var(--spacing-s---desktop);
   --button-size-small-paddingbottom---mobile: var(--spacing-s----mobile);
   --button-size-small-paddingleft---desktop: var(--spacing-m---desktop);
@@ -2546,30 +2383,30 @@
   --button-size-small-spacing---desktop: var(--spacing-s---desktop);
   --button-size-small-spacing---mobile: var(--spacing-s----mobile);
   --corner-radius-0: ;
-  --corner-radius-2xl: ;
-  --corner-radius-2xs: ;
-  --corner-radius-l: ;
-  --corner-radius-m: ;
-  --corner-radius-s: ;
-  --corner-radius-xl: ;
-  --corner-radius-xs: ;
-  --corner-radius-rounded: ;
+  --corner-radius-2xl: 32px;
+  --corner-radius-2xs: 2px;
+  --corner-radius-l: 16px;
+  --corner-radius-m: 12px;
+  --corner-radius-s: 8px;
+  --corner-radius-xl: 24px;
+  --corner-radius-xs: 4px;
+  --corner-radius-rounded: 9999px;
   --icon-button-size-large-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-large-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-large-icon---desktop: var(--typography-web-button-large-size---desktop);
-  --icon-button-size-large-icon---mobile: var(--typography-web-button-large-size---mobile);
+  --icon-button-size-large-icon---desktop: var(--typography-button-large-size---desktop);
+  --icon-button-size-large-icon---mobile: var(--typography-button-large-size---mobile);
   --icon-button-size-large-padding---desktop: var(--spacing-l---desktop);
   --icon-button-size-large-padding---mobile: var(--spacing-l---mobile);
   --icon-button-size-medium-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-medium-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-medium-icon---desktop: var(--typography-web-button-medium-size---desktop);
-  --icon-button-size-medium-icon---mobile: var(--typography-web-button-medium-size---mobile);
+  --icon-button-size-medium-icon---desktop: var(--typography-button-medium-size---desktop);
+  --icon-button-size-medium-icon---mobile: var(--typography-button-medium-size---mobile);
   --icon-button-size-medium-padding---desktop: var(--spacing-m---desktop);
   --icon-button-size-medium-padding---mobile: var(--spacing-m---mobile);
   --icon-button-size-small-corner-radius---desktop: var(--corner-radius-m);
   --icon-button-size-small-corner-radius---mobile: var(--corner-radius-m);
-  --icon-button-size-small-icon---desktop: var(--typography-web-button-small-size---desktop);
-  --icon-button-size-small-icon---mobile: var(--typography-web-button-small-size---mobile);
+  --icon-button-size-small-icon---desktop: var(--typography-button-small-size---desktop);
+  --icon-button-size-small-icon---mobile: var(--typography-button-small-size---mobile);
   --icon-button-size-small-padding---desktop: var(--spacing-s---desktop);
   --icon-button-size-small-padding---mobile: var(--spacing-s----mobile);
   --spacing-0---desktop: ;
@@ -2598,123 +2435,84 @@
   --spacing-xl---mobile: 16px;
   --spacing-xs----mobile: 4px;
   --spacing-xs---desktop: 4px;
-  --typography-print-body-large-line-height---desktop: 12px;
-  --typography-print-body-large-size---desktop: 12px;
-  --typography-print-body-large-weight---desktop: 400;
-  --typography-print-body-medium-line-height---desktop: 10px;
-  --typography-print-body-medium-size---desktop: 10px;
-  --typography-print-body-medium-weight---desktop: 400;
-  --typography-print-body-small-line-height---desktop: 8px;
-  --typography-print-body-small-size---desktop: 8px;
-  --typography-print-body-small-weight---desktop: 400;
-  --typography-print-button-large-line-height---desktop: 14px;
-  --typography-print-button-large-size---desktop: 14px;
-  --typography-print-button-large-weight---desktop: 600;
-  --typography-print-button-medium-line-height---desktop: 10px;
-  --typography-print-button-medium-size---desktop: 10px;
-  --typography-print-button-medium-weight---desktop: 600;
-  --typography-print-button-small-line-height---desktop: 8px;
-  --typography-print-button-small-size---desktop: 8px;
-  --typography-print-button-small-weight---desktop: 600;
-  --typography-print-heading-medium-line-height---desktop: 24px;
-  --typography-print-heading-medium-size---desktop: 24px;
-  --typography-print-heading-medium-weight---desktop: 600;
-  --typography-print-label-large-line-height---desktop: 12px;
-  --typography-print-label-large-size---desktop: 12px;
-  --typography-print-label-large-weight---desktop: 400;
-  --typography-print-label-medium-line-height---desktop: 10px;
-  --typography-print-label-medium-size---desktop: 10px;
-  --typography-print-label-medium-weight---desktop: 400;
-  --typography-print-label-small-line-height---desktop: 8px;
-  --typography-print-label-small-size---desktop: 8px;
-  --typography-print-label-small-weight---desktop: 500;
-  --typography-print-title-large-line-height---desktop: 18px;
-  --typography-print-title-large-size---desktop: 18px;
-  --typography-print-title-large-weight---desktop: 600;
-  --typography-print-title-medium-line-height---desktop: 16px;
-  --typography-print-title-medium-size---desktop: 16px;
-  --typography-print-title-medium-weight---desktop: 600;
-  --typography-print-title-small-line-height---desktop: 14px;
-  --typography-print-title-small-size---desktop: 14px;
-  --typography-print-title-small-weight---desktop: 600;
-  --typography-web-body-large-line-height---desktop: 24px;
-  --typography-web-body-large-line-height---mobile: 24px;
-  --typography-web-body-large-size---desktop: 18px;
-  --typography-web-body-large-size---mobile: 18px;
-  --typography-web-body-large-weight---desktop: 400;
-  --typography-web-body-large-weight---mobile: 400;
-  --typography-web-body-medium-line-height---desktop: 22px;
-  --typography-web-body-medium-line-height---mobile: 22px;
-  --typography-web-body-medium-size---desktop: 16px;
-  --typography-web-body-medium-size---mobile: 16px;
-  --typography-web-body-medium-weight---desktop: 400;
-  --typography-web-body-medium-weight---mobile: 400;
-  --typography-web-body-small-line-height---desktop: 16px;
-  --typography-web-body-small-line-height---mobile: 16px;
-  --typography-web-body-small-size---desktop: 14px;
-  --typography-web-body-small-size---mobile: 14px;
-  --typography-web-body-small-weight---desktop: 300;
-  --typography-web-body-small-weight---mobile: 300;
-  --typography-web-button-large-line-height---desktop: 18px;
-  --typography-web-button-large-line-height---mobile: 18px;
-  --typography-web-button-large-size---desktop: 20px;
-  --typography-web-button-large-size---mobile: 18px;
-  --typography-web-button-large-weight---desktop: 600;
-  --typography-web-button-large-weight---mobile: 600;
-  --typography-web-button-medium-line-height---desktop: 16px;
-  --typography-web-button-medium-line-height---mobile: 16px;
-  --typography-web-button-medium-size---desktop: 16px;
-  --typography-web-button-medium-size---mobile: 16px;
-  --typography-web-button-medium-weight---desktop: 600;
-  --typography-web-button-medium-weight---mobile: 600;
-  --typography-web-button-small-line-height---desktop: 12px;
-  --typography-web-button-small-line-height---mobile: 14px;
-  --typography-web-button-small-size---desktop: 14px;
-  --typography-web-button-small-size---mobile: 14px;
-  --typography-web-button-small-weight---desktop: 600;
-  --typography-web-button-small-weight---mobile: 600;
-  --typography-web-heading-medium-line-height---desktop: 48px;
-  --typography-web-heading-medium-line-height---mobile: 32px;
-  --typography-web-heading-medium-size---desktop: 48px;
-  --typography-web-heading-medium-size---mobile: 32px;
-  --typography-web-heading-medium-weight---desktop: 500;
-  --typography-web-heading-medium-weight---mobile: 500;
-  --typography-web-label-large-line-height---desktop: 11px;
-  --typography-web-label-large-line-height---mobile: 11px;
-  --typography-web-label-large-size---desktop: 12px;
-  --typography-web-label-large-size---mobile: 12px;
-  --typography-web-label-large-weight---desktop: 400;
-  --typography-web-label-large-weight---mobile: 400;
-  --typography-web-label-medium-line-height---desktop: 12px;
-  --typography-web-label-medium-line-height---mobile: 12px;
-  --typography-web-label-medium-size---desktop: 12px;
-  --typography-web-label-medium-size---mobile: 12px;
-  --typography-web-label-medium-weight---desktop: 400;
-  --typography-web-label-medium-weight---mobile: 400;
-  --typography-web-label-small-line-height---desktop: 7px;
-  --typography-web-label-small-line-height---mobile: 7px;
-  --typography-web-label-small-size---desktop: 10px;
-  --typography-web-label-small-size---mobile: 10px;
-  --typography-web-label-small-weight---desktop: 500;
-  --typography-web-label-small-weight---mobile: 500;
-  --typography-web-title-large-line-height---desktop: 34px;
-  --typography-web-title-large-line-height---mobile: 30px;
-  --typography-web-title-large-size---desktop: 28px;
-  --typography-web-title-large-size---mobile: 24px;
-  --typography-web-title-large-weight---desktop: 600;
-  --typography-web-title-large-weight---mobile: 600;
-  --typography-web-title-medium-line-height---desktop: 24px;
-  --typography-web-title-medium-line-height---mobile: 20px;
-  --typography-web-title-medium-size---desktop: 18px;
-  --typography-web-title-medium-size---mobile: 16px;
-  --typography-web-title-medium-weight---desktop: 700;
-  --typography-web-title-medium-weight---mobile: 600;
-  --typography-web-title-small-line-height---desktop: 18px;
-  --typography-web-title-small-line-height---mobile: 18px;
-  --typography-web-title-small-size---desktop: 14px;
-  --typography-web-title-small-size---mobile: 14px;
-  --typography-web-title-small-weight---desktop: 700;
-  --typography-web-title-small-weight---mobile: 700;
+  --typography-body-large-line-height---desktop: 24px;
+  --typography-body-large-line-height---mobile: 24px;
+  --typography-body-large-size---desktop: 18px;
+  --typography-body-large-size---mobile: 18px;
+  --typography-body-large-weight---desktop: 400;
+  --typography-body-large-weight---mobile: 400;
+  --typography-body-medium-line-height---desktop: 22px;
+  --typography-body-medium-line-height---mobile: 22px;
+  --typography-body-medium-size---desktop: 16px;
+  --typography-body-medium-size---mobile: 16px;
+  --typography-body-medium-weight---desktop: 400;
+  --typography-body-medium-weight---mobile: 400;
+  --typography-body-small-line-height---desktop: 16px;
+  --typography-body-small-line-height---mobile: 16px;
+  --typography-body-small-size---desktop: 14px;
+  --typography-body-small-size---mobile: 14px;
+  --typography-body-small-weight---desktop: 300;
+  --typography-body-small-weight---mobile: 300;
+  --typography-button-large-line-height---desktop: 18px;
+  --typography-button-large-line-height---mobile: 18px;
+  --typography-button-large-size---desktop: 20px;
+  --typography-button-large-size---mobile: 18px;
+  --typography-button-large-weight---desktop: 600;
+  --typography-button-large-weight---mobile: 600;
+  --typography-button-medium-line-height---desktop: 16px;
+  --typography-button-medium-line-height---mobile: 16px;
+  --typography-button-medium-size---desktop: 16px;
+  --typography-button-medium-size---mobile: 16px;
+  --typography-button-medium-weight---desktop: 600;
+  --typography-button-medium-weight---mobile: 600;
+  --typography-button-small-line-height---desktop: 12px;
+  --typography-button-small-line-height---mobile: 14px;
+  --typography-button-small-size---desktop: 14px;
+  --typography-button-small-size---mobile: 14px;
+  --typography-button-small-weight---desktop: 600;
+  --typography-button-small-weight---mobile: 600;
+  --typography-heading-medium-line-height---desktop: 48px;
+  --typography-heading-medium-line-height---mobile: 32px;
+  --typography-heading-medium-size---desktop: 48px;
+  --typography-heading-medium-size---mobile: 32px;
+  --typography-heading-medium-weight---desktop: 500;
+  --typography-heading-medium-weight---mobile: 500;
+  --typography-label-large-line-height---desktop: 11px;
+  --typography-label-large-line-height---mobile: 11px;
+  --typography-label-large-size---desktop: 12px;
+  --typography-label-large-size---mobile: 12px;
+  --typography-label-large-weight---desktop: 400;
+  --typography-label-large-weight---mobile: 400;
+  --typography-label-medium-line-height---desktop: 12px;
+  --typography-label-medium-line-height---mobile: 12px;
+  --typography-label-medium-size---desktop: 12px;
+  --typography-label-medium-size---mobile: 12px;
+  --typography-label-medium-weight---desktop: 400;
+  --typography-label-medium-weight---mobile: 400;
+  --typography-label-small-line-height---desktop: 7px;
+  --typography-label-small-line-height---mobile: 7px;
+  --typography-label-small-size---desktop: 10px;
+  --typography-label-small-size---mobile: 10px;
+  --typography-label-small-weight---desktop: 500;
+  --typography-label-small-weight---mobile: 500;
+  --typography-title-large-line-height---desktop: 34px;
+  --typography-title-large-line-height---mobile: 30px;
+  --typography-title-large-size---desktop: 28px;
+  --typography-title-large-size---mobile: 24px;
+  --typography-title-large-weight---desktop: 600;
+  --typography-title-large-weight---mobile: 600;
+  --typography-title-medium-line-height---desktop: 24px;
+  --typography-title-medium-line-height---mobile: 20px;
+  --typography-title-medium-size---desktop: 18px;
+  --typography-title-medium-size---mobile: 16px;
+  --typography-title-medium-weight---desktop: 700;
+  --typography-title-medium-weight---mobile: 600;
+  --typography-title-small-line-height---desktop: 18px;
+  --typography-title-small-line-height---mobile: 18px;
+  --typography-title-small-size---desktop: 14px;
+  --typography-title-small-size---mobile: 14px;
+  --typography-title-small-weight---desktop: 700;
+  --typography-title-small-weight---mobile: 700;
 }
 
 /* Mode: accordion-Default */
@@ -2725,15 +2523,15 @@
   --fontcolor: var(--accordion-fontcolor);
   --borderradius: var(--corner-radius-xl);
   --borderwidth: 1px;
-  --fontlineheight: var(--typography-web-title-line-height-medium);
-  --fontsize: var(--typography-web-title-size-medium);
-  --fontweight: var(--typography-web-title-weight-medium);
+  --fontlineheight: var(--typography-title-line-height-medium);
+  --fontsize: var(--typography-title-size-medium);
+  --fontweight: var(--typography-title-weight-medium);
   --paddingbottom: var(--spacing-l);
   --paddingleft: var(--spacing-l);
   --paddingright: var(--spacing-l);
   --paddingtop: var(--spacing-l);
   --spacing: var(--corner-radius-m);
-  --fonttype: var(--typography-font-2);
+  --fonttype: var(--typography-font-family-font-2);
 }
 
 /* Mode: buttonAppearance-Disabled */
@@ -3512,26 +3310,26 @@
 
 /* Mode: cardTitle-Large */
 [data-mode*="cardTitle-Large"] {
-  --subtitle-font-line-height: var(--typography-web-body-line-height-medium);
-  --subtitle-font-size: var(--typography-web-body-size-medium);
-  --subtitle-font-weight: var(--typography-web-body-weight-medium);
-  --title-font-line-height: var(--typography-web-title-line-height-large);
-  --title-font-size: var(--typography-web-title-size-large);
-  --title-font-weight: var(--typography-web-title-weight-large);
-  --subtitle-font-type: var(--typography-font-2);
-  --title-font-type: var(--typography-font-1);
+  --subtitle-font-line-height: var(--typography-body-line-height-medium);
+  --subtitle-font-size: var(--typography-body-size-medium);
+  --subtitle-font-weight: var(--typography-body-weight-medium);
+  --title-font-line-height: var(--typography-title-line-height-large);
+  --title-font-size: var(--typography-title-size-large);
+  --title-font-weight: var(--typography-title-weight-large);
+  --subtitle-font-type: var(--typography-font-family-font-2);
+  --title-font-type: var(--typography-font-family-font-1);
 }
 
 /* Mode: cardTitle-Medium */
 [data-mode*="cardTitle-Medium"] {
-  --subtitle-font-line-height: var(--typography-web-body-line-height-medium);
-  --subtitle-font-size: var(--typography-web-body-size-medium);
-  --subtitle-font-weight: var(--typography-web-body-weight-medium);
-  --title-font-line-height: var(--typography-web-title-line-height-medium);
-  --title-font-size: var(--typography-web-title-size-medium);
-  --title-font-weight: var(--typography-web-title-weight-medium);
-  --subtitle-font-type: var(--typography-font-2);
-  --title-font-type: var(--typography-font-1);
+  --subtitle-font-line-height: var(--typography-body-line-height-medium);
+  --subtitle-font-size: var(--typography-body-size-medium);
+  --subtitle-font-weight: var(--typography-body-weight-medium);
+  --title-font-line-height: var(--typography-title-line-height-medium);
+  --title-font-size: var(--typography-title-size-medium);
+  --title-font-weight: var(--typography-title-weight-medium);
+  --subtitle-font-type: var(--typography-font-family-font-2);
+  --title-font-type: var(--typography-font-family-font-1);
 }
 
 /* Mode: chipAppearance-Active */
@@ -3576,11 +3374,11 @@
 
 /* Mode: dropdownAppearance-Disabled */
 [data-mode*="dropdownAppearance-Disabled"] {
-  --dropdown-empty-background: var(--background-light-global-paper3);
+  --dropdown-empty-background: var(--background-disabled);
   --dropdown-empty-border: var(--border-disabled);
   --dropdown-empty-iconaction: var(--text-disabled);
   --dropdown-empty-label: var(--text-disabled);
-  --dropdown-filled-background: var(--background-light-global-paper3);
+  --dropdown-filled-background: var(--background-disabled);
   --dropdown-filled-border: var(--border-disabled);
   --dropdown-filled-iconaction: var(--text-disabled);
   --dropdown-filled-label: var(--text-disabled);
@@ -3646,70 +3444,10 @@
 
 /* Mode: dropdownSize-Medium */
 [data-mode*="dropdownSize-Medium"] {
-  --dropdown-cornerradius: var(--corner-radius-m);
+  --dropdown-borderradius: var(--border-radius-m);
   --dropdown-paddinghorizontal: var(--spacing-l);
   --dropdown-paddingvertical: var(--spacing-l);
   --dropdown-spacing: var(--spacing-s);
-}
-
-/* Mode: dropdownStatusAppearance-Disabled */
-[data-mode*="dropdownStatusAppearance-Disabled"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--background-light-global-paper2);
-  --border: var(--colors-primitives-grey-scale-black-10);
-  --icon: var(--text-disabled);
-  --label: var(--text-disabled);
-}
-
-/* Mode: dropdownStatusAppearance-Error */
-[data-mode*="dropdownStatusAppearance-Error"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--brand-error-brandlight);
-  --border: var(--brand-error-brand);
-  --icon: var(--brand-error-onbrandlight);
-  --label: var(--brand-error-onbrandlight);
-}
-
-/* Mode: dropdownStatusAppearance-Neutral */
-[data-mode*="dropdownStatusAppearance-Neutral"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--background-light-global-paper3);
-  --border: var(--colors-primitives-grey-scale-black-20);
-  --icon: var(--text-secondary);
-  --label: var(--text-secondary);
-}
-
-/* Mode: dropdownStatusAppearance-Resting */
-[data-mode*="dropdownStatusAppearance-Resting"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--brand-secondary-brandlight);
-  --border: var(--brand-secondary-brand);
-  --icon: var(--brand-secondary-onbrandlight);
-  --label: var(--brand-secondary-onbrandlight);
-}
-
-/* Mode: dropdownStatusAppearance-Success */
-[data-mode*="dropdownStatusAppearance-Success"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--brand-success-brandlight);
-  --border: var(--brand-success-brand);
-  --icon: var(--brand-success-onbrandlight);
-  --label: var(--brand-success-onbrandlight);
-}
-
-/* Mode: dropdownStatusAppearance-Warning */
-[data-mode*="dropdownStatusAppearance-Warning"] {
-  --borderwidth: 1px;
-  --cornerradius: var(--corner-radius-rounded);
-  --background: var(--brand-warning-brandlight);
-  --border: var(--brand-warning-brand);
-  --icon: var(--brand-warning-onbrandlight);
-  --label: var(--brand-warning-onbrandlight);
 }
 
 /* Mode: elevation-0 */
@@ -3837,13 +3575,12 @@
   --background-color: var(--brand-error-brand);
   --border-color: var(--colors-primitives-grey-scale-transparent);
   --font-color: var(--brand-error-onbrand);
+  --border-radius: var(--spacing-l);
   --border-width: ;
-  --font-line-height: var(--typography-web-body-line-height-medium);
-  --font-size: var(--typography-web-body-size-medium);
-  --font-weight: var(--typography-web-body-weight-medium);
-  --cornerradius: var(--spacing-l);
-  --iconsize: 16px;
-  --font-type: var(--typography-font-2);
+  --font-line-height: var(--typography-body-line-height-medium);
+  --font-size: var(--typography-body-size-medium);
+  --font-weight: var(--typography-body-weight-medium);
+  --font-type: var(--typography-font-family-font-2);
 }
 
 /* Mode: snackbarAppearance-Info */
@@ -3851,13 +3588,12 @@
   --background-color: var(--colors-primitives-grey-scale-black-60);
   --border-color: var(--colors-primitives-grey-scale-black-10);
   --font-color: var(--neutral-white);
+  --border-radius: var(--spacing-l);
   --border-width: 1px;
-  --font-line-height: var(--typography-web-body-line-height-medium);
-  --font-size: var(--typography-web-body-size-medium);
-  --font-weight: var(--typography-web-body-weight-medium);
-  --cornerradius: var(--spacing-l);
-  --iconsize: 16px;
-  --font-type: var(--typography-font-2);
+  --font-line-height: var(--typography-body-line-height-medium);
+  --font-size: var(--typography-body-size-medium);
+  --font-weight: var(--typography-body-weight-medium);
+  --font-type: var(--typography-font-family-font-2);
 }
 
 /* Mode: snackbarAppearance-Success */
@@ -3865,13 +3601,12 @@
   --background-color: var(--brand-success-brand);
   --border-color: var(--colors-primitives-grey-scale-transparent);
   --font-color: var(--brand-success-onbrand);
+  --border-radius: var(--spacing-l);
   --border-width: ;
-  --font-line-height: var(--typography-web-body-line-height-medium);
-  --font-size: var(--typography-web-body-size-medium);
-  --font-weight: var(--typography-web-body-weight-medium);
-  --cornerradius: var(--spacing-l);
-  --iconsize: 16px;
-  --font-type: var(--typography-font-2);
+  --font-line-height: var(--typography-body-line-height-medium);
+  --font-size: var(--typography-body-size-medium);
+  --font-weight: var(--typography-body-weight-medium);
+  --font-type: var(--typography-font-family-font-2);
 }
 
 /* Mode: snackbarAppearance-Warning */
@@ -3879,13 +3614,12 @@
   --background-color: var(--brand-warning-brand);
   --border-color: var(--colors-primitives-grey-scale-transparent);
   --font-color: var(--brand-warning-onbrand);
+  --border-radius: var(--spacing-l);
   --border-width: ;
-  --font-line-height: var(--typography-web-body-line-height-medium);
-  --font-size: var(--typography-web-body-size-medium);
-  --font-weight: var(--typography-web-body-weight-medium);
-  --cornerradius: var(--spacing-l);
-  --iconsize: 16px;
-  --font-type: var(--typography-font-2);
+  --font-line-height: var(--typography-body-line-height-medium);
+  --font-size: var(--typography-body-size-medium);
+  --font-weight: var(--typography-body-weight-medium);
+  --font-type: var(--typography-font-family-font-2);
 }
 
 /* Mode: standlinkAppearance-Neutral */
@@ -3912,62 +3646,20 @@
   --heading-text-color: var(--text-secondary);
   --content-border-width: 1px;
   --content-padding-horizontal: var(--spacing-m);
-  --content-padding-vertical: var(--spacing-xl);
-  --content-spacing: var(--spacing-2xl);
+  --content-padding-vertical: var(--spacing-l);
+  --content-spacing: var(--spacing-4xl);
   --footer-border-radius: var(--corner-radius-s);
   --footer-padding-horizontal: var(--spacing-m);
   --footer-padding-vertical: var(--spacing-l);
-  --footer-spacing: var(--spacing-2xl);
+  --footer-spacing: var(--spacing-4xl);
   --heading-border-radius: var(--corner-radius-s);
-  --heading-font-line-height: var(--typography-web-title-line-height-small);
-  --heading-font-size: var(--typography-web-title-size-small);
-  --heading-font-weight: var(--typography-web-title-weight-small);
+  --heading-font-line-height: var(--typography-title-line-height-small);
+  --heading-font-size: var(--typography-title-size-small);
+  --heading-font-weight: var(--typography-title-weight-small);
   --heading-padding-horizontal: var(--spacing-m);
   --heading-padding-vertical: var(--spacing-l);
-  --heading-spacing: var(--spacing-2xl);
-  --heading-font-type: var(--typography-font-1);
-}
-
-/* Mode: tagAppearance-Primary */
-[data-mode*="tagAppearance-Primary"] {
-  --tag-default-background: var(--tag-primary-default-default-background);
-  --tag-default-foreground: var(--tag-primary-default-default-foreground);
-  --tag-light-background: var(--tag-primary-light-default-background);
-  --tag-light-foreground: var(--tag-primary-light-default-foreground);
-}
-
-/* Mode: tagAppearance-Secondary */
-[data-mode*="tagAppearance-Secondary"] {
-  --tag-default-background: var(--tag-secondary-default-default-background);
-  --tag-default-foreground: var(--tag-secondary-default-default-foreground);
-  --tag-light-background: var(--tag-secondary-light-default-background);
-  --tag-light-foreground: var(--tag-secondary-light-default-foreground);
-}
-
-/* Mode: tagEmphasis-Default */
-[data-mode*="tagEmphasis-Default"] {
-  --background: var(--tag-default-background);
-  --foreground: var(--tag-default-foreground);
-}
-
-/* Mode: tagEmphasis-Light */
-[data-mode*="tagEmphasis-Light"] {
-  --background: var(--tag-light-background);
-  --foreground: var(--tag-light-foreground);
-}
-
-/* Mode: tagSize-Medium */
-[data-mode*="tagSize-Medium"] {
-  --cornerradius: var(--corner-radius-s);
-  --fontletterspacing: 2px;
-  --fontlineheight: 12px;
-  --fontsize: 12px;
-  --fontweight: 600;
-  --iconsize: 16px;
-  --paddinghorizontal: var(--spacing-s);
-  --paddingvertical: var(--spacing-xs);
-  --spacing: var(--spacing-xs);
-  --fontfamily: var(--typography-web-title-font);
+  --heading-spacing: var(--spacing-4xl);
+  --heading-font-type: var(--typography-font-family-font-1);
 }
 
 /* Mode: texteditorEmphasis-Active */
@@ -4088,183 +3780,92 @@
 
 /* Mode: typoBody-Large */
 [data-mode*="typoBody-Large"] {
-  --line-height: var(--typography-web-body-line-height-large);
-  --size: var(--typography-web-body-size-large);
-  --weight: var(--typography-web-body-weight-large);
+  --line-height: var(--typography-body-line-height-large);
+  --size: var(--typography-body-size-large);
+  --weight: var(--typography-body-weight-large);
 }
 
 /* Mode: typoBody-Medium */
 [data-mode*="typoBody-Medium"] {
-  --line-height: var(--typography-web-body-line-height-medium);
-  --size: var(--typography-web-body-size-medium);
-  --weight: var(--typography-web-body-weight-medium);
+  --line-height: var(--typography-body-line-height-medium);
+  --size: var(--typography-body-size-medium);
+  --weight: var(--typography-body-weight-medium);
 }
 
 /* Mode: typoBody-Small */
 [data-mode*="typoBody-Small"] {
-  --line-height: var(--typography-web-body-line-height-small);
-  --size: var(--typography-web-body-size-small);
-  --weight: var(--typography-web-body-weight-small);
+  --line-height: var(--typography-body-line-height-small);
+  --size: var(--typography-body-size-small);
+  --weight: var(--typography-body-weight-small);
 }
 
 /* Mode: typoButton-Large */
 [data-mode*="typoButton-Large"] {
-  --line-height: var(--typography-web-button-lineheight-large);
-  --size: var(--typography-web-button-size-large);
-  --weight: var(--typography-web-button-weight-large);
+  --line-height: var(--typography-button-lineheight-large);
+  --size: var(--typography-button-size-large);
+  --weight: var(--typography-button-weight-large);
 }
 
 /* Mode: typoButton-Medium */
 [data-mode*="typoButton-Medium"] {
-  --line-height: var(--typography-web-button-lineheight-medium);
-  --size: var(--typography-web-button-size-medium);
-  --weight: var(--typography-web-button-weight-medium);
+  --line-height: var(--typography-button-lineheight-medium);
+  --size: var(--typography-button-size-medium);
+  --weight: var(--typography-button-weight-medium);
 }
 
 /* Mode: typoButton-Small */
 [data-mode*="typoButton-Small"] {
-  --line-height: var(--typography-web-button-lineheight-small);
-  --size: var(--typography-web-button-size-small);
-  --weight: var(--typography-web-button-weight-small);
+  --line-height: var(--typography-button-lineheight-small);
+  --size: var(--typography-button-size-small);
+  --weight: var(--typography-button-weight-small);
 }
 
 /* Mode: typoHeading-Medium */
 [data-mode*="typoHeading-Medium"] {
-  --line-height: var(--typography-web-heading-line-height-medium);
-  --size: var(--typography-web-heading-size-medium);
-  --weight: var(--typography-web-heading-weigth-medium);
+  --line-height: var(--typography-heading-line-height-medium);
+  --size: var(--typography-heading-size-medium);
+  --weight: var(--typography-heading-weight-medium);
 }
 
 /* Mode: typoLabel-Large */
 [data-mode*="typoLabel-Large"] {
-  --line-height: var(--typography-web-label-line-height-large);
-  --size: var(--typography-web-label-size-large);
-  --weight: var(--typography-web-label-weight-large);
+  --line-height: var(--typography-label-line-height-large);
+  --size: var(--typography-label-size-large);
+  --weight: var(--typography-label-weight-large);
 }
 
 /* Mode: typoLabel-Medium */
 [data-mode*="typoLabel-Medium"] {
-  --line-height: var(--typography-web-label-line-height-medium);
-  --size: var(--typography-web-label-size-medium);
-  --weight: var(--typography-web-label-weight-medium);
+  --line-height: var(--typography-label-line-height-medium);
+  --size: var(--typography-label-size-medium);
+  --weight: var(--typography-label-weight-medium);
 }
 
 /* Mode: typoLabel-Small */
 [data-mode*="typoLabel-Small"] {
-  --line-height: var(--typography-web-label-line-height-small);
-  --size: var(--typography-web-label-size-small);
-  --weight: var(--typography-web-label-weight-small);
-}
-
-/* Mode: typoPrintBody-Large */
-[data-mode*="typoPrintBody-Large"] {
-  --line-height: var(--typography-print-body-line-height-large);
-  --size: var(--typography-print-body-size-large);
-  --weight: var(--typography-print-body-weight-large);
-}
-
-/* Mode: typoPrintBody-Medium */
-[data-mode*="typoPrintBody-Medium"] {
-  --line-height: var(--typography-print-body-line-height-medium);
-  --size: var(--typography-print-body-size-medium);
-  --weight: var(--typography-print-body-weight-medium);
-}
-
-/* Mode: typoPrintBody-Small */
-[data-mode*="typoPrintBody-Small"] {
-  --line-height: var(--typography-print-body-line-height-small);
-  --size: var(--typography-print-body-size-small);
-  --weight: var(--typography-print-body-weight-small);
-}
-
-/* Mode: typoPrintButton-Large */
-[data-mode*="typoPrintButton-Large"] {
-  --line-height: var(--typography-print-button-lineheight-large);
-  --size: var(--typography-print-button-size-large);
-  --weight: var(--typography-print-button-weight-large);
-}
-
-/* Mode: typoPrintButton-Medium */
-[data-mode*="typoPrintButton-Medium"] {
-  --line-height: var(--typography-print-button-lineheight-medium);
-  --size: var(--typography-print-button-size-medium);
-  --weight: var(--typography-print-button-weight-medium);
-}
-
-/* Mode: typoPrintButton-Small */
-[data-mode*="typoPrintButton-Small"] {
-  --line-height: var(--typography-print-button-lineheight-small);
-  --size: var(--typography-print-button-size-small);
-  --weight: var(--typography-print-button-weight-small);
-}
-
-/* Mode: typoPrintHeading-Medium */
-[data-mode*="typoPrintHeading-Medium"] {
-  --line-height: var(--typography-print-heading-line-height-medium);
-  --size: var(--typography-print-heading-size-medium);
-  --weight: var(--typography-print-heading-weight-medium);
-}
-
-/* Mode: typoPrintLabel-Large */
-[data-mode*="typoPrintLabel-Large"] {
-  --line-height: var(--typography-print-label-line-height-large);
-  --size: var(--typography-print-label-size-large);
-  --weight: var(--typography-print-label-weight-large);
-}
-
-/* Mode: typoPrintLabel-Medium */
-[data-mode*="typoPrintLabel-Medium"] {
-  --line-height: var(--typography-print-label-line-height-medium);
-  --size: var(--typography-print-label-size-medium);
-  --weight: var(--typography-print-label-weight-medium);
-}
-
-/* Mode: typoPrintLabel-Small */
-[data-mode*="typoPrintLabel-Small"] {
-  --line-height: var(--typography-print-label-line-height-small);
-  --size: var(--typography-print-label-size-small);
-  --weight: var(--typography-print-label-weight-small);
-}
-
-/* Mode: typoPrintTitle-Large */
-[data-mode*="typoPrintTitle-Large"] {
-  --line-height: var(--typography-print-title-line-height-large);
-  --size: var(--typography-print-title-size-large);
-  --weight: var(--typography-print-title-weight-large);
-}
-
-/* Mode: typoPrintTitle-Medium */
-[data-mode*="typoPrintTitle-Medium"] {
-  --line-height: var(--typography-print-title-line-height-medium);
-  --size: var(--typography-print-title-size-medium);
-  --weight: var(--typography-print-title-weight-medium);
-}
-
-/* Mode: typoPrintTitle-Small */
-[data-mode*="typoPrintTitle-Small"] {
-  --line-height: var(--typography-print-title-line-height-small);
-  --size: var(--typography-print-title-size-small);
-  --weight: var(--typography-print-title-weight-small);
+  --line-height: var(--typography-label-line-height-small);
+  --size: var(--typography-label-size-small);
+  --weight: var(--typography-label-weight-small);
 }
 
 /* Mode: typoTitle-Large */
 [data-mode*="typoTitle-Large"] {
-  --line-height: var(--typography-web-title-line-height-large);
-  --size: var(--typography-web-title-size-large);
-  --weight: var(--typography-web-title-weight-large);
+  --line-height: var(--typography-title-line-height-large);
+  --size: var(--typography-title-size-large);
+  --weight: var(--typography-title-weight-large);
 }
 
 /* Mode: typoTitle-Medium */
 [data-mode*="typoTitle-Medium"] {
-  --line-height: var(--typography-web-title-line-height-medium);
-  --size: var(--typography-web-title-size-medium);
-  --weight: var(--typography-web-title-weight-medium);
+  --line-height: var(--typography-title-line-height-medium);
+  --size: var(--typography-title-size-medium);
+  --weight: var(--typography-title-weight-medium);
 }
 
 /* Mode: typoTitle-Small */
 [data-mode*="typoTitle-Small"] {
-  --line-height: var(--typography-web-title-line-height-small);
-  --size: var(--typography-web-title-size-small);
-  --weight: var(--typography-web-title-weight-small);
+  --line-height: var(--typography-title-line-height-small);
+  --size: var(--typography-title-size-small);
+  --weight: var(--typography-title-weight-small);
 }
 

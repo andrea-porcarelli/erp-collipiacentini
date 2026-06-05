@@ -64,6 +64,24 @@ class Partner extends LogsModel
         return $this->partner_name ?? '';
     }
 
+    /**
+     * Brand del design system applicato a questo partner.
+     * Match con gli slug dei brand registrati in config('design.brands').
+     */
+    public function getBrandAttribute() : string
+    {
+        $default = config('design.default_brand', 'miticko');
+        $slug = (string) ($this->slug_name ?? '');
+
+        foreach (array_keys(config('design.brands', [])) as $brandSlug) {
+            if ($brandSlug !== $default && str_contains($slug, $brandSlug)) {
+                return $brandSlug;
+            }
+        }
+
+        return $default;
+    }
+
     public function active_products() : HasMany
     {
         return $this->products()->where('is_active', 1);

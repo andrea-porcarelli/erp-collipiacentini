@@ -1,3 +1,8 @@
+@php
+    $brand = $order->partner?->brand ?? config('design.default_brand', 'miticko');
+    $t = config("design.brands.{$brand}.tokens")
+        ?? config('design.brands.miticko.tokens', []);
+@endphp
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -10,7 +15,7 @@
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
             font-size: 11px;
             line-height: 1.55;
             margin: 0;
@@ -25,7 +30,7 @@
         .tab-strip {
             margin: 0 0 12px;
             font-size: 10px;
-            color: #5C6470;
+            color: {{ $t['text-secondary'] }};
         }
         .tab-strip .accent {
             display: inline-block;
@@ -43,7 +48,7 @@
             right: 0;
             width: 100%;
             height: 15px;
-            background: #E85A1F;
+            background: {{ $t['brand-primary-brand'] }};
             line-height: 0;
             font-size: 0;
         }
@@ -57,12 +62,12 @@
         .ticket-header .partner-name {
             font-size: 14px;
             font-weight: 700;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
             line-height: 1.2;
         }
         .ticket-header .partner-site {
             font-size: 11px;
-            color: #5C6470;
+            color: {{ $t['text-secondary'] }};
             margin-top: 3px;
         }
         .ticket-header .right { text-align: right; }
@@ -71,18 +76,18 @@
             font-size: 15px;
             font-weight: 800;
             letter-spacing: 0.5px;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
         }
         .ticket-header .order-id {
             margin-top: 6px;
             font-size: 10.5px;
-            color: #5C6470;
+            color: {{ $t['text-secondary'] }};
         }
 
         /* --- Ticket card --- */
         .ticket-card {
             width: 100%;
-            background: #FCDCC9;
+            background: {{ $t['brand-primary-brandlight'] }};
             border-radius: 16px;
             border-collapse: separate;
             border-spacing: 0;
@@ -94,8 +99,8 @@
         .ticket-card .badge-wrap { margin: 0 0 14px; }
         .ticket-card .badge {
             display: inline-block;
-            background: #E85A1F;
-            color: #FFFFFF;
+            background: {{ $t['brand-primary-brand'] }};
+            color: {{ $t['background-global-paper1'] }};
             font-size: 9.5px;
             font-weight: 700;
             letter-spacing: 0.7px;
@@ -109,32 +114,32 @@
         .ticket-card .product-title {
             font-size: 18px;
             font-weight: 700;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
             margin: 0 0 4px;
             line-height: 1.25;
         }
         .ticket-card .product-variant {
             font-size: 12.5px;
-            color: #1F1F1F;
+            color: {{ $t['text-main'] }};
             margin-bottom: 16px;
             font-weight: 400;
         }
         .ticket-card .slot {
             font-size: 12px;
-            color: #1F1F1F;
+            color: {{ $t['text-main'] }};
             margin-bottom: 16px;
         }
         .ticket-card .guest {
             font-size: 12.5px;
             font-weight: 700;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
         }
         .ticket-card .qr {
             width: 140px;
             text-align: right;
         }
         .qr-box {
-            background: #FFFFFF;
+            background: {{ $t['background-global-paper1'] }};
             border-radius: 14px;
             border-collapse: separate;
             border-spacing: 0;
@@ -150,7 +155,7 @@
         .ticket-card .qr .code {
             font-family: DejaVu Sans Mono, monospace;
             font-size: 9.5px;
-            color: #5C6470;
+            color: {{ $t['text-secondary'] }};
             letter-spacing: 0.3px;
             text-align: center;
             padding-top: 6px;
@@ -161,22 +166,24 @@
         .section h3 {
             font-size: 13px;
             font-weight: 700;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
             margin: 0 0 10px;
         }
         .section p {
             margin: 0 0 8px;
-            font-size: 11px;
-            color: #1F1F1F;
-            line-height: 1;
+            font-size: 10px;
+            font-weight: 300;
+            line-height: normal;
+            color: {{ $t['text-main'] }};
+            font-family: "DM Sans", DejaVu Sans, sans-serif;
         }
         .section p:last-child { margin-bottom: 0; }
 
         /* --- Meta grid (Durata / Tipologia / ...) --- */
         .meta-grid {
             width: 100%;
-            border-top: 1px solid #E3E3E3;
-            border-bottom: 1px solid #E3E3E3;
+            border-top: 1px solid {{ $t['border-default'] }};
+            border-bottom: 1px solid {{ $t['border-default'] }};
             margin: 0 0 24px;
         }
         .meta-grid td {
@@ -186,23 +193,23 @@
         }
         .meta-grid .label {
             font-size: 10.5px;
-            color: #6B7280;
+            color: {{ $t['text-secondary'] }};
             margin-bottom: 6px;
         }
         .meta-grid .value {
             font-size: 12px;
             font-weight: 400;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
         }
 
         /* --- Terms --- */
         .terms p {
             font-size: 9px;
-            color: #5C6470;
+            color: {{ $t['text-secondary'] }};
             line-height: 1.5;
             margin: 0 0 6px;
         }
-        .terms strong { color: #0D0D0D; font-weight: 700; }
+        .terms strong { color: {{ $t['text-main'] }}; font-weight: 700; }
 
         /* --- Footer --- */
         .footer {
@@ -211,7 +218,7 @@
             left: 0;
             right: 0;
             width: 100%;
-            background: #F5F5F5;
+            background: {{ $t['background-global-paper3'] }};
         }
         .footer table {
             width: 100%;
@@ -230,14 +237,14 @@
             font-size: 14px;
             font-weight: 800;
             letter-spacing: 0.5px;
-            color: #0D0D0D;
+            color: {{ $t['text-main'] }};
         }
         .footer .info {
             padding-right: 30px;
         }
         .footer p {
             font-size: 9.5px;
-            color: #4A5260;
+            color: {{ $t['text-secondary'] }};
             line-height: 1.55;
             margin: 0;
         }
@@ -264,7 +271,8 @@
         'quietzoneSize'   => 1,
     ]));
 
-    $logoPath = public_path('assets/images/logo-miticko.png');
+    $logoCandidate = public_path("assets/images/logo-{$brand}.png");
+    $logoPath = file_exists($logoCandidate) ? $logoCandidate : public_path('assets/images/logo-miticko.png');
     $hasLogo  = file_exists($logoPath);
     $logoSrc  = $hasLogo ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
 
@@ -451,21 +459,27 @@
         </table>
 
         {{-- INFORMAZIONI PER LA VISITA --}}
-        <div class="section">
-            <h3>Informazioni per la visita</h3>
-            <p>
-                Presentarsi al punto di ritrovo almeno 15 minuti prima dell'orario di visita indicato. Non è garantito l'ingresso oltre 30 minuti dopo l'orario.
-            </p>
-            <p>
-                Esibire all'ingresso questo biglietto (stampato o su dispositivo mobile) insieme a un documento d'identità in corso di validità.
-            </p>
-            <p>
-                Il QR code verrà scansionato all'ingresso: ogni biglietto è valido per una sola persona, esclusivamente per la data e l'orario indicati.
-            </p>
-            <p>
-                Per esigenze di accessibilità, assistenza o variazioni della prenotazione scrivere a support@miticko.com almeno 48 ore prima della visita.
-            </p>
-        </div>
+        @php
+            $visitInfo    = $product?->contentField('visit_info');
+            $supportEmail = $product?->support_email;
+        @endphp
+        @if($visitInfo || $supportEmail)
+            <div class="section">
+                <h3>Informazioni per la visita</h3>
+                @if($visitInfo)
+                    @foreach(preg_split('/\R+/', trim($visitInfo)) as $paragraph)
+                        @if(trim($paragraph) !== '')
+                            <p>{{ $paragraph }}</p>
+                        @endif
+                    @endforeach
+                @endif
+                @if($supportEmail)
+                    <p>
+                        Per esigenze di accessibilità, assistenza o variazioni della prenotazione scrivere a {{ $supportEmail }} almeno 48 ore prima della visita.
+                    </p>
+                @endif
+            </div>
+        @endif
 
         {{-- META GRID --}}
         <table class="meta-grid">

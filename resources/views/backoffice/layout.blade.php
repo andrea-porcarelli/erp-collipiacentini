@@ -38,6 +38,7 @@
             })();
         </script>
         @include('backoffice.components.footer')
+        @include('backoffice.components.ticket-scanner')
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
         @livewireScripts
     </body>

@@ -34,6 +34,7 @@ class Product extends LogsModel
         'free_occupancy_rule',
         'max_tickets_per_session',
         'booking_deadline_hours',
+        'support_email',
     ];
 
     protected $casts = [];
@@ -209,6 +210,10 @@ class Product extends LogsModel
 
     public function getMetaKeywordsAttribute() : ?string {
         return $this->contentField('meta_keywords');
+    }
+
+    public function getVisitInfoAttribute() : ?string {
+        return $this->contentField('visit_info');
     }
 
     public function getRouteAttribute() : string {
