@@ -51,11 +51,11 @@
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                 </div>
             </x-card>
-            <x-card title="Categoria" class="mt-4 position-relative">
+            <x-card title="Categoria prodotto" class="mt-4 position-relative">
                 <form id="form-info-categories">
                     <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <x-select name="category_id" label="Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio 'visite' e 'degustazioni'" required :options="$categories" icon="fa-regular fa-circle-info" />
+                        <div class="col-12">
+                            <x-select name="category_id" label="Seleziona Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio 'visite' e 'degustazioni'" required :options="$categories" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
@@ -68,8 +68,30 @@
                 <form id="form-info-public">
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <x-input :model="$model" maxlength="55" name="meta_title" label="Nome prodotto pubblico" required />
-                            <x-textarea :model="$model" maxlength="150"  name="meta_description" label="Descrizione breve" required class_container="mt-4" />
+                            <div class="d-flex align-items-start gap-2">
+                                <div class="flex-grow-1">
+                                    <x-input :model="$model" maxlength="70" name="title" label="Titolo pubblico" message="Titolo del prodoto usato dalla scheda del browser" icon="fa-regular fa-circle-info" />
+                                </div>
+                                <button type="button" data-mode="medium primary" data-field="title" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 mt-4">
+                                <div class="flex-grow-1">
+                                    <x-input :model="$model" maxlength="55" name="meta_title" label="Nome prodotto pubblico (meta title)" required />
+                                </div>
+                                <button type="button" data-mode="medium primary" data-field="meta_title" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 mt-4">
+                                <div class="flex-grow-1">
+                                    <x-textarea :model="$model" maxlength="150" name="meta_description" label="Descrizione breve (meta description)" required />
+                                </div>
+                                <button type="button" data-mode="medium primary" data-field="meta_description" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 mt-4">
+                                <div class="flex-grow-1">
+                                    <x-input :model="$model" maxlength="500" name="meta_keywords" label="Keywords" placeholder="es. visite guidate, degustazioni, vino" message="Parole chiave separate da virgola" icon="fa-regular fa-circle-info" />
+                                </div>
+                                <button type="button" data-mode="medium primary" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations bt-m-outlined mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                            </div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="text-field">

@@ -6,28 +6,27 @@ use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StoreProductRequest;
 use App\Http\Controllers\Backoffice\Requests\UpdateProductRequest;
 use App\Interfaces\ProductInterface;
+use App\Jobs\SyncProductToWooCommerce;
 use App\Models\Category;
 use App\Models\CustomerFieldType;
 use App\Models\Language;
-use App\Models\Product;
-use App\Jobs\SyncProductToWooCommerce;
 use App\Models\LanguageContent;
 use App\Models\Media;
 use App\Models\OrderProduct;
 use App\Models\Partner;
+use App\Models\Product;
 use App\Models\ProductCustomerField;
-use App\Models\ProductFeature;
-use App\Models\ProductVariant;
-use App\Models\ProductVariantPrice;
 use App\Models\ProductFaq;
+use App\Models\ProductFeature;
 use App\Models\ProductLink;
 use App\Models\ProductRelated;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantPrice;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class ProductController extends CrudController
@@ -35,6 +34,7 @@ class ProductController extends CrudController
     use AuthorizesRequests, ValidatesRequests;
 
     public ProductInterface $interface;
+
     public string $path;
 
     public function __construct(ProductInterface $interface)
@@ -52,11 +52,12 @@ class ProductController extends CrudController
             $partners = Utils::map_collection(Partner::active());
         }
 
-        return view('backoffice.' . $this->path . '.index', compact('partners'))
+        return view('backoffice.'.$this->path.'.index', compact('partners'))
             ->with('path', $this->path);
     }
 
-    public function data(Request $request) : JsonResponse {
+    public function data(Request $request): JsonResponse
+    {
         try {
             $user = Auth::user();
             $filters = $request->get('filters') ?? [];
@@ -73,12 +74,13 @@ class ProductController extends CrudController
                     return Utils::data_long($item->created_at);
                 })
                 ->addColumn('product_code', function ($item) {
-                    return '#' . $item->product_code;
+                    return '#'.$item->product_code;
                 })
                 ->addColumn('partner', function ($item) {
                     if (isset($item->partner)) {
                         return $item->partner->partner_name;
                     }
+
                     return ' -- ';
                 })
                 ->addColumn('category', function ($item) {
@@ -93,10 +95,10 @@ class ProductController extends CrudController
 
                     $rows = $variants
                         ->sortBy('sort_order')
-                        ->map(fn($v) => e(($v->label ?? 'Variante') . ' ' . Utils::price($v->full_price)))
+                        ->map(fn ($v) => e(($v->label ?? 'Variante').' '.Utils::price($v->full_price)))
                         ->implode('<br>');
 
-                    return $rows ? '<small>' . $rows . '</small>' : ' - ';
+                    return $rows ? '<small>'.$rows.'</small>' : ' - ';
                 })
                 ->addColumn('options', function ($item) {
                     return ' > ';
@@ -128,7 +130,7 @@ class ProductController extends CrudController
 
         $product = $this->interface->store($data);
 
-        return $this->success(['redirect' => route($this->path . '.show', $product->id)]);
+        return $this->success(['redirect' => route($this->path.'.show', $product->id)]);
     }
 
     public function show(int $id)
@@ -140,13 +142,13 @@ class ProductController extends CrudController
         $categories = Utils::map_collection(Category::where('is_active', 1));
         $languages = Language::where('is_active', 1)
             ->get()
-            ->map(fn($l) => ['id' => $l->id, 'label' => $l->custom_label ?? $l->label, 'iso_code' => $l->iso_code])
+            ->map(fn ($l) => ['id' => $l->id, 'label' => $l->custom_label ?? $l->label, 'iso_code' => $l->iso_code])
             ->values()
             ->toArray();
         $fieldTypes = CustomerFieldType::orderBy('sort_order')->get();
         $features = ProductFeature::orderBy('category')->orderBy('sort_order')->get()->groupBy('category');
 
-        return view('backoffice.' . $this->path . '.show', compact('model', 'categories', 'languages', 'fieldTypes', 'features'))
+        return view('backoffice.'.$this->path.'.show', compact('model', 'categories', 'languages', 'fieldTypes', 'features'))
             ->with('path', $this->path);
     }
 
@@ -157,16 +159,16 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
 
             match ($request->input('section')) {
-                'settings'         => $this->updateSettings($product, $request),
-                'duration'         => $this->updateDuration($product, $request),
-                'categories'       => $this->updateCategories($product, $request),
-                'public'           => $this->updatePublic($product, $request),
-                'description'      => $this->updateDescription($product, $request),
-                'occupancy'        => $this->updateOccupancy($product, $request),
+                'settings' => $this->updateSettings($product, $request),
+                'duration' => $this->updateDuration($product, $request),
+                'categories' => $this->updateCategories($product, $request),
+                'public' => $this->updatePublic($product, $request),
+                'description' => $this->updateDescription($product, $request),
+                'occupancy' => $this->updateOccupancy($product, $request),
                 'long_description' => $this->updateLongDescription($product, $request),
-                'features'         => $this->updateFeatures($product, $request),
-                'visit'            => $this->updateVisit($product, $request),
-                default            => throw new \Exception('Sezione non valida'),
+                'features' => $this->updateFeatures($product, $request),
+                'visit' => $this->updateVisit($product, $request),
+                default => throw new \Exception('Sezione non valida'),
             };
 
             return $this->success();
@@ -186,8 +188,8 @@ class ProductController extends CrudController
 
     private function updateDuration(Product $product, UpdateProductRequest $request): void
     {
-        $days    = (int) $request->input('duration_days', 0);
-        $hours   = (int) $request->input('duration_hours', 0);
+        $days = (int) $request->input('duration_days', 0);
+        $hours = (int) $request->input('duration_hours', 0);
         $minutes = (int) $request->input('duration_minutes', 0);
 
         $duration = ($days * 1440) + ($hours * 60) + $minutes;
@@ -195,10 +197,10 @@ class ProductController extends CrudController
         $bookingDeadline = $request->input('booking_deadline_hours');
 
         $this->interface->edit($product, [
-            'duration'               => $duration,
-            'duration_days'          => $days,
-            'duration_hours'         => $hours,
-            'duration_minutes'       => $minutes,
+            'duration' => $duration,
+            'duration_days' => $days,
+            'duration_hours' => $hours,
+            'duration_minutes' => $minutes,
             'booking_deadline_hours' => $bookingDeadline === null || $bookingDeadline === '' ? null : (int) $bookingDeadline,
         ]);
     }
@@ -209,7 +211,7 @@ class ProductController extends CrudController
         if ($request->has('category_id')) {
             $data['category_id'] = $request->category_id ?: null;
         }
-        if (!empty($data)) {
+        if (! empty($data)) {
             $this->interface->edit($product, $data);
         }
     }
@@ -217,8 +219,10 @@ class ProductController extends CrudController
     private function updatePublic(Product $product, UpdateProductRequest $request): void
     {
         $product->setContentFields([
-            'meta_title'       => $request->meta_title,
+            'title' => $request->input('title'),
+            'meta_title' => $request->meta_title,
             'meta_description' => $request->input('meta_description'),
+            'meta_keywords' => $request->input('meta_keywords'),
         ]);
     }
 
@@ -244,10 +248,10 @@ class ProductController extends CrudController
         $maxTickets = $request->input('max_tickets_per_session');
 
         $this->interface->edit($product, [
-            'occupancy'                => (int) $request->input('occupancy'),
-            'occupancy_for_price'      => $request->boolean('occupancy_for_price'),
-            'free_occupancy_rule'      => $request->boolean('free_occupancy_rule'),
-            'max_tickets_per_session'  => $maxTickets === null || $maxTickets === '' ? null : (int) $maxTickets,
+            'occupancy' => (int) $request->input('occupancy'),
+            'occupancy_for_price' => $request->boolean('occupancy_for_price'),
+            'free_occupancy_rule' => $request->boolean('free_occupancy_rule'),
+            'max_tickets_per_session' => $maxTickets === null || $maxTickets === '' ? null : (int) $maxTickets,
         ]);
     }
 
@@ -275,11 +279,11 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
             $languages = Language::where('is_active', 1)->get();
 
-            $data = $languages->map(fn($lang) => [
+            $data = $languages->map(fn ($lang) => [
                 'language_id' => $lang->id,
-                'language'    => $lang->label,
-                'iso_code'    => $lang->iso_code,
-                'visit_info'  => $product->contentField('visit_info', $lang->iso_code) ?? '',
+                'language' => $lang->label,
+                'iso_code' => $lang->iso_code,
+                'visit_info' => $product->contentField('visit_info', $lang->iso_code) ?? '',
             ]);
 
             return $this->success(['data' => $data]);
@@ -296,11 +300,67 @@ class ProductController extends CrudController
 
             foreach ($request->input('translations', []) as $translation) {
                 $lang = Language::find($translation['language_id']);
-                if (!$lang) continue;
+                if (! $lang) {
+                    continue;
+                }
 
                 $product->setContentFields([
                     'visit_info' => $translation['visit_info'] ?? '',
                 ], $lang->iso_code);
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    public function getPublicMetaTranslations(int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+            $languages = Language::where('is_active', 1)->get();
+
+            $data = $languages->map(fn ($lang) => [
+                'language_id' => $lang->id,
+                'language' => $lang->label,
+                'iso_code' => $lang->iso_code,
+                'title' => $product->contentField('title', $lang->iso_code) ?? '',
+                'meta_title' => $product->contentField('meta_title', $lang->iso_code) ?? '',
+                'meta_description' => $product->contentField('meta_description', $lang->iso_code) ?? '',
+                'meta_keywords' => $product->contentField('meta_keywords', $lang->iso_code) ?? '',
+            ]);
+
+            return $this->success(['data' => $data]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function savePublicMetaTranslations(Request $request, int $id): JsonResponse
+    {
+        try {
+            $product = $this->interface->find($id);
+            $this->authorizeAccess($product);
+
+            $allowed = ['title', 'meta_title', 'meta_description', 'meta_keywords'];
+
+            foreach ($request->input('translations', []) as $translation) {
+                $lang = Language::find($translation['language_id'] ?? null);
+                if (! $lang) {
+                    continue;
+                }
+
+                $payload = [];
+                foreach ($allowed as $field) {
+                    if (array_key_exists($field, $translation)) {
+                        $payload[$field] = $translation[$field] ?? '';
+                    }
+                }
+                if ($payload) {
+                    $product->setContentFields($payload, $lang->iso_code);
+                }
             }
 
             return $this->success();
@@ -321,8 +381,8 @@ class ProductController extends CrudController
             }
 
             \DB::transaction(function () use ($id, $product) {
-                $linkIds    = ProductLink::where('product_id', $id)->pluck('id');
-                $faqIds     = ProductFaq::where('product_id', $id)->pluck('id');
+                $linkIds = ProductLink::where('product_id', $id)->pluck('id');
+                $faqIds = ProductFaq::where('product_id', $id)->pluck('id');
                 $variantIds = ProductVariant::where('product_id', $id)->pluck('id');
 
                 LanguageContent::where('entity_type', Product::class)->where('entity_id', $id)->delete();
@@ -340,7 +400,7 @@ class ProductController extends CrudController
                 $product->delete();
             });
 
-            return $this->success(['redirect' => route($this->path . '.index')]);
+            return $this->success(['redirect' => route($this->path.'.index')]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }
@@ -353,28 +413,28 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
 
             $data = $request->validate([
-                'label'             => 'required|string|max:255',
-                'description'       => 'nullable|string|max:500',
-                'max_quantity'      => 'nullable|integer|min:1',
-                'prices'            => 'required|array|min:1',
-                'prices.*.label'    => 'required|string|max:255',
-                'prices.*.price'    => 'required|numeric|min:0',
+                'label' => 'required|string|max:255',
+                'description' => 'nullable|string|max:500',
+                'max_quantity' => 'nullable|integer|min:1',
+                'prices' => 'required|array|min:1',
+                'prices.*.label' => 'required|string|max:255',
+                'prices.*.price' => 'required|numeric|min:0',
                 'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
             ]);
 
             $maxOrder = $product->variants()->max('sort_order') ?? 0;
 
             $variant = $product->variants()->create([
-                'label'        => $data['label'],
-                'description'  => $data['description'] ?? null,
+                'label' => $data['label'],
+                'description' => $data['description'] ?? null,
                 'max_quantity' => $data['max_quantity'] ?? null,
-                'sort_order'   => $maxOrder + 1,
+                'sort_order' => $maxOrder + 1,
             ]);
 
             foreach ($data['prices'] as $row) {
                 $variant->prices()->create([
-                    'label'    => $row['label'],
-                    'price'    => $row['price'],
+                    'label' => $row['label'],
+                    'price' => $row['price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
             }
@@ -392,20 +452,20 @@ class ProductController extends CrudController
             $this->authorizeAccess($product);
 
             $data = $request->validate([
-                'label'             => 'required|string|max:255',
-                'description'       => 'nullable|string|max:500',
-                'max_quantity'      => 'nullable|integer|min:1',
-                'prices'            => 'required|array|min:1',
-                'prices.*.id'       => 'nullable|integer',
-                'prices.*.label'    => 'required|string|max:255',
-                'prices.*.price'    => 'required|numeric|min:0',
+                'label' => 'required|string|max:255',
+                'description' => 'nullable|string|max:500',
+                'max_quantity' => 'nullable|integer|min:1',
+                'prices' => 'required|array|min:1',
+                'prices.*.id' => 'nullable|integer',
+                'prices.*.label' => 'required|string|max:255',
+                'prices.*.price' => 'required|numeric|min:0',
                 'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
             ]);
 
             $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
             $variant->update([
-                'label'        => $data['label'],
-                'description'  => $data['description'] ?? null,
+                'label' => $data['label'],
+                'description' => $data['description'] ?? null,
                 'max_quantity' => $data['max_quantity'] ?? null,
             ]);
 
@@ -414,17 +474,17 @@ class ProductController extends CrudController
 
             $savedPrices = [];
             foreach ($data['prices'] as $row) {
-                if (!empty($row['id'])) {
+                if (! empty($row['id'])) {
                     ProductVariantPrice::where('id', $row['id'])->update([
-                        'label'    => $row['label'],
-                        'price'    => $row['price'],
+                        'label' => $row['label'],
+                        'price' => $row['price'],
                         'vat_rate' => $row['vat_rate'],
                     ]);
                     $savedPrices[] = ['id' => (int) $row['id']];
                 } else {
                     $newPrice = $variant->prices()->create([
-                        'label'    => $row['label'],
-                        'price'    => $row['price'],
+                        'label' => $row['label'],
+                        'price' => $row['price'],
                         'vat_rate' => $row['vat_rate'],
                     ]);
                     $savedPrices[] = ['id' => $newPrice->id];
@@ -479,11 +539,11 @@ class ProductController extends CrudController
             $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
             $languages = Language::where('is_active', 1)->get();
 
-            $data = $languages->map(fn($lang) => [
+            $data = $languages->map(fn ($lang) => [
                 'language_id' => $lang->id,
-                'language'    => $lang->label,
-                'iso_code'    => $lang->iso_code,
-                'label'       => $lang->iso_code === 'it'
+                'language' => $lang->label,
+                'iso_code' => $lang->iso_code,
+                'label' => $lang->iso_code === 'it'
                     ? $variant->label
                     : ($variant->contentField('label', $lang->iso_code) ?? ''),
                 'description' => $lang->iso_code === 'it'
@@ -504,17 +564,19 @@ class ProductController extends CrudController
 
             foreach ($request->input('translations', []) as $translation) {
                 $lang = Language::find($translation['language_id']);
-                if (!$lang) continue;
+                if (! $lang) {
+                    continue;
+                }
 
                 if ($lang->iso_code === 'it') {
                     $variant->update([
-                        'label'       => $translation['label'] ?? $variant->label,
+                        'label' => $translation['label'] ?? $variant->label,
                         'description' => $translation['description'] ?? $variant->description,
                     ]);
                     $variant->refresh();
                 } else {
                     $variant->setContentFields([
-                        'label'       => $translation['label'] ?? '',
+                        'label' => $translation['label'] ?? '',
                         'description' => $translation['description'] ?? '',
                     ], $lang->iso_code);
                 }
@@ -534,11 +596,11 @@ class ProductController extends CrudController
 
             $company = $product->partner?->company;
 
-            if (!$company || !$company->has_woocommerce) {
+            if (! $company || ! $company->has_woocommerce) {
                 return $this->error(['message' => 'L\'azienda non ha il plugin WooCommerce attivo']);
             }
 
-            if (!$company->endpoint_woocommerce) {
+            if (! $company->endpoint_woocommerce) {
                 return $this->error(['message' => 'Endpoint WooCommerce non configurato per questa azienda']);
             }
 

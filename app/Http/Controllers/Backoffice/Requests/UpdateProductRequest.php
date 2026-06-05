@@ -19,30 +19,32 @@ class UpdateProductRequest extends FormRequest
 
         return match ($this->input('section')) {
             'settings' => [
-                'label'     => ['required', 'string', 'max:255', Rule::unique('products', 'label')->ignore($productId)],
+                'label' => ['required', 'string', 'max:255', Rule::unique('products', 'label')->ignore($productId)],
                 'is_active' => ['nullable', Rule::in(['0', '1'])],
             ],
             'duration' => [
-                'duration_days'          => ['nullable', 'integer', 'min:0'],
-                'duration_hours'         => ['nullable', 'integer', 'min:0', 'max:23'],
-                'duration_minutes'       => ['nullable', 'integer', 'min:0', 'max:59'],
+                'duration_days' => ['nullable', 'integer', 'min:0'],
+                'duration_hours' => ['nullable', 'integer', 'min:0', 'max:23'],
+                'duration_minutes' => ['nullable', 'integer', 'min:0', 'max:59'],
                 'booking_deadline_hours' => ['nullable', 'integer', 'min:0', 'max:65535'],
             ],
             'occupancy' => [
-                'occupancy'               => ['required', 'integer', 'min:1'],
-                'occupancy_for_price'     => ['nullable'],
-                'free_occupancy_rule'     => ['nullable'],
+                'occupancy' => ['required', 'integer', 'min:1'],
+                'occupancy_for_price' => ['nullable'],
+                'free_occupancy_rule' => ['nullable'],
                 'max_tickets_per_session' => ['nullable', 'integer', 'min:1', 'max:65535'],
             ],
             'categories' => [
                 'category_id' => ['nullable', 'exists:categories,id'],
             ],
             'public' => [
-                'meta_title'       => ['required', 'string', 'max:255'],
+                'title' => ['nullable', 'string', 'max:255'],
+                'meta_title' => ['required', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable', 'string', 'max:500'],
             ],
             'visit' => [
-                'visit_info'    => ['nullable', 'string', 'max:600'],
+                'visit_info' => ['nullable', 'string', 'max:600'],
                 'support_email' => ['nullable', 'email', 'max:255'],
             ],
             default => [],
@@ -52,14 +54,14 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'label.required'          => 'Il nome prodotto interno è obbligatorio',
-            'label.unique'            => 'Il nome prodotto scelto è già stato usato',
-            'duration_hours.max'      => 'Le ore non possono superare 23',
-            'duration_minutes.max'    => 'I minuti non possono superare 59',
-            'meta_title.required'     => 'Il nome prodotto pubblico è obbligatorio',
-            'category_id.exists'      => 'La categoria selezionata non è valida',
-            'visit_info.max'          => 'Le informazioni sulla visita non possono superare 600 caratteri',
-            'support_email.email'     => 'Inserisci un indirizzo email valido',
+            'label.required' => 'Il nome prodotto interno è obbligatorio',
+            'label.unique' => 'Il nome prodotto scelto è già stato usato',
+            'duration_hours.max' => 'Le ore non possono superare 23',
+            'duration_minutes.max' => 'I minuti non possono superare 59',
+            'meta_title.required' => 'Il nome prodotto pubblico è obbligatorio',
+            'category_id.exists' => 'La categoria selezionata non è valida',
+            'visit_info.max' => 'Le informazioni sulla visita non possono superare 600 caratteri',
+            'support_email.email' => 'Inserisci un indirizzo email valido',
         ];
     }
 }

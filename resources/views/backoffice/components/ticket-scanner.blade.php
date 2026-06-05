@@ -1,5 +1,5 @@
 @auth
-    @if(in_array(Auth::user()->role, ['admin', 'partner']))
+    @if(in_array(Auth::user()->role, ['god', 'admin', 'partner']))
         <link rel="stylesheet" href="{{ asset('backoffice/css/ticket-scanner.css') }}?v={{ filemtime(public_path('backoffice/css/ticket-scanner.css')) }}">
 
         <button type="button" class="ticket-scanner-fab" id="ticket-scanner-fab" aria-label="Scansiona biglietto">

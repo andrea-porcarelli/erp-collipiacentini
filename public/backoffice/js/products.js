@@ -125,6 +125,12 @@ const translationFields = {
     'visit-info': [
         { name: 'visit_info', label: 'Informazioni importanti sulla visita', type: 'textarea', placeholder: 'Inserisci le informazioni più importanti per l\'accesso all\'esperienza' },
     ],
+    'public-meta': [
+        { name: 'title',            label: 'Title',            type: 'input',    placeholder: 'Tag <title> della pagina' },
+        { name: 'meta_title',       label: 'Meta title',       type: 'input',    placeholder: 'Nome prodotto pubblico' },
+        { name: 'meta_description', label: 'Meta description', type: 'textarea', placeholder: 'Descrizione breve' },
+        { name: 'meta_keywords',    label: 'Keywords',         type: 'input',    placeholder: 'es. visite, degustazioni, vino' },
+    ],
 };
 
 // ---------------------------------------------------------------------------
@@ -217,11 +223,37 @@ const saveForm = (formId, btn) => {
 // ---------------------------------------------------------------------------
 // Modale traduzioni condivisa
 // ---------------------------------------------------------------------------
-const renderTranslationBody = (data, entityType) => {
-    const fields = translationFields[entityType];
+const resolveTranslationFields = (entityType, fieldFilter) => {
+    const all = translationFields[entityType] || [];
+    if (!fieldFilter) return all;
+    return all.filter(f => f.name === fieldFilter);
+};
+
+const renderTranslationField = (field, value) => {
+    const safe = escapeHtml(value || '');
+    const placeholder = field.placeholder || '';
+    if (field.type === 'textarea') {
+        return `<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+            <div class="text-field-container">
+                <textarea class="input-miticko" name="${field.name}" rows="2" placeholder="${placeholder}">${safe}</textarea>
+            </div>
+        </div>`;
+    }
+    return `<div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+        <div class="text-field-container">
+            <input class="input-miticko" name="${field.name}" value="${safe}" placeholder="${placeholder}">
+        </div>
+    </div>`;
+};
+
+const renderTranslationBody = (data, entityType, fieldFilter = null) => {
+    const fields = resolveTranslationFields(entityType, fieldFilter);
 
     if (!data || data.length === 0) {
-        return '<p class="text-secondary small  mb-0">Nessuna lingua disponibile nel sistema.</p>';
+        return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
+    }
+    if (fields.length === 0) {
+        return '<p class="text-secondary small mb-0">Campo non configurato per la traduzione.</p>';
     }
 
     const headerCols = fields.map(f => {
@@ -235,23 +267,8 @@ const renderTranslationBody = (data, entityType) => {
 
     const rowsHtml = data.map(lang => {
         const fieldsHtml = fields.map(f => {
-            const value = escapeHtml(lang[f.name] || '');
-            if (f.type === 'textarea') {
-                return `<div class="col">
-                    <div class="text-field"
-                        <div class="text-field-container">
-                            <textarea class="input-miticko" name="${f.name}" rows="2" placeholder="${f.placeholder || ''}">${value}</textarea>
-                        </div>
-                    </div>
-                </div>`;
-            }
-            return `<div class="col" style="${f.name == 'label' ? 'max-width:35%' : ''}">
-                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting" >
-                    <div class="text-field-container">
-                        <input class="input-miticko" name="${f.name}" value="${value}" placeholder="${f.placeholder || ''}">
-                    </div>
-                </div>
-            </div>`;
+            const colStyle = f.name === 'label' ? 'max-width:35%' : '';
+            return `<div class="col" style="${colStyle}">${renderTranslationField(f, lang[f.name])}</div>`;
         }).join('');
 
         return `<div class="translation-lang row g-2 align-items-center mb-2" data-language-id="${lang.language_id}">
@@ -266,23 +283,32 @@ const renderTranslationBody = (data, entityType) => {
     return headerRow + rowsHtml;
 };
 
-const openTranslationsModal = (entityType, id) => {
+const openTranslationsModal = (entityType, id, fieldFilter = null) => {
     const $modal = $('#modal-translations');
     const paths = {
-        link:         `/products/${window.PRODUCT_ID}/links/${id}/translations`,
-        faq:          `/products/${window.PRODUCT_ID}/faqs/${id}/translations`,
-        variant:      `/products/${window.PRODUCT_ID}/variants/${id}/translations`,
-        'visit-info': `/products/${window.PRODUCT_ID}/visit-info/translations`,
+        link:          `/products/${window.PRODUCT_ID}/links/${id}/translations`,
+        faq:           `/products/${window.PRODUCT_ID}/faqs/${id}/translations`,
+        variant:       `/products/${window.PRODUCT_ID}/variants/${id}/translations`,
+        'visit-info':  `/products/${window.PRODUCT_ID}/visit-info/translations`,
+        'public-meta': `/products/${window.PRODUCT_ID}/public-meta/translations`,
     };
     const path = paths[entityType];
 
+    const fieldLabel = fieldFilter
+        ? (resolveTranslationFields(entityType, fieldFilter)[0]?.label || fieldFilter)
+        : null;
+    $modal.find('.modal-title').text(fieldLabel ? `Traduci — ${fieldLabel}` : 'Traduci');
+
     $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
-    $modal.data('save-path', path).data('entity-type', entityType);
+    $modal
+        .data('save-path', path)
+        .data('entity-type', entityType)
+        .data('field-filter', fieldFilter);
     $modal.modal('show');
 
     App.ajax({ path, method: 'get' })
         .then((res) => {
-            $('#modal-trans-body').html(renderTranslationBody(res.data, entityType));
+            $('#modal-trans-body').html(renderTranslationBody(res.data, entityType, fieldFilter));
         })
         .catch(() => {
             $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
@@ -293,7 +319,8 @@ const saveTranslations = () => {
     const $modal = $('#modal-translations');
     const savePath = $modal.data('save-path');
     const entityType = $modal.data('entity-type');
-    const fields = translationFields[entityType];
+    const fieldFilter = $modal.data('field-filter') || null;
+    const fields = resolveTranslationFields(entityType, fieldFilter);
 
     const translations = [];
     $modal.find('.translation-lang').each(function () {
@@ -1244,6 +1271,11 @@ const init = () => {
 
     $(document).on('click', '.btn-visit-info-translations', function () {
         openTranslationsModal('visit-info', window.PRODUCT_ID);
+    });
+
+    $(document).on('click', '.btn-public-meta-translations', function () {
+        const field = $(this).data('field') || null;
+        openTranslationsModal('public-meta', window.PRODUCT_ID, field);
     });
 
     initCategorySelect();

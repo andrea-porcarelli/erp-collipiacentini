@@ -84,6 +84,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
         Route::get('products/{product}/visit-info/translations', [ProductController::class, 'getVisitInfoTranslations'])->name('products.visit-info.translations.get');
         Route::put('products/{product}/visit-info/translations', [ProductController::class, 'saveVisitInfoTranslations'])->name('products.visit-info.translations.save');
+        Route::get('products/{product}/public-meta/translations', [ProductController::class, 'getPublicMetaTranslations'])->name('products.public-meta.translations.get');
+        Route::put('products/{product}/public-meta/translations', [ProductController::class, 'savePublicMetaTranslations'])->name('products.public-meta.translations.save');
         Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
         Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
         Route::put('products/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('products.variants.update');

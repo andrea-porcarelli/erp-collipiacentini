@@ -1,7 +1,8 @@
 <?php
+
 namespace App\Models;
+
 use App\Enums\ProductStatus;
-use App\Models\ProductPriceVariation;
 use App\Traits\HasLanguageContent;
 use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,17 +40,16 @@ class Product extends LogsModel
 
     protected $casts = [];
 
-
     public function status(): ProductStatus
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return ProductStatus::PENDING;
         }
 
         return $this->is_available ? ProductStatus::ACTIVE : ProductStatus::UNAVAILABLE;
     }
 
-    public function partner() : BelongsTo
+    public function partner(): BelongsTo
     {
         return $this->belongsTo(Partner::class);
     }
@@ -64,12 +64,12 @@ class Product extends LogsModel
         return $this->belongsToMany(ProductFeature::class)->withTimestamps();
     }
 
-    public function category() : BelongsTo
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function availabilities() : HasMany
+    public function availabilities(): HasMany
     {
         return $this->hasMany(ProductAvailability::class);
     }
@@ -86,7 +86,7 @@ class Product extends LogsModel
             $ref->addMonth();
         }
 
-        return collect($dates)->map(fn($d) => (object)['date' => $d]);
+        return collect($dates)->map(fn ($d) => (object) ['date' => $d]);
     }
 
     public function priceVariations(): HasMany
@@ -94,42 +94,42 @@ class Product extends LogsModel
         return $this->hasMany(ProductPriceVariation::class);
     }
 
-    public function links() : HasMany
+    public function links(): HasMany
     {
         return $this->hasMany(ProductLink::class);
     }
 
-    public function faqs() : HasMany
+    public function faqs(): HasMany
     {
         return $this->hasMany(ProductFaq::class);
     }
 
-    public function relatedProducts() : HasMany
+    public function relatedProducts(): HasMany
     {
         return $this->hasMany(ProductRelated::class);
     }
 
-    public function customerFields() : HasMany
+    public function customerFields(): HasMany
     {
         return $this->hasMany(ProductCustomerField::class);
     }
 
-    public function variants() : HasMany
+    public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
     }
 
-    public function media() : MorphMany
+    public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');
     }
 
-    public function cover() : MorphMany
+    public function cover(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->where('media_type', 'cover');
     }
 
-    public function gallery() : MorphMany
+    public function gallery(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery')->orderBy('sort_order');
     }
@@ -144,79 +144,102 @@ class Product extends LogsModel
         return $this->hasMany(ProductClosedPeriod::class)->orderBy('date_from');
     }
 
-    public function getProductCodeAttribute() : string
+    public function getProductCodeAttribute(): string
     {
-        if (!isset($this->category)) {
+        if (! isset($this->category)) {
             return ' #---- ';
         }
+
         return isset($this->partner) ? sprintf('%s-%s%s', $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
     }
 
-    public function getLowestPriceAttribute() : string {
+    public function getLowestPriceAttribute(): string
+    {
         $variant = $this->variants
             ->whereNull('availability_id')
             ->whereNull('special_schedule_id')
             ->first();
+
         return (float) ($variant?->full_price ?? 0);
     }
 
-    public function getLowestPriceWithCommissionAttribute() : float {
+    public function getLowestPriceWithCommissionAttribute(): float
+    {
         $base = (float) $this->lowest_price;
+
         return $base + ($this->partner?->resolvePresaleCommission($base) ?? 0);
     }
 
-    public function getIsFreeAttribute() : bool {
+    public function getIsFreeAttribute(): bool
+    {
         $variants = $this->variants
             ->whereNull('availability_id')
             ->whereNull('special_schedule_id');
-        return $variants->isNotEmpty() && $variants->every(fn($v) => (float) $v->full_price <= 0);
+
+        return $variants->isNotEmpty() && $variants->every(fn ($v) => (float) $v->full_price <= 0);
     }
 
-    public function getIsAvailableAttribute() : bool {
-        if (!$this->is_active) {
+    public function getIsAvailableAttribute(): bool
+    {
+        if (! $this->is_active) {
             return false;
         }
         // Has weekly template slots
         if ($this->availabilities()->whereNotNull('day_of_week')->exists()) {
             return true;
         }
+
         // Has future special schedule slots
         return $this->specialSchedules()->where('date', '>=', date('Y-m-d'))->exists();
     }
 
-    public function getButtonAttribute() : string {
+    public function getButtonAttribute(): string
+    {
         return $this->is_available ? 'primary' : 'disabled';
     }
 
-    public function getTypeAttribute() : string {
-        return __('products.types.' . $this->product_type);
+    public function getTypeAttribute(): string
+    {
+        return __('products.types.'.$this->product_type);
     }
 
-    public function getIntroAttribute() : ?string {
+    public function getIntroAttribute(): ?string
+    {
         return $this->contentField('description');
     }
 
-    public function getDescriptionAttribute() : ?string {
+    public function getDescriptionAttribute(): ?string
+    {
         return $this->contentField('long_description');
     }
 
-    public function getMetaTitleAttribute() : ?string {
+    public function getTitleAttribute(): ?string
+    {
+        return $this->contentField('title');
+    }
+
+    public function getMetaTitleAttribute(): ?string
+    {
         return $this->contentField('meta_title') ?? $this->label;
     }
 
-    public function getMetaDescriptionAttribute() : ?string {
+    public function getMetaDescriptionAttribute(): ?string
+    {
         return $this->contentField('meta_description');
     }
 
-    public function getMetaKeywordsAttribute() : ?string {
+    public function getMetaKeywordsAttribute(): ?string
+    {
         return $this->contentField('meta_keywords');
     }
 
-    public function getVisitInfoAttribute() : ?string {
+    public function getVisitInfoAttribute(): ?string
+    {
         return $this->contentField('visit_info');
     }
 
-    public function getRouteAttribute() : string {
+    public function getRouteAttribute(): string
+    {
         try {
             $slugProduct = Str::slug($this->meta_title ?? $this->label ?? 'product');
             $productCode = $this->product_code;
@@ -230,25 +253,28 @@ class Product extends LogsModel
         }
     }
 
-    public function getPublicUrlAttribute() : string {
+    public function getPublicUrlAttribute(): string
+    {
         $domain = $this->partner?->domain_name;
-        if (!$domain) {
+        if (! $domain) {
             return $this->route;
         }
 
         try {
             $slugProduct = Str::slug($this->meta_title ?? $this->label ?? 'product');
-            return 'https://' . $domain . '/shop/' . $slugProduct . '/' . $this->product_code . '.html';
+
+            return 'https://'.$domain.'/shop/'.$slugProduct.'/'.$this->product_code.'.html';
         } catch (\Exception $e) {
             return $this->route;
         }
     }
 
-    public function getProductTagsAttribute() : ?string {
+    public function getProductTagsAttribute(): ?string
+    {
         return view('whitelabel.products.product_tags', ['product' => $this])->render();
     }
 
-    public function getAvailabilityDaysAttribute() : array
+    public function getAvailabilityDaysAttribute(): array
     {
         return $this->availabilities()
             ->whereNotNull('day_of_week')
