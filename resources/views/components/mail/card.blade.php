@@ -15,7 +15,7 @@
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#FFFFFF; border-radius:14px; border:1px solid #E5E7EB;">
     @if($title)
         <tr>
-            <td align="center" style="padding:28px 24px 24px 24px; border-bottom:1px solid #E5E7EB;">
+            <td align="center" style="padding:28px 24px 24px 24px; border-bottom:1px solid #E5E7EB; background-color:#FAFAFA; border-radius:14px 14px 0 0;">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                     <tr>
                         <td style="padding-right:10px; vertical-align:middle;">

@@ -11,7 +11,7 @@
     $signature = $partnerName ?: 'Lo staff di miticko';
 
     $logoPath = public_path('assets/images/logo-miticko.png');
-    $logoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+    $logoSrc = isset($message) ? $message->embed($logoPath) : asset('assets/images/logo-miticko.png');
 
     $brandOrange = '#E55E1D';
 @endphp
