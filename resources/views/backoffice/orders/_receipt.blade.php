@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Biglietto MTK-{{ $order->order_number }}</title>
     <style>
-        @page { margin: 28px 30px 28px 30px; }
+        @page { margin: 0; }
 
         * { box-sizing: border-box; }
 
@@ -15,6 +15,10 @@
             line-height: 1.55;
             margin: 0;
             padding: 0;
+        }
+
+        .page-content {
+            padding: 22px 30px 28px 30px;
         }
 
         /* --- Top tab "Email - Biglietto" --- */
@@ -32,10 +36,12 @@
             margin-right: 6px;
             vertical-align: middle;
         }
-        .top-rule {
-            border: 0;
-            border-top: 4px solid #E85A1F;
-            margin: 0 0 26px;
+        .top-band {
+            width: 100%;
+            height: 15px;
+            background: #E85A1F;
+            line-height: 0;
+            font-size: 0;
         }
 
         /* --- Header --- */
@@ -196,22 +202,31 @@
 
         /* --- Footer --- */
         .footer {
-            margin-top: 18px;
-            padding-top: 14px;
-            border-top: 1px solid #E3E3E3;
-            text-align: center;
+            width: 100%;
+            background: #F5F5F5;
+            border-collapse: collapse;
+            margin: 0;
         }
-        .footer .brand { margin-bottom: 6px; }
-        .footer .brand img { height: 15px; }
-        .footer .brand .fallback {
-            font-size: 12px;
+        .footer td {
+            vertical-align: middle;
+            padding: 16px 12px 16px 30px;
+        }
+        .footer .logo {
+            width: 130px;
+        }
+        .footer .logo img { height: 22px; display: block; }
+        .footer .logo .fallback {
+            font-size: 14px;
             font-weight: 800;
             letter-spacing: 0.5px;
             color: #0D0D0D;
         }
+        .footer .info {
+            padding-right: 30px;
+        }
         .footer p {
-            font-size: 9px;
-            color: #6B7280;
+            font-size: 9.5px;
+            color: #4A5260;
             line-height: 1.55;
             margin: 0;
         }
@@ -327,7 +342,8 @@
     @endphp
 
     <div class="{{ $index < $totalTickets - 1 ? 'page-break' : '' }}">
-        <hr class="top-rule">
+        <div class="top-band">&nbsp;</div>
+        <div class="page-content">
 
         {{-- HEADER --}}
         <table class="ticket-header">
@@ -387,10 +403,10 @@
                                             @else
                                                 <div style="width:100px;height:100px;border:1px dashed #B89C8B;border-radius:6px;"></div>
                                             @endif
+                                            <div class="code">{{ $code }}</div>
                                         </td>
                                     </tr>
                                 </table>
-                                <div class="code">{{ $code }}</div>
                             </td>
                         </tr>
                     </table>
@@ -450,20 +466,26 @@
             </p>
         </div>
 
+        </div>{{-- /.page-content --}}
+
         {{-- FOOTER --}}
-        <div class="footer">
-            <div class="brand">
-                @if($hasLogo)
-                    <img src="{{ $logoSrc }}" alt="Miticko">
-                @else
-                    <span class="fallback">miticko</span>
-                @endif
-            </div>
-            <p>
-                Servizio offerto da Miticko (miticko.com) - Miticko.com è un brand di Colli Italiani S.N.C.<br>
-                P.IVA 12343060963 - San Giuliano Milanese (MI) Via Fratelli Rizzi 8 - CAP 20098 - Italia
-            </p>
-        </div>
+        <table class="footer">
+            <tr>
+                <td class="logo">
+                    @if($hasLogo)
+                        <img src="{{ $logoSrc }}" alt="Miticko">
+                    @else
+                        <span class="fallback">miticko</span>
+                    @endif
+                </td>
+                <td class="info">
+                    <p>
+                        Servizio offerto da Miticko (miticko.com) – Miticko.com è un brand di Colli Italiani S.N.C.<br>
+                        P.IVA 12343060963 – San Giuliano Milanese (MI) Via Fratelli Rizzi 8 – CAP 20098 – Italia
+                    </p>
+                </td>
+            </tr>
+        </table>
     </div>
 @endforeach
 </body>
