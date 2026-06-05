@@ -74,10 +74,14 @@
             width: 100%;
             background: #FCDCC9;
             border-radius: 16px;
-            padding: 22px 24px 24px;
+            border-collapse: separate;
+            border-spacing: 0;
             margin: 0 0 26px;
         }
-        .ticket-card .badge-wrap { margin-bottom: 16px; }
+        .ticket-card-cell {
+            padding: 22px 24px 24px 24px;
+        }
+        .ticket-card .badge-wrap { margin: 0 0 14px; }
         .ticket-card .badge {
             display: inline-block;
             background: #E85A1F;
@@ -89,9 +93,9 @@
             padding: 6px 14px;
             border-radius: 9999px;
         }
-        .ticket-card table { width: 100%; }
-        .ticket-card td { vertical-align: top; }
-        .ticket-card .left { padding-right: 16px; }
+        .ticket-card-body { width: 100%; border-collapse: collapse; }
+        .ticket-card-body td { vertical-align: top; }
+        .ticket-card-body .left { padding-right: 16px; }
         .ticket-card .product-title {
             font-size: 18px;
             font-weight: 700;
@@ -116,21 +120,30 @@
             color: #0D0D0D;
         }
         .ticket-card .qr {
-            text-align: center;
-            width: 120px;
+            width: 140px;
+            text-align: right;
         }
-        .ticket-card .qr img {
-            width: 110px;
-            height: 110px;
-            display: block;
-            margin: 0 auto 6px;
+        .qr-box {
             background: #FFFFFF;
+            border-radius: 14px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .qr-box td {
+            padding: 10px;
+        }
+        .qr-box img {
+            width: 100px;
+            height: 100px;
+            display: block;
         }
         .ticket-card .qr .code {
             font-family: DejaVu Sans Mono, monospace;
             font-size: 9.5px;
             color: #5C6470;
             letter-spacing: 0.3px;
+            text-align: center;
+            padding-top: 6px;
         }
 
         /* --- Section --- */
@@ -314,7 +327,6 @@
     @endphp
 
     <div class="{{ $index < $totalTickets - 1 ? 'page-break' : '' }}">
-        <div class="tab-strip"><span class="accent"></span>Email - Biglietto</div>
         <hr class="top-rule">
 
         {{-- HEADER --}}
@@ -340,41 +352,51 @@
         </table>
 
         {{-- TICKET CARD --}}
-        <div class="ticket-card">
-            <div class="badge-wrap">
-                <span class="badge">Biglietto {{ $index + 1 }} di {{ $totalTickets }}</span>
-            </div>
-            <table>
-                <tr>
-                    <td class="left">
-                        <div class="product-title">{{ $product?->label ?? '—' }}</div>
-                        <div class="product-variant">
-                            {{ $variantLabel ?? '—' }}
-                            @if($unitPrice !== null)
-                                - {{ number_format((float) $unitPrice, 2, ',', '.') }}€
-                            @endif
-                        </div>
-                        @if($bookingDate)
-                            <div class="slot">
-                                {{ $bookingDate->translatedFormat('j F Y') }}
-                                @if($bookingTime) / Ore {{ $bookingTime }} @endif
-                            </div>
-                        @endif
-                        @if($guestName)
-                            <div class="guest">{{ $guestName }}</div>
-                        @endif
-                    </td>
-                    <td class="qr">
-                        @if($qrDataUri)
-                            <img src="{{ $qrDataUri }}" alt="QR {{ $code }}">
-                        @else
-                            <div style="width:100px;height:100px;border:1px dashed #B89C8B;border-radius:6px;"></div>
-                        @endif
-                        <div class="code">{{ $code }}</div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <table class="ticket-card">
+            <tr>
+                <td class="ticket-card-cell">
+                    <div class="badge-wrap">
+                        <span class="badge">Biglietto {{ $index + 1 }} di {{ $totalTickets }}</span>
+                    </div>
+                    <table class="ticket-card-body">
+                        <tr>
+                            <td class="left">
+                                <div class="product-title">{{ $product?->label ?? '—' }}</div>
+                                <div class="product-variant">
+                                    {{ $variantLabel ?? '—' }}
+                                    @if($unitPrice !== null)
+                                        - {{ number_format((float) $unitPrice, 2, ',', '.') }}€
+                                    @endif
+                                </div>
+                                @if($bookingDate)
+                                    <div class="slot">
+                                        {{ $bookingDate->translatedFormat('j F Y') }}
+                                        @if($bookingTime) / Ore {{ $bookingTime }} @endif
+                                    </div>
+                                @endif
+                                @if($guestName)
+                                    <div class="guest">{{ $guestName }}</div>
+                                @endif
+                            </td>
+                            <td class="qr">
+                                <table class="qr-box" align="right">
+                                    <tr>
+                                        <td>
+                                            @if($qrDataUri)
+                                                <img src="{{ $qrDataUri }}" alt="QR {{ $code }}">
+                                            @else
+                                                <div style="width:100px;height:100px;border:1px dashed #B89C8B;border-radius:6px;"></div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="code">{{ $code }}</div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
 
         {{-- INFORMAZIONI PER LA VISITA --}}
         <div class="section">
