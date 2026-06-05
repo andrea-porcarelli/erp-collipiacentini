@@ -168,7 +168,7 @@
             margin: 0 0 8px;
             font-size: 11px;
             color: #1F1F1F;
-            line-height: 1.55;
+            line-height: 1;
         }
         .section p:last-child { margin-bottom: 0; }
 
@@ -212,6 +212,9 @@
             right: 0;
             width: 100%;
             background: #F5F5F5;
+        }
+        .footer table {
+            width: 100%;
             border-collapse: collapse;
             margin: 0;
         }
@@ -322,6 +325,29 @@
 
     $totalTickets = $tickets->count();
 @endphp
+
+{{-- Banda arancione e footer: position:fixed → DomPDF li ripete su ogni pagina --}}
+<div class="top-band">&nbsp;</div>
+
+<div class="footer">
+    <table>
+        <tr>
+            <td class="logo">
+                @if($hasLogo)
+                    <img src="{{ $logoSrc }}" alt="Miticko">
+                @else
+                    <span class="fallback">miticko</span>
+                @endif
+            </td>
+            <td class="info">
+                <p>
+                    Servizio offerto da Miticko (miticko.com) – Miticko.com è un brand di Colli Italiani S.N.C.<br>
+                    P.IVA 12343060963 – San Giuliano Milanese (MI) Via Fratelli Rizzi 8 – CAP 20098 – Italia
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>
 
 @foreach($tickets as $index => $ticket)
     @php
@@ -479,26 +505,5 @@
         </div>{{-- /.page-content --}}
     </div>
 @endforeach
-
-{{-- Banda arancione e footer: position:fixed → DomPDF li ripete su ogni pagina --}}
-<div class="top-band">&nbsp;</div>
-
-<table class="footer">
-    <tr>
-        <td class="logo">
-            @if($hasLogo)
-                <img src="{{ $logoSrc }}" alt="Miticko">
-            @else
-                <span class="fallback">miticko</span>
-            @endif
-        </td>
-        <td class="info">
-            <p>
-                Servizio offerto da Miticko (miticko.com) – Miticko.com è un brand di Colli Italiani S.N.C.<br>
-                P.IVA 12343060963 – San Giuliano Milanese (MI) Via Fratelli Rizzi 8 – CAP 20098 – Italia
-            </p>
-        </td>
-    </tr>
-</table>
 </body>
 </html>
