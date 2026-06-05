@@ -1,17 +1,17 @@
 body {
     background: var(--background-be-default) !important;
     color: var(--text-secondary) !important;
-    font-family: var(--typography-title-font), serif !important;
+    font-family: var(--typography-web-title-font, "DM Sans");
+
 }
 input.form-control {
     font-size: var(--typography-body-size-medium) !important;
-    font-family: var(--typography-title-font), serif !important;
-
+    font-family: var(--typography-web-title-font, "DM Sans");
 }
 
 
 a {
-    font-family: var(--typography-title-font), serif !important;
+    font-family: var(--typography-web-title-font, "DM Sans");
     color: var(--color) !important;
     text-decoration: none !important;
 }
