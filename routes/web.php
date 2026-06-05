@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Frontend\BookingController;
-use App\Http\Controllers\Frontend\PaymentController;
-use App\Http\Controllers\Frontend\StripeWebhookController;
 use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
@@ -10,30 +7,34 @@ use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\LoginController;
 use App\Http\Controllers\Backoffice\OrderController;
 use App\Http\Controllers\Backoffice\PartnerController;
+use App\Http\Controllers\Backoffice\PartnerUserController;
+use App\Http\Controllers\Backoffice\ProductAvailabilityController;
+use App\Http\Controllers\Backoffice\ProductClosedPeriodController;
 use App\Http\Controllers\Backoffice\ProductController;
+use App\Http\Controllers\Backoffice\ProductCustomerFieldController;
 use App\Http\Controllers\Backoffice\ProductFaqController;
 use App\Http\Controllers\Backoffice\ProductLinkController;
-use App\Http\Controllers\Backoffice\ProductRelatedController;
-use App\Http\Controllers\Backoffice\ProductAvailabilityController;
-use App\Http\Controllers\Backoffice\ProductPriceVariationController;
-use App\Http\Controllers\Backoffice\ProductCustomerFieldController;
-use App\Http\Controllers\Backoffice\ProductSpecialScheduleController;
-use App\Http\Controllers\Backoffice\ProductClosedPeriodController;
 use App\Http\Controllers\Backoffice\ProductMediaController;
-use App\Http\Controllers\Backoffice\PartnerUserController;
+use App\Http\Controllers\Backoffice\ProductPriceVariationController;
+use App\Http\Controllers\Backoffice\ProductRelatedController;
+use App\Http\Controllers\Backoffice\ProductSpecialScheduleController;
+use App\Http\Controllers\Backoffice\StatisticsController;
 use App\Http\Controllers\Backoffice\UserController;
+use App\Http\Controllers\Frontend\BookingController;
+use App\Http\Controllers\Frontend\PaymentController;
+use App\Http\Controllers\Frontend\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => '/shop', 'middleware' => 'token'], function() {
-    Route::get('/',[BookingController::class, 'index']);
-    Route::get('/filter-products',[BookingController::class, 'filterProducts']);
-    Route::get('/product/{productId}/available-times',[BookingController::class, 'getAvailableTimes']);
-    Route::get('/product/{productId}/available-days',[BookingController::class, 'getAvailableDays']);
-    Route::post('/cart/add',[BookingController::class, 'addToCart'])->name('booking.cart.add');
-    Route::delete('/cart/remove',[BookingController::class, 'removeCart'])->name('booking.cart.remove');
-    Route::post('/cart/customer',[BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
-    Route::get('/cart',[BookingController::class, 'cart'])->name('booking.cart');
-    Route::get('/{slugProduct}/{productCode}.html',[BookingController::class, 'product'])->name('booking.product');
+Route::group(['prefix' => '/shop', 'middleware' => 'token'], function () {
+    Route::get('/', [BookingController::class, 'index']);
+    Route::get('/filter-products', [BookingController::class, 'filterProducts']);
+    Route::get('/product/{productId}/available-times', [BookingController::class, 'getAvailableTimes']);
+    Route::get('/product/{productId}/available-days', [BookingController::class, 'getAvailableDays']);
+    Route::post('/cart/add', [BookingController::class, 'addToCart'])->name('booking.cart.add');
+    Route::delete('/cart/remove', [BookingController::class, 'removeCart'])->name('booking.cart.remove');
+    Route::post('/cart/customer', [BookingController::class, 'saveCustomer'])->name('booking.cart.customer');
+    Route::get('/cart', [BookingController::class, 'cart'])->name('booking.cart');
+    Route::get('/{slugProduct}/{productCode}.html', [BookingController::class, 'product'])->name('booking.product');
 
     // Payment routes
     Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
@@ -53,10 +54,10 @@ Route::domain('admin.miticko.com')->group(function () {
             return redirect()->route('login');
         }
     });
-    Route::get('/login',[LoginController::class, 'index'])->name('login');
-    Route::post('/login',[LoginController::class, 'login']);
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 
-    Route::group(['middleware' => ['auth']], function() {
+    Route::group(['middleware' => ['auth']], function () {
         Route::impersonate();
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -138,6 +139,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('companies/{company}/products', [CompanyController::class, 'syncProducts'])->name('companies.products.sync');
         Route::resource('users', UserController::class);
         Route::resource('customers', CustomerController::class);
+        Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
     });
 });
 Route::fallback(function () {

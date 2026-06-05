@@ -48,6 +48,20 @@ services:
       - ./storage/dbdata:/var/lib/mysql
     networks:
       - erp
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+    expose:
+      - "1025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - erp
 volumes:
   caddy_data:
   caddy_config:

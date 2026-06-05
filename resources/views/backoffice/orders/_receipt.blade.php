@@ -2,10 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Ricevuta #{{ $order->order_number }}</title>
+    <title>Biglietto MTK-{{ $order->order_number }}</title>
     <style>
-        /* Miticko design tokens (light, PDF-safe) */
-        @page { margin: 32px 36px 90px 36px; }
+        @page { margin: 28px 30px 28px 30px; }
 
         * { box-sizing: border-box; }
 
@@ -13,364 +12,437 @@
             font-family: DejaVu Sans, sans-serif;
             color: #0D0D0D;
             font-size: 11px;
-            line-height: 1.5;
+            line-height: 1.55;
             margin: 0;
             padding: 0;
         }
 
-        /* Header */
-        .receipt-header {
-            width: 100%;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #0D0D0D;
-        }
-        .receipt-header td { vertical-align: top; }
-        .receipt-title {
-            font-size: 28px;
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -0.5px;
-            color: #0D0D0D;
-            margin: 0 0 6px;
-        }
-        .receipt-subtitle {
-            font-size: 12px;
-            color: #666;
-            font-weight: 400;
-        }
-        .receipt-header .right { text-align: right; }
-        .receipt-header .partner-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0D0D0D;
-            margin-bottom: 2px;
-        }
-        .receipt-header .meta {
-            color: #666;
-            font-size: 11px;
-            line-height: 1.7;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            background: #E8F5E9;
-            color: #1B5E20;
-            border-radius: 9999px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .badge.pending  { background: #FFF4E5; color: #B36100; }
-        .badge.failed,
-        .badge.cancelled { background: #FDECEA; color: #B71C1C; }
-        .badge.refunded { background: #ECEFF1; color: #455A64; }
-
-        /* Section */
-        .section { margin-top: 28px; }
-        .section-title {
-            font-size: 13px;
-            font-weight: 700;
+        /* --- Top tab "Email - Biglietto" --- */
+        .tab-strip {
             margin: 0 0 12px;
-            color: #0D0D0D;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-
-        /* Card-like info grid */
-        .info-grid {
-            width: 100%;
-            border: 1px solid #E6E6E6;
-            border-radius: 12px;
-            background: #FAFAFA;
-            padding: 16px 20px;
-            margin-top: 4px;
-        }
-        .info-grid td {
-            vertical-align: top;
-            padding: 6px 12px 6px 0;
-            width: 33.33%;
-        }
-        .info-label {
-            color: #666;
             font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            color: #5C6470;
         }
-        .info-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: #0D0D0D;
-        }
-
-        /* Tickets table */
-        table.tickets {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 4px;
-            border: 1px solid #E6E6E6;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        table.tickets thead th {
-            background: #F2F2F2;
-            color: #666;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 10px 14px;
-            text-align: left;
-            border-bottom: 1px solid #E6E6E6;
-        }
-        table.tickets thead th.center { text-align: center; }
-        table.tickets thead th.right  { text-align: right; }
-        table.tickets tbody td {
-            padding: 12px 14px;
-            font-size: 12px;
-            color: #0D0D0D;
-            border-bottom: 1px solid #F2F2F2;
-        }
-        table.tickets tbody tr:last-child td { border-bottom: none; }
-        table.tickets tbody td.center { text-align: center; }
-        table.tickets tbody td.right  { text-align: right; font-variant-numeric: tabular-nums; }
-        .ticket-name { font-weight: 700; }
-
-        /* Totals box (right-aligned card) */
-        .totals-wrap {
-            width: 100%;
-            margin-top: 16px;
-        }
-        .totals-wrap td { vertical-align: top; }
-        .totals {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #E6E6E6;
-            border-radius: 12px;
-            background: #FAFAFA;
-            padding: 6px 16px;
-        }
-        .totals td {
-            padding: 8px 16px;
-            font-size: 12px;
-            border: none;
-        }
-        .totals td.right {
-            text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
-        .totals tr.total-line td {
-            border-top: 2px solid #0D0D0D;
-            font-weight: 700;
-            font-size: 14px;
-            padding-top: 12px;
-            padding-bottom: 12px;
-        }
-
-        /* Customer block */
-        .customer {
-            border: 1px solid #E6E6E6;
-            border-radius: 12px;
-            padding: 16px 20px;
-            background: #FFF;
-            line-height: 1.7;
-        }
-        .customer .name { font-weight: 700; font-size: 13px; color: #0D0D0D; }
-        .customer .row  { color: #666; font-size: 12px; }
-
-        /* Footer (fixed at bottom of every page) */
-        .receipt-footer {
-            position: fixed;
-            left: 0; right: 0; bottom: -50px;
-            padding: 16px 0 0;
-            border-top: 1px solid #E6E6E6;
-            text-align: center;
-            color: #999;
-            font-size: 10px;
-        }
-        .receipt-footer .powered {
+        .tab-strip .accent {
             display: inline-block;
-            text-align: center;
-        }
-        .receipt-footer .powered .label {
-            display: block;
-            color: #999;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        .receipt-footer .powered img {
-            height: 18px;
+            width: 6px;
+            height: 6px;
+            background: #2F6BFF;
+            border-radius: 50%;
+            margin-right: 6px;
             vertical-align: middle;
         }
-        .receipt-footer .legal {
-            margin-top: 6px;
-            color: #B2B2B2;
-            font-size: 9px;
+        .top-rule {
+            border: 0;
+            border-top: 4px solid #E85A1F;
+            margin: 0 0 26px;
         }
+
+        /* --- Header --- */
+        .ticket-header {
+            width: 100%;
+            margin-bottom: 22px;
+        }
+        .ticket-header td { vertical-align: top; }
+        .ticket-header .partner-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0D0D0D;
+            line-height: 1.2;
+        }
+        .ticket-header .partner-site {
+            font-size: 11px;
+            color: #5C6470;
+            margin-top: 3px;
+        }
+        .ticket-header .right { text-align: right; }
+        .ticket-header .brand img { height: 20px; }
+        .ticket-header .brand .fallback {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #0D0D0D;
+        }
+        .ticket-header .order-id {
+            margin-top: 6px;
+            font-size: 10.5px;
+            color: #5C6470;
+        }
+
+        /* --- Ticket card --- */
+        .ticket-card {
+            width: 100%;
+            background: #FCDCC9;
+            border-radius: 16px;
+            padding: 22px 24px 24px;
+            margin: 0 0 26px;
+        }
+        .ticket-card .badge-wrap { margin-bottom: 16px; }
+        .ticket-card .badge {
+            display: inline-block;
+            background: #E85A1F;
+            color: #FFFFFF;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 9999px;
+        }
+        .ticket-card table { width: 100%; }
+        .ticket-card td { vertical-align: top; }
+        .ticket-card .left { padding-right: 16px; }
+        .ticket-card .product-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0D0D0D;
+            margin: 0 0 4px;
+            line-height: 1.25;
+        }
+        .ticket-card .product-variant {
+            font-size: 12.5px;
+            color: #1F1F1F;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+        .ticket-card .slot {
+            font-size: 12px;
+            color: #1F1F1F;
+            margin-bottom: 16px;
+        }
+        .ticket-card .guest {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #0D0D0D;
+        }
+        .ticket-card .qr {
+            text-align: center;
+            width: 120px;
+        }
+        .ticket-card .qr img {
+            width: 110px;
+            height: 110px;
+            display: block;
+            margin: 0 auto 6px;
+            background: #FFFFFF;
+        }
+        .ticket-card .qr .code {
+            font-family: DejaVu Sans Mono, monospace;
+            font-size: 9.5px;
+            color: #5C6470;
+            letter-spacing: 0.3px;
+        }
+
+        /* --- Section --- */
+        .section { margin: 0 0 24px; }
+        .section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0D0D0D;
+            margin: 0 0 10px;
+        }
+        .section p {
+            margin: 0 0 8px;
+            font-size: 11px;
+            color: #1F1F1F;
+            line-height: 1.55;
+        }
+        .section p:last-child { margin-bottom: 0; }
+
+        /* --- Meta grid (Durata / Tipologia / ...) --- */
+        .meta-grid {
+            width: 100%;
+            border-top: 1px solid #E3E3E3;
+            border-bottom: 1px solid #E3E3E3;
+            margin: 0 0 24px;
+        }
+        .meta-grid td {
+            width: 25%;
+            padding: 14px 8px 14px 0;
+            vertical-align: top;
+        }
+        .meta-grid .label {
+            font-size: 10.5px;
+            color: #6B7280;
+            margin-bottom: 6px;
+        }
+        .meta-grid .value {
+            font-size: 12px;
+            font-weight: 400;
+            color: #0D0D0D;
+        }
+
+        /* --- Terms --- */
+        .terms p {
+            font-size: 9px;
+            color: #5C6470;
+            line-height: 1.5;
+            margin: 0 0 6px;
+        }
+        .terms strong { color: #0D0D0D; font-weight: 700; }
+
+        /* --- Footer --- */
+        .footer {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #E3E3E3;
+            text-align: center;
+        }
+        .footer .brand { margin-bottom: 6px; }
+        .footer .brand img { height: 15px; }
+        .footer .brand .fallback {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #0D0D0D;
+        }
+        .footer p {
+            font-size: 9px;
+            color: #6B7280;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        /* --- Page break --- */
+        .page-break { page-break-after: always; }
+        .page-break:last-child { page-break-after: auto; }
     </style>
 </head>
 <body>
-    @php($firstOp = $order->orderProducts->first())
-    @php($effettuatoIl = $order->paid_at ?? $order->created_at)
-    @php($statusKey = $order->order_status->value)
-    @php($logoPath = public_path('assets/images/logo-miticko.png'))
+@php
+    use Illuminate\Support\Carbon;
+    use chillerlan\QRCode\QRCode;
+    use chillerlan\QRCode\QROptions;
+    use chillerlan\QRCode\Common\EccLevel;
+    use chillerlan\QRCode\Output\QRGdImagePNG;
 
-    {{-- HEADER --}}
-    <table class="receipt-header">
-        <tr>
-            <td style="width: 60%;">
-                <div class="receipt-title">Ricevuta</div>
-                <div class="receipt-subtitle">#{{ $order->order_number }}</div>
-            </td>
-            <td class="right" style="width: 40%;">
-                @if($order->partner)
-                    <div class="partner-name">{{ $order->partner->partner_name }}</div>
-                @endif
-                <div class="meta">
-                    Effettuato il {{ $effettuatoIl?->translatedFormat('j F Y') }} alle {{ $effettuatoIl?->format('H:i') }}<br>
-                    <span class="badge {{ $statusKey }}">{{ $order->order_status->label() }}</span>
-                </div>
-            </td>
-        </tr>
-    </table>
+    $qrRenderer = new QRCode(new QROptions([
+        'outputInterface' => QRGdImagePNG::class,
+        'eccLevel'        => EccLevel::M,
+        'scale'           => 6,
+        'outputBase64'    => true,
+        'addQuietzone'    => true,
+        'quietzoneSize'   => 1,
+    ]));
 
-    {{-- DETTAGLI ORDINE --}}
-    <div class="section">
-        <div class="section-title">Dettagli ordine</div>
-        <table class="info-grid">
+    $logoPath = public_path('assets/images/logo-miticko.png');
+    $hasLogo  = file_exists($logoPath);
+    $logoSrc  = $hasLogo ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+    $orderCode    = $order->order_number;
+    $partnerName  = $order->partner?->partner_name;
+    $partnerSite  = $order->partner?->domain_name;
+    $guestName    = $order->customer?->full_name;
+    $purchasedAt  = $order->paid_at ?? $order->created_at;
+
+    $payment = $order->card_brand
+        ? trim(ucfirst($order->card_brand) . ($order->card_last4 ? ' · ' . $order->card_last4 : ''))
+        : ($order->stripe_payment_method ? 'Carta di credito' : '—');
+
+    // Costruisco la lista dei biglietti da stampare: un'entry per ogni OrderParticipant.
+    $tickets = collect();
+    foreach ($order->orderProducts as $op) {
+        foreach ($op->items as $item) {
+            foreach ($item->orderProductItem?->id ? collect() : collect() as $_) {}
+            $itemParticipants = $order->participants
+                ->where('order_product_item_id', $item->id)
+                ->values();
+
+            $variantLabel = $item->variant?->label;
+            $unitPrice    = (float) $item->unit_price;
+
+            foreach ($itemParticipants as $participant) {
+                $tickets->push([
+                    'participant'   => $participant,
+                    'order_product' => $op,
+                    'item'          => $item,
+                    'product'       => $op->product,
+                    'variant_label' => $variantLabel,
+                    'unit_price'    => $unitPrice,
+                ]);
+            }
+        }
+    }
+
+    if ($tickets->isEmpty()) {
+        // Fallback per ordini legacy senza participants/items: una stampa per quantity.
+        foreach ($order->orderProducts as $op) {
+            $qty = max(1, (int) $op->quantity);
+            for ($i = 0; $i < $qty; $i++) {
+                $tickets->push([
+                    'participant'   => null,
+                    'order_product' => $op,
+                    'item'          => null,
+                    'product'       => $op->product,
+                    'variant_label' => null,
+                    'unit_price'    => $op->quantity > 0 ? $op->total / $op->quantity : $op->total,
+                ]);
+            }
+        }
+    }
+
+    $totalTickets = $tickets->count();
+@endphp
+
+@foreach($tickets as $index => $ticket)
+    @php
+        $product       = $ticket['product'];
+        $op            = $ticket['order_product'];
+        $participant   = $ticket['participant'];
+        $variantLabel  = $ticket['variant_label'] ?? $product?->label;
+        $unitPrice     = $ticket['unit_price'];
+        $bookingDate   = $op->booking_date ? Carbon::parse($op->booking_date) : null;
+        $bookingTime   = $op->booking_time ? substr($op->booking_time, 0, 5) : null;
+        $code          = $participant?->code ?? sprintf('mtk%05d%02d', $order->id, $index + 1);
+
+        $durationLabel = null;
+        if ($product?->duration_minutes) {
+            $durationLabel = $product->duration_minutes . ' min';
+        } elseif ($product?->duration_hours) {
+            $durationLabel = $product->duration_hours . ' h';
+        } elseif ($product?->duration_days) {
+            $durationLabel = $product->duration_days . ' g';
+        }
+
+        $typeLabel = $product?->category?->label ?? ($product?->product_type ? __('products.types.' . $product->product_type) : null);
+
+        try {
+            $qrDataUri = $qrRenderer->render($code);
+        } catch (\Throwable $e) {
+            $qrDataUri = null;
+        }
+    @endphp
+
+    <div class="{{ $index < $totalTickets - 1 ? 'page-break' : '' }}">
+        <div class="tab-strip"><span class="accent"></span>Email - Biglietto</div>
+        <hr class="top-rule">
+
+        {{-- HEADER --}}
+        <table class="ticket-header">
             <tr>
-                <td>
-                    <div class="info-label">Numero ordine</div>
-                    <div class="info-value">#{{ $order->order_number }}</div>
+                <td style="width: 60%;">
+                    <div class="partner-name">{{ $partnerName ?? '—' }}</div>
+                    @if($partnerSite)
+                        <div class="partner-site">{{ $partnerSite }}</div>
+                    @endif
                 </td>
-                @if($firstOp)
-                    <td>
-                        <div class="info-label">Data e ora visita</div>
-                        <div class="info-value">{{ \Carbon\Carbon::parse($firstOp->booking_date)->translatedFormat('j F Y') }} · ore {{ substr($firstOp->booking_time, 0, 5) }}</div>
-                    </td>
-                    <td>
-                        <div class="info-label">Prodotto</div>
-                        <div class="info-value">{{ $firstOp->product?->label }}</div>
-                    </td>
-                @endif
+                <td class="right" style="width: 40%;">
+                    <div class="brand">
+                        @if($hasLogo)
+                            <img src="{{ $logoSrc }}" alt="Miticko">
+                        @else
+                            <span class="fallback">miticko</span>
+                        @endif
+                    </div>
+                    <div class="order-id">Ordine #{{ $orderCode }}</div>
+                </td>
             </tr>
-            @if($order->card_brand || $order->stripe_payment_method)
+        </table>
+
+        {{-- TICKET CARD --}}
+        <div class="ticket-card">
+            <div class="badge-wrap">
+                <span class="badge">Biglietto {{ $index + 1 }} di {{ $totalTickets }}</span>
+            </div>
+            <table>
                 <tr>
-                    <td>
-                        <div class="info-label">Metodo di pagamento</div>
-                        <div class="info-value">
-                            @if($order->card_brand)
-                                {{ ucfirst($order->card_brand) }}@if($order->card_last4) · {{ $order->card_last4 }}@endif
-                            @else
-                                Carta di credito
+                    <td class="left">
+                        <div class="product-title">{{ $product?->label ?? '—' }}</div>
+                        <div class="product-variant">
+                            {{ $variantLabel ?? '—' }}
+                            @if($unitPrice !== null)
+                                - {{ number_format((float) $unitPrice, 2, ',', '.') }}€
                             @endif
                         </div>
+                        @if($bookingDate)
+                            <div class="slot">
+                                {{ $bookingDate->translatedFormat('j F Y') }}
+                                @if($bookingTime) / Ore {{ $bookingTime }} @endif
+                            </div>
+                        @endif
+                        @if($guestName)
+                            <div class="guest">{{ $guestName }}</div>
+                        @endif
                     </td>
-                    @if($firstOp?->product?->duration_minutes)
-                        <td>
-                            <div class="info-label">Durata</div>
-                            <div class="info-value">{{ $firstOp->product->duration_minutes }} min</div>
-                        </td>
-                    @endif
-                    @if($order->partner?->domain_name)
-                        <td>
-                            <div class="info-label">Canale di vendita</div>
-                            <div class="info-value">{{ $order->partner->domain_name }}</div>
-                        </td>
-                    @endif
+                    <td class="qr">
+                        @if($qrDataUri)
+                            <img src="{{ $qrDataUri }}" alt="QR {{ $code }}">
+                        @else
+                            <div style="width:100px;height:100px;border:1px dashed #B89C8B;border-radius:6px;"></div>
+                        @endif
+                        <div class="code">{{ $code }}</div>
+                    </td>
                 </tr>
-            @endif
+            </table>
+        </div>
+
+        {{-- INFORMAZIONI PER LA VISITA --}}
+        <div class="section">
+            <h3>Informazioni per la visita</h3>
+            <p>
+                Presentarsi al punto di ritrovo almeno 15 minuti prima dell'orario di visita indicato. Non è garantito l'ingresso oltre 30 minuti dopo l'orario.
+            </p>
+            <p>
+                Esibire all'ingresso questo biglietto (stampato o su dispositivo mobile) insieme a un documento d'identità in corso di validità.
+            </p>
+            <p>
+                Il QR code verrà scansionato all'ingresso: ogni biglietto è valido per una sola persona, esclusivamente per la data e l'orario indicati.
+            </p>
+            <p>
+                Per esigenze di accessibilità, assistenza o variazioni della prenotazione scrivere a support@miticko.com almeno 48 ore prima della visita.
+            </p>
+        </div>
+
+        {{-- META GRID --}}
+        <table class="meta-grid">
+            <tr>
+                <td>
+                    <div class="label">Durata</div>
+                    <div class="value">{{ $durationLabel ?? '—' }}</div>
+                </td>
+                <td>
+                    <div class="label">Tipologia</div>
+                    <div class="value">{{ $typeLabel ?? '—' }}</div>
+                </td>
+                <td>
+                    <div class="label">Acquistato il</div>
+                    <div class="value">{{ $purchasedAt ? $purchasedAt->translatedFormat('j F Y') : '—' }}</div>
+                </td>
+                <td>
+                    <div class="label">Pagamento</div>
+                    <div class="value">{{ $payment }}</div>
+                </td>
+            </tr>
         </table>
-    </div>
 
-    {{-- BIGLIETTI --}}
-    <div class="section">
-        <div class="section-title">Biglietti</div>
-        <table class="tickets">
-            <thead>
-                <tr>
-                    <th>Tipo</th>
-                    <th class="center">Q.tà</th>
-                    <th class="right">Prezzo</th>
-                    <th class="right">Subtotale</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($order->orderProducts as $op)
-                    @if($op->items->isNotEmpty())
-                        @foreach($op->items as $item)
-                            <tr>
-                                <td class="ticket-name">{{ $item->variant?->label ?? $op->product?->label ?? '—' }}</td>
-                                <td class="center">{{ $item->quantity }}</td>
-                                <td class="right">{{ number_format($item->unit_price, 2, ',', '.') }} €</td>
-                                <td class="right">{{ number_format($item->subtotal, 2, ',', '.') }} €</td>
-                            </tr>
-                        @endforeach
-                    @else
-                        @php($unit = $op->quantity > 0 ? $op->total / $op->quantity : $op->total)
-                        <tr>
-                            <td class="ticket-name">{{ $op->product?->label ?? '—' }}</td>
-                            <td class="center">{{ $op->quantity }}</td>
-                            <td class="right">{{ number_format($unit, 2, ',', '.') }} €</td>
-                            <td class="right">{{ number_format($op->total, 2, ',', '.') }} €</td>
-                        </tr>
-                    @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+        {{-- TERMS --}}
+        <div class="section terms">
+            <p>
+                <strong>Condizioni di vendita.</strong> Il biglietto è strettamente personale, non cedibile e non rimborsabile salvo nei casi previsti dal D.lgs. 206/2005 (Codice del Consumo). La data e l'orario di visita non sono modificabili se non secondo le condizioni indicate al momento dell'acquisto e in base alla disponibilità. Mancato utilizzo: ogni responsabilità per smarrimento, furto o duplicazione del biglietto, l'organizzazione si riserva il diritto di modificare o annullare la visita per cause di forza maggiore. In tal caso il cliente sarà contattato tempestivamente e la modalità indicate al momento dell'acquisto.
+            </p>
+            <p>
+                <strong>Trattamento dei dati personali.</strong> I dati personali raccolti sono trattati ai sensi del Regolamento (UE) 2016/679 (GDPR) e del D.lgs. 196/2003 esclusivamente per la gestione della prenotazione e degli obblighi fiscali correlati. L'informativa completa è disponibile su miticko.com/privacy. Il titolare del trattamento è Miticko S.r.l.
+            </p>
+            <p>
+                <strong>Foro competente.</strong> Per ogni controversia relativa all'interpretazione, esecuzione e risoluzione del contratto è competente in via esclusiva il Foro di Firenze, fatta salva l'applicazione delle normative inderogabili a tutela dei consumatori.
+            </p>
+        </div>
 
-    {{-- TOTALI --}}
-    <table class="totals-wrap">
-        <tr>
-            <td style="width: 50%;"></td>
-            <td style="width: 50%;">
-                <table class="totals">
-                    <tr>
-                        <td>Subtotale</td>
-                        <td class="right">{{ number_format($order->amount, 2, ',', '.') }} €</td>
-                    </tr>
-                    <tr class="total-line">
-                        <td>Totale ordine</td>
-                        <td class="right">{{ number_format($order->amount, 2, ',', '.') }} €</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-
-    {{-- DETTAGLI CLIENTE --}}
-    <div class="section">
-        <div class="section-title">Dettagli cliente</div>
-        <div class="customer">
-            <div class="name">{{ $order->customer->full_name }}</div>
-            @if($order->customer->email)<div class="row">{{ $order->customer->email }}</div>@endif
-            @if($order->customer->phone)<div class="row">{{ trim(($order->customer->prefix_phone ?? '') . ' ' . $order->customer->phone) }}</div>@endif
-            @if($order->customer->address)<div class="row">{{ $order->customer->full_address }}</div>@endif
-            @if($order->customer->country)<div class="row">{{ $order->customer->country->name }}</div>@endif
-            @if($order->customer->fiscal_code)<div class="row">C.F. {{ $order->customer->fiscal_code }}</div>@endif
+        {{-- FOOTER --}}
+        <div class="footer">
+            <div class="brand">
+                @if($hasLogo)
+                    <img src="{{ $logoSrc }}" alt="Miticko">
+                @else
+                    <span class="fallback">miticko</span>
+                @endif
+            </div>
+            <p>
+                Servizio offerto da Miticko (miticko.com) - Miticko.com è un brand di Colli Italiani S.N.C.<br>
+                P.IVA 12343060963 - San Giuliano Milanese (MI) Via Fratelli Rizzi 8 - CAP 20098 - Italia
+            </p>
         </div>
     </div>
-
-    {{-- FOOTER --}}
-    <div class="receipt-footer">
-        <div class="powered">
-            <span class="label">Servizio offerto da</span>
-            @if(file_exists($logoPath))
-                <img src="{{ $logoPath }}" alt="Miticko">
-            @else
-                <strong style="font-size: 14px; letter-spacing: 1px; color: #0D0D0D;">MITICKO</strong>
-            @endif
-        </div>
-        <div class="legal">
-            Documento generato in data {{ now()->translatedFormat('j F Y') }} — non costituisce documento fiscale
-        </div>
-    </div>
+@endforeach
 </body>
 </html>

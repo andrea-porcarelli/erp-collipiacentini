@@ -6,9 +6,9 @@
         <x-navigation-item label="Ordini" icon="fa fa-receipt" route="orders.index" :is_active="$active === 'orders'"  />
         <x-navigation-item label="Prodotti" icon="fa fa-border-all" route="products.index" :is_active="$active === 'products'"  />
         <x-navigation-item label="Clienti" icon="fa fa-border-all" route="customers.index" :is_active="$active === 'customers'" />
+        <x-navigation-item label="Statistiche" icon="fa fa-chart-line" route="statistics.index" :is_active="$active === 'statistics'" />
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Categorie" icon="fa fa-border-all" route="categories.index" :is_active="$active === 'categories'"  />
-            <x-navigation-item label="Statistiche" icon="fa fa-chart-line" />
             <x-navigation-item label="Gestione Aziende" icon="fa fa-buildings" route="companies.index" :is_active="$active === 'companies'" />
             <x-navigation-item label="Gestione Partner" icon="fa fa-buildings" route="partners.index" :is_active="$active === 'partners'" />
         @endif

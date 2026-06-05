@@ -28,6 +28,7 @@ class OrderController extends Controller
     use AuthorizesRequests, ValidatesRequests;
 
     public OrderInterface $interface;
+
     public string $path;
 
     public function __construct(OrderInterface $interface)
@@ -39,11 +40,13 @@ class OrderController extends Controller
     public function index(): View
     {
         $statuses = OrderStatus::statuses();
-        return view('backoffice.' . $this->path . '.index', compact('statuses'))
+
+        return view('backoffice.'.$this->path.'.index', compact('statuses'))
             ->with('path', $this->path);
     }
 
-    public function data(Request $request) : JsonResponse {
+    public function data(Request $request): JsonResponse
+    {
         try {
             $user = Auth::user();
             $filters = $request->get('filters') ?? [];
@@ -60,12 +63,12 @@ class OrderController extends Controller
                 $elements->where('partner_id', $user->partner_id);
             }
 
-            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['preview', 'detail', ])
+            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['preview', 'detail'])
                 ->addColumn('created_at', function ($item) {
                     return Utils::data($item->product_data);
                 })
                 ->addColumn('order_number', function ($item) {
-                    return '#' . $item->order_number;
+                    return '#'.$item->order_number;
                 })
                 ->addColumn('customer', function ($item) {
                     return $item->customer->full_name;
@@ -82,13 +85,15 @@ class OrderController extends Controller
                         ->groupBy('product_variant_id')
                         ->map(function ($group) {
                             $label = $group->first()->variant?->label ?? 'Variante';
-                            $qty   = $group->sum('quantity');
+                            $qty = $group->sum('quantity');
+
                             return "{$qty} × {$label}";
                         })
                         ->implode(', ');
                 })
                 ->addColumn('status', function ($item) {
                     $order_status = $item->order_status;
+
                     return view('backoffice.components.label', ['status' => $order_status->status(), 'label' => $order_status->label()])->render();
                 })
                 ->rawColumns(['status', 'options'])
@@ -125,7 +130,7 @@ class OrderController extends Controller
         ]);
 
         // Lazy backfill di card_brand/card_last4 per ordini precedenti.
-        if (!$order->card_brand && $order->stripe_payment_method) {
+        if (! $order->card_brand && $order->stripe_payment_method) {
             try {
                 $pm = app(StripePaymentService::class)->retrievePaymentMethod($order->stripe_payment_method);
                 $order->update([
@@ -143,10 +148,10 @@ class OrderController extends Controller
         $commissionPaymentAmount = round($amount * $commissionPaymentRate / 100, 2);
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
-        return view('backoffice.' . $this->path . '.show', [
+        return view('backoffice.'.$this->path.'.show', [
             'model' => $order,
-            'commissionPaymentRate'   => $commissionPaymentRate,
-            'commissionServiceRate'   => $commissionServiceRate,
+            'commissionPaymentRate' => $commissionPaymentRate,
+            'commissionServiceRate' => $commissionServiceRate,
             'commissionPaymentAmount' => $commissionPaymentAmount,
             'commissionServiceAmount' => $commissionServiceAmount,
         ])->with('path', $this->path);
@@ -157,6 +162,7 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $order->update($request->validated());
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -168,6 +174,7 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $order->update($request->validated());
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -179,6 +186,7 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $order->customer->update($request->validated());
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -190,10 +198,11 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $orderProduct = $order->orderProducts()->first();
-            if (!$orderProduct) {
+            if (! $orderProduct) {
                 return $this->error(['response' => 'Nessun prodotto associato all\'ordine']);
             }
             $orderProduct->update($request->validated());
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -206,7 +215,7 @@ class OrderController extends Controller
             $this->authorizeOrderAccess($order);
             $order->load(['customer', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
 
-            if (!$order->customer?->email) {
+            if (! $order->customer?->email) {
                 return $this->error(['response' => 'Il cliente non ha un\'email valida']);
             }
 
@@ -221,11 +230,17 @@ class OrderController extends Controller
     public function downloadReceipt(Order $order): Response
     {
         $this->authorizeOrderAccess($order);
-        $order->load(['customer.country', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
+        $order->load([
+            'customer.country',
+            'partner',
+            'orderProducts.product.category',
+            'orderProducts.items.variant',
+            'participants',
+        ]);
 
         $pdf = Pdf::loadView('backoffice.orders._receipt', ['order' => $order]);
 
-        return $pdf->download("ricevuta-{$order->order_number}.pdf");
+        return $pdf->download("biglietto-MTK-{$order->order_number}.pdf");
     }
 
     public function refund(Order $order): JsonResponse
@@ -233,7 +248,7 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
 
-            if (!$order->stripe_payment_intent_id) {
+            if (! $order->stripe_payment_intent_id) {
                 return $this->error(['response' => 'PaymentIntent Stripe non disponibile per questo ordine']);
             }
             if ($order->order_status === OrderStatus::REFUNDED) {
