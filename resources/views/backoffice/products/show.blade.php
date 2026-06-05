@@ -360,7 +360,7 @@
             }
         });
     </script>
-    <script src="{{ asset('backoffice/js/products.js') }}?v=1.1" type="module"></script>
+    <script src="{{ asset('backoffice/js/products.js') }}?v=1.2" type="module"></script>
     <script>
         document.addEventListener('variants-notify', (e) => {
             toastr[e.detail.type]?.(e.detail.message);

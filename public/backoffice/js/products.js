@@ -1077,10 +1077,22 @@ const initMediaGallery = () => {
     const el = document.getElementById('media-list');
     if (!el) return;
 
+    const persistMediaOrder = () => {
+        const ids = [...el.querySelectorAll('.media-item[data-id]')]
+            .map(item => parseInt(item.dataset.id));
+        if (ids.length === 0) return;
+        App.ajax({
+            path: `/products/${window.PRODUCT_ID}/media/reorder`,
+            method: 'post',
+            data: { ordered_ids: ids },
+        }).catch(() => toastr.error('Errore durante il riordinamento'));
+    };
+
     Sortable.create(el, {
         handle: '.drag-handle',
         animation: 150,
         ghostClass: 'sortable-ghost',
+        onEnd: persistMediaOrder,
     });
 
     $(document).on('click', '.btn-add-media', () => {
@@ -1122,23 +1134,6 @@ const initMediaGallery = () => {
         });
     });
 
-    $(document).on('click', '.btn-save-media-order', function () {
-        const $btn = $(this);
-        const ids = [...document.querySelectorAll('#media-list .media-item[data-id]')]
-            .map(el => parseInt(el.dataset.id));
-
-        setLoading($btn, true);
-        App.ajax({
-            path: `/products/${window.PRODUCT_ID}/media/reorder`,
-            method: 'post',
-            data: { ordered_ids: ids },
-        }).then(() => {
-            toastr.success('Ordine salvato');
-        }).catch(() => {
-            toastr.error('Errore durante il salvataggio');
-        }).finally(() => setLoading($btn, false));
-    });
-
     $(document).on('click', '.btn-media-delete', function () {
         const $item = $(this).closest('.media-item');
         const id    = $item.data('id');
@@ -1151,7 +1146,11 @@ const initMediaGallery = () => {
                     }
                     toastr.success('Immagine eliminata');
                 })
-                .catch(() => toastr.error('Errore durante l\'eliminazione'));
+                .catch((xhr) => {
+                    const msg = xhr?.responseJSON?.message
+                        || `Errore durante l'eliminazione (HTTP ${xhr?.status ?? '?'})`;
+                    toastr.error(msg);
+                });
         }, null, 'Elimina immagine');
     });
 };
