@@ -18,7 +18,7 @@
         }
 
         .page-content {
-            padding: 22px 30px 28px 30px;
+            padding: 37px 30px 90px 30px;
         }
 
         /* --- Top tab "Email - Biglietto" --- */
@@ -37,6 +37,10 @@
             vertical-align: middle;
         }
         .top-band {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             height: 15px;
             background: #E85A1F;
@@ -202,6 +206,10 @@
 
         /* --- Footer --- */
         .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
             background: #F5F5F5;
             border-collapse: collapse;
@@ -263,9 +271,12 @@
     $guestName    = $order->customer?->full_name;
     $purchasedAt  = $order->paid_at ?? $order->created_at;
 
-    $payment = $order->card_brand
-        ? trim(ucfirst($order->card_brand) . ($order->card_last4 ? ' · ' . $order->card_last4 : ''))
-        : ($order->stripe_payment_method ? 'Carta di credito' : '—');
+    $payment = match (true) {
+        (float) $order->amount === 0.0 => 'Ingresso gratuito',
+        ! empty($order->card_brand) => trim(ucfirst($order->card_brand) . ($order->card_last4 ? ' · ' . $order->card_last4 : '')),
+        ! empty($order->stripe_payment_method) => 'Carta di credito',
+        default => '—',
+    };
 
     // Costruisco la lista dei biglietti da stampare: un'entry per ogni OrderParticipant.
     $tickets = collect();
@@ -342,7 +353,6 @@
     @endphp
 
     <div class="{{ $index < $totalTickets - 1 ? 'page-break' : '' }}">
-        <div class="top-band">&nbsp;</div>
         <div class="page-content">
 
         {{-- HEADER --}}
@@ -467,26 +477,28 @@
         </div>
 
         </div>{{-- /.page-content --}}
-
-        {{-- FOOTER --}}
-        <table class="footer">
-            <tr>
-                <td class="logo">
-                    @if($hasLogo)
-                        <img src="{{ $logoSrc }}" alt="Miticko">
-                    @else
-                        <span class="fallback">miticko</span>
-                    @endif
-                </td>
-                <td class="info">
-                    <p>
-                        Servizio offerto da Miticko (miticko.com) – Miticko.com è un brand di Colli Italiani S.N.C.<br>
-                        P.IVA 12343060963 – San Giuliano Milanese (MI) Via Fratelli Rizzi 8 – CAP 20098 – Italia
-                    </p>
-                </td>
-            </tr>
-        </table>
     </div>
 @endforeach
+
+{{-- Banda arancione e footer: position:fixed → DomPDF li ripete su ogni pagina --}}
+<div class="top-band">&nbsp;</div>
+
+<table class="footer">
+    <tr>
+        <td class="logo">
+            @if($hasLogo)
+                <img src="{{ $logoSrc }}" alt="Miticko">
+            @else
+                <span class="fallback">miticko</span>
+            @endif
+        </td>
+        <td class="info">
+            <p>
+                Servizio offerto da Miticko (miticko.com) – Miticko.com è un brand di Colli Italiani S.N.C.<br>
+                P.IVA 12343060963 – San Giuliano Milanese (MI) Via Fratelli Rizzi 8 – CAP 20098 – Italia
+            </p>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
