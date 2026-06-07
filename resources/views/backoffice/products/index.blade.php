@@ -11,6 +11,7 @@
                     </div>
                     <x-table-header>
                         <div class="filters-miticko">
+                            <x-filter label="Prodotto" type="text" name="label" />
                             <x-filter label="Stato" name="status" />
                         </div>
                         <span class="table-header-total" > - </span>
@@ -34,6 +35,9 @@
             </div>
         </div>
     </div>
+    <x-modal id="filter-text" title="Filtra per prodotto" primary="Salva" secondary="annulla" width="400px">
+        <x-input name="filter_text_value" label="Nome prodotto" placeholder="Cerca per nome" />
+    </x-modal>
     <x-modal title="Aggiungi nuovo prodotto" primary="Crea prodotto" secondary="annulla" width="650px" id="create-product">
         <div class="row">
             <form id="create-product-form" class="w-100">

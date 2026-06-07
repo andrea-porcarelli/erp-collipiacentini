@@ -334,7 +334,7 @@
 .ticket-scanner-content .ts-checkin-counter-main {
     font-size: 18px;
     font-weight: 700;
-    color: var(--ts-warning);
+    color: var(--ts-orange);
 }
 .ticket-scanner-content .ts-checkin-counter-sub {
     font-size: 13px;
@@ -358,6 +358,24 @@
 }
 .ticket-scanner-content .ts-btn-all-arrived:hover {
     background: rgba(16, 185, 129, 0.12);
+}
+.ticket-scanner-content .ts-btn-save-inline {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--ts-orange);
+    border: 1px solid var(--ts-orange);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+}
+.ticket-scanner-content .ts-btn-save-inline:hover {
+    background: var(--ts-orange);
+    color: #fff;
 }
 
 /* Tickets list */
@@ -400,21 +418,41 @@
 .ticket-scanner-content .ts-status-select {
     appearance: none;
     -webkit-appearance: none;
-    background-color: rgba(124, 58, 237, 0.08);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237C3AED' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-color: rgba(59, 130, 246, 0.08);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%233B82F6' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 10px 6px;
-    border: 1px solid rgba(124, 58, 237, 0.4);
-    color: var(--ts-violet);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #3B82F6;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
-    padding: 6px 26px 6px 14px;
+    padding: 6px 26px 6px 22px;
     letter-spacing: 0.04em;
     cursor: pointer;
     min-width: 130px;
+    position: relative;
 }
+.ticket-scanner-content .ts-ticket-status {
+    position: relative;
+}
+.ticket-scanner-content .ts-ticket-status::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3B82F6;
+    transform: translateY(-50%);
+    z-index: 1;
+    pointer-events: none;
+}
+.ticket-scanner-content .ts-ticket-status:has(.ts-status-checked_in)::before { background: var(--ts-success); }
+.ticket-scanner-content .ts-ticket-status:has(.ts-status-no_show)::before { background: var(--ts-danger); }
+.ticket-scanner-content .ts-ticket-status:has(.ts-status-cancelled)::before { background: var(--ts-muted); }
 .ticket-scanner-content .ts-status-checked_in {
     background-color: rgba(16, 185, 129, 0.10);
     border-color: rgba(16, 185, 129, 0.45);

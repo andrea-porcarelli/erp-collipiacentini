@@ -466,6 +466,14 @@ const fill_filters = (type, input, value, name) => {
         container.html(`<span class="fa-regular fa-xmark remove-filter" data-name="${name}"></span><span class="filter-filled">${date_long_ita(value.start)} - ${date_long_ita(value.end)}</span>`);
         filter.addClass('filled')
     }
+    if (type === 'text') {
+        input.val(value);
+        const filter = input.parent();
+        const container = filter.find(`.label-container`);
+        const safe = $('<div>').text(value).html();
+        container.html(`<span class="fa-regular fa-xmark remove-filter" data-name="${name}"></span><span class="filter-filled">${safe}</span>`);
+        filter.addClass('filled')
+    }
 }
 
 const date_long_ita = (date) => {
@@ -629,6 +637,38 @@ const init = () => {
             if (!close) {
                 filter_date_range(filter_type, modal, name, label)
             }
+        }
+        if (filter_type === 'text') {
+            const hiddenInput = filter.find('input');
+            const modalInput = modal.find('input[type="text"]').first();
+            modalInput.val(hiddenInput.val() || '');
+            modal.modal('show');
+            setTimeout(() => modalInput.trigger('focus'), 200);
+            const btn_success = modal.find(`.btn-success`);
+            const btn_cancel = modal.find(`.btn-cancel`);
+            const submit = () => {
+                const value = (modalInput.val() || '').trim();
+                if (value.length > 0) {
+                    fill_filters('text', hiddenInput, value, name);
+                } else {
+                    hiddenInput.val('');
+                    const container = filter.find(`.label-container`);
+                    container.html(`<span class="fa fa-square-plus"></span><span class="label">${label}</span>`);
+                    filter.removeClass('filled');
+                }
+                modal.modal('hide');
+                App.reloadTable();
+            };
+            btn_success.off('click').on('click', submit);
+            btn_cancel.off('click').on('click', function () {
+                modal.modal('hide');
+            });
+            modalInput.off('keydown.filterText').on('keydown.filterText', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submit();
+                }
+            });
         }
         if (filter_type === 'status') {
             modal.modal('show');

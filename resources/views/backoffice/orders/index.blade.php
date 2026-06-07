@@ -9,6 +9,7 @@
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Data" type="daterange" name="dates" />
+                            <x-filter label="Prodotto" type="text" name="label" />
                             <x-filter label="Tipo di acquisto" name="types" type="status" />
                             <x-filter label="Stato" name="status" />
                         </div>
@@ -35,6 +36,9 @@
             </div>
         </div>
     </div>
+    <x-modal id="filter-text" title="Filtra per prodotto" primary="Salva" secondary="annulla" width="400px">
+        <x-input name="filter_text_value" label="Nome prodotto" placeholder="Cerca per nome" />
+    </x-modal>
     <x-modal id="filter-daterange" title="Seleziona periodo" primary="Salva" secondary="annulla" width="350px">
         <div class="d-flex align-items-center justify-content-center">
             <div id="calendar-container" data-filter="dates"></div>
