@@ -3,7 +3,7 @@
     'datetime' => '',
 ])
 
-@php($t = config('design.tokens'))
+@php($t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []))
 
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 4px 0;">
     <tr>

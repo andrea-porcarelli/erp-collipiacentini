@@ -13,7 +13,7 @@
     $logoPath = public_path('assets/images/logo-miticko.png');
     $logoSrc = isset($message) ? $message->embed($logoPath) : asset('assets/images/logo-miticko.png');
 
-    $t = config('design.tokens');
+    $t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []);
     $brandOrange = $t['brand-primary-brand'];
     $textMain = $t['text-main'];
     $textSecondary = $t['text-secondary'];

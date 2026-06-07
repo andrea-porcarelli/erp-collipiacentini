@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductAvailability;
 use App\Models\ProductSpecialSchedule;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductSpecialScheduleController extends Controller
 {
@@ -26,6 +29,8 @@ class ProductSpecialScheduleController extends Controller
 
     /**
      * Restituisce gli slot speciali per una data specifica.
+     * Se la data non ha override, ritorna gli slot del template settimanale
+     * come "preview" — non ancora salvati come ProductSpecialSchedule.
      */
     public function index(Product $product, string $date): JsonResponse
     {
@@ -36,12 +41,146 @@ class ProductSpecialScheduleController extends Controller
             ->orderBy('time')
             ->get();
 
-        $html = $slots->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
+        if ($slots->isNotEmpty()) {
+            $html = $slots->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
+
+            return response()->json([
+                'html'        => $html,
+                'is_override' => true,
+                'is_preview'  => false,
+            ]);
+        }
+
+        // Nessun override: mostra il template settimanale per quel giorno.
+        $dayOfWeek = Carbon::parse($date)->isoWeekday();
+        $templateSlots = ProductAvailability::where('product_id', $product->id)
+            ->whereNotNull('day_of_week')
+            ->where('day_of_week', $dayOfWeek)
+            ->orderBy('time')
+            ->get();
+
+        $html = $templateSlots->map(fn($s) => view('backoffice.products._special_slot_item', [
+            'slot'      => $s,
+            'isPreview' => true,
+        ])->render())->join('');
 
         return response()->json([
             'html'        => $html,
-            'is_override' => $slots->isNotEmpty(),
+            'is_override' => false,
+            'is_preview'  => true,
         ]);
+    }
+
+    /**
+     * Restituisce le varianti del template settimanale per una preview slot.
+     */
+    public function previewVariants(Product $product, ProductAvailability $availability): JsonResponse
+    {
+        abort_if((int) $availability->product_id !== $product->id, 403);
+        $this->authorizeAccess($product);
+
+        $variants = ProductVariant::where('availability_id', $availability->id)
+            ->orderBy('sort_order')
+            ->with('prices')
+            ->get();
+
+        $html = $variants->map(fn($v) => view('backoffice.products._special_variant_item', [
+            'variant'   => $v,
+            'isPreview' => true,
+        ])->render())->join('');
+
+        return response()->json(['html' => $html]);
+    }
+
+    /**
+     * Materializza il template settimanale come override per la data:
+     * crea ProductSpecialSchedule + ProductVariant + prezzi clonando dal template.
+     * Idempotente: se esistono già override per la data, ritorna lo stato corrente.
+     * Risponde con la mappa { time → special_schedule_id, variants[ { template_id → id, prices[…] } ] }
+     * così che il frontend possa rimpiazzare i data-* delle preview con gli id reali.
+     */
+    public function materialize(Product $product, string $date): JsonResponse
+    {
+        $this->authorizeAccess($product);
+
+        $existing = ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $date)
+            ->with(['variants.prices'])
+            ->orderBy('time')
+            ->get();
+
+        if ($existing->isNotEmpty()) {
+            return response()->json(['slots' => $this->mapExistingSlotsResponse($existing)]);
+        }
+
+        $dayOfWeek = Carbon::parse($date)->isoWeekday();
+        $templateSlots = ProductAvailability::where('product_id', $product->id)
+            ->whereNotNull('day_of_week')
+            ->where('day_of_week', $dayOfWeek)
+            ->with(['variants.prices'])
+            ->orderBy('time')
+            ->get();
+
+        $result = [];
+
+        DB::transaction(function () use ($product, $date, $templateSlots, &$result) {
+            foreach ($templateSlots as $tSlot) {
+                $newSlot = ProductSpecialSchedule::create([
+                    'product_id' => $product->id,
+                    'date'       => $date,
+                    'time'       => $tSlot->time,
+                ]);
+
+                $variantsMap = [];
+                foreach ($tSlot->variants->sortBy('sort_order') as $tVariant) {
+                    $newVariant = ProductVariant::create([
+                        'product_id'          => $product->id,
+                        'special_schedule_id' => $newSlot->id,
+                        'label'               => $tVariant->label,
+                        'description'         => $tVariant->description,
+                        'max_quantity'        => $tVariant->max_quantity,
+                        'sort_order'          => $tVariant->sort_order,
+                    ]);
+
+                    $pricesMap = [];
+                    foreach ($tVariant->prices as $price) {
+                        $newPrice = $newVariant->prices()->create([
+                            'label'    => $price->label,
+                            'price'    => $price->price,
+                            'vat_rate' => $price->vat_rate,
+                        ]);
+                        $pricesMap[] = ['template_id' => $price->id, 'id' => $newPrice->id];
+                    }
+
+                    $variantsMap[] = [
+                        'template_id' => $tVariant->id,
+                        'id'          => $newVariant->id,
+                        'prices'      => $pricesMap,
+                    ];
+                }
+
+                $result[] = [
+                    'time'     => substr($newSlot->time, 0, 5),
+                    'id'       => $newSlot->id,
+                    'variants' => $variantsMap,
+                ];
+            }
+        });
+
+        return response()->json(['slots' => $result]);
+    }
+
+    /**
+     * Genera la struttura di risposta della materialize per slot già esistenti
+     * (senza mappature template→id perché lo stato è già reale).
+     */
+    private function mapExistingSlotsResponse($slots): array
+    {
+        return $slots->map(fn($s) => [
+            'time'     => substr($s->time, 0, 5),
+            'id'       => $s->id,
+            'variants' => [],
+        ])->values()->all();
     }
 
     /**

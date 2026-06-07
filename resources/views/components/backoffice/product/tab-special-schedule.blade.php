@@ -298,16 +298,99 @@
             method: 'get',
             then: function (res) {
                 if (!res.html) {
-                    $list.html('<p class="text-secondary small mb-0" id="special-slots-empty">Nessun orario speciale per questa data. Usa il template settimanale.</p>');
+                    $list.html('<p class="text-secondary small mb-0" id="special-slots-empty">Nessun orario configurato per questo giorno della settimana. Aggiungi un orario per crearne uno solo per questa data.</p>');
                 } else {
                     $list.html(res.html);
                 }
                 if (res.is_override) { _overrideDates.add(isoDate); }
                 else { _overrideDates.delete(isoDate); }
+                // In preview (nessun override) "Ripristina default" è un no-op: nascondilo.
+                $('.btn-reset-special-date').toggle(!res.is_preview);
                 renderCalendar();
             },
             catch: function () {
                 $list.html('<p class="text-danger small mb-0">Errore nel caricamento degli orari.</p>');
+            },
+        }]);
+    }
+
+    /* ── Materializza: clona il template settimanale come override ── */
+    function isPreviewDate() {
+        return $('#special-slots-list .special-slot-item[data-preview="1"]').length > 0;
+    }
+
+    function applyMaterializedIds(slots) {
+        (slots || []).forEach(function (s) {
+            var $slot = $('#special-slots-list .special-slot-item[data-time="' + s.time + '"]');
+            if (!$slot.length) return;
+            $slot.attr('data-id', s.id)
+                 .removeAttr('data-preview')
+                 .removeAttr('data-time')
+                 .removeAttr('data-availability-id')
+                 .removeClass('special-slot-item--preview')
+                 .removeData('preview')
+                 .removeData('time')
+                 .removeData('availabilityId')
+                 .data('id', s.id);
+            $slot.find('.special-slot-preview-label').remove();
+            (s.variants || []).forEach(function (v) {
+                var $v = $slot.find('.ss-variant-item[data-template-variant-id="' + v.template_id + '"]');
+                if (!$v.length) return;
+                $v.attr('data-variant-id', v.id)
+                  .removeAttr('data-template-variant-id')
+                  .removeAttr('data-preview')
+                  .removeData('templateVariantId')
+                  .removeData('preview')
+                  .data('variant-id', v.id);
+                (v.prices || []).forEach(function (p) {
+                    var $p = $v.find('.ss-edit-price-row[data-template-price-id="' + p.template_id + '"]');
+                    if (!$p.length) return;
+                    $p.attr('data-price-id', p.id)
+                      .removeAttr('data-template-price-id')
+                      .removeData('templatePriceId')
+                      .data('price-id', p.id);
+                });
+            });
+        });
+    }
+
+    function ensureMaterialized(callback) {
+        if (!isPreviewDate()) { callback(); return; }
+        var date = _selectedDate;
+        $(document).trigger('fetch', [{
+            path: '/products/' + PRODUCT_ID + '/special-schedule/' + date + '/materialize',
+            method: 'post',
+            data: {},
+            then: function (res) {
+                applyMaterializedIds(res.slots || []);
+                _overrideDates.add(date);
+                renderCalendar();
+                callback();
+            },
+            catch: function () {
+                toastr.error('Errore durante la creazione dell\'override');
+            },
+        }]);
+    }
+
+    /* ── Carica varianti preview (dal template settimanale) ── */
+    function loadPreviewVariants($body, availabilityId) {
+        var $list = $body.find('.ssv-list');
+        $list.html('<p class="text-secondary small ssv-empty">Caricamento...</p>');
+
+        $(document).trigger('fetch', [{
+            path: '/products/' + PRODUCT_ID + '/special-schedule/preview/' + availabilityId + '/variants',
+            method: 'get',
+            then: function (res) {
+                if (!res.html) {
+                    $list.html('<p class="text-secondary small ssv-empty mb-0">Nessuna variante nel template. Aggiungi la prima per personalizzare questa data.</p>');
+                } else {
+                    $list.html(res.html);
+                }
+                $body.data('loaded', 1);
+            },
+            catch: function () {
+                $list.html('<p class="text-secondary small mb-0">Si applicano le varianti prodotto presenti nel tab "Varianti e prezzi".</p>');
             },
         }]);
     }
@@ -409,23 +492,25 @@
         var minute = String($('#special-slot-minute').val()).padStart(2, '0');
         var $btn = $(this).prop('disabled', true);
 
-        $(document).trigger('fetch', [{
-            path: '/products/' + PRODUCT_ID + '/special-schedule',
-            method: 'post',
-            data: { date: _selectedDate, time: hour + ':' + minute },
-            then: function () {
-                _overrideDates.add(_selectedDate);
-                renderCalendar();
-                loadSpecialSlots(_selectedDate);
-                $('#modal-add-special-slot').modal('hide');
-                toastr.success('Orario aggiunto');
-                $btn.prop('disabled', false);
-            },
-            catch: function (err) {
-                toastr.error((err && err.responseJSON && err.responseJSON.message) || 'Errore durante il salvataggio');
-                $btn.prop('disabled', false);
-            },
-        }]);
+        ensureMaterialized(function () {
+            $(document).trigger('fetch', [{
+                path: '/products/' + PRODUCT_ID + '/special-schedule',
+                method: 'post',
+                data: { date: _selectedDate, time: hour + ':' + minute },
+                then: function () {
+                    _overrideDates.add(_selectedDate);
+                    renderCalendar();
+                    loadSpecialSlots(_selectedDate);
+                    $('#modal-add-special-slot').modal('hide');
+                    toastr.success('Orario aggiunto');
+                    $btn.prop('disabled', false);
+                },
+                catch: function (err) {
+                    toastr.error((err && err.responseJSON && err.responseJSON.message) || 'Errore durante il salvataggio');
+                    $btn.prop('disabled', false);
+                },
+            }]);
+        });
     });
 
     /* Ripristina default */
@@ -461,7 +546,11 @@
         $icon.attr('class', isOpen ? 'fa-regular fa-chevron-down icon' : 'fa-regular fa-chevron-up icon');
 
         if (!isOpen && $body.data('loaded') == 0) {
-            loadSlotVariants($body, $item.data('id'));
+            if ($item.attr('data-preview') === '1') {
+                loadPreviewVariants($body, $item.attr('data-availability-id'));
+            } else {
+                loadSlotVariants($body, $item.data('id'));
+            }
         }
     });
 
@@ -493,39 +582,44 @@
 
     /* Elimina slot */
     $(document).on('click', '.btn-special-slot-delete', function () {
-        var $item  = $(this).closest('.special-slot-item');
-        var slotId = $item.data('id');
+        var $item = $(this).closest('.special-slot-item');
         $(document).trigger('sweetConfirmTrigger', [{
             title: 'Elimina orario',
             text: 'Vuoi eliminare questo orario speciale?',
             callback: function () {
-                $(document).trigger('fetch', [{
-                    path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId,
-                    method: 'delete',
-                    then: function () {
-                        $item.remove();
-                        if ($('#special-slots-list .special-slot-item').length === 0) {
-                            _overrideDates.delete(_selectedDate);
-                            renderCalendar();
-                            $('#special-slots-list').html('<p class="text-secondary small mb-0" id="special-slots-empty">Nessun orario speciale per questa data. Usa il template settimanale.</p>');
-                        }
-                        toastr.success('Orario eliminato');
-                    },
-                    catch: function () { toastr.error('Errore durante l\'eliminazione'); },
-                }]);
+                ensureMaterialized(function () {
+                    var slotId = $item.data('id');
+                    $(document).trigger('fetch', [{
+                        path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId,
+                        method: 'delete',
+                        then: function () {
+                            $item.remove();
+                            if ($('#special-slots-list .special-slot-item').length === 0) {
+                                _overrideDates.delete(_selectedDate);
+                                renderCalendar();
+                                $('#special-slots-list').html('<p class="text-secondary small mb-0" id="special-slots-empty">Nessun orario configurato per questo giorno della settimana. Aggiungi un orario per crearne uno solo per questa data.</p>');
+                            }
+                            toastr.success('Orario eliminato');
+                        },
+                        catch: function () { toastr.error('Errore durante l\'eliminazione'); },
+                    }]);
+                });
             },
         }]);
     });
 
     /* ── Apri modale aggiungi variante ───────────────────── */
     $(document).on('click', '.btn-ssv-open-modal', function () {
-        var slotId = $(this).closest('.special-slot-item').data('id');
-        $('#ssv-slot-id').val(slotId);
-        $('[name="ssv_label"]').val('');
-        $('[name="ssv_description"]').val('');
-        $('[name="ssv_max_quantity"]').val('');
-        $('#ssv-prices-list').html('');
-        $('#modal-add-special-variant').modal('show');
+        var $slotItem = $(this).closest('.special-slot-item');
+        ensureMaterialized(function () {
+            var slotId = $slotItem.data('id');
+            $('#ssv-slot-id').val(slotId);
+            $('[name="ssv_label"]').val('');
+            $('[name="ssv_description"]').val('');
+            $('[name="ssv_max_quantity"]').val('');
+            $('#ssv-prices-list').html('');
+            $('#modal-add-special-variant').modal('show');
+        });
     });
 
     /* Aggiungi riga prezzo nel modale */
@@ -625,73 +719,78 @@
 
     /* Salva variante */
     $(document).on('click', '.btn-ssv-save', function () {
-        var $v      = $(this).closest('.ss-variant-item');
-        var $slot   = $v.closest('.special-slot-item');
-        var slotId  = $slot.data('id');
-        var varId   = $v.data('variant-id');
-        var prices  = [];
-
-        $v.find('.ssv-edit-prices .ss-edit-price-row').each(function () {
-            var pid = $(this).data('price-id');
-            prices.push({
-                id:       pid || null,
-                label:    $(this).find('.ssv-price-label').val(),
-                price:    parseFloat($(this).find('.ssv-price-value').val()) || 0,
-                vat_rate: parseFloat($(this).find('[name="ssv_price_vat"]').val()) || 0,
-            });
-        });
+        var $btn  = $(this);
+        var $v    = $btn.closest('.ss-variant-item');
+        var $slot = $v.closest('.special-slot-item');
 
         if (!$v.find('.ssv-edit-label').val()) { toastr.warning('Inserisci il nome della variante'); return; }
-        if (prices.length === 0) { toastr.warning('Aggiungi almeno un componente IVA'); return; }
+        if ($v.find('.ssv-edit-prices .ss-edit-price-row').length === 0) { toastr.warning('Aggiungi almeno un componente IVA'); return; }
 
-        var $btn = $(this).prop('disabled', true);
+        ensureMaterialized(function () {
+            var slotId = $slot.data('id');
+            var varId  = $v.data('variant-id');
+            var prices = [];
 
-        $(document).trigger('fetch', [{
-            path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants/' + varId,
-            method: 'put',
-            data: {
-                label:        $v.find('.ssv-edit-label').val(),
-                description:  $v.find('.ssv-edit-description').val(),
-                max_quantity: $v.find('.ssv-edit-max').val() || null,
-                prices:       prices,
-            },
-            then: function (res) {
-                var $list = $v.closest('.ssv-list');
-                $v.replaceWith(res.html);
-                initSsvSortable($list, slotId);
-                toastr.success('Variante aggiornata');
-                $btn.prop('disabled', false);
-            },
-            catch: function (err) {
-                toastr.error((err && err.responseJSON && err.responseJSON.message) || 'Errore');
-                $btn.prop('disabled', false);
-            },
-        }]);
+            $v.find('.ssv-edit-prices .ss-edit-price-row').each(function () {
+                var pid = $(this).attr('data-price-id');
+                prices.push({
+                    id:       pid ? parseInt(pid) : null,
+                    label:    $(this).find('.ssv-price-label').val(),
+                    price:    parseFloat($(this).find('.ssv-price-value').val()) || 0,
+                    vat_rate: parseFloat($(this).find('[name="ssv_price_vat"]').val()) || 0,
+                });
+            });
+
+            $btn.prop('disabled', true);
+            $(document).trigger('fetch', [{
+                path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants/' + varId,
+                method: 'put',
+                data: {
+                    label:        $v.find('.ssv-edit-label').val(),
+                    description:  $v.find('.ssv-edit-description').val(),
+                    max_quantity: $v.find('.ssv-edit-max').val() || null,
+                    prices:       prices,
+                },
+                then: function (res) {
+                    var $list = $v.closest('.ssv-list');
+                    $v.replaceWith(res.html);
+                    initSsvSortable($list, slotId);
+                    toastr.success('Variante aggiornata');
+                    $btn.prop('disabled', false);
+                },
+                catch: function (err) {
+                    toastr.error((err && err.responseJSON && err.responseJSON.message) || 'Errore');
+                    $btn.prop('disabled', false);
+                },
+            }]);
+        });
     });
 
     /* Elimina variante */
     $(document).on('click', '.btn-ssv-delete', function () {
-        var $v     = $(this).closest('.ss-variant-item');
-        var $slot  = $v.closest('.special-slot-item');
-        var slotId = $slot.data('id');
-        var varId  = $v.data('variant-id');
+        var $v    = $(this).closest('.ss-variant-item');
+        var $slot = $v.closest('.special-slot-item');
 
         $(document).trigger('sweetConfirmTrigger', [{
             title: 'Elimina variante',
             text: 'Vuoi eliminare questa variante?',
             callback: function () {
-                $(document).trigger('fetch', [{
-                    path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants/' + varId,
-                    method: 'delete',
-                    then: function () {
-                        $v.remove();
-                        if ($slot.find('.ss-variant-item').length === 0) {
-                            $slot.find('.ssv-list').html('<p class="text-secondary small ssv-empty mb-0">Nessuna variante. Aggiungi la prima.</p>');
-                        }
-                        toastr.success('Variante eliminata');
-                    },
-                    catch: function () { toastr.error('Errore durante l\'eliminazione'); },
-                }]);
+                ensureMaterialized(function () {
+                    var slotId = $slot.data('id');
+                    var varId  = $v.data('variant-id');
+                    $(document).trigger('fetch', [{
+                        path: '/products/' + PRODUCT_ID + '/special-schedule/' + slotId + '/variants/' + varId,
+                        method: 'delete',
+                        then: function () {
+                            $v.remove();
+                            if ($slot.find('.ss-variant-item').length === 0) {
+                                $slot.find('.ssv-list').html('<p class="text-secondary small ssv-empty mb-0">Nessuna variante. Aggiungi la prima.</p>');
+                            }
+                            toastr.success('Variante eliminata');
+                        },
+                        catch: function () { toastr.error('Errore durante l\'eliminazione'); },
+                    }]);
+                });
             },
         }]);
     });

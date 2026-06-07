@@ -3,6 +3,7 @@
         <meta name="referrer" content="strict-origin-when-cross-origin">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/Miticko.css') }}">
         <title>{{ Utils::site_title() }} | {{ $title ?? '' }} </title><!-- Font Awesome -->
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

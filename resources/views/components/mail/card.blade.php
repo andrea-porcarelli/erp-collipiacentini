@@ -4,7 +4,7 @@
 ])
 
 @php
-    $t = config('design.tokens');
+    $t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []);
     $variants = [
         'success' => ['color' => $t['brand-success-brand'], 'icon' => '&#10003;'],
         'warning' => ['color' => $t['brand-warning-brand'], 'icon' => '!'],

@@ -3,6 +3,9 @@ import {
     ClassicEditor, Essentials, Paragraph,
     Bold, Italic, Underline, Strikethrough, RemoveFormat,
     List, Link, Heading,
+    Image, ImageToolbar, ImageStyle, ImageInsert, ImageUpload,
+    ImageResize, ImageCaption, AutoImage, LinkImage,
+    SimpleUploadAdapter,
 } from 'ckeditor5';
 
 // ---------------------------------------------------------------------------
@@ -478,8 +481,40 @@ const initLinks = () => {
 const faqEditors = new Map(); // key: 'new' | String(faqId)
 
 const faqEditorConfig = {
-    plugins: [Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, RemoveFormat, List, Link, Heading],
-    toolbar: { items: ['heading', '|', 'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|', 'bulletedList', 'numberedList', '|', 'link'] },
+    plugins: [
+        Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, RemoveFormat,
+        List, Link, Heading,
+        Image, ImageToolbar, ImageStyle, ImageInsert, ImageUpload, ImageResize, ImageCaption,
+        AutoImage, LinkImage, SimpleUploadAdapter,
+    ],
+    toolbar: {
+        items: [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|',
+            'bulletedList', 'numberedList', '|',
+            'link', 'insertImage',
+        ],
+    },
+    image: {
+        toolbar: [
+            'imageStyle:inline', 'imageStyle:wrapText', 'imageStyle:breakText', '|',
+            'toggleImageCaption', 'imageTextAlternative', 'linkImage',
+        ],
+        resizeUnit: '%',
+        resizeOptions: [
+            { name: 'resizeImage:original', value: null, label: 'Originale' },
+            { name: 'resizeImage:50', value: '50', label: '50%' },
+            { name: 'resizeImage:75', value: '75', label: '75%' },
+        ],
+    },
+    simpleUpload: {
+        uploadUrl: '/editor/upload-image',
+        withCredentials: true,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            'Accept': 'application/json',
+        },
+    },
     licenseKey: 'GPL',
 };
 

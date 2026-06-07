@@ -4,6 +4,7 @@ use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
 use App\Http\Controllers\Backoffice\DashboardController;
+use App\Http\Controllers\Backoffice\EditorMediaController;
 use App\Http\Controllers\Backoffice\LoginController;
 use App\Http\Controllers\Backoffice\OrderController;
 use App\Http\Controllers\Backoffice\PartnerController;
@@ -118,6 +119,8 @@ Route::domain('admin.miticko.com')->group(function () {
 
         // Special schedule
         Route::get('products/{product}/special-schedule/dates', [ProductSpecialScheduleController::class, 'dates'])->name('products.special-schedule.dates');
+        Route::get('products/{product}/special-schedule/preview/{availability}/variants', [ProductSpecialScheduleController::class, 'previewVariants'])->name('products.special-schedule.preview-variants');
+        Route::post('products/{product}/special-schedule/{date}/materialize', [ProductSpecialScheduleController::class, 'materialize'])->name('products.special-schedule.materialize')->where('date', '\d{4}-\d{2}-\d{2}');
         Route::get('products/{product}/special-schedule/{date}', [ProductSpecialScheduleController::class, 'index'])->name('products.special-schedule.index')->where('date', '\d{4}-\d{2}-\d{2}');
         Route::post('products/{product}/special-schedule', [ProductSpecialScheduleController::class, 'store'])->name('products.special-schedule.store');
         Route::delete('products/{product}/special-schedule/{date}/reset', [ProductSpecialScheduleController::class, 'reset'])->name('products.special-schedule.reset')->where('date', '\d{4}-\d{2}-\d{2}');
@@ -132,6 +135,9 @@ Route::domain('admin.miticko.com')->group(function () {
         // Closed periods
         Route::post('products/{product}/closed-periods', [ProductClosedPeriodController::class, 'store'])->name('products.closed-periods.store');
         Route::delete('products/{product}/closed-periods/{period}', [ProductClosedPeriodController::class, 'destroy'])->name('products.closed-periods.destroy');
+
+        // Upload immagini per editor WYSIWYG (CKEditor)
+        Route::post('editor/upload-image', [EditorMediaController::class, 'uploadImage'])->name('editor.upload-image');
 
         // Media gallery
         Route::post('products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');

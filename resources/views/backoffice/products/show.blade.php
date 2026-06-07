@@ -247,6 +247,14 @@
         border: none !important;
         box-shadow: none !important;
     }
+
+    /* Immagini inserite nell'editor: responsive */
+    .text-field .text-field-container .ck.ck-editor__editable img,
+    .text-field .text-field-container .ck.ck-editor__editable .image img,
+    .text-field .text-field-container .ck.ck-editor__editable .image-inline img {
+        max-width: 100%;
+        height: auto;
+    }
     .product-tabs {
         border-bottom: 2px solid #e9ecef;
         margin-bottom: 24px;
@@ -360,7 +368,7 @@
             }
         });
     </script>
-    <script src="{{ asset('backoffice/js/products.js') }}?v=1.4" type="module"></script>
+    <script src="{{ asset('backoffice/js/products.js') }}?v=1.5" type="module"></script>
     <script>
         document.addEventListener('variants-notify', (e) => {
             toastr[e.detail.type]?.(e.detail.message);

@@ -3,9 +3,16 @@
     $fullPrice  = $variant->prices->sum('price');
     $priceCount = $variant->prices->count();
     $compLabel  = $priceCount . ($priceCount === 1 ? ' componente' : ' componenti') . ' IVA';
+    $isPreview  = $isPreview ?? false;
 @endphp
 
-<div class="ss-variant-item" data-variant-id="{{ $variant->id }}">
+<div class="ss-variant-item"
+     @if($isPreview)
+         data-preview="1"
+         data-template-variant-id="{{ $variant->id }}"
+     @else
+         data-variant-id="{{ $variant->id }}"
+     @endif>
     <div class="ss-variant-header">
         <span class="drag-handle text-secondary me-2" style="cursor:grab;font-size:18px;line-height:1">⠿</span>
         <span class="fw-bold flex-grow-1">{{ $variant->label }}</span>
@@ -50,7 +57,12 @@
         </div>
         <div class="ssv-edit-prices">
             @foreach($variant->prices as $price)
-            <div class="ss-edit-price-row" data-price-id="{{ $price->id }}">
+            <div class="ss-edit-price-row"
+                 @if($isPreview)
+                     data-template-price-id="{{ $price->id }}"
+                 @else
+                     data-price-id="{{ $price->id }}"
+                 @endif>
                 <div class="flex-grow-1"><div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">
                     <input type="text" class="input-miticko ssv-price-label" value="{{ $price->label }}" placeholder="es. Visita">
                 </div></div></div>
