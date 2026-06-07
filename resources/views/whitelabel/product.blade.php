@@ -264,12 +264,12 @@
 
     .time-slot {
         padding: 12px 8px;
-        border: 1px solid var(--neutral-grey-10, #E6E6E6);
+        border: 1px solid var(--background-global-paper2, #E6E6E6);
         text-align: center;
         cursor: pointer;
         transition: all 0.2s ease;
         border-radius: var(--border-radius-s, 8px);
-        background: var(--secondary-brandlight, #EAEBF4);
+        background: var(--background-global-paper2, #FAFAFA);
     }
 
     @media (min-width: 768px) {
