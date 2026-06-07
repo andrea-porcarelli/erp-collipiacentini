@@ -276,6 +276,11 @@
     $hasLogo  = file_exists($logoPath);
     $logoSrc  = $hasLogo ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
 
+    // Il footer riporta sempre il marchio Miticko, indipendentemente dal brand del partner.
+    $footerLogoPath = public_path('assets/images/logo-miticko.png');
+    $hasFooterLogo  = file_exists($footerLogoPath);
+    $footerLogoSrc  = $hasFooterLogo ? 'data:image/png;base64,' . base64_encode(file_get_contents($footerLogoPath)) : null;
+
     $orderCode    = $order->order_number;
     $partnerName  = $order->partner?->partner_name;
     $partnerSite  = $order->partner?->domain_name;
@@ -341,8 +346,8 @@
     <table>
         <tr>
             <td class="logo">
-                @if($hasLogo)
-                    <img src="{{ $logoSrc }}" alt="Miticko">
+                @if($hasFooterLogo)
+                    <img src="{{ $footerLogoSrc }}" alt="Miticko">
                 @else
                     <span class="fallback">miticko</span>
                 @endif
@@ -401,9 +406,9 @@
                 <td class="right" style="width: 40%;">
                     <div class="brand">
                         @if($hasLogo)
-                            <img src="{{ $logoSrc }}" alt="Miticko">
+                            <img src="{{ $logoSrc }}" alt="{{ ucfirst($brand) }}">
                         @else
-                            <span class="fallback">miticko</span>
+                            <span class="fallback">{{ $brand }}</span>
                         @endif
                     </div>
                     <div class="order-id">Ordine #{{ $orderCode }}</div>
