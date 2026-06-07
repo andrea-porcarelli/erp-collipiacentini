@@ -14,6 +14,7 @@
 <x-mail.layout
     :title="'Conferma ordine #' . $order->order_number"
     :partner-name="$order->partner?->partner_name"
+    :brand="$order->partner?->brand"
     :preheader="'La tua prenotazione è confermata · ' . $order->order_number"
 >
     <x-mail.card status="success" title="Prenotazione confermata">

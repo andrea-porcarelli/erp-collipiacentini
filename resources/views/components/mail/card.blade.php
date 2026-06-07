@@ -1,10 +1,15 @@
 @props([
     'status' => 'success',
     'title' => '',
+    'brand' => null,
 ])
 
+@aware(['brand' => null])
+
 @php
-    $t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []);
+    $defaultBrand = config('design.default_brand', 'miticko');
+    $brand = $brand ?: $defaultBrand;
+    $t = config("design.brands.{$brand}.tokens") ?? config("design.brands.{$defaultBrand}.tokens", []);
     $variants = [
         'success' => ['color' => $t['brand-success-brand'], 'icon' => '&#10003;'],
         'warning' => ['color' => $t['brand-warning-brand'], 'icon' => '!'],

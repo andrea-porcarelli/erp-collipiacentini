@@ -1,9 +1,16 @@
 @props([
     'title' => '',
     'datetime' => '',
+    'brand' => null,
 ])
 
-@php($t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []))
+@aware(['brand' => null])
+
+@php
+    $defaultBrand = config('design.default_brand', 'miticko');
+    $brand = $brand ?: $defaultBrand;
+    $t = config("design.brands.{$brand}.tokens") ?? config("design.brands.{$defaultBrand}.tokens", []);
+@endphp
 
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 4px 0;">
     <tr>

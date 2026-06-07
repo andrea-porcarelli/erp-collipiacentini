@@ -3,17 +3,24 @@
     'partnerName' => null,
     'supportEmail' => null,
     'preheader' => null,
+    'brand' => null,
 ])
 
 @php
     $title ??= config('app.name');
     $supportEmail ??= config('mail.support_address');
-    $signature = $partnerName ?: 'Lo staff di miticko';
 
-    $logoPath = public_path('assets/images/logo-miticko.png');
-    $logoSrc = isset($message) ? $message->embed($logoPath) : asset('assets/images/logo-miticko.png');
+    $defaultBrand = config('design.default_brand', 'miticko');
+    $brand = $brand ?: $defaultBrand;
 
-    $t = config('design.brands.'.config('design.default_brand', 'miticko').'.tokens', []);
+    $signature = $partnerName ?: 'Lo staff di '.$brand;
+
+    $logoCandidate = public_path("assets/images/logo-{$brand}.png");
+    $logoPath = file_exists($logoCandidate) ? $logoCandidate : public_path("assets/images/logo-{$defaultBrand}.png");
+    $logoFallback = asset('assets/images/logo-'.(file_exists($logoCandidate) ? $brand : $defaultBrand).'.png');
+    $logoSrc = isset($message) ? $message->embed($logoPath) : $logoFallback;
+
+    $t = config("design.brands.{$brand}.tokens") ?? config("design.brands.{$defaultBrand}.tokens", []);
     $brandOrange = $t['brand-primary-brand'];
     $textMain = $t['text-main'];
     $textSecondary = $t['text-secondary'];
@@ -41,7 +48,7 @@
 
                     <tr>
                         <td align="center" style="padding:0 0 28px 0;">
-                            <img src="{{ $logoSrc }}" alt="miticko" width="140" style="display:block; border:0; outline:none; text-decoration:none; height:auto; max-width:140px;">
+                            <img src="{{ $logoSrc }}" alt="{{ $brand }}" width="140" style="display:block; border:0; outline:none; text-decoration:none; height:auto; max-width:140px;">
                         </td>
                     </tr>
 
