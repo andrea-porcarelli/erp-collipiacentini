@@ -27,7 +27,7 @@
     @livewireStyles
 </head>
 
-<body data-mode="Miticko Light Desktop White">
+<body data-mode="{{ ($partner ?? null)?->css_style ?: 'Miticko' }} Light Desktop White">
     <x-whitelabel.header />
     @yield('content')
     <x-whitelabel.footer />

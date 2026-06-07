@@ -146,8 +146,10 @@ class PartnerController extends CrudController
                 'string',
                 Rule::unique('partners', 'domain_name')->ignore($partner->id),
             ],
+            'css_style' => ['nullable', Rule::in(Partner::CSS_STYLES)],
         ], [
             'domain_name.unique' => 'Il dominio inserito è già associato a un altro partner',
+            'css_style.in' => 'Stile CSS non valido',
         ]);
 
         $hasOrders = $partner->orders()->exists();
@@ -163,6 +165,7 @@ class PartnerController extends CrudController
             'email_notify'  => $request->input('email_notify'),
             'sale_method'   => $request->input('sale_method'),
             'domain_name'   => $request->input('domain_name') ?: null,
+            'css_style'     => $request->input('css_style') ?: 'Miticko',
         ]);
     }
 

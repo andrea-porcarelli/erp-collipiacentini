@@ -85,6 +85,14 @@
                             <div class="col-12 col-sm-4" id="domain-name-container" style="{{ $model->sale_method !== 'none' ? '' : 'display:none' }}">
                                 <x-input :model="$model" name="domain_name" label="Nome dominio" placeholder="es. www.esempio.it" />
                             </div>
+                            <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                                <x-select
+                                    name="css_style"
+                                    label="Stile CSS"
+                                    :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
+                                    :model="$model"
+                                />
+                            </div>
                         </div>
                     </form>
                     <div class="button-card-absolute">

@@ -27,6 +27,7 @@ class Partner extends LogsModel
         'sale_method',
         'domain_name',
         'slug_name',
+        'css_style',
         'commission_presale_low',
         'commission_presale_high',
         'commission_presale_threshold',
@@ -34,6 +35,8 @@ class Partner extends LogsModel
         'commission_miticko_variable',
         'commission_payment',
     ];
+
+    public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno'];
 
     public function products() : HasMany
     {
