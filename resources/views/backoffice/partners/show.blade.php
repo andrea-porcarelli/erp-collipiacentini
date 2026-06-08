@@ -197,13 +197,7 @@
                     </div>
                 </x-card>
 
-                @php
-                    $legalTabs = [
-                        'privacy-policy'     => ['label' => 'Privacy Policy',       'icon' => 'fa-shield-check', 'field' => 'privacy_policy'],
-                        'cookie-policy'      => ['label' => 'Cookie Policy',        'icon' => 'fa-cookie-bite',  'field' => 'cookie_policy'],
-                        'termini-condizioni' => ['label' => 'Termini e Condizioni', 'icon' => 'fa-file-contract','field' => 'terms_conditions'],
-                    ];
-                @endphp
+                @php($legalTabs = ['privacy-policy' => ['label' => 'Privacy Policy', 'icon' => 'fa-shield-check', 'field' => 'privacy_policy'], 'cookie-policy' => ['label' => 'Cookie Policy', 'icon' => 'fa-cookie-bite', 'field' => 'cookie_policy'], 'termini-condizioni' => ['label' => 'Termini e Condizioni', 'icon' => 'fa-file-contract', 'field' => 'terms_conditions']])
                 @if(Auth::user()->role === 'god')
                     <x-card title="Politiche e Condizioni" sub_title="Documenti legali pubblicati sul sito del partner" class="mt-4 position-relative">
                         <ul class="nav nav-tabs entity-tabs" role="tablist">
