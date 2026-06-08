@@ -88,7 +88,7 @@ class ProductMediaController extends Controller
      */
     public function destroy(Product $product, Media $media): JsonResponse
     {
-        abort_if($media->mediable_id !== $product->id || $media->mediable_type !== Product::class, 403);
+        abort_if($media->mediable_id != $product->id || $media->mediable_type !== Product::class, 403);
         $this->authorizeAccess($product);
 
         Storage::disk('public')->delete($media->file_path);
