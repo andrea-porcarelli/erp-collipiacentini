@@ -197,6 +197,87 @@
                     </div>
                 </x-card>
 
+                @if(Auth::user()->role === 'god')
+                    @php
+                        $legalTabs = [
+                            'privacy-policy'     => ['label' => 'Privacy Policy',       'icon' => 'fa-shield-check', 'field' => 'privacy_policy'],
+                            'cookie-policy'      => ['label' => 'Cookie Policy',        'icon' => 'fa-cookie-bite',  'field' => 'cookie_policy'],
+                            'termini-condizioni' => ['label' => 'Termini e Condizioni', 'icon' => 'fa-file-contract','field' => 'terms_conditions'],
+                        ];
+                    @endphp
+                    <x-card title="Politiche e Condizioni" sub_title="Documenti legali pubblicati sul sito del partner" class="mt-4 position-relative">
+                        <ul class="nav nav-tabs entity-tabs" role="tablist">
+                            @foreach($legalTabs as $slug => $tab)
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link {{ $loop->first ? 'active' : '' }}" type="button"
+                                            data-bs-toggle="tab" data-bs-target="#tab-legal-{{ $slug }}"
+                                            role="tab" aria-controls="tab-legal-{{ $slug }}"
+                                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                        <i class="fa-regular {{ $tab['icon'] }} me-1"></i> {{ $tab['label'] }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="tab-content">
+                            <form id="form-partner-policies">
+                                @foreach($legalTabs as $slug => $tab)
+                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                         id="tab-legal-{{ $slug }}" role="tabpanel">
+                                        <div class="d-flex align-items-center gap-2 mb-spacing-s">
+                                            <span class="small text-secondary">URL della pagina (non modificabile):</span>
+                                            <code class="small">/{{ $slug }}</code>
+                                        </div>
+                                        <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                                            <div class="text-field-container position-relative">
+                                                <textarea id="legal-editor-{{ $slug }}"
+                                                          name="{{ $tab['field'] }}"
+                                                          rows="10"
+                                                          data-legal-type="{{ $slug }}"
+                                                          data-legal-field="{{ $tab['field'] }}"
+                                                          data-it="{{ $model->contentField($tab['field'], 'it') ?? '' }}"></textarea>
+                                                <button type="button"
+                                                        class="btn-legal-translations bt-miticko bt-m-light position-absolute"
+                                                        data-legal-type="{{ $slug }}"
+                                                        data-mode="medium primary"
+                                                        title="Traduci nelle altre lingue"
+                                                        style="top:8px;right:8px;z-index:5;">
+                                                    <i class="fa-regular fa-language icon"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </form>
+                        </div>
+                        <div class="button-card-absolute">
+                            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
+                        </div>
+                    </x-card>
+
+                    {{-- Modale traduzioni dei documenti legali --}}
+                    <div class="modal" tabindex="-1" id="modal-translations">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content modal-miticko">
+                                <div class="modal-header">
+                                    <h1 class="modal-title">Traduci</h1>
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span class="fa-regular fa-times"></span>
+                                    </button>
+                                </div>
+                                <div class="modal-body w-100" id="modal-trans-body">
+                                    <div class="text-center py-3">
+                                        <i class="fa-regular fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <x-button size="Small " emphasis="Low" label="annulla" :dataset="['bs-dismiss' => 'modal']" />
+                                    <x-button size="Small " emphasis="High" class="btn-save-translations" label="Salva" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <x-card title="Elimina partner" class="mt-4 position-relative">
                     <x-button status="Error" emphasis="MediumLow" label="Elimina partner" leading="fa-trash-can" class="btn-delete-partner" />
                 </x-card>
@@ -206,6 +287,43 @@
 @endsection
 
 @section('custom-css')
+@if(Auth::user()->role === 'god')
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css" />
+    <script type="importmap">
+    {
+        "imports": {
+            "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.js",
+            "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/43.3.1/"
+        }
+    }
+    </script>
+    <style>
+        .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content { border: none !important; }
+        .text-field .text-field-container:has(.ck-editor) { display: block; padding: 0; overflow: hidden; }
+        .text-field .text-field-container .ck.ck-editor { width: 100%; border: none; box-shadow: none; }
+        .text-field .text-field-container .ck.ck-toolbar {
+            border: none !important;
+            border-bottom: 1px solid var(--text-field-empty-border, #E6E6E6) !important;
+            border-radius: 0 !important;
+            background: #f9f9f9;
+            box-shadow: none !important;
+        }
+        .text-field .text-field-container .ck.ck-editor__editable {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: var(--text-field-empty-background, #FFF);
+            color: var(--text-main);
+            font-family: var(--font-font-1), serif;
+            font-size: var(--typography-body-size-medium);
+            font-weight: var(--typography-body-weight-medium);
+            line-height: var(--typography-body-lineheight-medium);
+            padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
+            min-height: 180px;
+        }
+    </style>
+@endif
 <style>
     .entity-tabs {
         border-bottom: 2px solid #e9ecef;

@@ -1,4 +1,9 @@
 import App from "./app.js";
+import {
+    ClassicEditor, Essentials, Paragraph,
+    Bold, Italic, Underline, Strikethrough, RemoveFormat,
+    List, Link, Heading,
+} from 'ckeditor5';
 
 // ---------------------------------------------------------------------------
 // Form save configs
@@ -42,6 +47,20 @@ const formConfigs = {
         successMessage: 'Dati di fatturazione aggiornati con successo',
         validate: () => ({}),
     },
+    'form-partner-policies': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'policies',
+        successMessage: 'Politiche e condizioni aggiornate con successo',
+        validate: () => ({}),
+        collect: () => {
+            const data = {};
+            legalEditors.forEach((editor, field) => {
+                data[field] = editor.getData();
+            });
+            return data;
+        },
+    },
 };
 
 // ---------------------------------------------------------------------------
@@ -84,6 +103,10 @@ const saveForm = (formId, btn) => {
     if (!config) return;
 
     const { data, form } = App.serialize(`#${formId}`);
+
+    if (config.collect) {
+        Object.assign(data, config.collect());
+    }
 
     if (config.validate) {
         const errors = config.validate(data);
@@ -379,6 +402,124 @@ const initDeletePartner = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Documenti legali — CKEditor + traduzioni
+// ---------------------------------------------------------------------------
+const legalEditors = new Map(); // field → ClassicEditor
+
+const legalEditorConfig = {
+    plugins: [
+        Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, RemoveFormat,
+        List, Link, Heading,
+    ],
+    toolbar: {
+        items: [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|',
+            'bulletedList', 'numberedList', '|',
+            'link',
+        ],
+    },
+    licenseKey: 'GPL',
+};
+
+const initLegalEditors = async () => {
+    const $textareas = $('textarea[id^="legal-editor-"]');
+    if ($textareas.length === 0) return;
+
+    for (const el of $textareas.toArray()) {
+        const field = el.dataset.legalField;
+        const editor = await ClassicEditor.create(el, legalEditorConfig);
+        editor.setData(el.dataset.it || '');
+        editor.model.document.on('change:data', () => {
+            $(el).closest('.card-miticko').find('.btn-save-card')
+                .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
+        });
+        legalEditors.set(field, editor);
+    }
+};
+
+// Configurazione campi per le traduzioni dei documenti legali
+const legalTranslationLabels = {
+    'privacy-policy':     'Privacy Policy',
+    'cookie-policy':      'Cookie Policy',
+    'termini-condizioni': 'Termini e Condizioni',
+};
+
+const langFlag = (isoCode) => {
+    const flags = { it: '🇮🇹', en: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', es: '🇪🇸', pt: '🇵🇹', nl: '🇳🇱', ru: '🇷🇺', zh: '🇨🇳', ja: '🇯🇵', ar: '🇸🇦' };
+    return flags[isoCode.toLowerCase()] || '🏳';
+};
+
+const renderLegalTranslationBody = (data) => {
+    if (!data || data.length === 0) {
+        return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
+    }
+    return data.map(lang => `
+        <div class="translation-lang mb-3" data-language-id="${lang.language_id}">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span>${langFlag(lang.iso_code)}</span>
+                <span class="fw-semibold small">${escapeHtml(lang.iso_code.toUpperCase())}</span>
+                <span class="text-secondary small">${escapeHtml(lang.language)}</span>
+            </div>
+            <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                <div class="text-field-container">
+                    <textarea class="input-miticko" name="value" rows="6">${escapeHtml(lang.value || '')}</textarea>
+                </div>
+            </div>
+        </div>
+    `).join('');
+};
+
+const openLegalTranslationsModal = (type) => {
+    const $modal = $('#modal-translations');
+    const path = `/partners/${window.PARTNER_ID}/legal/${type}/translations`;
+    const label = legalTranslationLabels[type] || 'Documento';
+
+    $modal.find('.modal-title').text(`Traduci — ${label}`);
+    $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
+    $modal.data('save-path', path);
+    $modal.modal('show');
+
+    App.ajax({ path, method: 'get' })
+        .then((res) => {
+            $('#modal-trans-body').html(renderLegalTranslationBody(res.data));
+        })
+        .catch(() => {
+            $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
+        });
+};
+
+const saveLegalTranslations = () => {
+    const $modal = $('#modal-translations');
+    const savePath = $modal.data('save-path');
+    if (!savePath) return;
+
+    const translations = [];
+    $modal.find('.translation-lang').each(function () {
+        translations.push({
+            language_id: parseInt($(this).data('language-id')),
+            value: $(this).find('[name="value"]').val() || '',
+        });
+    });
+
+    App.ajax({ path: savePath, method: 'put', data: { translations } })
+        .then(() => {
+            toastr.success('Traduzioni salvate con successo');
+            setTimeout(() => $modal.modal('hide'), 1200);
+        })
+        .catch(() => toastr.error('Errore durante il salvataggio delle traduzioni'));
+};
+
+const initLegalTranslations = () => {
+    $(document).on('click', '.btn-legal-translations', function () {
+        const type = $(this).data('legal-type');
+        if (type) openLegalTranslationsModal(type);
+    });
+
+    $(document).on('click', '#modal-translations .btn-save-translations', saveLegalTranslations);
+};
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 const init = () => {
@@ -396,6 +537,8 @@ const init = () => {
     initUsers();
     initLogo();
     initDeletePartner();
+    initLegalTranslations();
+    initLegalEditors();
 };
 
 $(function () {

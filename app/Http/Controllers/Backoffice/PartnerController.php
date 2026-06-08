@@ -7,6 +7,7 @@ use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StorePartnerRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\PartnerInterface;
+use App\Models\Language;
 use App\Models\Media;
 use App\Models\Partner;
 use App\Models\PartnerBilling;
@@ -15,6 +16,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -25,6 +27,16 @@ class PartnerController extends CrudController
 
     public PartnerInterface $interface;
     public string $path;
+
+    /**
+     * Mappa dello slug pubblico → campo salvato in language_contents.
+     * I tre slug sono fissi e identici per ogni partner.
+     */
+    private const LEGAL_TYPES = [
+        'privacy-policy'    => 'privacy_policy',
+        'cookie-policy'     => 'cookie_policy',
+        'termini-condizioni' => 'terms_conditions',
+    ];
 
     public function __construct(PartnerInterface $interface)
     {
@@ -129,6 +141,7 @@ class PartnerController extends CrudController
                         'iban', 'tax_regime',
                     ]),
                 ),
+                'policies' => $this->updatePolicies($partner, $request),
                 default => throw new \Exception('Sezione non valida'),
             };
 
@@ -167,6 +180,88 @@ class PartnerController extends CrudController
             'domain_name'   => $request->input('domain_name') ?: null,
             'css_style'     => $request->input('css_style') ?: 'Miticko',
         ]);
+    }
+
+    /**
+     * Salva il contenuto italiano dei 3 documenti legali (Privacy / Cookie / Termini)
+     * nella tabella `language_contents` (locale `it`). Riservato agli operatori Miticko.
+     */
+    private function updatePolicies(Partner $partner, Request $request): void
+    {
+        $this->ensureMiticko();
+
+        $fields = [];
+        foreach (self::LEGAL_TYPES as $field) {
+            if ($request->exists($field)) {
+                $fields[$field] = (string) ($request->input($field) ?? '');
+            }
+        }
+
+        if (!empty($fields)) {
+            $partner->setContentFields($fields, 'it');
+        }
+    }
+
+    public function getLegalTranslations(int $id, string $type): JsonResponse
+    {
+        try {
+            $this->ensureMiticko();
+            $field = $this->resolveLegalField($type);
+
+            $partner = $this->interface->find($id);
+            $languages = Language::where('is_active', 1)->get();
+
+            $data = $languages->map(fn ($lang) => [
+                'language_id' => $lang->id,
+                'language'    => $lang->label,
+                'iso_code'    => $lang->iso_code,
+                'value'       => $partner->contentField($field, $lang->iso_code) ?? '',
+            ]);
+
+            return $this->success(['data' => $data]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function saveLegalTranslations(Request $request, int $id, string $type): JsonResponse
+    {
+        try {
+            $this->ensureMiticko();
+            $field = $this->resolveLegalField($type);
+
+            $partner = $this->interface->find($id);
+
+            foreach ($request->input('translations', []) as $translation) {
+                $lang = Language::find($translation['language_id'] ?? null);
+                if (! $lang) {
+                    continue;
+                }
+
+                $partner->setContentFields([
+                    $field => (string) ($translation['value'] ?? ''),
+                ], $lang->iso_code);
+            }
+
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e, $request);
+        }
+    }
+
+    private function resolveLegalField(string $type): string
+    {
+        if (!array_key_exists($type, self::LEGAL_TYPES)) {
+            throw new \Exception('Tipo di documento legale non valido');
+        }
+        return self::LEGAL_TYPES[$type];
+    }
+
+    private function ensureMiticko(): void
+    {
+        if (Auth::user()?->role !== 'god') {
+            abort(403, 'Operazione riservata agli operatori Miticko.');
+        }
     }
 
     public function data(Request $request) : JsonResponse {
