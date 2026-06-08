@@ -33,6 +33,13 @@ const formConfigs = {
             return errors;
         },
     },
+    'form-partner-sale': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'sale',
+        successMessage: 'Configurazione vendita aggiornata con successo',
+        validate: () => ({}),
+    },
     'form-partner-commissions': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
@@ -47,19 +54,37 @@ const formConfigs = {
         successMessage: 'Dati di fatturazione aggiornati con successo',
         validate: () => ({}),
     },
-    'form-partner-policies': {
+    'form-partner-description': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
-        section: 'policies',
-        successMessage: 'Politiche e condizioni aggiornate con successo',
+        section: 'translatable',
+        successMessage: 'Descrizione aggiornata con successo',
         validate: () => ({}),
-        collect: () => {
-            const data = {};
-            legalEditors.forEach((editor, field) => {
-                data[field] = editor.getData();
-            });
-            return data;
-        },
+        collect: () => ({ description_short: richEditors.get('description_short')?.getData() ?? '' }),
+    },
+    'form-partner-policy-privacy-policy': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'translatable',
+        successMessage: 'Privacy Policy aggiornata con successo',
+        validate: () => ({}),
+        collect: () => ({ privacy_policy: richEditors.get('privacy_policy')?.getData() ?? '' }),
+    },
+    'form-partner-policy-cookie-policy': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'translatable',
+        successMessage: 'Cookie Policy aggiornata con successo',
+        validate: () => ({}),
+        collect: () => ({ cookie_policy: richEditors.get('cookie_policy')?.getData() ?? '' }),
+    },
+    'form-partner-policy-termini-condizioni': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'translatable',
+        successMessage: 'Termini e Condizioni aggiornati con successo',
+        validate: () => ({}),
+        collect: () => ({ terms_conditions: richEditors.get('terms_conditions')?.getData() ?? '' }),
     },
 };
 
@@ -402,11 +427,11 @@ const initDeletePartner = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Documenti legali — CKEditor + traduzioni
+// Rich text editors (descrizione + documenti legali) + modale traduzioni
 // ---------------------------------------------------------------------------
-const legalEditors = new Map(); // field → ClassicEditor
+const richEditors = new Map(); // field (es. 'description_short', 'privacy_policy') → ClassicEditor
 
-const legalEditorConfig = {
+const richEditorConfig = {
     plugins: [
         Essentials, Paragraph, Bold, Italic, Underline, Strikethrough, RemoveFormat,
         List, Link, Heading,
@@ -422,27 +447,35 @@ const legalEditorConfig = {
     licenseKey: 'GPL',
 };
 
-const initLegalEditors = async () => {
-    const $textareas = $('textarea[id^="legal-editor-"]');
-    if ($textareas.length === 0) return;
+const fieldLabels = {
+    description_short: 'Breve descrizione',
+    privacy_policy:    'Privacy Policy',
+    cookie_policy:     'Cookie Policy',
+    terms_conditions:  'Termini e Condizioni',
+};
 
-    for (const el of $textareas.toArray()) {
-        const field = el.dataset.legalField;
-        const editor = await ClassicEditor.create(el, legalEditorConfig);
-        editor.setData(el.dataset.it || '');
-        editor.model.document.on('change:data', () => {
-            $(el).closest('.card-miticko').find('.btn-save-card')
-                .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
-        });
-        legalEditors.set(field, editor);
+const initRichEditors = async () => {
+    // Editor per documenti legali (textarea con id legal-editor-*, data-legal-field=field)
+    const legalTextareas = document.querySelectorAll('textarea[id^="legal-editor-"]');
+    for (const el of legalTextareas) {
+        await mountRichEditor(el, el.dataset.legalField);
+    }
+
+    // Editor per la breve descrizione (textarea con id partner-description-editor)
+    const descEl = document.getElementById('partner-description-editor');
+    if (descEl) {
+        await mountRichEditor(descEl, 'description_short');
     }
 };
 
-// Configurazione campi per le traduzioni dei documenti legali
-const legalTranslationLabels = {
-    'privacy-policy':     'Privacy Policy',
-    'cookie-policy':      'Cookie Policy',
-    'termini-condizioni': 'Termini e Condizioni',
+const mountRichEditor = async (el, field) => {
+    const editor = await ClassicEditor.create(el, richEditorConfig);
+    editor.setData(el.dataset.it || '');
+    editor.model.document.on('change:data', () => {
+        $(el).closest('.card-miticko').find('.btn-save-card')
+            .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
+    });
+    richEditors.set(field, editor);
 };
 
 const langFlag = (isoCode) => {
@@ -450,7 +483,7 @@ const langFlag = (isoCode) => {
     return flags[isoCode.toLowerCase()] || '🏳';
 };
 
-const renderLegalTranslationBody = (data) => {
+const renderTranslationBody = (data) => {
     if (!data || data.length === 0) {
         return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
     }
@@ -470,10 +503,10 @@ const renderLegalTranslationBody = (data) => {
     `).join('');
 };
 
-const openLegalTranslationsModal = (type) => {
+const openTranslationsModal = (field) => {
     const $modal = $('#modal-translations');
-    const path = `/partners/${window.PARTNER_ID}/legal/${type}/translations`;
-    const label = legalTranslationLabels[type] || 'Documento';
+    const path = `/partners/${window.PARTNER_ID}/translations/${field}`;
+    const label = fieldLabels[field] || 'Campo';
 
     $modal.find('.modal-title').text(`Traduci — ${label}`);
     $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
@@ -482,14 +515,14 @@ const openLegalTranslationsModal = (type) => {
 
     App.ajax({ path, method: 'get' })
         .then((res) => {
-            $('#modal-trans-body').html(renderLegalTranslationBody(res.data));
+            $('#modal-trans-body').html(renderTranslationBody(res.data));
         })
         .catch(() => {
             $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
         });
 };
 
-const saveLegalTranslations = () => {
+const saveTranslations = () => {
     const $modal = $('#modal-translations');
     const savePath = $modal.data('save-path');
     if (!savePath) return;
@@ -510,13 +543,21 @@ const saveLegalTranslations = () => {
         .catch(() => toastr.error('Errore durante il salvataggio delle traduzioni'));
 };
 
-const initLegalTranslations = () => {
+const initTranslations = () => {
+    // Pulsante globo accanto agli editor delle policy
     $(document).on('click', '.btn-legal-translations', function () {
         const type = $(this).data('legal-type');
-        if (type) openLegalTranslationsModal(type);
+        const mapping = { 'privacy-policy': 'privacy_policy', 'cookie-policy': 'cookie_policy', 'termini-condizioni': 'terms_conditions' };
+        const field = mapping[type];
+        if (field) openTranslationsModal(field);
     });
 
-    $(document).on('click', '#modal-translations .btn-save-translations', saveLegalTranslations);
+    // Pulsante globo accanto all'editor della Breve descrizione
+    $(document).on('click', '.btn-description-translations', function () {
+        openTranslationsModal('description_short');
+    });
+
+    $(document).on('click', '#modal-translations .btn-save-translations', saveTranslations);
 };
 
 // ---------------------------------------------------------------------------
@@ -537,8 +578,8 @@ const init = () => {
     initUsers();
     initLogo();
     initDeletePartner();
-    initLegalTranslations();
-    initLegalEditors();
+    initTranslations();
+    initRichEditors();
 };
 
 $(function () {

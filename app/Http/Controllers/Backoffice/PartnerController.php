@@ -29,13 +29,14 @@ class PartnerController extends CrudController
     public string $path;
 
     /**
-     * Mappa dello slug pubblico → campo salvato in language_contents.
-     * I tre slug sono fissi e identici per ogni partner.
+     * Campi traducibili del Partner salvati nella tabella `language_contents`.
+     * I 3 documenti legali richiedono ruolo `god`; `description_short` è aperto a tutti.
      */
-    private const LEGAL_TYPES = [
-        'privacy-policy'    => 'privacy_policy',
-        'cookie-policy'     => 'cookie_policy',
-        'termini-condizioni' => 'terms_conditions',
+    private const TRANSLATABLE_FIELDS = [
+        'description_short' => ['restricted' => false],
+        'privacy_policy'    => ['restricted' => true],
+        'cookie_policy'     => ['restricted' => true],
+        'terms_conditions'  => ['restricted' => true],
     ];
 
     public function __construct(PartnerInterface $interface)
@@ -123,7 +124,8 @@ class PartnerController extends CrudController
                 'status' => $this->interface->edit($partner, [
                     'is_active' => $request->input('is_active'),
                 ]),
-                'info' => $this->validateAndEdit($partner, $request),
+                'info' => $this->updateInfo($partner, $request),
+                'sale' => $this->updateSale($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
                     'commission_presale_low'       => $request->input('commission_presale_low'),
                     'commission_presale_high'      => $request->input('commission_presale_high'),
@@ -141,7 +143,7 @@ class PartnerController extends CrudController
                         'iban', 'tax_regime',
                     ]),
                 ),
-                'policies' => $this->updatePolicies($partner, $request),
+                'translatable' => $this->updateTranslatable($partner, $request),
                 default => throw new \Exception('Sezione non valida'),
             };
 
@@ -151,7 +153,23 @@ class PartnerController extends CrudController
         }
     }
 
-    private function validateAndEdit($partner, Request $request): void
+    private function updateInfo(Partner $partner, Request $request): void
+    {
+        $hasOrders = $partner->orders()->exists();
+        $newCode = $request->input('partner_code');
+
+        if ($hasOrders && $request->has('partner_code') && $newCode !== $partner->partner_code) {
+            throw new \Exception('Il codice partner non può essere modificato: esistono già ordini registrati.');
+        }
+
+        $this->interface->edit($partner, [
+            'partner_name' => $request->input('partner_name'),
+            'partner_code' => $hasOrders ? $partner->partner_code : $newCode,
+            'email_notify' => $request->input('email_notify'),
+        ]);
+    }
+
+    private function updateSale(Partner $partner, Request $request): void
     {
         $this->validate($request, [
             'domain_name' => [
@@ -165,36 +183,29 @@ class PartnerController extends CrudController
             'css_style.in' => 'Stile CSS non valido',
         ]);
 
-        $hasOrders = $partner->orders()->exists();
-        $newCode = $request->input('partner_code');
-
-        if ($hasOrders && $request->has('partner_code') && $newCode !== $partner->partner_code) {
-            throw new \Exception('Il codice partner non può essere modificato: esistono già ordini registrati.');
-        }
-
         $this->interface->edit($partner, [
-            'partner_name'  => $request->input('partner_name'),
-            'partner_code'  => $hasOrders ? $partner->partner_code : $newCode,
-            'email_notify'  => $request->input('email_notify'),
-            'sale_method'   => $request->input('sale_method'),
-            'domain_name'   => $request->input('domain_name') ?: null,
-            'css_style'     => $request->input('css_style') ?: 'Miticko',
+            'sale_method' => $request->input('sale_method'),
+            'domain_name' => $request->input('domain_name') ?: null,
+            'css_style'   => $request->input('css_style') ?: 'Miticko',
         ]);
     }
 
     /**
-     * Salva il contenuto italiano dei 3 documenti legali (Privacy / Cookie / Termini)
-     * nella tabella `language_contents` (locale `it`). Riservato agli operatori Miticko.
+     * Salva i contenuti italiani dei campi traducibili presenti nel request
+     * (description_short, privacy_policy, cookie_policy, terms_conditions).
+     * I 3 campi legali richiedono ruolo `god`.
      */
-    private function updatePolicies(Partner $partner, Request $request): void
+    private function updateTranslatable(Partner $partner, Request $request): void
     {
-        $this->ensureMiticko();
-
         $fields = [];
-        foreach (self::LEGAL_TYPES as $field) {
-            if ($request->exists($field)) {
-                $fields[$field] = (string) ($request->input($field) ?? '');
+        foreach (self::TRANSLATABLE_FIELDS as $field => $meta) {
+            if (! $request->exists($field)) {
+                continue;
             }
+            if ($meta['restricted']) {
+                $this->ensureMiticko();
+            }
+            $fields[$field] = (string) ($request->input($field) ?? '');
         }
 
         if (!empty($fields)) {
@@ -202,11 +213,10 @@ class PartnerController extends CrudController
         }
     }
 
-    public function getLegalTranslations(int $id, string $type): JsonResponse
+    public function getFieldTranslations(int $id, string $field): JsonResponse
     {
         try {
-            $this->ensureMiticko();
-            $field = $this->resolveLegalField($type);
+            $this->authorizeField($field);
 
             $partner = $this->interface->find($id);
             $languages = Language::where('is_active', 1)->get();
@@ -224,11 +234,10 @@ class PartnerController extends CrudController
         }
     }
 
-    public function saveLegalTranslations(Request $request, int $id, string $type): JsonResponse
+    public function saveFieldTranslations(Request $request, int $id, string $field): JsonResponse
     {
         try {
-            $this->ensureMiticko();
-            $field = $this->resolveLegalField($type);
+            $this->authorizeField($field);
 
             $partner = $this->interface->find($id);
 
@@ -249,12 +258,14 @@ class PartnerController extends CrudController
         }
     }
 
-    private function resolveLegalField(string $type): string
+    private function authorizeField(string $field): void
     {
-        if (!array_key_exists($type, self::LEGAL_TYPES)) {
-            throw new \Exception('Tipo di documento legale non valido');
+        if (!array_key_exists($field, self::TRANSLATABLE_FIELDS)) {
+            throw new \Exception('Campo traducibile non valido');
         }
-        return self::LEGAL_TYPES[$type];
+        if (self::TRANSLATABLE_FIELDS[$field]['restricted']) {
+            $this->ensureMiticko();
+        }
     }
 
     private function ensureMiticko(): void

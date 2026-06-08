@@ -148,12 +148,12 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::resource('partners', PartnerController::class);
         Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
         Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
-        Route::get('partners/{partner}/legal/{type}/translations', [PartnerController::class, 'getLegalTranslations'])
-            ->whereIn('type', ['privacy-policy', 'cookie-policy', 'termini-condizioni'])
-            ->name('partners.legal.translations.get');
-        Route::put('partners/{partner}/legal/{type}/translations', [PartnerController::class, 'saveLegalTranslations'])
-            ->whereIn('type', ['privacy-policy', 'cookie-policy', 'termini-condizioni'])
-            ->name('partners.legal.translations.save');
+        Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
+            ->whereIn('field', ['description_short', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+            ->name('partners.translations.get');
+        Route::put('partners/{partner}/translations/{field}', [PartnerController::class, 'saveFieldTranslations'])
+            ->whereIn('field', ['description_short', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+            ->name('partners.translations.save');
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
         Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
         Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');
