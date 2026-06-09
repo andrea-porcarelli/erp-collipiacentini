@@ -106,6 +106,7 @@
 <script>
     const availableDates = @json($product->getSharedAvailabilities()->pluck('date')->unique()->values()->toArray());
     const productId = @json($product->id);
+    const maxTicketsPerSession = @json($product->max_tickets_per_session);
 
     // Variabili per memorizzare la selezione
     let selectedDate = null;
@@ -115,6 +116,10 @@
     let selectedVariants = [];   // [{id, label, price}] dal server per lo slot scelto
     let variantQuantities = {};  // {variantId: quantity}
     let maxAvailability = 0;
+
+    function getMaxTickets() {
+        return maxTicketsPerSession ? Math.min(maxAvailability, maxTicketsPerSession) : maxAvailability;
+    }
 </script>
 <style>
     .product-description img {
@@ -423,6 +428,15 @@
         line-height: var(--typography-body-lineheight-small, 16px);
     }
 
+    .max-tickets-hint {
+        margin-top: 12px;
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: var(--typography-body-size-small, 14px);
+        font-weight: 300;
+        color: var(--text-secondary, #666);
+        text-align: center;
+    }
+
     .total-info {
         margin-top: 16px;
         padding: 16px;
@@ -727,6 +741,12 @@
                 </div>
             `).join('');
 
+            if (maxTicketsPerSession) {
+                ticketTypesHTML += `
+                    <div class="max-tickets-hint">Massimo ${maxTicketsPerSession} biglietti per prenotazione</div>
+                `;
+            }
+
             ticketTypesHTML += `
                 <div class="total-info">
                     <div class="label">Totale</div>
@@ -750,11 +770,12 @@
 
             function updateAllButtons() {
                 const total = getTotalTickets();
+                const cap = getMaxTickets();
                 document.querySelectorAll('.btn-decrease-variant').forEach(btn => {
                     btn.disabled = variantQuantities[btn.dataset.variantId] <= 0;
                 });
                 document.querySelectorAll('.btn-increase-variant').forEach(btn => {
-                    btn.disabled = total >= maxAvailability;
+                    btn.disabled = total >= cap;
                 });
                 const btnPurchase = document.getElementById('btn-purchase');
                 const isDisabled = total <= 0;
@@ -777,7 +798,7 @@
             document.querySelectorAll('.btn-increase-variant').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const vid = this.dataset.variantId;
-                    if (getTotalTickets() < maxAvailability) {
+                    if (getTotalTickets() < getMaxTickets()) {
                         variantQuantities[vid]++;
                         document.getElementById(`qty-variant-${vid}`).textContent = variantQuantities[vid];
                         calculateTotal();

@@ -284,6 +284,12 @@ class BookingController extends Controller
             return response()->json(['error' => 'Disponibilità insufficiente per l\'orario selezionato'], 400);
         }
 
+        if ($product->max_tickets_per_session && $totalQuantity > $product->max_tickets_per_session) {
+            return response()->json([
+                'error' => "Puoi acquistare al massimo {$product->max_tickets_per_session} biglietti per prenotazione",
+            ], 400);
+        }
+
         // Find applicable price variation
         $variation = $this->availabilityService->getApplicablePriceVariation($product, $validated['date']);
         $variantMap = $product->variants->keyBy('id');
