@@ -196,6 +196,55 @@ a.text-small {
     box-shadow: none;
 }
 
+@supports (appearance: base-select) {
+    .text-field .text-field-container select.input-miticko,
+    .text-field .text-field-container select.input-miticko::picker(select) {
+        appearance: base-select;
+    }
+    .text-field .text-field-container select.input-miticko {
+        cursor: pointer;
+    }
+    .text-field .text-field-container select.input-miticko::picker-icon {
+        color: var(--text-field-empty-label, #0D0D0D);
+        margin-left: auto;
+        transition: rotate 0.2s ease;
+    }
+    .text-field .text-field-container select.input-miticko:open::picker-icon {
+        rotate: 180deg;
+    }
+    .text-field .text-field-container select.input-miticko::picker(select) {
+        background: var(--text-field-empty-background, #FFF);
+        border: var(--text-field-empty-borderwidth, 1px) solid var(--text-field-empty-border, #E6E6E6);
+        border-radius: var(--text-field-borderradius, 12px);
+        padding: var(--spacing-s, 8px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        margin-top: var(--spacing-xs, 4px);
+        max-height: 320px;
+        overflow-y: auto;
+    }
+    .text-field .text-field-container select.input-miticko option {
+        display: flex;
+        align-items: center;
+        padding: var(--spacing-s, 8px) var(--spacing-m, 12px);
+        border-radius: var(--spacing-s, 8px);
+        font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
+        font-size: var(--size, 16px);
+        line-height: var(--line-height, 22px);
+        color: var(--text-field-empty-label, #0D0D0D);
+        cursor: pointer;
+    }
+    .text-field .text-field-container select.input-miticko option:hover {
+        background: var(--brand-primary-brandlight, #EEF2FF);
+    }
+    .text-field .text-field-container select.input-miticko option:checked {
+        background: var(--brand-primary-brand, #0D6EFD);
+        color: var(--brand-primary-onbrand, #FFF);
+    }
+    .text-field .text-field-container select.input-miticko option::checkmark {
+        display: none;
+    }
+}
+
 .supporting-text {
     display: inline-flex;
     align-items: center;
@@ -1333,6 +1382,89 @@ table.order-detail-tickets tbody tr:last-child td {
     font-weight: var(--weight, 700);
     line-height: var(--line-height, 24px); /* 133.333% */
     padding-top: 14px;
+}
+
+/* --- Check-in visitatori card --- */
+.order-checkin-card .card-body {
+    padding-top: var(--spacing-l, 16px);
+}
+.order-checkin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.order-checkin-content .ts-checkin-counter {
+    background: var(--ts-bg-soft, #F9FAFB);
+    border-radius: 12px;
+    padding: 18px 16px;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+.order-checkin-content .ts-checkin-counter-main {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main, #0D0D0D);
+}
+.order-checkin-content .ts-checkin-counter-sub {
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+}
+.order-checkin-content .ts-btn-all-arrived {
+    margin-bottom: 0;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 10px;
+}
+.order-checkin-content .ts-tickets-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.order-checkin-content .ts-ticket-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.order-checkin-content .ts-ticket-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main, #0D0D0D);
+}
+.order-checkin-content .ts-ticket-variant {
+    font-weight: 700;
+}
+.order-checkin-content .ts-ticket-code {
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+}
+.order-checkin-content .ts-btn-save-inline {
+    margin-top: 4px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 700;
+}
+@media (max-width: 575.98px) {
+    .order-checkin-content .ts-ticket-row {
+        flex-wrap: wrap;
+    }
+    .order-checkin-content .ts-ticket-status {
+        margin-left: auto;
+    }
 }
 
 /* --- Footer actions card column --- */

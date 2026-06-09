@@ -19,6 +19,7 @@
         {{-- Tabs Navigation --}}
         <div class="d-flex gap-2 product-tabs-scroll" id="partnerTabs" role="tablist">
             <x-chip label="Informazioni" :dataset="['tab-target' => '#partner-info-panel']" />
+            <x-chip label="Dati aziendali" appearance="Resting" :dataset="['tab-target' => '#partner-business-panel']" />
             <x-chip label="Contatti" appearance="Resting" :dataset="['tab-target' => '#partner-contacts-panel']" />
             @if($isGod)
                 <x-chip label="Privacy Policy"        appearance="Resting" :dataset="['tab-target' => '#partner-privacy-panel']" />
@@ -31,7 +32,8 @@
         {{-- Tabs Content --}}
         <div class="tab-content mt-spacing-xl" id="partnerTabsContent">
             <x-backoffice.partner.tab-info     :model="$model" :hasOrders="$hasOrders" />
-            <x-backoffice.partner.tab-contacts :model="$model" />
+            <x-backoffice.partner.tab-business :model="$model" />
+            <x-backoffice.partner.tab-policy :model="$model" type="contatti" field="contacts_content" label="Contatti" slug="contatti" panelId="partner-contacts-panel" />
             @if($isGod)
                 <x-backoffice.partner.tab-policy :model="$model" type="privacy-policy"     field="privacy_policy"   label="Privacy Policy"        slug="privacy-policy"     panelId="partner-privacy-panel" />
                 <x-backoffice.partner.tab-policy :model="$model" type="cookie-policy"      field="cookie_policy"    label="Cookie Policy"         slug="cookie-policy"      panelId="partner-cookie-panel" />

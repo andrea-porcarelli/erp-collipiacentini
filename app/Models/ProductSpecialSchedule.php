@@ -11,11 +11,12 @@ class ProductSpecialSchedule extends Model
 {
     use InvalidatesProductSeoCache;
 
-    protected $fillable = ['product_id', 'date', 'time'];
+    protected $fillable = ['product_id', 'date', 'time', 'is_disabled'];
 
     protected $casts = [
         'date'         => 'date',
         'availability' => 'integer',
+        'is_disabled'  => 'boolean',
     ];
 
     public function product(): BelongsTo

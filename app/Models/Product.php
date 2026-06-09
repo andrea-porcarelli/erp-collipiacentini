@@ -189,8 +189,11 @@ class Product extends LogsModel
             return true;
         }
 
-        // Has future special schedule slots
-        return $this->specialSchedules()->where('date', '>=', date('Y-m-d'))->exists();
+        // Has future special schedule slots (override "veri", non blacklist)
+        return $this->specialSchedules()
+            ->where('is_disabled', false)
+            ->where('date', '>=', date('Y-m-d'))
+            ->exists();
     }
 
     public function getButtonAttribute(): string

@@ -23,9 +23,7 @@ if (isset($value)){
 if (isset($model->{$name})){
     $default = $model->{$name};
 }
-$charCountMessage = $maxlength
-    ? ($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'
-    : null;
+$remaining = isset($maxlength) ? ($maxlength - mb_strlen($default ?? '')) : null;
 @endphp
 <div class="text-field {{ $class_container }}" data-mode="{{ $size }}">
     @isset($label)
@@ -47,16 +45,14 @@ $charCountMessage = $maxlength
             @endif
             @if($maxlength)
                 maxlength="{{ $maxlength }}"
-                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - this.value.length) + ' / {{ $maxlength }} caratteri rimanenti'"
+                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - [...this.value].length) + ' / {{ $maxlength }} caratteri rimanenti'"
             @endif
         >{{ $default }}</textarea>
     </div>
     @if($maxlength)
-        <div class="supporting-text-row">
-            <x-supporting-text :message="$message" :icon="$icon"/>
-            <x-supporting-text :message="$charCountMessage" extra_class="char-count"/>
-        </div>
-    @else
-        <x-supporting-text :message="$message" :icon="$icon"/>
+        <x-supporting-text extra_class="char-count" :message="$remaining . ' / ' . $maxlength . ' caratteri rimanenti'"/>
     @endif
+    @isset($message)
+        <x-supporting-text :message="$message" :icon="$icon"/>
+    @endisset
 </div>

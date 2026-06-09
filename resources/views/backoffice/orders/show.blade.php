@@ -80,6 +80,52 @@
     {{-- BODY GRID --}}
     <div class="row g-3">
         <div class="col-12 col-lg-8">
+
+            @php($participants = $order->participants()->with('orderProductItem.variant')->orderBy('id')->get())
+            @php($checkinTotal = $participants->count())
+            @php($checkinDone = $participants->where('status', 'checked_in')->count())
+            @php($statusOptions = ['booked' => 'Prenotato', 'checked_in' => 'Arrivato', 'no_show' => 'No show', 'refunded' => 'Rimborsato', 'cancelled' => 'Annullato'])
+            <x-card class="position-relative mb-spacing-xl order-checkin-card" title="Check-in visitatori">
+                @if($participants->isEmpty())
+                    <div class="text-secondary">Nessun partecipante per questo ordine.</div>
+                @else
+                    <div class="ticket-scanner-content order-checkin-content" data-order-id="{{ $order->id }}">
+                        <div class="ts-checkin-counter order-checkin-counter">
+                            <div class="ts-checkin-counter-main">
+                                <span data-role="card-checkin-count">{{ $checkinDone }}</span> / <span data-role="card-checkin-total">{{ $checkinTotal }}</span> arrivati
+                            </div>
+                            <div class="ts-checkin-counter-sub">{{ $checkinTotal }} {{ $checkinTotal === 1 ? 'visitatore atteso' : 'visitatori attesi' }}</div>
+                        </div>
+
+                        <button type="button" class="ts-btn-all-arrived order-checkin-all-arrived" data-role="card-all-arrived">
+                            <i class="fa-solid fa-check"></i> Arrivati tutti
+                        </button>
+
+                        <ul class="ts-tickets-list order-checkin-tickets">
+                            @foreach($participants as $i => $participant)
+                                @php($variantLabel = $participant->orderProductItem?->variant?->label ?? '—')
+                                @php($displayCode = sprintf('MTK-%s-%02d', $order->order_number, $i + 1))
+                                <li class="ts-ticket-row" data-participant-id="{{ $participant->id }}">
+                                    <div class="ts-ticket-info">
+                                        <div class="ts-ticket-title">Biglietto {{ $i + 1 }} · <span class="ts-ticket-variant">{{ $variantLabel }}</span></div>
+                                        <div class="ts-ticket-code">{{ $displayCode }}</div>
+                                    </div>
+                                    <div class="ts-ticket-status">
+                                        <select class="ts-status-select ts-status-{{ $participant->status }}" data-role="card-status-select" data-original="{{ $participant->status }}">
+                                            @foreach($statusOptions as $value => $label)
+                                                <option value="{{ $value }}" {{ $participant->status === $value ? 'selected' : '' }}>{{ mb_strtoupper($label) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+
+                        <button type="button" class="ts-btn-save-inline order-checkin-save" data-role="card-save-changes">Salva</button>
+                    </div>
+                @endif
+            </x-card>
+
             <x-card :title="'Dettaglio ordine #' . $order->order_number">
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
@@ -202,28 +248,6 @@
         </div>
 
         <div class="col-12 col-lg-4 d-flex flex-column gap-3">
-            @php($participants = $order->participants()->with('orderProductItem.variant')->orderBy('id')->get())
-            <x-card class="position-relative" title="Partecipanti" :sub_title="$participants->count() . ' biglietti'">
-                @if($participants->isEmpty())
-                    <div class="text-secondary">Nessun partecipante per questo ordine.</div>
-                @else
-                    <div class="participants-list d-flex flex-column gap-2">
-                        @foreach($participants as $i => $participant)
-                            <div class="participant-row d-flex justify-content-between align-items-center py-2 border-bottom">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-secondary small" style="min-width:24px">#{{ $i + 1 }}</span>
-                                    <span><i class="fa-regular fa-ticket me-1 text-secondary"></i>{{ $participant->orderProductItem?->variant?->label ?? '—' }}</span>
-                                </div>
-                                @include('backoffice.components.label', [
-                                    'status' => 'success',
-                                    'label'  => $participant->status_label,
-                                ])
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </x-card>
-
             <x-card class="position-relative" title="Note">
                 <div class="button-card-absolute">
                     <x-button
@@ -309,6 +333,7 @@
             sendEmail:            @json(route('orders.sendEmail', $model)),
             receipt:              @json(route('orders.receipt', $model)),
             refund:               @json(route('orders.refund', $model)),
+            ticketsBatchStatus:   @json(route('tickets.batchStatus')),
         };
     </script>
     <script type="module" src="{{ asset('backoffice/js/orders.js') }}"></script>

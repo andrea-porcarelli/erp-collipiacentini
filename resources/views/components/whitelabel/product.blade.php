@@ -10,7 +10,7 @@
     @endphp
     <div class="card-product-container @if(!$product->is_available) is-unavailable @endif">
         <figure>
-            <img title="{{ $product->label }}" alt="{{ $product->label }}" src="{{ $productImageUrl }}">
+            <img title="{{ $product->contentField('short_title') }}" alt="{{ $product->contentField('short_title') }}" src="{{ $productImageUrl }}">
         </figure>
         <section>
             <div class="product-detail">
@@ -19,7 +19,7 @@
                 @else
                     <x-label appearance="Error">NON DISPONIBILE</x-label>
                 @endif
-                <h3 class="mt-2">{{ $product->label }}</h3>
+                <h3 class="mt-2">{{ $product->contentField('short_title') }}</h3>
                 <div class=" d-none d-sm-block">
                     <div class="details">
                         <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->category->label" />
@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="description mt-spacing-l">
-                    {{ $product->intro }}
+                    {{ $product->contentField('short_description') }}
                 </div>
             </div>
             <div class="d-none d-sm-block">

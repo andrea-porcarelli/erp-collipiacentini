@@ -34,6 +34,7 @@ class PartnerController extends CrudController
      */
     private const TRANSLATABLE_FIELDS = [
         'description_short' => ['restricted' => false],
+        'contacts_content'  => ['restricted' => false],
         'privacy_policy'    => ['restricted' => true],
         'cookie_policy'     => ['restricted' => true],
         'terms_conditions'  => ['restricted' => true],
@@ -121,9 +122,6 @@ class PartnerController extends CrudController
             $partner = $this->interface->find($id);
 
             match ($request->input('section')) {
-                'status' => $this->interface->edit($partner, [
-                    'is_active' => $request->input('is_active'),
-                ]),
                 'info' => $this->updateInfo($partner, $request),
                 'sale' => $this->updateSale($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
@@ -166,6 +164,7 @@ class PartnerController extends CrudController
             'partner_name' => $request->input('partner_name'),
             'partner_code' => $hasOrders ? $partner->partner_code : $newCode,
             'email_notify' => $request->input('email_notify'),
+            'is_active'    => (int) $request->input('is_active'),
         ]);
     }
 

@@ -19,6 +19,7 @@
     'model' => null,
     'maxlength' => null,
     'extra' => null,
+    'translate' => false
 ])
 @php
     $default = null;
@@ -28,9 +29,7 @@
     if (isset($model->{$name})){
         $default = $model->{$name};
     }
-    $charCountMessage = $maxlength
-        ? ($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'
-        : null;
+    $remaining = isset($maxlength) ? ($maxlength - mb_strlen($default ?? '')) : null;
 @endphp
 <div class="text-field" data-mode="textfieldSize-{{ $size }} textfieldAppearance-{{ $appearance }}">
     @isset($label)
@@ -60,7 +59,7 @@
             @endif
             @if($maxlength)
                 maxlength="{{ $maxlength }}"
-                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - this.value.length) + ' / {{ $maxlength }} caratteri rimanenti'"
+                oninput="this.closest('.text-field').querySelector('.char-count').textContent = ({{ $maxlength }} - [...this.value].length) + ' / {{ $maxlength }} caratteri rimanenti'"
             @endif
         />
         @isset($trailing)
@@ -71,15 +70,9 @@
         @endisset
     </div>
     @if($maxlength)
-        <div class="supporting-text-row">
-            @isset($message)
-            <x-supporting-text :message="$message" :icon="$icon"/>
-            @endisset
-            <x-supporting-text :message="($maxlength - strlen($default ?? '')) . ' / ' . $maxlength . ' caratteri rimanenti'" extra_class="char-count"/>
-        </div>
-    @else
-        @isset($message)
-        <x-supporting-text :message="$message" :icon="$icon"/>
-        @endisset
+        <x-supporting-text extra_class="char-count" :message="$remaining . ' / ' . $maxlength . ' caratteri rimanenti'"/>
     @endif
+    @isset($message)
+    <x-supporting-text :message="$message" :icon="$icon"/>
+    @endisset
 </div>

@@ -8,18 +8,16 @@ use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\ProductAvailability;
 use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
 use App\Services\ProductSeoService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -31,15 +29,15 @@ class BookingController extends Controller
 
     public function index(Request $request): View
     {
-        $partner  = $request->partner;
+        $partner = $request->partner;
         $products = Product::where('is_active', 1)
             ->where('partner_id', $partner->id)
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->get();
 
-        $categories = Category::whereHas('products', fn($q) => $q
-                ->where('partner_id', $partner->id)
-                ->where('is_active', 1))
+        $categories = Category::whereHas('products', fn ($q) => $q
+            ->where('partner_id', $partner->id)
+            ->where('is_active', 1))
             ->orderBy('label')
             ->get();
 
@@ -50,14 +48,14 @@ class BookingController extends Controller
 
     public function filterProducts(Request $request): JsonResponse
     {
-        $partner  = $request->partner;
-        $filter  = $request->get('filter', 'all');
-        $date    = $request->get('date'); // Y-m-d or null
+        $partner = $request->partner;
+        $filter = $request->get('filter', 'all');
+        $date = $request->get('date'); // Y-m-d or null
 
         $products = Product::where('is_active', 1)
             ->where('partner_id', $partner->id)
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
-            ->when($filter !== 'all', fn($q) => $q->where('category_id', $filter))
+            ->when($filter !== 'all', fn ($q) => $q->where('category_id', $filter))
             ->get()
             ->when($date !== null, function ($collection) use ($date) {
                 return $collection->filter(function (Product $product) use ($date) {
@@ -65,7 +63,8 @@ class BookingController extends Controller
                         return false;
                     }
                     $slots = $this->availabilityService->getSlotsForDate($product, $date);
-                    return $slots->contains(fn($s) => is_null($s['availability']) || $s['availability'] > 0);
+
+                    return $slots->contains(fn ($s) => is_null($s['availability']) || $s['availability'] > 0);
                 });
             });
 
@@ -104,21 +103,21 @@ class BookingController extends Controller
             'relatedProducts.relatedProduct.partner',
         ])
             ->where('id', $productId)
-            ->whereHas('category', fn($q) => $q->where('category_code', $categoryCode))
-            ->whereHas('partner', fn($q) => $q->where('partner_code', $partnerCode))
+            ->whereHas('category', fn ($q) => $q->where('category_code', $categoryCode))
+            ->whereHas('partner', fn ($q) => $q->where('partner_code', $partnerCode))
             ->first();
 
-        if (!$product) {
-            Log::info(__METHOD__ . ': Product not found', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
+        if (! $product) {
+            Log::info(__METHOD__.': Product not found', compact('productCode', 'categoryCode', 'partnerCode', 'productId'));
             abort(404);
         }
 
-        if (!$product->is_active) {
+        if (! $product->is_active) {
             return redirect('/shop', 301);
         }
 
         $partner = $request->partner;
-        $seo     = $this->seoService->forProduct($product);
+        $seo = $this->seoService->forProduct($product);
 
         return view('whitelabel.product', compact('product', 'partner', 'seo'));
     }
@@ -131,13 +130,13 @@ class BookingController extends Controller
     {
         $date = $request->get('date');
 
-        if (!$date) {
+        if (! $date) {
             return response()->json(['error' => 'Data non specificata'], 400);
         }
 
         $product = Product::with(['variants.prices', 'partner'])->find($productId);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['error' => 'Prodotto non trovato'], 404);
         }
 
@@ -146,9 +145,9 @@ class BookingController extends Controller
         }
 
         $variation = $this->availabilityService->getApplicablePriceVariation($product, $date);
-        $slots     = $this->availabilityService->getSlotsForDate($product, $date);
+        $slots = $this->availabilityService->getSlotsForDate($product, $date);
 
-        $times = $slots->map(function ($slot) use ($product, $variation, $date) {
+        $times = $slots->map(function ($slot) use ($product, $variation) {
             if ($slot['slot_type'] === 'weekly') {
                 $availabilityId = $slot['slot_id'];
                 $variantCollection = $product->variants->where('availability_id', $availabilityId);
@@ -166,33 +165,32 @@ class BookingController extends Controller
                 }
             }
 
-
             $variants = $variantCollection->map(function (ProductVariant $v) use ($product, $variation) {
                 $basePrice = (float) $v->full_price;
-                $price     = $this->availabilityService->applyPriceVariation($basePrice, $variation);
-                $baseCommission  = $product->partner?->resolvePresaleCommission($basePrice) ?? 0;
+                $price = $this->availabilityService->applyPriceVariation($basePrice, $variation);
+                $baseCommission = $product->partner?->resolvePresaleCommission($basePrice) ?? 0;
                 $priceCommission = $product->partner?->resolvePresaleCommission($price) ?? 0;
 
                 return [
-                    'id'         => $v->id,
-                    'label'      => $v->label,
+                    'id' => $v->id,
+                    'label' => $v->label,
                     'base_price' => $basePrice + $baseCommission,
-                    'price'      => $price + $priceCommission,
+                    'price' => $price + $priceCommission,
                 ];
             })->values();
 
             return [
-                'time'         => $slot['time'],
+                'time' => $slot['time'],
                 'availability' => $slot['availability'],
-                'slot_type'    => $slot['slot_type'],
-                'slot_id'      => $slot['slot_id'],
+                'slot_type' => $slot['slot_type'],
+                'slot_id' => $slot['slot_id'],
                 'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
-                'variants'     => $variants,
+                'variants' => $variants,
             ];
         });
 
         return response()->json([
-            'times'              => $times,
+            'times' => $times,
             'price_variation_id' => $variation?->id,
         ]);
     }
@@ -202,12 +200,12 @@ class BookingController extends Controller
      */
     public function getAvailableDays(Request $request, int $productId): JsonResponse
     {
-        $year  = (int) $request->get('year', now()->year);
+        $year = (int) $request->get('year', now()->year);
         $month = (int) $request->get('month', now()->month);
 
         $product = Product::find($productId);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['error' => 'Prodotto non trovato'], 404);
         }
 
@@ -223,12 +221,12 @@ class BookingController extends Controller
     public function addToCart(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'product_id'           => 'required|exists:products,id',
-            'date'                 => 'required|date_format:Y-m-d',
-            'time'                 => 'required|date_format:H:i',
-            'items'                => 'required|array|min:1',
-            'items.*.variant_id'   => 'required|exists:product_variants,id',
-            'items.*.quantity'     => 'required|integer|min:1',
+            'product_id' => 'required|exists:products,id',
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
+            'items' => 'required|array|min:1',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
         ]);
 
         $product = Product::with(['variants.prices', 'partner'])->findOrFail($validated['product_id']);
@@ -241,20 +239,20 @@ class BookingController extends Controller
         // Find the matching slot
         $slot = $this->availabilityService->getSlot($product, $validated['date'], $validated['time']);
 
-        if (!$slot) {
+        if (! $slot) {
             return response()->json(['error' => 'Orario non disponibile per questa data'], 400);
         }
 
         // Check total quantity against slot availability
         $totalQuantity = collect($validated['items'])->sum('quantity');
 
-        if (!is_null($slot['availability']) && $slot['availability'] < $totalQuantity) {
+        if (! is_null($slot['availability']) && $slot['availability'] < $totalQuantity) {
             return response()->json(['error' => 'Disponibilità insufficiente per l\'orario selezionato'], 400);
         }
 
         // Find applicable price variation
-        $variation   = $this->availabilityService->getApplicablePriceVariation($product, $validated['date']);
-        $variantMap  = $product->variants->keyBy('id');
+        $variation = $this->availabilityService->getApplicablePriceVariation($product, $validated['date']);
+        $variantMap = $product->variants->keyBy('id');
 
         // Build cart items with unit prices
         $cartItemsData = [];
@@ -262,7 +260,7 @@ class BookingController extends Controller
 
         foreach ($validated['items'] as $item) {
             $variant = $variantMap->get($item['variant_id']);
-            if (!$variant) {
+            if (! $variant) {
                 return response()->json(['error' => 'Variante non trovata'], 404);
             }
 
@@ -270,8 +268,8 @@ class BookingController extends Controller
             $unitPrice += $product->partner?->resolvePresaleCommission($unitPrice) ?? 0;
             $cartItemsData[] = [
                 'product_variant_id' => $variant->id,
-                'quantity'           => $item['quantity'],
-                'unit_price'         => $unitPrice,
+                'quantity' => $item['quantity'],
+                'unit_price' => $unitPrice,
             ];
             $total += $unitPrice * $item['quantity'];
         }
@@ -284,15 +282,15 @@ class BookingController extends Controller
             Cart::where('session_id', $sessionId)->delete();
 
             $cart = Cart::create([
-                'session_id'                => $sessionId,
-                'partner_id'                => $request->partner?->id ?? $product->partner_id,
-                'product_id'                => $product->id,
-                'date'                      => $validated['date'],
-                'time'                      => $validated['time'],
-                'slot_type'                 => $slot['slot_type'],
-                'slot_id'                   => $slot['slot_id'],
+                'session_id' => $sessionId,
+                'partner_id' => $request->partner?->id ?? $product->partner_id,
+                'product_id' => $product->id,
+                'date' => $validated['date'],
+                'time' => $validated['time'],
+                'slot_type' => $slot['slot_type'],
+                'slot_id' => $slot['slot_id'],
                 'applied_price_variation_id' => $variation?->id,
-                'total'                     => round($total, 2),
+                'total' => round($total, 2),
             ]);
 
             foreach ($cartItemsData as $itemData) {
@@ -302,12 +300,13 @@ class BookingController extends Controller
             DB::commit();
 
             return response()->json([
-                'success'      => true,
-                'cart_id'      => $cart->id,
+                'success' => true,
+                'cart_id' => $cart->id,
                 'redirect_url' => route('booking.cart'),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json(['error' => 'Errore durante l\'aggiunta al carrello'], 500);
         }
     }
@@ -329,78 +328,84 @@ class BookingController extends Controller
         $sessionId = session()->getId();
         $cart = Cart::where('session_id', $sessionId)->first();
 
-        if (!$cart) {
+        if (! $cart) {
             return response()->json(['error' => 'Carrello non trovato'], 404);
         }
 
         $cart->delete();
 
         return response()->json([
-            'success'      => true,
+            'success' => true,
             'redirect_url' => url('/shop'),
         ]);
     }
 
     public function saveCustomer(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'surname'     => 'required|string|max:255',
-            'email'       => 'required|email|max:255',
-            'address'     => 'required|string|max:255',
-            'zip_code'    => 'required|string|max:10',
-            'city'        => 'required|string|max:255',
-            'country'     => 'required|string|size:2',
-            'phone'       => 'required|string|max:20',
-            'fiscal_code' => 'nullable|string|max:16',
-            'birth_date'  => 'nullable|date',
-            'privacy'     => 'required|accepted',
-            'newsletter'  => 'nullable|boolean',
-        ]);
-
         $sessionId = session()->getId();
-        $cart = Cart::with('partner')->where('session_id', $sessionId)->first();
+        $cart = Cart::with(['partner', 'product.customerFields.fieldType'])
+            ->where('session_id', $sessionId)
+            ->first();
 
-        if (!$cart) {
+        if (! $cart) {
             return response()->json(['error' => 'Carrello non trovato'], 404);
         }
+
+        // Mappa key del field-type → colonna Customer + regola di base
+        $fieldDefinitions = [
+            'address' => ['column' => 'address',     'rule' => 'string|max:255'],
+            'birth_date' => ['column' => 'birth_date',  'rule' => 'date'],
+            'phone' => ['column' => 'phone',       'rule' => 'string|max:20'],
+            'tax_code' => ['column' => 'fiscal_code', 'rule' => 'string|max:16'],
+        ];
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'privacy' => 'required|accepted',
+            'newsletter' => 'nullable|boolean',
+        ];
+
+        $activeColumns = [];
+        foreach ($cart->product->customerFields as $field) {
+            $def = $fieldDefinitions[$field->fieldType->key] ?? null;
+            if (! $def) {
+                continue;
+            }
+            $rules[$def['column']] = ($field->is_required ? 'required|' : 'nullable|').$def['rule'];
+            $activeColumns[] = $def['column'];
+        }
+
+        $validated = $request->validate($rules);
 
         DB::beginTransaction();
         try {
             $user = Customer::where('email', $validated['email'])->first();
 
-            if (!$user) {
-                $user = Customer::create([
-                    'name'             => $validated['name'],
-                    'surname'          => $validated['surname'],
-                    'email'            => $validated['email'],
-                    'password'         => Hash::make(Str::random(16)),
-                    'role'             => 'customer',
-                    'company_id'       => $cart->partner?->company_id,
-                    'partner_id'       => $cart->partner_id,
-                    'address'          => $validated['address'],
-                    'zip_code'         => $validated['zip_code'],
-                    'city'             => $validated['city'],
-                    'country'          => $validated['country'],
-                    'phone'            => $validated['phone'],
-                    'fiscal_code'      => $validated['fiscal_code'] ?? null,
-                    'birth_date'       => $validated['birth_date'] ?? null,
+            $customerData = [
+                'name' => $validated['name'],
+                'surname' => $validated['surname'],
+            ];
+            foreach ($activeColumns as $column) {
+                if (! empty($validated[$column])) {
+                    $customerData[$column] = $validated[$column];
+                }
+            }
+
+            if (! $user) {
+                $user = Customer::create(array_merge($customerData, [
+                    'email' => $validated['email'],
+                    'password' => Hash::make(Str::random(16)),
+                    'role' => 'customer',
+                    'company_id' => $cart->partner?->company_id,
+                    'partner_id' => $cart->partner_id,
                     'privacy_accepted' => true,
-                    'newsletter'       => $validated['newsletter'] ?? false,
-                ]);
+                    'newsletter' => $validated['newsletter'] ?? false,
+                ]));
             } else {
-                $user->update([
-                    'name'        => $validated['name'],
-                    'surname'     => $validated['surname'],
-                    'address'     => $validated['address'],
-                    'zip_code'    => $validated['zip_code'],
-                    'city'        => $validated['city'],
-                    'country'     => $validated['country'],
-                    'phone'       => $validated['phone'],
-                    'fiscal_code' => $validated['fiscal_code'] ?? $user->fiscal_code,
-                    'birth_date'  => $validated['birth_date'] ?? $user->birth_date,
-                    'newsletter'  => $validated['newsletter'] ?? $user->newsletter,
-                ]);
+                $customerData['newsletter'] = $validated['newsletter'] ?? $user->newsletter;
+                $user->update($customerData);
             }
 
             $cart->update(['customer_id' => $user->id]);
@@ -413,7 +418,8 @@ class BookingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Errore durante il salvataggio dei dati: ' . $e->getMessage()], 500);
+
+            return response()->json(['error' => 'Errore durante il salvataggio dei dati: '.$e->getMessage()], 500);
         }
     }
 }

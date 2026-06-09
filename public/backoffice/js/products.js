@@ -25,6 +25,25 @@ const formConfigs = {
             return errors;
         },
     },
+    'form-info-ecommerce': {
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'ecommerce',
+        successMessage: 'Nome e descrizione e-commerce aggiornati con successo',
+        validate: (data) => {
+            const errors = {};
+            if (!data.short_title || data.short_title.trim() === '') {
+                errors.short_title = ['Il nome breve è obbligatorio'];
+            }
+            if (!data.short_description || data.short_description.trim() === '') {
+                errors.short_description = ['La descrizione breve è obbligatoria'];
+            }
+            if (!data.long_title || data.long_title.trim() === '') {
+                errors.long_title = ['Il nome completo è obbligatorio'];
+            }
+            return errors;
+        },
+    },
     'form-info-duration': {
         endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',

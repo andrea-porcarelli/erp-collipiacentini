@@ -123,6 +123,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('products/{product}/special-schedule/{date}/materialize', [ProductSpecialScheduleController::class, 'materialize'])->name('products.special-schedule.materialize')->where('date', '\d{4}-\d{2}-\d{2}');
         Route::get('products/{product}/special-schedule/{date}', [ProductSpecialScheduleController::class, 'index'])->name('products.special-schedule.index')->where('date', '\d{4}-\d{2}-\d{2}');
         Route::post('products/{product}/special-schedule', [ProductSpecialScheduleController::class, 'store'])->name('products.special-schedule.store');
+        Route::post('products/{product}/special-schedule/toggle-disable', [ProductSpecialScheduleController::class, 'toggleDisable'])->name('products.special-schedule.toggle-disable');
         Route::delete('products/{product}/special-schedule/{date}/reset', [ProductSpecialScheduleController::class, 'reset'])->name('products.special-schedule.reset')->where('date', '\d{4}-\d{2}-\d{2}');
         Route::put('products/{product}/special-schedule/{slot}/availability', [ProductSpecialScheduleController::class, 'updateAvailability'])->name('products.special-schedule.availability');
         Route::delete('products/{product}/special-schedule/{slot}', [ProductSpecialScheduleController::class, 'destroy'])->name('products.special-schedule.destroy');
@@ -149,10 +150,10 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
         Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
         Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
-            ->whereIn('field', ['description_short', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+            ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
             ->name('partners.translations.get');
         Route::put('partners/{partner}/translations/{field}', [PartnerController::class, 'saveFieldTranslations'])
-            ->whereIn('field', ['description_short', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+            ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
             ->name('partners.translations.save');
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
         Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');

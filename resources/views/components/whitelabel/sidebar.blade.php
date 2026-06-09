@@ -10,10 +10,8 @@
     </x-card>
 @endif
 <div class="d-none d-sm-block">
-    <x-card :title="__('whitelabel.sidebar.castle_title')" class="card-spacing">
-        @isset($partner)
-            {{ $partner->partner_name }}
-        @endisset
+    <x-card :title="$partner->partner_name" class="card-spacing">
+        {!!   $partner->contentField('description_short') !!}
     </x-card>
 
     <x-card :title="__('whitelabel.sidebar.useful_links_title')" class="card-spacing">

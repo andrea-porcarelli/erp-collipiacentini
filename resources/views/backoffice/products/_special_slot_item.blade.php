@@ -1,24 +1,38 @@
 @php
-    $isPreview = $isPreview ?? false;
-    $time      = substr($slot->time, 0, 5);
+    $isPreview  = $isPreview ?? false;
+    $isDisabled = $isDisabled ?? false;
+    $time       = substr($slot->time, 0, 5);
 @endphp
-<div class="special-slot-item @if($isPreview) special-slot-item--preview @endif"
+<div class="special-slot-item @if($isPreview) special-slot-item--preview @endif @if($isDisabled) special-slot-item--disabled @endif"
      @if($isPreview)
          data-preview="1"
          data-time="{{ $time }}"
          data-availability-id="{{ $slot->id }}"
+         data-disabled="{{ $isDisabled ? '1' : '0' }}"
      @else
          data-id="{{ $slot->id }}"
      @endif>
     <div class="special-slot-header">
         <span class="fw-medium" style="min-width:52px">{{ $time }}</span>
-        @if($isPreview)
+        @if($isPreview && !$isDisabled)
             <span class="text-secondary small fst-italic special-slot-preview-label">dal template settimanale</span>
+        @endif
+        @if($isDisabled)
+            <span class="badge rounded-pill special-slot-disabled-badge">Disattivato per questa data</span>
         @endif
         <span class="special-slot-header-tools">
             <span class="text-secondary small flex-grow-1">Prenotazioni attive: 0</span>
-            <button type="button" class="bt-miticko btn-special-slot-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash-can icon"></i></button>
-            <button type="button" class="bt-miticko btn-special-slot-toggle" data-mode="small primary"><i class="fa-regular fa-chevron-down icon"></i></button>
+            @if($isPreview)
+                <button type="button"
+                        class="bt-miticko btn-special-slot-disable-toggle"
+                        data-mode="small {{ $isDisabled ? 'primary' : 'secondary' }} bt-m-text-only"
+                        title="{{ $isDisabled ? 'Riattiva per questa data' : 'Disattiva per questa data' }}">
+                    <i class="fa-regular {{ $isDisabled ? 'fa-rotate-left' : 'fa-ban' }} icon"></i>
+                </button>
+            @else
+                <button type="button" class="bt-miticko btn-special-slot-delete" data-mode="small primary bt-m-text-only"><i class="fa-regular fa-trash-can icon"></i></button>
+            @endif
+            <button type="button" class="bt-miticko btn-special-slot-toggle" data-mode="small primary" @if($isDisabled) style="visibility:hidden" @endif><i class="fa-regular fa-chevron-down icon"></i></button>
         </span>
     </div>
     <div class="special-slot-body d-none p0" data-loaded="0">

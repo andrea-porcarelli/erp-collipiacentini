@@ -15,10 +15,10 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-12 col-sm-6">
-                            <x-select :model="$model"  name="is_active" label="Stato prodotto" required :options="[['id' => 1, 'label' => 'Pubblicato'],['id' => 0, 'label' => 'Non Pubblicato']]" icon="fa-regular fa-circle-info" message="Questo campo è solo per uso interno e non visibile al pubblico" />
+                            <x-select :model="$model"  name="is_active" label="Stato prodotto" required :options="[['id' => 1, 'label' => 'Pubblicato'],['id' => 0, 'label' => 'Non Pubblicato']]" icon="fa-regular fa-circle-info" />
                         </div>
                         <div class="col-12 col-sm-6">
-                            <x-input :value="$model->public_url" name="slug" label="URL" disabled required message="Non è possibile modificare l'URL" icon="fa-regular fa-circle-info" />
+                            <x-input :value="$model->public_url" name="slug" label="URL" disabled required message="L'URL è assegnato dal sistema e non può essere modificato" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
@@ -26,29 +26,47 @@
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                 </div>
             </x-card>
-            <x-card title="Durata" sub_title="sotto" class="mt-4 position-relative">
-                <form id="form-info-duration">
+            <x-card title="Nome e descrizione del prodotto sull'E-commerce" sub_title="Homepage dell'E-commerce" class="mt-4 position-relative">
+                <form id="form-info-ecommerce">
                     <div class="row">
-                        <div class="col-12 col-sm-4" style="display: flex; gap: 10px">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-4">
-                                    <x-input :model="$model" name="duration_days" label="Giorni" type="number" required message="inserisci il valore in giorni" icon="fa-regular fa-circle-info"/>
-                                </div>
-                                <div class="col-xs-12 col-sm-4">
-                                    <x-input :model="$model" name="duration_hours" label="Ore" type="number" max="23" required message="inserisci il valore in ore" icon="fa-regular fa-circle-info"/>
-                                </div>
-                                <div class="col-xs-12 col-sm-4">
-                                    <x-input :model="$model" name="duration_minutes" label="Minuti" type="number" max="59" required message="inserisci il valore in minuti" icon="fa-regular fa-circle-info"/>
-                                </div>
-                            </div>
+                        <div class="col-12">
+                            <x-input :value="$model->contentField('short_title')" name="short_title" maxlength="55" label="Nome breve (card prodotto)" required message="Indica l’esperienza che offri: non usare il nome della tua attività e non inserire il prezzo (es. Visita guidata completa con degustazione)" icon="fa-regular fa-circle-info"/>
                         </div>
-                        <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                            <x-input :model="$model" name="booking_deadline_hours" label="Prenotabile fino a (ore prima)" type="number" min="0" message="Ore prima dell'inizio dello slot entro cui è possibile prenotare. Es: 1 = prenotazioni chiuse 1 ora prima. Lascia vuoto per nessun limite." icon="fa-regular fa-circle-info"/>
+                        <div class="col-12 mt-spacing-l">
+                            <x-textarea :value="$model->contentField('short_description')" name="short_description" maxlength="110" label="Descrizione breve (card prodotto)" required message="Indica l’esperienza che offri: non usare il nome della tua attività e non inserire il prezzo (es. Visita guidata completa con degustazione)" icon="fa-regular fa-circle-info" />
+                        </div>
+                        <div class="col-12 mt-spacing-l">
+                            <x-input :value="$model->contentField('long_title')" name="long_title" maxlength="62" label="Nome completo nella pagina prodotto dedicata" required message="Scrivi il nome dell’attività includendo: cosa faranno i clienti, il prezzo ed il nome della tua attività (es. Visita guidata completa con degustazione 15€ a Veleia Romana)" icon="fa-regular fa-circle-info"/>
                         </div>
                     </div>
                 </form>
                 <div class="button-card-absolute">
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
+                </div>
+            </x-card>
+            <x-card title="Durata" class="mt-4 position-relative">
+                <form id="form-info-duration">
+                    <div class="row">
+                        <div class="col-12 col-sm-4" style="display: flex; gap: 10px">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_days" label="Giorni" type="number" required icon="fa-regular fa-circle-info"/>
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_hours" label="Ore" type="number" max="23" required  icon="fa-regular fa-circle-info"/>
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <x-input :model="$model" name="duration_minutes" label="Minuti" type="number" max="59" required icon="fa-regular fa-circle-info"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-8 mt-3 mt-sm-0">
+                            <x-input :model="$model" name="booking_deadline_hours" type="number" label="Tempo limite prenotazione (minuti prima dell’inizio dell’orario di visita)" type="number" min="0" message="indica in minuti entro quando i clienti possono prenotare a ridosso dell'inizio del turno" icon="fa-regular fa-circle-info"/>
+                        </div>
+                    </div>
+                </form>
+                <div class="button-card-absolute">
+                    <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" stat us="Disabled" />
                 </div>
             </x-card>
             <x-card title="Categoria prodotto" class="mt-4 position-relative">
@@ -64,33 +82,28 @@
                 </div>
             </x-card>
             <x-backoffice.product.features :model="$model" :features="$features" />
-            <x-card title="Impostazioni prodotto pubbliche" class="mt-4 mb-5 position-relative" sub_title="titolo e descrizione che vedranno gli utenti su Google e sul sito">
+            <x-card title="Impostazioni per i motori di ricerca" class="mt-4 mb-5 position-relative" sub_title="Usa descrizioni brevi, includi il nome della tua attività, il nome del prodotto ed il prezzo.">
                 <form id="form-info-public">
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <div class="d-flex align-items-start gap-2">
+
+                            <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
-                                    <x-input :model="$model" maxlength="70" name="title" label="Titolo pubblico" message="Titolo del prodoto usato dalla scheda del browser" icon="fa-regular fa-circle-info" />
+                                    <x-input :model="$model" name="meta_keywords" label="Keywords" placeholder="es. visite guidate, degustazioni, vino" message="Parole chiave separate da virgola" icon="fa-regular fa-circle-info" />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="title" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Neutral" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations mt-spacing-2xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
                                     <x-input :model="$model" maxlength="55" name="meta_title" label="Nome prodotto pubblico (meta title)" required />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_title" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Neutral" data-field="meta_title" class="bt-miticko btn-public-meta-translations mt-spacing-2xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
-                                    <x-textarea :model="$model" maxlength="150" name="meta_description" label="Descrizione breve (meta description)" required />
+                                    <x-textarea :model="$model" maxlength="150" name="meta_description" rows="3" label="Descrizione breve (meta description)" required />
                                 </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_description" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
-                            </div>
-                            <div class="d-flex align-items-start gap-2 mt-4">
-                                <div class="flex-grow-1">
-                                    <x-input :model="$model" maxlength="500" name="meta_keywords" label="Keywords" placeholder="es. visite guidate, degustazioni, vino" message="Parole chiave separate da virgola" icon="fa-regular fa-circle-info" />
-                                </div>
-                                <button type="button" data-mode="medium primary" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Neutral" data-field="meta_description" class="bt-miticko btn-public-meta-translations mt-spacing-3xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6">
@@ -113,19 +126,6 @@
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                 </div>
             </x-card>
-            <x-card title="Breve descrizione del prodotto" class="mt-4 mb-5 position-relative" sub_title="Inserisci una breve descrizione che verrà mostrata nella barra laterale (sidebar) della pagina prodotto. Serve sia per gli utenti che per i motori di ricerca (SEO).">
-                <form id="form-info-description">
-                    <div class="row">
-                        <div class="col-12">
-                            <x-textarea :model="$model" maxlength="300" name="description" rows="5" label="Breve descrizione del prodotto" required class_container="mt-4" />
-                        </div>
-                    </div>
-                </form>
-                <div class="button-card-absolute">
-                    <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-                </div>
-            </x-card>
-
             <x-card title="Personalizza informazioni per la visita inviate via Email in formato PDF" class="mt-4 mb-5 position-relative" sub_title="Le informazioni che inserisci qui verranno visualizzate nel PDF di riepilogo per l'accesso all'esperienza che i clienti ricevono via email">
                 <form id="form-info-visit">
                     <div class="row">
@@ -136,15 +136,15 @@
                                         name="visit_info"
                                         :value="$model->contentField('visit_info') ?? ''"
                                         maxlength="600"
-                                        rows="4"
+                                        rows="3"
                                         label="Informazioni importanti sulla visita"
                                         placeholder="Inserisci le informazioni più importanti per l'accesso all'esperienza es. &quot;presentati 15 minuti prima in biglietteria, il parcheggio si trova dietro&quot;"
                                     />
                                 </div>
-                                <button type="button" data-mode="medium primary" class="bt-miticko btn-visit-info-translations bt-m-light mt-spacing-xl"><i class="fa-regular fa-language icon"></i></button>
+                                <button type="button" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Neutral" class="bt-miticko btn-visit-info-translations mt-spacing-3xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 mt-4">
+                        <div class="col-12  mt-4">
                             <x-input :model="$model" name="support_email" type="email" label="Email contatto per assistenza clienti" leading="fa-envelope" placeholder="inserisci email..." />
                         </div>
                     </div>

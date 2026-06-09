@@ -36,22 +36,30 @@ class ProductSpecialScheduleController extends Controller
     {
         $this->authorizeAccess($product);
 
-        $slots = ProductSpecialSchedule::where('product_id', $product->id)
+        $overrides = ProductSpecialSchedule::where('product_id', $product->id)
             ->where('date', $date)
+            ->where('is_disabled', false)
             ->orderBy('time')
             ->get();
 
-        if ($slots->isNotEmpty()) {
-            $html = $slots->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
+        $hasExceptions = ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $date)
+            ->where('is_disabled', true)
+            ->exists();
+
+        if ($overrides->isNotEmpty()) {
+            $html = $overrides->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
 
             return response()->json([
-                'html'        => $html,
-                'is_override' => true,
-                'is_preview'  => false,
+                'html'           => $html,
+                'is_override'    => true,
+                'is_preview'     => false,
+                'has_exceptions' => $hasExceptions,
             ]);
         }
 
-        // Nessun override: mostra il template settimanale per quel giorno.
+        // Nessun override: mostra il template settimanale per quel giorno,
+        // segnando come "disabilitati" gli slot con un record blacklist (is_disabled=true).
         $dayOfWeek = Carbon::parse($date)->isoWeekday();
         $templateSlots = ProductAvailability::where('product_id', $product->id)
             ->whereNotNull('day_of_week')
@@ -59,16 +67,60 @@ class ProductSpecialScheduleController extends Controller
             ->orderBy('time')
             ->get();
 
+        $blacklistTimes = ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $date)
+            ->where('is_disabled', true)
+            ->pluck('time')
+            ->map(fn ($t) => substr($t, 0, 5))
+            ->all();
+
         $html = $templateSlots->map(fn($s) => view('backoffice.products._special_slot_item', [
-            'slot'      => $s,
-            'isPreview' => true,
+            'slot'       => $s,
+            'isPreview'  => true,
+            'isDisabled' => in_array(substr($s->time, 0, 5), $blacklistTimes, true),
         ])->render())->join('');
 
         return response()->json([
-            'html'        => $html,
-            'is_override' => false,
-            'is_preview'  => true,
+            'html'           => $html,
+            'is_override'    => false,
+            'is_preview'     => true,
+            'has_exceptions' => $hasExceptions,
         ]);
+    }
+
+    /**
+     * Disabilita o riabilita uno slot del template settimanale per una data specifica.
+     * Crea/elimina un record ProductSpecialSchedule con is_disabled=true (blacklist).
+     */
+    public function toggleDisable(Request $request, Product $product): JsonResponse
+    {
+        $this->authorizeAccess($product);
+
+        $data = $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
+        ]);
+
+        $existing = ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $data['date'])
+            ->where('time', $data['time'])
+            ->where('is_disabled', true)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+
+            return response()->json(['is_disabled' => false]);
+        }
+
+        ProductSpecialSchedule::create([
+            'product_id'  => $product->id,
+            'date'        => $data['date'],
+            'time'        => $data['time'],
+            'is_disabled' => true,
+        ]);
+
+        return response()->json(['is_disabled' => true]);
     }
 
     /**
@@ -105,6 +157,7 @@ class ProductSpecialScheduleController extends Controller
 
         $existing = ProductSpecialSchedule::where('product_id', $product->id)
             ->where('date', $date)
+            ->where('is_disabled', false)
             ->with(['variants.prices'])
             ->orderBy('time')
             ->get();
@@ -113,17 +166,32 @@ class ProductSpecialScheduleController extends Controller
             return response()->json(['slots' => $this->mapExistingSlotsResponse($existing)]);
         }
 
+        $blacklistTimes = ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $date)
+            ->where('is_disabled', true)
+            ->pluck('time')
+            ->map(fn ($t) => substr($t, 0, 5))
+            ->all();
+
         $dayOfWeek = Carbon::parse($date)->isoWeekday();
         $templateSlots = ProductAvailability::where('product_id', $product->id)
             ->whereNotNull('day_of_week')
             ->where('day_of_week', $dayOfWeek)
             ->with(['variants.prices'])
             ->orderBy('time')
-            ->get();
+            ->get()
+            ->reject(fn ($s) => in_array(substr($s->time, 0, 5), $blacklistTimes, true));
 
         $result = [];
 
         DB::transaction(function () use ($product, $date, $templateSlots, &$result) {
+            // La data passa da "template + blacklist" a "override completo":
+            // i record blacklist non sono più necessari.
+            ProductSpecialSchedule::where('product_id', $product->id)
+                ->where('date', $date)
+                ->where('is_disabled', true)
+                ->delete();
+
             foreach ($templateSlots as $tSlot) {
                 $newSlot = ProductSpecialSchedule::create([
                     'product_id' => $product->id,
@@ -209,6 +277,14 @@ class ProductSpecialScheduleController extends Controller
             'date'         => 'required|date_format:Y-m-d',
             'time'         => 'required|date_format:H:i',
         ]);
+
+        // Se esisteva un record blacklist per lo stesso (date, time), rimuovilo:
+        // ora quell'orario diventa un override "vero".
+        ProductSpecialSchedule::where('product_id', $product->id)
+            ->where('date', $data['date'])
+            ->where('time', $data['time'])
+            ->where('is_disabled', true)
+            ->delete();
 
         $slot = ProductSpecialSchedule::create([
             'product_id'   => $product->id,

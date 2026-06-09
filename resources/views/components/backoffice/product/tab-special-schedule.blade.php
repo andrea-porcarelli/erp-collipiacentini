@@ -150,6 +150,19 @@
     .special-slot-item {
         border-bottom: 1px solid #f0f0f0;
     }
+    .special-slot-item--disabled .special-slot-header > .fw-medium {
+        text-decoration: line-through;
+        color: var(--text-disabled, #999);
+    }
+    .special-slot-item--disabled .special-slot-body {
+        display: none !important;
+    }
+    .special-slot-disabled-badge {
+        background: var(--brand-error-brandlight, #FDECEC);
+        color: var(--brand-error-brand, #C62828);
+        font-size: 11px;
+        padding: 3px 8px;
+    }
     .special-slot-header {
         display: flex;
         align-items: center;
@@ -302,10 +315,11 @@
                 } else {
                     $list.html(res.html);
                 }
-                if (res.is_override) { _overrideDates.add(isoDate); }
+                if (res.is_override || res.has_exceptions) { _overrideDates.add(isoDate); }
                 else { _overrideDates.delete(isoDate); }
-                // In preview (nessun override) "Ripristina default" è un no-op: nascondilo.
-                $('.btn-reset-special-date').toggle(!res.is_preview);
+                // "Ripristina default" rimuove tutto ciò che è custom per la data:
+                // override completi e/o eccezioni (slot disabilitati).
+                $('.btn-reset-special-date').toggle(res.is_override || !!res.has_exceptions);
                 renderCalendar();
             },
             catch: function () {
@@ -576,6 +590,31 @@
             catch: function (err) {
                 toastr.error((err && err.responseJSON && err.responseJSON.message) || 'Errore');
                 $btn.prop('disabled', false);
+            },
+        }]);
+    });
+
+    /* Toggle disabilita/riabilita slot del template per la data corrente */
+    $(document).on('click', '.btn-special-slot-disable-toggle', function () {
+        if (!_selectedDate) return;
+        var $item = $(this).closest('.special-slot-item');
+        var time  = $item.attr('data-time');
+        if (!time) return;
+        var $btn = $(this).prop('disabled', true);
+
+        $(document).trigger('fetch', [{
+            path: '/products/' + PRODUCT_ID + '/special-schedule/toggle-disable',
+            method: 'post',
+            data: { date: _selectedDate, time: time },
+            then: function (res) {
+                $btn.prop('disabled', false);
+                loadSpecialSlots(_selectedDate);
+                loadOverrideDates();
+                toastr.success(res.is_disabled ? 'Slot disattivato per questa data' : 'Slot riattivato');
+            },
+            catch: function () {
+                $btn.prop('disabled', false);
+                toastr.error('Errore durante l\'operazione');
             },
         }]);
     });

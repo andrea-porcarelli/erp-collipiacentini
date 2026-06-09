@@ -9,13 +9,6 @@ import {
 // Form save configs
 // ---------------------------------------------------------------------------
 const formConfigs = {
-    'form-partner-status': {
-        endpoint: () => `/partners/${window.PARTNER_ID}`,
-        method: 'put',
-        section: 'status',
-        successMessage: 'Stato partner aggiornato con successo',
-        validate: () => ({}),
-    },
     'form-partner-info': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
@@ -61,6 +54,14 @@ const formConfigs = {
         successMessage: 'Descrizione aggiornata con successo',
         validate: () => ({}),
         collect: () => ({ description_short: richEditors.get('description_short')?.getData() ?? '' }),
+    },
+    'form-partner-policy-contatti': {
+        endpoint: () => `/partners/${window.PARTNER_ID}`,
+        method: 'put',
+        section: 'translatable',
+        successMessage: 'Pagina contatti aggiornata con successo',
+        validate: () => ({}),
+        collect: () => ({ contacts_content: richEditors.get('contacts_content')?.getData() ?? '' }),
     },
     'form-partner-policy-privacy-policy': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
@@ -449,28 +450,34 @@ const richEditorConfig = {
 
 const fieldLabels = {
     description_short: 'Breve descrizione',
+    contacts_content:  'Pagina contatti',
     privacy_policy:    'Privacy Policy',
     cookie_policy:     'Cookie Policy',
     terms_conditions:  'Termini e Condizioni',
 };
 
 const initRichEditors = async () => {
-    // Editor per documenti legali (textarea con id legal-editor-*, data-legal-field=field)
-    const legalTextareas = document.querySelectorAll('textarea[id^="legal-editor-"]');
-    for (const el of legalTextareas) {
-        await mountRichEditor(el, el.dataset.legalField);
+    // Editor per documenti legali e pagina contatti
+    // (wrapper .legal-rich-editor con data-legal-field e data-it; textarea figlia)
+    const legalWrappers = document.querySelectorAll('.legal-rich-editor');
+    for (const wrapper of legalWrappers) {
+        const textarea = wrapper.querySelector('textarea');
+        if (!textarea) continue;
+        const field = wrapper.dataset.legalField;
+        const initialValue = wrapper.dataset.it || '';
+        await mountRichEditor(textarea, field, initialValue);
     }
 
     // Editor per la breve descrizione (textarea con id partner-description-editor)
     const descEl = document.getElementById('partner-description-editor');
     if (descEl) {
-        await mountRichEditor(descEl, 'description_short');
+        await mountRichEditor(descEl, 'description_short', descEl.dataset.it || '');
     }
 };
 
-const mountRichEditor = async (el, field) => {
+const mountRichEditor = async (el, field, initialValue = '') => {
     const editor = await ClassicEditor.create(el, richEditorConfig);
-    editor.setData(el.dataset.it || '');
+    editor.setData(initialValue);
     editor.model.document.on('change:data', () => {
         $(el).closest('.card-miticko').find('.btn-save-card')
             .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
@@ -481,6 +488,16 @@ const mountRichEditor = async (el, field) => {
 const langFlag = (isoCode) => {
     const flags = { it: '🇮🇹', en: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', es: '🇪🇸', pt: '🇵🇹', nl: '🇳🇱', ru: '🇷🇺', zh: '🇨🇳', ja: '🇯🇵', ar: '🇸🇦' };
     return flags[isoCode.toLowerCase()] || '🏳';
+};
+
+// Editor CKEditor montati per lingua nel modal traduzioni
+const translationEditors = new Map(); // language_id → ClassicEditor
+
+const destroyTranslationEditors = async () => {
+    for (const editor of translationEditors.values()) {
+        try { await editor.destroy(); } catch (e) {}
+    }
+    translationEditors.clear();
 };
 
 const renderTranslationBody = (data) => {
@@ -496,17 +513,32 @@ const renderTranslationBody = (data) => {
             </div>
             <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                 <div class="text-field-container">
-                    <textarea class="input-miticko" name="value" rows="6">${escapeHtml(lang.value || '')}</textarea>
+                    <textarea class="input-miticko translation-editor"
+                              data-language-id="${lang.language_id}"
+                              data-initial="${escapeHtml(lang.value || '')}"
+                              name="value"
+                              rows="6"></textarea>
                 </div>
             </div>
         </div>
     `).join('');
 };
 
-const openTranslationsModal = (field) => {
+const mountTranslationEditors = async () => {
+    const textareas = document.querySelectorAll('#modal-trans-body .translation-editor');
+    for (const el of textareas) {
+        const editor = await ClassicEditor.create(el, richEditorConfig);
+        editor.setData(el.dataset.initial || '');
+        translationEditors.set(String(el.dataset.languageId), editor);
+    }
+};
+
+const openTranslationsModal = async (field) => {
     const $modal = $('#modal-translations');
     const path = `/partners/${window.PARTNER_ID}/translations/${field}`;
     const label = fieldLabels[field] || 'Campo';
+
+    await destroyTranslationEditors();
 
     $modal.find('.modal-title').text(`Traduci — ${label}`);
     $('#modal-trans-body').html('<div class="text-center py-3"><i class="fa-regular fa-spinner fa-spin"></i></div>');
@@ -514,8 +546,9 @@ const openTranslationsModal = (field) => {
     $modal.modal('show');
 
     App.ajax({ path, method: 'get' })
-        .then((res) => {
+        .then(async (res) => {
             $('#modal-trans-body').html(renderTranslationBody(res.data));
+            await mountTranslationEditors();
         })
         .catch(() => {
             $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
@@ -529,10 +562,10 @@ const saveTranslations = () => {
 
     const translations = [];
     $modal.find('.translation-lang').each(function () {
-        translations.push({
-            language_id: parseInt($(this).data('language-id')),
-            value: $(this).find('[name="value"]').val() || '',
-        });
+        const languageId = parseInt($(this).data('language-id'));
+        const editor = translationEditors.get(String(languageId));
+        const value = editor ? editor.getData() : ($(this).find('[name="value"]').val() || '');
+        translations.push({ language_id: languageId, value });
     });
 
     App.ajax({ path: savePath, method: 'put', data: { translations } })
@@ -547,7 +580,7 @@ const initTranslations = () => {
     // Pulsante globo accanto agli editor delle policy
     $(document).on('click', '.btn-legal-translations', function () {
         const type = $(this).data('legal-type');
-        const mapping = { 'privacy-policy': 'privacy_policy', 'cookie-policy': 'cookie_policy', 'termini-condizioni': 'terms_conditions' };
+        const mapping = { 'contatti': 'contacts_content', 'privacy-policy': 'privacy_policy', 'cookie-policy': 'cookie_policy', 'termini-condizioni': 'terms_conditions' };
         const field = mapping[type];
         if (field) openTranslationsModal(field);
     });
@@ -558,6 +591,46 @@ const initTranslations = () => {
     });
 
     $(document).on('click', '#modal-translations .btn-save-translations', saveTranslations);
+    $(document).on('hidden.bs.modal', '#modal-translations', destroyTranslationEditors);
+};
+
+// ---------------------------------------------------------------------------
+// Copia URL pagina (slug di sistema)
+// ---------------------------------------------------------------------------
+const initCopyUrl = () => {
+    $(document).on('click', '.partner-url-copy .fa-copy', function () {
+        const $icon = $(this);
+        const $wrapper = $icon.closest('.partner-url-copy');
+        const value = $wrapper.data('url') || $wrapper.find('input').val();
+        if (!value) return;
+
+        const fallback = () => {
+            const $tmp = $('<textarea>').val(value).appendTo('body').select();
+            try { document.execCommand('copy'); } catch (e) {}
+            $tmp.remove();
+        };
+
+        if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(value).catch(fallback);
+        } else {
+            fallback();
+        }
+
+        const originalClass = $icon.attr('class');
+        $icon.attr('class', 'fa-regular fa-check icon text-success');
+        $wrapper.find('input').addClass('border-success');
+        setTimeout(() => {
+            $icon.attr('class', originalClass);
+            $wrapper.find('input').removeClass('border-success');
+        }, 1400);
+
+        toastr.success('URL copiato negli appunti');
+    });
+
+    // Cursore pointer sull'icona copia
+    $(document).on('mouseenter', '.partner-url-copy .fa-copy', function () {
+        $(this).css('cursor', 'pointer');
+    });
 };
 
 // ---------------------------------------------------------------------------
@@ -579,6 +652,7 @@ const init = () => {
     initLogo();
     initDeletePartner();
     initTranslations();
+    initCopyUrl();
     initRichEditors();
 };
 

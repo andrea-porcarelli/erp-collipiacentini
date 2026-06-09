@@ -161,6 +161,7 @@ class ProductController extends CrudController
 
             match ($request->input('section')) {
                 'settings' => $this->updateSettings($product, $request),
+                'ecommerce' => $this->updateEcommerce($product, $request),
                 'duration' => $this->updateDuration($product, $request),
                 'categories' => $this->updateCategories($product, $request),
                 'public' => $this->updatePublic($product, $request),
@@ -185,6 +186,15 @@ class ProductController extends CrudController
             $data['is_active'] = $request->input('is_active', '0');
         }
         $this->interface->edit($product, $data);
+    }
+
+    private function updateEcommerce(Product $product, UpdateProductRequest $request): void
+    {
+        $product->setContentFields([
+            'short_title' => $request->input('short_title'),
+            'short_description' => $request->input('short_description'),
+            'long_title' => $request->input('long_title'),
+        ]);
     }
 
     private function updateDuration(Product $product, UpdateProductRequest $request): void

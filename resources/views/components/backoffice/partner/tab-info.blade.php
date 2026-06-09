@@ -1,22 +1,7 @@
 @props(['model', 'hasOrders' => false])
 
 <div class="tab-pane fade show active" id="partner-info-panel" role="tabpanel">
-    <x-card title="Stato partner" class="position-relative">
-        <div class="row mt-3">
-            <div class="col-12 col-md-6">
-                <form id="form-partner-status">
-                    <x-select name="is_active" label="Stato partner" placeholder="Stato partner" required
-                              :options="[['id' => 1, 'label' => 'Abilitato'],['id' => 0, 'label' => 'Non Abilitato']]"
-                              icon="fa-regular fa-lock-open" :model="$model" />
-                </form>
-            </div>
-        </div>
-        <div class="button-card-absolute">
-            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-        </div>
-    </x-card>
-
-    <x-card title="Informazioni partner" sub_title="Dati principali del partner" class="mt-4 position-relative">
+    <x-card title="Informazioni generali" sub_title="Dati principali del partner" class="position-relative">
         <form id="form-partner-info">
             <div class="row">
                 <div class="col-12 col-sm-4">
@@ -28,16 +13,19 @@
                              :message="$hasOrders ? 'Non modificabile: esistono ordini registrati' : null" />
                 </div>
                 <div class="col-12 col-sm-4">
+                    <x-select name="is_active" label="Stato partner" placeholder="Stato partner" required
+                              :options="[['id' => 1, 'label' => 'Abilitato'],['id' => 0, 'label' => 'Non Abilitato']]"
+                              icon="fa-regular fa-lock-open" :model="$model" />
+                </div>
+                <div class="col-12 col-sm-4 mt-3">
                     <x-input :model="$model" name="email_notify" label="Email notifiche" />
                 </div>
             </div>
         </form>
-        <div class="button-card-absolute">
-            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-        </div>
-    </x-card>
 
-    <x-card title="Logo partner" class="mt-4 position-relative">
+        <hr class="my-4">
+
+        <div class="mb-2 fw-semibold">Logo partner</div>
         <div class="d-flex flex-column align-items-start gap-3">
             <div id="partner-logo-preview" class="d-flex align-items-center justify-content-center border rounded bg-light" style="min-width:200px;height:100px;padding:8px;overflow:hidden">
                 @if($model->logo)
@@ -52,6 +40,10 @@
                 <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="MediumLow" status="Error" size="Small" :style="$model->logo ? '' : 'display:none'" />
             </div>
             <p class="text-secondary small mb-0">Formato consigliato orizzontale. Altezza massima di visualizzazione: 80px. Max 2MB.</p>
+        </div>
+
+        <div class="button-card-absolute">
+            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
 
@@ -135,6 +127,15 @@
         </form>
         <div class="button-card-absolute">
             <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
+        </div>
+    </x-card>
+
+
+    <x-card title="Gestione utenti" class="mt-4 position-relative">
+        <x-backoffice.partner.users :model="$model" />
+        <div class="button-card-absolute">
+            <x-button class="btn-user-add" status="Secondary" emphasis="MediumLow" label="Aggiungi account" leading="fa-plus" />
+            <x-button class="btn-save-users" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
 

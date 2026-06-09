@@ -106,7 +106,13 @@
 
                     {{-- Step 2: Dati anagrafici --}}
                     <div id="step2-card" style="display: none;">
-                    <x-card class="cart-card step-card" title="Inserisci i tuoi dati" sub_title="per alcuni prodotti serve emettere la fattura, assicurati che i dati siano corretti">
+                    @php($customerFieldMap = [
+                        'address'    => ['label' => 'Indirizzo di residenza', 'type' => 'text', 'payload' => 'address'],
+                        'birth_date' => ['label' => 'Data di nascita',        'type' => 'date', 'payload' => 'birth_date'],
+                        'phone'      => ['label' => 'Cellulare',              'type' => 'tel',  'payload' => 'phone'],
+                        'tax_code'   => ['label' => 'Codice fiscale',         'type' => 'text', 'payload' => 'fiscal_code'],
+                    ])
+                    <x-card class="cart-card step-card" title="Inserisci i tuoi dati" sub_title="i dati richiesti sono solo quelli necessari per questo prodotto">
                         <div class="cart-item">
                             <form id="customer-form" class="customer-form">
                                 <div class="form-row">
@@ -119,64 +125,21 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <x-input name="email" label="Email" required />
-                                </div>
-                                <div class="form-group">
-                                    <x-input name="address" label="Indirizzo" required />
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <x-input name="zip_code" label="CAP" required />
-                                    </div>
-                                    <div class="form-group">
-                                        <x-input name="city" label="Città" required />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="country">Paese *</label>
-                                    <div class="country-select-wrapper">
-                                        <span class="country-flag" id="selected-flag">🇮🇹</span>
-                                        <select id="country" name="country" required>
-                                            <option value="IT" data-flag="🇮🇹" selected>Italia</option>
-                                            <option value="DE" data-flag="🇩🇪">Germania</option>
-                                            <option value="FR" data-flag="🇫🇷">Francia</option>
-                                            <option value="ES" data-flag="🇪🇸">Spagna</option>
-                                            <option value="GB" data-flag="🇬🇧">Regno Unito</option>
-                                            <option value="AT" data-flag="🇦🇹">Austria</option>
-                                            <option value="CH" data-flag="🇨🇭">Svizzera</option>
-                                            <option value="BE" data-flag="🇧🇪">Belgio</option>
-                                            <option value="NL" data-flag="🇳🇱">Paesi Bassi</option>
-                                            <option value="PT" data-flag="🇵🇹">Portogallo</option>
-                                            <option value="PL" data-flag="🇵🇱">Polonia</option>
-                                            <option value="SE" data-flag="🇸🇪">Svezia</option>
-                                            <option value="NO" data-flag="🇳🇴">Norvegia</option>
-                                            <option value="DK" data-flag="🇩🇰">Danimarca</option>
-                                            <option value="FI" data-flag="🇫🇮">Finlandia</option>
-                                            <option value="IE" data-flag="🇮🇪">Irlanda</option>
-                                            <option value="GR" data-flag="🇬🇷">Grecia</option>
-                                            <option value="CZ" data-flag="🇨🇿">Repubblica Ceca</option>
-                                            <option value="RO" data-flag="🇷🇴">Romania</option>
-                                            <option value="HU" data-flag="🇭🇺">Ungheria</option>
-                                            <option value="US" data-flag="🇺🇸">Stati Uniti</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <x-input name="phone" label="Cellulare" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <x-input name="fiscal_code" label="Codice fiscale" required />
+                                    <x-input name="email" type="email" label="Email" required />
                                 </div>
 
                                 @foreach($cart->product->customerFields->sortBy('fieldType.sort_order') as $field)
-                                    <div class="form-group">
-                                        <x-input
-                                            name="{{ $field->fieldType->key }}"
-                                            label="{{ $field->fieldType->label }}"
-                                            :required="$field->is_required"
-                                        />
-                                    </div>
+                                    @php($cfg = $customerFieldMap[$field->fieldType->key] ?? null)
+                                    @if($cfg)
+                                        <div class="form-group">
+                                            <x-input
+                                                name="{{ $cfg['payload'] }}"
+                                                type="{{ $cfg['type'] }}"
+                                                label="{{ $cfg['label'] }}"
+                                                :required="(bool) $field->is_required"
+                                            />
+                                        </div>
+                                    @endif
                                 @endforeach
 
                                 <div class="form-group">
@@ -1021,72 +984,24 @@
             });
         }
 
-        // Event listener per cambio paese (aggiorna bandiera)
-        const countrySelect = document.getElementById('country');
-        const selectedFlag = document.getElementById('selected-flag');
-        if (countrySelect && selectedFlag) {
-            countrySelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const flag = selectedOption.getAttribute('data-flag');
-                if (flag) {
-                    selectedFlag.textContent = flag;
-                }
-            });
-        }
-
         // Event listener per "Procedi al pagamento"
         if (btnToPayment) {
             btnToPayment.addEventListener('click', function() {
                 const form = document.getElementById('customer-form');
-                const name = form.querySelector('[name="name"]');
-                const surname = form.querySelector('[name="surname"]');
-                const email = form.querySelector('[name="email"]');
-                const address = form.querySelector('[name="address"]');
-                const zipCode = form.querySelector('[name="zip_code"]');
-                const city = form.querySelector('[name="city"]');
-                const country = form.querySelector('[name="country"]');
-                const phone = form.querySelector('[name="phone"]');
-                const fiscalCode = form.querySelector('[name="fiscal_code"]');
-                const birthDate = form.querySelector('[name="birth_date"]');
                 const privacy = document.getElementById('privacy');
                 const newsletter = document.getElementById('newsletter');
 
-                // Reset errori
-                form.querySelectorAll('input, select').forEach(input => {
-                    input.classList.remove('error');
-                });
+                form.querySelectorAll('input, select').forEach(input => input.classList.remove('error'));
 
                 let hasError = false;
 
-                // Validazione campi obbligatori
-                if (!name || !name.value.trim()) {
-                    if (name) name.classList.add('error');
-                    hasError = true;
-                }
-                if (!surname || !surname.value.trim()) {
-                    if (surname) surname.classList.add('error');
-                    hasError = true;
-                }
-                if (!email || !email.value.trim()) {
-                    if (email) email.classList.add('error');
-                    hasError = true;
-                }
-                if (!address || !address.value.trim()) {
-                    if (address) address.classList.add('error');
-                    hasError = true;
-                }
-                if (!zipCode || !zipCode.value.trim()) {
-                    if (zipCode) zipCode.classList.add('error');
-                    hasError = true;
-                }
-                if (!city || !city.value.trim()) {
-                    if (city) city.classList.add('error');
-                    hasError = true;
-                }
-                if (!phone || !phone.value.trim()) {
-                    if (phone) phone.classList.add('error');
-                    hasError = true;
-                }
+                form.querySelectorAll('input[required]:not([type="checkbox"]), select[required]').forEach(input => {
+                    if (!input.value.trim()) {
+                        input.classList.add('error');
+                        hasError = true;
+                    }
+                });
+
                 if (!privacy || !privacy.checked) {
                     alert('Devi accettare la Privacy Policy per procedere');
                     hasError = true;
@@ -1096,12 +1011,16 @@
                     return;
                 }
 
-                // Disabilita il bottone
+                const payload = { privacy: privacy.checked, newsletter: !!(newsletter && newsletter.checked) };
+                form.querySelectorAll('input[name], select[name]').forEach(input => {
+                    if (input.type === 'checkbox' || input.name === 'privacy' || input.name === 'newsletter') return;
+                    payload[input.name] = input.value.trim();
+                });
+
                 const btn = this;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvataggio...';
 
-                // Salva i dati cliente
                 fetch('/shop/cart/customer', {
                     method: 'POST',
                     headers: {
@@ -1109,20 +1028,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        name: name.value.trim(),
-                        surname: surname.value.trim(),
-                        email: email.value.trim(),
-                        address: address.value.trim(),
-                        zip_code: zipCode.value.trim(),
-                        city: city.value.trim(),
-                        country: country ? country.value : 'IT',
-                        phone: phone.value.trim(),
-                        fiscal_code: fiscalCode ? fiscalCode.value.trim() : null,
-                        birth_date: birthDate ? birthDate.value : null,
-                        privacy: privacy.checked,
-                        newsletter: newsletter ? newsletter.checked : false
-                    })
+                    body: JSON.stringify(payload)
                 })
                 .then(response => response.json())
                 .then(data => {

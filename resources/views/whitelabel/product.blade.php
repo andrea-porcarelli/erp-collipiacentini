@@ -11,7 +11,7 @@
                 <x-whitelabel.sidebar :partner="$partner" :date="false" />
             </aside>
             <div class="col-12 col-sm-9">
-                <x-card :pre_title="$product->partner?->partner_name" :title="$product->meta_title" class="product-card" h1="true" leading="fa-shield-check">
+                <x-card :pre_title="$product->partner?->partner_name" :title="$product->contentField('long_title')" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->product_tags !!}
                     <div class="button-progress">
                         <x-button label="Data" id="btn-date" emphasis="MediumLow" class="btn-create-category" size="Small" leading="fa-calendar" class="btn-date " />
