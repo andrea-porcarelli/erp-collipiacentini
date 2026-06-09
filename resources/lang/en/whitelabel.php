@@ -27,6 +27,8 @@ return [
     'products' => [
         'no_availability' => 'No availability found',
         'free'            => 'FREE',
+        'buy'             => 'Buy',
+        'book'            => 'Book',
     ],
 
     // Filters

@@ -109,7 +109,22 @@
             sub_title="Verrà mostrata nella home website del partner (testata) della sua pagina prodotto e ogni prodotto che ha in vendita."
             class="mt-4 position-relative">
         <form id="form-partner-description">
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6">
+                    <x-input name="hero_title"
+                             label="Hero – Titolo"
+                             placeholder="Titolo mostrato nella testata della home"
+                             :value="$model->contentField('hero_title', 'it') ?? ''" />
+                </div>
+                <div class="col-12 col-sm-6">
+                    <x-input name="hero_subtitle"
+                             label="Hero – Sottotitolo"
+                             placeholder="Sottotitolo mostrato sotto il titolo della testata"
+                             :value="$model->contentField('hero_subtitle', 'it') ?? ''" />
+                </div>
+            </div>
             <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                <label>Descrizione</label>
                 <div class="text-field-container position-relative">
                     <textarea id="partner-description-editor"
                               name="description_short"

@@ -34,6 +34,8 @@ class PartnerController extends CrudController
      */
     private const TRANSLATABLE_FIELDS = [
         'description_short' => ['restricted' => false],
+        'hero_title'        => ['restricted' => false],
+        'hero_subtitle'     => ['restricted' => false],
         'contacts_content'  => ['restricted' => false],
         'privacy_policy'    => ['restricted' => true],
         'cookie_policy'     => ['restricted' => true],

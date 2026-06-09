@@ -8,8 +8,8 @@
     <div class="container mt-5">
         <div class="row w-100">
             <div class="col-12 text-center hero mt-spacing-3xl mb-spacing-3xl">
-                <h1>{{ __('whitelabel.hero.title', ['partner' => $partner->partner_name]) }}</h1>
-                <h5>{{ __('whitelabel.hero.subtitle') }}</h5>
+                <h1>{{ $partner->contentField('hero_title', app()->getLocale()) ?: __('whitelabel.hero.title', ['partner' => $partner->partner_name]) }}</h1>
+                <h5>{{ $partner->contentField('hero_subtitle', app()->getLocale()) ?: __('whitelabel.hero.subtitle') }}</h5>
             </div>
         </div>
         <div class="row w-100">

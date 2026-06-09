@@ -53,7 +53,11 @@ const formConfigs = {
         section: 'translatable',
         successMessage: 'Descrizione aggiornata con successo',
         validate: () => ({}),
-        collect: () => ({ description_short: richEditors.get('description_short')?.getData() ?? '' }),
+        collect: () => ({
+            description_short: richEditors.get('description_short')?.getData() ?? '',
+            hero_title: document.querySelector('#form-partner-description [name="hero_title"]')?.value ?? '',
+            hero_subtitle: document.querySelector('#form-partner-description [name="hero_subtitle"]')?.value ?? '',
+        }),
     },
     'form-partner-policy-contatti': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,

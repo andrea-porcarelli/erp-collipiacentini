@@ -693,3 +693,6 @@ body {
 #datePickerModal .modal-dialog {
     width: fit-content;
 }
+.mr-spacing-4xl {
+    margin-right: var(--spacing-4xl, 16px);
+}

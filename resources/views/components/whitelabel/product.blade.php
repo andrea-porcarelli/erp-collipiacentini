@@ -13,7 +13,7 @@
             <img title="{{ $product->contentField('short_title') }}" alt="{{ $product->contentField('short_title') }}" src="{{ $productImageUrl }}">
         </figure>
         <section>
-            <div class="product-detail">
+            <div class="product-detail mr-spacing-4xl">
                 @if($product->is_available)
                     <x-label appearance="Success">DISPONIBILE</x-label>
                 @else
@@ -34,7 +34,7 @@
                 <div class="price">
                     <b>{{ $product->is_free ? __('whitelabel.products.free') : Utils::price($product->lowest_price_with_commission) }}</b>
                     <x-button
-                        label="Acquista"
+                        :label="$product->is_free ? __('whitelabel.products.book') : __('whitelabel.products.buy')"
                         emphasis="High"
                         status="Primary"
                         trailing="fa-ticket-perforated"
@@ -53,7 +53,7 @@
             <div class="price">
                 <b>{{ $product->is_free ? __('whitelabel.products.free') : Utils::price($product->lowest_price_with_commission) }}</b>
                 <x-button
-                    label="Acquista"
+                    :label="$product->is_free ? __('whitelabel.products.book') : __('whitelabel.products.buy')"
                     trailing="fa-ticket-perforated"
                     :href="$product->route"
                 />

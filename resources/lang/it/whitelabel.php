@@ -26,7 +26,9 @@ return [
     // Products
     'products' => [
         'no_availability' => 'Nessuna disponibilità trovata',
-        'free'            => 'GRATUITO',
+        'free'            => 'Gratis',
+        'buy'             => 'Acquista',
+        'book'            => 'Prenota',
     ],
 
     // Filters
