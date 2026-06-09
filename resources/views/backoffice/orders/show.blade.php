@@ -349,7 +349,14 @@
                 @else
                     @foreach($customerConsents as $i => $consent)
                         <div class="consent-block @if($i > 0) mt-spacing-l @endif">
-                            <div class="detail-value"><i class="fa-solid fa-check"></i> {{ $consent['label'] }}</div>
+                            <div class="detail-value">
+                                @if($consent['accepted'])
+                                    <i class="fa-solid fa-check"></i>
+                                @else
+                                    <i class="fa-solid fa-xmark text-secondary"></i>
+                                @endif
+                                {{ $consent['label'] }}
+                            </div>
                             <div class="detail-label mt-spacing-xs">
                                 <i class="fa-regular fa-calendar"></i>
                                 Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
