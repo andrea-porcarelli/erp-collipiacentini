@@ -104,6 +104,52 @@
         }
         #partnerTabsContent .tab-pane { display: none; }
         #partnerTabsContent .tab-pane.show.active { display: block; }
+
+        /* Consensi: check "Obbligatorio" arancio (fill solid + check bianco) */
+        .consent-required-wrap { cursor: pointer; user-select: none; }
+        .consent-required-wrap.disabled { cursor: default; opacity: 0.75; }
+        .consent-check-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: transparent;
+            border: 1.5px solid #d1d5db;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .consent-check-box.checked {
+            background: #FF8A50;
+            border-color: #FF8A50;
+        }
+        .consent-check-box i {
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Consensi: stato disabilitato e drag */
+        .consent-item.consent-disabled .card-miticko { opacity: 0.55; }
+        .consent-item.consent-disabled .consent-handle,
+        .consent-item.consent-disabled .consent-disabled-badge { opacity: 1; }
+        .consent-item .sortable-ghost,
+        #consents-list .sortable-ghost { opacity: 0.4; background: #f1f3f5; }
+
+        /* Link visibili dentro al rich editor (CKEditor) */
+        .ck.ck-content a,
+        .ck.ck-content a:visited,
+        .ck-editor__editable a,
+        .ck-editor__editable a:visited {
+            color: #0d6efd !important;
+            text-decoration: underline !important;
+            text-decoration-color: #0d6efd !important;
+            text-decoration-thickness: 1px !important;
+        }
+        .ck.ck-content a:hover,
+        .ck-editor__editable a:hover {
+            color: #0a58ca !important;
+            text-decoration: underline !important;
+        }
     </style>
 @endsection
 

@@ -1,17 +1,6 @@
 @props(['model', 'type', 'field', 'label', 'slug', 'panelId'])
 
-@php
-    $slugPath = ltrim($slug, '/');
-    $domain   = $model->domain_name ?: null;
-    if ($model->sale_method === 'whitelabel_domain' && $domain) {
-        $base = preg_match('#^https?://#i', $domain) ? rtrim($domain, '/') : 'https://' . rtrim($domain, '/');
-        $pageUrl = $base . '/' . $slugPath;
-    } elseif ($model->sale_method === 'whitelabel_no_domain' && $domain) {
-        $pageUrl = 'https://miticko.com/' . trim($domain, '/') . '/' . $slugPath;
-    } else {
-        $pageUrl = '/' . $slugPath;
-    }
-@endphp
+@php($pageUrl = $model->pageUrl($slug))
 
 <div class="tab-pane fade" id="{{ $panelId }}" role="tabpanel">
     <x-card :title="$label"  class="position-relative">

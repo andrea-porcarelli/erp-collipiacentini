@@ -36,6 +36,9 @@ use App\Repositories\ProductRelatedRepository;
 use App\Interfaces\ProductCustomerFieldInterface;
 use App\Repositories\ProductCustomerFieldRepository;
 
+use App\Interfaces\PartnerConsentInterface;
+use App\Repositories\PartnerConsentRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -57,6 +60,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductLinkInterface::class, ProductLinkRepository::class);
         $this->app->bind(ProductRelatedInterface::class, ProductRelatedRepository::class);
         $this->app->bind(ProductCustomerFieldInterface::class, ProductCustomerFieldRepository::class);
+        $this->app->bind(PartnerConsentInterface::class, PartnerConsentRepository::class);
 
     }
 

@@ -142,19 +142,36 @@
                                     @endif
                                 @endforeach
 
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="privacy" name="privacy" required>
-                                        <span>Accetto la <a href="#" target="_blank">Privacy Policy</a> *</span>
-                                    </label>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="newsletter" name="newsletter">
-                                        <span>Desidero ricevere comunicazioni commerciali</span>
-                                    </label>
-                                </div>
+                                @if($partnerConsents->isNotEmpty())
+                                    @foreach($partnerConsents as $pc)
+                                        @php($pcText = $pc->contentField('content', app()->getLocale()) ?: ($pc->contentField('content', 'it') ?? ''))
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox"
+                                                       class="partner-consent"
+                                                       name="consents[{{ $pc->id }}]"
+                                                       value="1"
+                                                       data-consent-id="{{ $pc->id }}"
+                                                       data-required="{{ $pc->is_required ? '1' : '0' }}"
+                                                       @if($pc->is_required) required @endif>
+                                                <span>{!! $pcText !!} @if($pc->is_required)*@endif</span>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="form-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="privacy" name="privacy" required>
+                                            <span>Accetto la <a href="#" target="_blank">Privacy Policy</a> *</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="newsletter" name="newsletter">
+                                            <span>Desidero ricevere comunicazioni commerciali</span>
+                                        </label>
+                                    </div>
+                                @endif
                             </form>
                         </div>
                     </x-card>
@@ -1002,7 +1019,24 @@
                     }
                 });
 
-                if (!privacy || !privacy.checked) {
+                const partnerConsents = form.querySelectorAll('.partner-consent');
+                const usingPartnerConsents = partnerConsents.length > 0;
+                const consents = {};
+
+                if (usingPartnerConsents) {
+                    partnerConsents.forEach(cb => {
+                        const id = cb.dataset.consentId;
+                        const required = cb.dataset.required === '1';
+                        consents[id] = cb.checked ? 1 : 0;
+                        if (required && !cb.checked) {
+                            cb.classList.add('error');
+                            hasError = true;
+                        }
+                    });
+                    if (hasError) {
+                        alert('Devi accettare tutti i consensi obbligatori per procedere');
+                    }
+                } else if (!privacy || !privacy.checked) {
                     alert('Devi accettare la Privacy Policy per procedere');
                     hasError = true;
                 }
@@ -1011,9 +1045,17 @@
                     return;
                 }
 
-                const payload = { privacy: privacy.checked, newsletter: !!(newsletter && newsletter.checked) };
+                const payload = {
+                    privacy: usingPartnerConsents ? true : !!(privacy && privacy.checked),
+                    consents,
+                };
+                if (!usingPartnerConsents) {
+                    payload.newsletter = !!(newsletter && newsletter.checked);
+                }
                 form.querySelectorAll('input[name], select[name]').forEach(input => {
-                    if (input.type === 'checkbox' || input.name === 'privacy' || input.name === 'newsletter') return;
+                    if (input.type === 'checkbox') return;
+                    if (input.name === 'privacy' || input.name === 'newsletter') return;
+                    if (input.name.startsWith('consents[')) return;
                     payload[input.name] = input.value.trim();
                 });
 

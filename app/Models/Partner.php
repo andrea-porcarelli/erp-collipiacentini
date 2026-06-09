@@ -1,10 +1,10 @@
 <?php
+
 namespace App\Models;
 
 use App\Traits\HasLanguageContent;
 use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -36,35 +36,71 @@ class Partner extends LogsModel
         'commission_miticko_fixed',
         'commission_miticko_variable',
         'commission_payment',
+        'consents_enabled',
+    ];
+
+    protected $casts = [
+        'consents_enabled' => 'boolean',
     ];
 
     public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno'];
 
-    public function products() : HasMany
+    public const PAGES = [
+        'contatti' => ['field' => 'contacts_content', 'title' => 'Contatti'],
+        'privacy-policy' => ['field' => 'privacy_policy',   'title' => 'Privacy Policy'],
+        'cookie-policy' => ['field' => 'cookie_policy',    'title' => 'Cookie Policy'],
+        'termini-condizioni' => ['field' => 'terms_conditions', 'title' => 'Termini e Condizioni'],
+    ];
+
+    public function pageUrl(string $slug): string
+    {
+        $slugPath = ltrim($slug, '/');
+        $domain = $this->domain_name ?: null;
+
+        if ($this->sale_method === 'whitelabel_domain' && $domain) {
+            $base = preg_match('#^https?://#i', $domain) ? rtrim($domain, '/') : 'https://'.rtrim($domain, '/');
+
+            return $base.'/'.$slugPath;
+        }
+
+        if ($this->sale_method === 'whitelabel_no_domain' && $domain) {
+            return 'https://miticko.com/'.trim($domain, '/').'/'.$slugPath;
+        }
+
+        return '/'.$slugPath;
+    }
+
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
-    public function orders() : HasMany
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    public function users() : HasMany
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    public function billing() : HasOne
+    public function billing(): HasOne
     {
         return $this->hasOne(PartnerBilling::class);
     }
 
-    public static function active() : Builder {
+    public function consents(): HasMany
+    {
+        return $this->hasMany(PartnerConsent::class)->orderBy('position');
+    }
+
+    public static function active(): Builder
+    {
         return self::where('is_active', true);
     }
 
-    public function getLabelAttribute() : string
+    public function getLabelAttribute(): string
     {
         return $this->partner_name ?? '';
     }
@@ -74,7 +110,7 @@ class Partner extends LogsModel
      * Deriva dal campo `css_style` (vedi Partner::CSS_STYLES) mappato
      * in minuscolo sulle chiavi di config('design.brands').
      */
-    public function getBrandAttribute() : string
+    public function getBrandAttribute(): string
     {
         $default = config('design.default_brand', 'miticko');
         $candidate = strtolower(trim((string) ($this->css_style ?? '')));
@@ -85,32 +121,32 @@ class Partner extends LogsModel
             : $default;
     }
 
-    public function active_products() : HasMany
+    public function active_products(): HasMany
     {
         return $this->products()->where('is_active', 1);
     }
 
-    public function media() : MorphMany
+    public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');
     }
 
-    public function logo() : MorphOne
+    public function logo(): MorphOne
     {
         return $this->morphOne(Media::class, 'mediable')->where('media_type', 'logo');
     }
 
-    public function cover() : MorphOne
+    public function cover(): MorphOne
     {
         return $this->morphOne(Media::class, 'mediable')->where('media_type', 'cover');
     }
 
-    public function gallery() : MorphMany
+    public function gallery(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery');
     }
 
-    public function resolvePresaleCommission(float $unitPrice) : float
+    public function resolvePresaleCommission(float $unitPrice): float
     {
         if (is_null($this->commission_presale_threshold)) {
             return 0.0;

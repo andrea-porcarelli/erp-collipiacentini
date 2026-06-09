@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
 use App\Mail\OrderConfirmationMail;
 use App\Models\Order;
+use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -204,6 +205,62 @@ class OrderController extends Controller
             $orderProduct->update($request->validated());
 
             return $this->success();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function availabilityDays(Order $order): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $product = $order->orderProducts()->first()?->product;
+            if (! $product) {
+                return $this->error(['response' => 'Nessun prodotto associato all\'ordine']);
+            }
+
+            $service = app(ProductAvailabilityService::class);
+            $ref = now()->startOfMonth();
+            $dates = [];
+            for ($m = 0; $m < 12; $m++) {
+                $dates = array_merge($dates, $service->getAvailableDaysForMonth($product, $ref->year, $ref->month));
+                $ref->addMonth();
+            }
+
+            return $this->success(['days' => array_values(array_unique($dates))]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function availabilitySlots(Order $order, Request $request): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+            $date = $request->query('date');
+            if (! $date) {
+                return $this->error(['response' => 'Data non specificata']);
+            }
+            $product = $order->orderProducts()->first()?->product;
+            if (! $product) {
+                return $this->error(['response' => 'Nessun prodotto associato all\'ordine']);
+            }
+
+            $service = app(ProductAvailabilityService::class);
+            if ($service->isDateClosed($product, $date)) {
+                return $this->success(['times' => [], 'closed' => true]);
+            }
+
+            $slots = $service->getSlotsForDate($product, $date);
+            $times = $slots->map(fn ($slot) => [
+                'time'         => $slot['time'],
+                'availability' => $slot['availability'],
+                'slot_type'    => $slot['slot_type'],
+                'slot_id'      => $slot['slot_id'],
+                'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
+            ])->values();
+
+            return $this->success(['times' => $times]);
         } catch (\Exception $e) {
             return $this->exception($e);
         }

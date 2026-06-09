@@ -2,7 +2,7 @@
 
 @php($billing = $model->billing ?? new \App\Models\PartnerBilling())
 
-<div class="tab-pane fade" id="partner-contacts-panel" role="tabpanel">
+<div class="tab-pane fade" id="partner-business-panel" role="tabpanel">
     <x-card title="Dati di fatturazione" sub_title="Anagrafica, sede legale e dati bancari" class="position-relative">
         <form id="form-partner-billing">
             <div class="row">
@@ -53,14 +53,6 @@
         </form>
         <div class="button-card-absolute">
             <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-        </div>
-    </x-card>
-
-    <x-card title="Gestione account" class="mt-4 position-relative">
-        <x-backoffice.partner.users :model="$model" />
-        <div class="button-card-absolute">
-            <x-button class="btn-user-add" status="Secondary" emphasis="MediumLow" label="Aggiungi account" leading="fa-plus" />
-            <x-button class="btn-save-users" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
 </div>

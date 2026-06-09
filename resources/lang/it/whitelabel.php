@@ -3,9 +3,10 @@
 return [
     // Header
     'menu' => [
-        'page_1' => 'Pagina 1',
-        'page_2' => 'Pagina 2',
-        'other_page' => 'Altra pagina',
+        'contacts'           => 'Contatti',
+        'privacy_policy'     => 'Privacy Policy',
+        'cookie_policy'      => 'Cookie Policy',
+        'terms_conditions'   => 'Termini e Condizioni',
     ],
     'languages' => [
         'italian' => 'Italiano',
@@ -43,8 +44,15 @@ return [
         'select_date' => 'Seleziona data',
         'castle_title' => 'Il castello',
         'useful_links_title' => 'Link utili',
-        'contacts' => 'Contatti',
-        'privacy_policy' => 'Privacy Policy',
+        'contacts'           => 'Contatti',
+        'privacy_policy'     => 'Privacy Policy',
+        'cookie_policy'      => 'Cookie Policy',
+        'terms_conditions'   => 'Termini e Condizioni',
+    ],
+
+    // Generic page
+    'page' => [
+        'empty' => 'Contenuto non ancora disponibile.',
     ],
 
     // Product card

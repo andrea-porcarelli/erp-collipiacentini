@@ -10,6 +10,41 @@
     @php($cardLabel = $order->card_brand ? ucfirst($order->card_brand) . ' · ' . ($order->card_last4 ?? '••••') : '—')
 
     {{-- HEADER --}}
+
+    @section('custom-css')
+    <style>
+        .modal {
+            --bs-modal-width: 350px !important;
+        }
+        .flatpickr-day {
+            font-weight:var(--weight,700);
+        }
+        .flatpickr-day.flatpickr-disabled {
+            text-decoration-line: line-through;
+            font-weight:var(--weight, 300);
+            color: var(--text-disabled, #999);
+        }
+        .flatpickr-day.selected {
+            border-radius: var(--border-radius-s, 8px) !important;
+            border: 1px solid var(--brand-secondary-brand, #3948D3);
+            background: var(--brand-secondary-brand, #3948D3);
+            line-height: 38px;
+        }
+        .flatpickr-day.today {
+            border: none;
+            border-radius: var(--border-radius-0, 0) !important;
+            background: var(--brand-secondary-brandlight, #EAEEFA) !important;
+            color: var(--brand-secondary-brand, #3948D3) !important;
+            text-align: center;
+
+            /* Title */
+            font-family: var(--typography-web-title-font, "DM Sans");
+            font-size: var(--size, 14px);
+            font-style: normal;
+            font-weight: var(--weight, 700);
+        }
+    </style>
+    @endsection
     <div class="order-show-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3 mb-spacing-2xl">
         <div class="d-flex gap-3 align-items-start">
             <a href="{{ route('orders.index') }}" class="text-decoration-none">
@@ -334,7 +369,13 @@
             receipt:              @json(route('orders.receipt', $model)),
             refund:               @json(route('orders.refund', $model)),
             ticketsBatchStatus:   @json(route('tickets.batchStatus')),
+            availabilityDays:     @json(route('orders.availabilityDays', $model)),
+            availabilitySlots:    @json(route('orders.availabilitySlots', $model)),
+        };
+        window.orderBooking = {
+            currentDate: @json($firstOp?->booking_date ? \Carbon\Carbon::parse($firstOp->booking_date)->format('Y-m-d') : null),
+            currentTime: @json($firstOp?->booking_time ? substr($firstOp->booking_time, 0, 5) : null),
         };
     </script>
-    <script type="module" src="{{ asset('backoffice/js/orders.js') }}"></script>
+    <script type="module" src="{{ asset('backoffice/js/orders.js') }}?v={{ filemtime(public_path('backoffice/js/orders.js')) }}"></script>
 @endpush

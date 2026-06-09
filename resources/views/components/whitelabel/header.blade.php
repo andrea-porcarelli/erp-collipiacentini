@@ -1,3 +1,4 @@
+@php($menuPartner = $partner ?? session('partner'))
 <nav class="navbar navbar-expand-lg mt-3">
     <div class="container">
         <div class="navbar-container d-flex justify-content-between w-100 align-items-center">
@@ -12,10 +13,13 @@
                                 <i class="fa-solid fa-bars"></i>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">{{ __('whitelabel.menu.page_1') }}</a></li>
-                                <li><a class="dropdown-item" href="#">{{ __('whitelabel.menu.page_2') }}</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">{{ __('whitelabel.menu.other_page') }}</a></li>
+                                @if($menuPartner)
+                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('contatti') }}">{{ __('whitelabel.menu.contacts') }}</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('privacy-policy') }}">{{ __('whitelabel.menu.privacy_policy') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('cookie-policy') }}">{{ __('whitelabel.menu.cookie_policy') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('termini-condizioni') }}">{{ __('whitelabel.menu.terms_conditions') }}</a></li>
+                                @endif
                             </ul>
                         </li>
                     </ul>

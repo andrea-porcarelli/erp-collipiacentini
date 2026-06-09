@@ -33,6 +33,11 @@ class Customer extends LogsModel
         return $this->hasMany(Order::class);
     }
 
+    public function consents(): HasMany
+    {
+        return $this->hasMany(CustomerConsent::class);
+    }
+
     public function getFullNameAttribute() : string
     {
         return sprintf('%s %s',$this->name, $this->surname);

@@ -445,6 +445,19 @@ const richEditorConfig = {
             'link',
         ],
     },
+    link: {
+        addTargetToExternalLinks: true,
+        decorators: {
+            openInNewTab: {
+                mode: 'automatic',
+                callback: () => true,
+                attributes: {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                },
+            },
+        },
+    },
     licenseKey: 'GPL',
 };
 
@@ -634,6 +647,295 @@ const initCopyUrl = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Consensi utente
+// ---------------------------------------------------------------------------
+const consentState = new Map(); // domId → { editor, translations:{iso:html}, currentLang:'it', dirty:bool }
+
+const partnerConsentsBasePath = () => `/partners/${window.PARTNER_ID}/consents`;
+
+const markConsentItemDirty = ($item) => {
+    $item.find('> .card-miticko .btn-save-card, .card-miticko .btn-save-card')
+        .first()
+        .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
+};
+
+const clearConsentItemDirty = ($item) => {
+    $item.find('> .card-miticko .btn-save-card, .card-miticko .btn-save-card')
+        .first()
+        .attr('data-mode', 'medium disabled');
+};
+
+const setConsentDirty = ($item, dirty = true) => {
+    const state = consentState.get($item.attr('data-dom-id'));
+    if (state) state.dirty = dirty;
+    if (dirty) markConsentItemDirty($item);
+    else clearConsentItemDirty($item);
+};
+
+const assignDomId = ($item) => {
+    let id = $item.attr('data-dom-id');
+    if (!id) {
+        id = 'consent-' + Math.random().toString(36).slice(2, 10);
+        $item.attr('data-dom-id', id);
+    }
+    return id;
+};
+
+const mountConsentEditor = async ($item) => {
+    const textarea = $item.find('.consent-editor').get(0);
+    if (!textarea) return;
+    const initial = textarea.dataset.initial || '';
+    const editor = await ClassicEditor.create(textarea, richEditorConfig);
+    editor.setData(initial);
+
+    const domId = assignDomId($item);
+    const state = {
+        editor,
+        translations: { it: initial },
+        currentLang: 'it',
+        dirty: false,
+        suppressDirty: false,
+    };
+    consentState.set(domId, state);
+
+    editor.model.document.on('change:data', () => {
+        const s = consentState.get(domId);
+        if (!s || s.suppressDirty) return;
+        s.translations[s.currentLang] = editor.getData();
+        setConsentDirty($item, true);
+    });
+};
+
+const initExistingConsents = async () => {
+    const items = $('#consents-list .consent-item').toArray();
+    for (const el of items) {
+        await mountConsentEditor($(el));
+    }
+};
+
+const fetchConsentLanguage = async (consentId, iso) => {
+    if (!consentId) return '';
+    const res = await App.ajax({
+        path: `${partnerConsentsBasePath()}/${consentId}/translations`,
+        method: 'get',
+    });
+    const list = res?.data || [];
+    const found = list.find(l => l.iso_code === iso);
+    return found?.content ?? '';
+};
+
+const changeConsentLanguage = async ($item, iso) => {
+    const domId = $item.attr('data-dom-id');
+    const state = consentState.get(domId);
+    if (!state) return;
+
+    // Salva il contenuto corrente nella cache della lingua precedente
+    state.translations[state.currentLang] = state.editor.getData();
+    state.currentLang = iso;
+
+    let next = state.translations[iso];
+    if (next === undefined) {
+        const consentId = $item.attr('data-consent-id');
+        next = consentId ? await fetchConsentLanguage(consentId, iso) : '';
+        state.translations[iso] = next;
+    }
+    state.suppressDirty = true;
+    state.editor.setData(next || '');
+    state.suppressDirty = false;
+};
+
+const buildConsentPayload = ($item) => {
+    const domId = $item.attr('data-dom-id');
+    const state = consentState.get(domId);
+    if (state) {
+        state.translations[state.currentLang] = state.editor.getData();
+    }
+    return {
+        is_required:   $item.find('.consent-required-input').val() === '1' ? 1 : 0,
+        expiry_days:   parseInt($item.find('.consent-expiry-days').val() || 0, 10),
+        expiry_months: parseInt($item.find('.consent-expiry-months').val() || 0, 10),
+        expiry_years:  parseInt($item.find('.consent-expiry-years').val() || 0, 10),
+        content_translations: state?.translations || {},
+    };
+};
+
+const saveSingleConsent = async ($item, $btn) => {
+    setLoading($btn, true);
+    try {
+        const state = consentState.get($item.attr('data-dom-id'));
+        const consentId = $item.attr('data-consent-id');
+        const isNew = !consentId;
+        const payload = buildConsentPayload($item);
+
+        const res = isNew
+            ? await App.ajax({ path: partnerConsentsBasePath(), method: 'post', data: payload })
+            : await App.ajax({ path: `${partnerConsentsBasePath()}/${consentId}`, method: 'put', data: payload });
+
+        if (isNew && res?.consent?.id) {
+            $item.attr('data-consent-id', String(res.consent.id));
+        }
+        if (state) state.dirty = false;
+        toastr.success('Consenso salvato');
+        clearConsentItemDirty($item);
+    } catch (e) {
+        toastr.error('Errore durante il salvataggio del consenso');
+    } finally {
+        setLoading($btn, false);
+    }
+};
+
+const addConsentRow = async () => {
+    const tpl = document.getElementById('consent-item-template');
+    if (!tpl) return;
+    const html = tpl.innerHTML;
+    const $new = $(html);
+    $new.removeAttr('data-consent-id');
+    $('#consents-list').append($new);
+    await mountConsentEditor($new);
+    setConsentDirty($new, true);
+};
+
+const deleteConsentRow = ($item) => {
+    const consentId = $item.attr('data-consent-id');
+    const domId = $item.attr('data-dom-id');
+
+    const purge = () => {
+        const s = consentState.get(domId);
+        if (s) { try { s.editor.destroy(); } catch (e) {} }
+        consentState.delete(domId);
+        $item.remove();
+    };
+
+    if (!consentId) {
+        purge();
+        return;
+    }
+
+    App.sweetConfirm('Vuoi eliminare definitivamente questo consenso?', () => {
+        App.ajax({ path: `${partnerConsentsBasePath()}/${consentId}`, method: 'delete' })
+            .then(() => {
+                purge();
+                toastr.success('Consenso eliminato');
+            })
+            .catch(() => toastr.error('Errore durante l\'eliminazione'));
+    }, null, 'Elimina consenso');
+};
+
+const enableConsents = () => {
+    const $btn = $('.btn-consents-enable');
+    setLoading($btn, true);
+    App.ajax({ path: `${partnerConsentsBasePath()}/enable`, method: 'post' })
+        .then(() => {
+            toastr.success('Sezione consensi abilitata');
+            setTimeout(() => window.location.reload(), 600);
+        })
+        .catch(() => {
+            setLoading($btn, false);
+            toastr.error('Errore durante l\'abilitazione');
+        });
+};
+
+let _consentsSortable = null;
+const initConsentsSortable = () => {
+    const el = document.getElementById('consents-list');
+    if (!el || typeof Sortable === 'undefined') return;
+    if (_consentsSortable) { _consentsSortable.destroy(); _consentsSortable = null; }
+    _consentsSortable = Sortable.create(el, {
+        handle: '.consent-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd() {
+            const ids = [...el.querySelectorAll('.consent-item[data-consent-id]')]
+                .map(it => it.getAttribute('data-consent-id'))
+                .filter(id => id);
+            if (ids.length === 0) return;
+            App.ajax({
+                path: `${partnerConsentsBasePath()}/reorder`,
+                method: 'post',
+                data: { ordered_ids: ids },
+            })
+                .then(() => toastr.success('Ordine aggiornato'))
+                .catch(() => toastr.error('Errore durante il riordinamento'));
+        },
+    });
+};
+
+const toggleConsentActive = ($item, $btn) => {
+    const consentId = $item.attr('data-consent-id');
+    if (!consentId) {
+        toastr.warning('Salva prima il consenso, poi potrai disabilitarlo.');
+        return;
+    }
+    const wasActive = $item.attr('data-is-active') === '1';
+    const nextActive = !wasActive;
+
+    setLoading($btn, true);
+    App.ajax({
+        path: `${partnerConsentsBasePath()}/${consentId}/toggle-active`,
+        method: 'put',
+        data: { is_active: nextActive ? 1 : 0 },
+    }).then(() => {
+        // Stop loading PRIMA di aggiornare l'icona: altrimenti setLoading
+        // ripristina l'icona "originale" salvata e annulla il cambio.
+        setLoading($btn, false);
+        $item.attr('data-is-active', nextActive ? '1' : '0');
+        $item.toggleClass('consent-disabled', !nextActive);
+        $item.find('.consent-disabled-badge').css('display', nextActive ? 'none' : 'inline-block');
+        $btn.find('.consent-toggle-label').text(nextActive ? 'Disabilita' : 'Abilita');
+        const $icon = $btn.find('i');
+        $icon.attr('class', `fa-regular ${nextActive ? 'fa-toggle-on' : 'fa-toggle-off'} icon me-1`);
+        $icon.removeData('original-class');
+        $btn.attr('title', nextActive ? 'Disabilita questo consenso lato frontend' : 'Riabilita questo consenso lato frontend');
+        toastr.success(nextActive ? 'Consenso abilitato' : 'Consenso disabilitato');
+    }).catch(() => {
+        setLoading($btn, false);
+        toastr.error('Errore durante l\'aggiornamento dello stato');
+    });
+};
+
+const initConsents = () => {
+    $(document).on('click', '.btn-consents-enable', enableConsents);
+    $(document).on('click', '.btn-consent-add', addConsentRow);
+    $(document).on('click', '.btn-consent-delete', function () {
+        deleteConsentRow($(this).closest('.consent-item'));
+    });
+    $(document).on('click', '.btn-consent-toggle', function () {
+        toggleConsentActive($(this).closest('.consent-item'), $(this));
+    });
+    $(document).on('click', '.consent-item .btn-save-card', function (e) {
+        e.stopImmediatePropagation();
+        saveSingleConsent($(this).closest('.consent-item'), $(this));
+    });
+    $(document).on('change', '.consent-item .consent-language', function () {
+        const $item = $(this).closest('.consent-item');
+        changeConsentLanguage($item, $(this).val());
+    });
+    $(document).on('change input', '.consent-item .consent-expiry-days, .consent-item .consent-expiry-months, .consent-item .consent-expiry-years', function () {
+        const $item = $(this).closest('.consent-item');
+        setConsentDirty($item, true);
+    });
+    $(document).on('click', '.consent-item .consent-required-wrap:not(.disabled)', function () {
+        const $wrap  = $(this);
+        const $input = $wrap.find('.consent-required-input');
+        const $box   = $wrap.find('.consent-check-box');
+        const nowChecked = $input.val() !== '1';
+        if (nowChecked) {
+            $input.val('1');
+            $box.addClass('checked').html('<i class="fa-solid fa-check"></i>');
+        } else {
+            $input.val('0');
+            $box.removeClass('checked').empty();
+        }
+        setConsentDirty($wrap.closest('.consent-item'), true);
+    });
+
+    if (document.getElementById('consents-list')) {
+        initExistingConsents();
+        initConsentsSortable();
+    }
+};
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 const init = () => {
@@ -642,6 +944,7 @@ const init = () => {
     });
 
     $(document).on('click', '.btn-save-card', function () {
+        if ($(this).closest('.consent-item').length) return; // gestito da initConsents
         const card = $(this).closest('.card-miticko');
         const form = card.find('form');
         if (!form.length) return;
@@ -653,6 +956,7 @@ const init = () => {
     initDeletePartner();
     initTranslations();
     initCopyUrl();
+    initConsents();
     initRichEditors();
 };
 

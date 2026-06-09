@@ -41,8 +41,9 @@ class OrderParticipant extends LogsModel
     {
         return match ($this->status) {
             'booked' => 'Prenotato',
-            'checked_in' => 'Presentato',
-            'no_show' => 'Non presentato',
+            'checked_in' => 'Arrivato',
+            'no_show' => 'No show',
+            'refunded' => 'Rimborsato',
             'cancelled' => 'Annullato',
             default => ucfirst((string) $this->status),
         };

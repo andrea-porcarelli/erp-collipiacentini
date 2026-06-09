@@ -7,6 +7,7 @@ use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\EditorMediaController;
 use App\Http\Controllers\Backoffice\LoginController;
 use App\Http\Controllers\Backoffice\OrderController;
+use App\Http\Controllers\Backoffice\PartnerConsentController;
 use App\Http\Controllers\Backoffice\PartnerController;
 use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\ProductAvailabilityController;
@@ -47,6 +48,16 @@ Route::group(['prefix' => '/shop', 'middleware' => 'token'], function () {
 
 // Stripe Webhook (fuori dal middleware CSRF)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+
+// Pagine statiche partner (contatti, privacy-policy, cookie-policy, termini-condizioni).
+// Risolte da dominio (whitelabel_domain) oppure da slug nel path (whitelabel_no_domain).
+$partnerPages = array_keys(\App\Models\Partner::PAGES);
+Route::get('/{page}', [BookingController::class, 'page'])
+    ->whereIn('page', $partnerPages)
+    ->name('partner.page');
+Route::get('/{slug}/{page}', [BookingController::class, 'page'])
+    ->whereIn('page', $partnerPages)
+    ->name('partner.page.slug');
 Route::domain('admin.miticko.com')->group(function () {
 
     Route::get('/', function () {
@@ -77,6 +88,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('orders/{order}/notes', [OrderController::class, 'updateNotes'])->name('orders.updateNotes');
         Route::put('orders/{order}/customer', [OrderController::class, 'updateCustomer'])->name('orders.updateCustomer');
         Route::put('orders/{order}/booking', [OrderController::class, 'updateBooking'])->name('orders.updateBooking');
+        Route::get('orders/{order}/availability/days', [OrderController::class, 'availabilityDays'])->name('orders.availabilityDays');
+        Route::get('orders/{order}/availability/slots', [OrderController::class, 'availabilitySlots'])->name('orders.availabilitySlots');
         Route::resource('orders', OrderController::class);
         Route::resource('products', ProductController::class);
         Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');
@@ -158,6 +171,15 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
         Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
         Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');
+        Route::post('partners/{partner}/consents/enable', [PartnerConsentController::class, 'enable'])->name('partners.consents.enable');
+        Route::post('partners/{partner}/consents/reorder', [PartnerConsentController::class, 'reorder'])->name('partners.consents.reorder');
+        Route::put('partners/{partner}/consents/{consent}/toggle-active', [PartnerConsentController::class, 'toggleActive'])->name('partners.consents.toggleActive');
+        Route::get('partners/{partner}/consents', [PartnerConsentController::class, 'index'])->name('partners.consents.index');
+        Route::post('partners/{partner}/consents', [PartnerConsentController::class, 'store'])->name('partners.consents.store');
+        Route::put('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'update'])->name('partners.consents.update');
+        Route::delete('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'destroy'])->name('partners.consents.destroy');
+        Route::get('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'getTranslations'])->name('partners.consents.translations.get');
+        Route::put('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'saveTranslations'])->name('partners.consents.translations.save');
         Route::resource('companies', CompanyController::class);
         Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
         Route::put('companies/{company}/products', [CompanyController::class, 'syncProducts'])->name('companies.products.sync');

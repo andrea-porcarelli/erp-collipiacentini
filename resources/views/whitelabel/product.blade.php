@@ -192,6 +192,8 @@
         height: 50px !important;
         line-height: 50px !important;
         margin: 1px !important;
+        font-weight: var(--weight, 700);
+
     }
 
     .flatpickr-calendar .flatpickr-weekdays {

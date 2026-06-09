@@ -7,6 +7,9 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\CustomerConsent;
+use App\Models\Partner;
+use App\Models\PartnerConsent;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
@@ -78,6 +81,37 @@ class BookingController extends Controller
         }
 
         return response()->json(['html' => $html]);
+    }
+
+    public function page(Request $request, string $page, ?string $slug = null): View
+    {
+        $config = Partner::PAGES[$page] ?? null;
+
+        if (! $config) {
+            abort(404);
+        }
+
+        if ($slug !== null) {
+            $partner = Partner::where('sale_method', 'whitelabel_no_domain')
+                ->where(fn ($q) => $q->where('domain_name', $slug)->orWhere('slug_name', $slug))
+                ->first();
+        } else {
+            $host = $request->getHost();
+            $partner = Partner::where('sale_method', 'whitelabel_domain')
+                ->where(fn ($q) => $q->where('domain_name', $host)->orWhere('slug_name', $host))
+                ->first();
+        }
+
+        if (! $partner) {
+            abort(404);
+        }
+
+        session()->put('partner', $partner);
+
+        $title = $config['title'];
+        $content = $partner->contentField($config['field']) ?? '';
+
+        return view('whitelabel.page', compact('partner', 'title', 'content', 'page'));
     }
 
     public function product(Request $request, string $slugProduct, string $productCode): View|RedirectResponse
@@ -320,7 +354,11 @@ class BookingController extends Controller
 
         $partner = $request->partner;
 
-        return view('whitelabel.cart', compact('cart', 'partner'));
+        $partnerConsents = ($partner && $partner->consents_enabled)
+            ? $partner->consents()->where('is_active', true)->orderBy('position')->get()
+            : collect();
+
+        return view('whitelabel.cart', compact('cart', 'partner', 'partnerConsents'));
     }
 
     public function removeCart(Request $request): JsonResponse
@@ -359,13 +397,22 @@ class BookingController extends Controller
             'tax_code' => ['column' => 'fiscal_code', 'rule' => 'string|max:16'],
         ];
 
+        $partnerConsents = ($cart->partner && $cart->partner->consents_enabled)
+            ? $cart->partner->consents()->where('is_active', true)->get()
+            : collect();
+
         $rules = [
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'privacy' => 'required|accepted',
+            'privacy' => $partnerConsents->isNotEmpty() ? 'nullable' : 'required|accepted',
             'newsletter' => 'nullable|boolean',
+            'consents' => 'array',
         ];
+
+        foreach ($partnerConsents as $pc) {
+            $rules['consents.'.$pc->id] = $pc->is_required ? 'required|accepted' : 'nullable|boolean';
+        }
 
         $activeColumns = [];
         foreach ($cart->product->customerFields as $field) {
@@ -410,6 +457,10 @@ class BookingController extends Controller
 
             $cart->update(['customer_id' => $user->id]);
 
+            if ($partnerConsents->isNotEmpty()) {
+                $this->persistCustomerConsents($user->id, $cart->partner_id, $partnerConsents, $validated['consents'] ?? []);
+            }
+
             DB::commit();
 
             return response()->json([
@@ -420,6 +471,29 @@ class BookingController extends Controller
             DB::rollBack();
 
             return response()->json(['error' => 'Errore durante il salvataggio dei dati: '.$e->getMessage()], 500);
+        }
+    }
+
+    private function persistCustomerConsents(int $customerId, int $partnerId, $partnerConsents, array $consentInput): void
+    {
+        $now = now();
+        foreach ($partnerConsents as $pc) {
+            $accepted = $pc->is_required
+                ? true
+                : (bool) ($consentInput[$pc->id] ?? false);
+
+            CustomerConsent::updateOrCreate(
+                [
+                    'customer_id'        => $customerId,
+                    'partner_consent_id' => $pc->id,
+                ],
+                [
+                    'partner_id'    => $partnerId,
+                    'accepted'      => $accepted,
+                    'subscribed_at' => $now,
+                    'expires_at'    => $pc->computeExpiresAt($now),
+                ]
+            );
         }
     }
 }

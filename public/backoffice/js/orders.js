@@ -46,7 +46,31 @@ $(function () {
 
     // Modali — pulsanti "Salva" (.btn-success interno al modal-footer)
     $(document).on('click', '#modal-edit-booking .btn-success', function () {
-        submitForm('#form-edit-booking', routes.updateBooking, 'PUT', 'modal-edit-booking', 'Data/orario aggiornati');
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const { data } = App.serialize('#form-edit-booking');
+        if (!data.booking_date) { toastr.error('Seleziona una data'); return; }
+        if (!data.booking_time) { toastr.error('Seleziona un orario'); return; }
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: routes.updateBooking,
+            method: 'PUT',
+            dataType: 'json',
+            data,
+        })
+        .done(function () {
+            toastr.success('Data/orario aggiornati');
+            const modalEl = document.getElementById('modal-edit-booking');
+            if (modalEl) {
+                try { bootstrap.Modal.getOrCreateInstance(modalEl).hide(); } catch (_) {}
+            }
+            setTimeout(() => location.reload(), 800);
+        })
+        .fail(function (xhr) {
+            $btn.prop('disabled', false);
+            const msg = xhr?.responseJSON?.message || xhr?.responseJSON?.response || 'Errore durante l\'operazione. Riprova.';
+            toastr.error(msg);
+        });
     });
     $(document).on('click', '#modal-edit-notes .btn-success', function () {
         submitForm('#form-edit-notes', routes.updateNotes, 'PUT', 'modal-edit-notes', 'Note aggiornate');
@@ -69,10 +93,189 @@ $(function () {
         window.location.href = routes.receipt;
     });
 
+    // --- Modifica data/ora modale ---
+    const bookingModalEl = document.getElementById('modal-edit-booking');
+    if (bookingModalEl && window.flatpickr && routes.availabilityDays) {
+        const initial = window.orderBooking || {};
+        const state = {
+            picker: null,
+            availableDays: [],
+            selectedDate: initial.currentDate || null,
+            selectedTime: initial.currentTime || null,
+            selectedSlotType: null,
+            selectedSlotId: null,
+            initialized: false,
+        };
+
+        const $dateInput = $('#booking-date-input');
+        const $timeInput = $('#booking-time-input');
+        const $slotTypeInput = $('#booking-slot-type-input');
+        const $slotIdInput = $('#booking-slot-id-input');
+        const $chipDate = $('[data-role="booking-chip-date"]');
+        const $chipTime = $('[data-role="booking-chip-time"]');
+        const $chipDateLabel = $('[data-role="chip-date-label"]');
+        const $chipTimeLabel = $('[data-role="chip-time-label"]');
+        const $stepCalendar = $('.booking-step-calendar');
+        const $stepSlots = $('.booking-step-slots');
+        const $slotsContainer = $('#booking-time-slots');
+
+        const monthsShort = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+        const formatDateChip = (d) => {
+            const dt = new Date(d + 'T00:00:00');
+            return `${dt.getDate()} ${monthsShort[dt.getMonth()]} ${String(dt.getFullYear()).slice(-2)}`;
+        };
+
+        const showStep = (step) => {
+            $stepCalendar.toggleClass('d-none', step !== 'calendar');
+            $stepSlots.toggleClass('d-none', step !== 'slots');
+        };
+
+        const updateChips = () => {
+            if (state.selectedDate) {
+                $chipDate.removeClass('booking-chip-empty');
+                $chipDateLabel.text(formatDateChip(state.selectedDate));
+            } else {
+                $chipDate.addClass('booking-chip-empty');
+                $chipDateLabel.text('Seleziona data');
+            }
+            if (state.selectedTime) {
+                $chipTime.prop('disabled', false).removeClass('booking-chip-empty');
+                $chipTimeLabel.text(state.selectedTime);
+            } else {
+                $chipTime.prop('disabled', !state.selectedDate).addClass('booking-chip-empty');
+                $chipTimeLabel.text('Orario');
+            }
+        };
+
+        const loadSlots = (date) => {
+            $slotsContainer.html('<div class="booking-time-slots-loading">Caricamento orari...</div>');
+            showStep('slots');
+
+            $.ajax({
+                url: routes.availabilitySlots,
+                method: 'GET',
+                dataType: 'json',
+                data: { date },
+            })
+            .done((res) => {
+                const times = res?.times || [];
+                if (!times.length) {
+                    $slotsContainer.html('<div class="booking-time-slots-empty">Nessun orario disponibile per questa data.</div>');
+                    return;
+                }
+                $slotsContainer.empty();
+                times.forEach((slot) => {
+                    const isSelected = state.selectedTime === slot.time && state.selectedDate === date;
+                    const availLabel = slot.availability === null ? '∞' : slot.availability;
+                    const $el = $(`
+                        <div class="booking-time-slot ${slot.is_available ? '' : 'disabled'} ${isSelected ? 'selected' : ''}">
+                            <div class="booking-time-slot-time">${slot.time}</div>
+                            <div class="booking-time-slot-avail"><i class="fa-regular fa-user"></i> ${availLabel}</div>
+                        </div>
+                    `);
+                    if (slot.is_available) {
+                        $el.on('click', function () {
+                            $slotsContainer.find('.booking-time-slot').removeClass('selected');
+                            $(this).addClass('selected');
+                            state.selectedTime = slot.time;
+                            state.selectedSlotType = slot.slot_type;
+                            state.selectedSlotId = slot.slot_id;
+                            $timeInput.val(slot.time);
+                            $slotTypeInput.val(slot.slot_type || '');
+                            $slotIdInput.val(slot.slot_id || '');
+                            updateChips();
+                        });
+                    }
+                    $slotsContainer.append($el);
+                });
+            })
+            .fail((xhr) => {
+                const msg = xhr?.responseJSON?.response || xhr?.responseJSON?.message || 'Errore nel caricamento degli orari';
+                $slotsContainer.html(`<div class="booking-time-slots-empty">${msg}</div>`);
+            });
+        };
+
+        const initPicker = (availableDays) => {
+            if (state.picker) {
+                state.picker.destroy();
+            }
+            const enable = availableDays.length ? availableDays : [];
+            state.picker = flatpickr('#booking-calendar', {
+                inline: true,
+                locale: 'it',
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disableMobile: true,
+                monthSelectorType: 'static',
+                enable,
+                defaultDate: state.selectedDate || undefined,
+                onChange: function (selectedDates, dateStr) {
+                    if (!dateStr) return;
+                    if (state.selectedDate !== dateStr) {
+                        state.selectedTime = null;
+                        state.selectedSlotType = null;
+                        state.selectedSlotId = null;
+                        $timeInput.val('');
+                        $slotTypeInput.val('');
+                        $slotIdInput.val('');
+                    }
+                    state.selectedDate = dateStr;
+                    $dateInput.val(dateStr);
+                    updateChips();
+                    loadSlots(dateStr);
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    if (availableDays.length) {
+                        const today = instance.formatDate(new Date(), 'Y-m-d');
+                        const jumpTo = state.selectedDate && availableDays.includes(state.selectedDate)
+                            ? state.selectedDate
+                            : availableDays.filter((d) => d >= today).sort()[0];
+                        if (jumpTo) instance.jumpToDate(jumpTo);
+                    }
+                },
+            });
+        };
+
+        const ensureInitialized = () => {
+            if (state.initialized) return;
+            state.initialized = true;
+
+            $.ajax({
+                url: routes.availabilityDays,
+                method: 'GET',
+                dataType: 'json',
+            })
+            .done((res) => {
+                state.availableDays = res?.days || [];
+                initPicker(state.availableDays);
+                if (state.selectedDate && state.availableDays.includes(state.selectedDate)) {
+                    loadSlots(state.selectedDate);
+                    showStep('calendar');
+                }
+                updateChips();
+            })
+            .fail(() => {
+                toastr.error('Errore nel caricamento delle disponibilità');
+            });
+        };
+
+        $(bookingModalEl).on('shown.bs.modal', ensureInitialized);
+
+        $chipDate.on('click', function () {
+            showStep('calendar');
+        });
+        $chipTime.on('click', function () {
+            if ($(this).prop('disabled')) return;
+            if (state.selectedDate) loadSlots(state.selectedDate);
+        });
+
+        updateChips();
+    }
+
     // --- Check-in visitatori (card su /orders/{id}) ---
     const $checkinCard = $('.order-checkin-content');
     if ($checkinCard.length) {
-        const statusClasses = ['ts-status-booked', 'ts-status-checked_in', 'ts-status-no_show', 'ts-status-cancelled'];
+        const statusClasses = ['ts-status-booked', 'ts-status-checked_in', 'ts-status-no_show', 'ts-status-refunded', 'ts-status-cancelled'];
 
         const updateSelectClass = ($sel, status) => {
             statusClasses.forEach((cls) => $sel.removeClass(cls));

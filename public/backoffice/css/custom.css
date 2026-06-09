@@ -1498,6 +1498,245 @@ table.order-detail-tickets tbody tr:last-child td {
     }
 }
 
+/* --- Modifica data/ora modale --- */
+.booking-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.booking-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.booking-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #E4572E;
+    background: #FFF5F0;
+    color: #E4572E;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease;
+}
+.booking-chip:hover:not(:disabled) {
+    background: #FFE6DA;
+}
+.booking-chip:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.booking-chip.booking-chip-empty {
+    color: var(--text-secondary, #666);
+    border-color: var(--border-light, #E6E6E6);
+    background: var(--background-global-paper2, #FAFAFA);
+}
+.booking-chip .fa-regular,
+.booking-chip .fa-solid {
+    font-size: 13px;
+}
+
+.booking-calendar-inline {
+    width: 100%;
+}
+.booking-calendar-inline .flatpickr-calendar.inline {
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+.booking-calendar-inline .flatpickr-months,
+.booking-calendar-inline .flatpickr-innerContainer,
+.booking-calendar-inline .flatpickr-rContainer,
+.booking-calendar-inline .flatpickr-days,
+.booking-calendar-inline .flatpickr-weekdays {
+    width: 100% !important;
+}
+.booking-calendar-inline .flatpickr-months {
+    align-items: center !important;
+    padding: 0 4px 8px !important;
+}
+.booking-calendar-inline .flatpickr-current-month {
+    position: static !important;
+    height: auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex: 1 !important;
+}
+.booking-calendar-inline .flatpickr-current-month .cur-month,
+.booking-calendar-inline .flatpickr-current-month .flatpickr-monthDropdown-months,
+.booking-calendar-inline .flatpickr-current-month .numInputWrapper .numInput.cur-year {
+    color: var(--text-main, #0D0D0D) !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    text-align: center !important;
+    pointer-events: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    padding: 0 4px !important;
+}
+.booking-calendar-inline .flatpickr-current-month .numInputWrapper {
+    background: transparent !important;
+    width: 6ch !important;
+}
+.booking-calendar-inline .flatpickr-current-month .numInputWrapper .arrowUp,
+.booking-calendar-inline .flatpickr-current-month .numInputWrapper .arrowDown,
+.booking-calendar-inline .flatpickr-current-month .numInputWrapper span {
+    display: none !important;
+}
+.booking-calendar-inline .flatpickr-prev-month,
+.booking-calendar-inline .flatpickr-next-month {
+    position: static !important;
+    color: var(--text-main, #0D0D0D) !important;
+    fill: var(--text-main, #0D0D0D) !important;
+    padding: 4px !important;
+}
+.booking-calendar-inline .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    padding: 4px 0 !important;
+}
+.booking-calendar-inline .flatpickr-day {
+    flex: 0 0 calc(14.28% - 4px) !important;
+    max-width: calc(14.28% - 4px) !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    margin: 2px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    color: var(--text-main, #0D0D0D) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+.booking-calendar-inline .flatpickr-weekdays {
+    background: transparent !important;
+    padding: 0 !important;
+    height: 30px !important;
+}
+.booking-calendar-inline .flatpickr-weekdaycontainer {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+.booking-calendar-inline .flatpickr-weekday {
+    flex: 0 0 calc(14.28% - 4px) !important;
+    max-width: calc(14.28% - 4px) !important;
+    margin: 2px !important;
+    color: var(--text-secondary, #666) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    background: transparent !important;
+}
+.booking-calendar-inline .flatpickr-day.flatpickr-disabled,
+.booking-calendar-inline .flatpickr-day.flatpickr-disabled:hover {
+    color: #C7C7C7 !important;
+    text-decoration: line-through !important;
+    cursor: not-allowed !important;
+    background: transparent !important;
+}
+.booking-calendar-inline .flatpickr-day.prevMonthDay,
+.booking-calendar-inline .flatpickr-day.nextMonthDay {
+    color: #C7C7C7 !important;
+}
+.booking-calendar-inline .flatpickr-day.today,
+.booking-calendar-inline .flatpickr-day.today:hover {
+    background: transparent !important;
+    color: var(--text-main, #0D0D0D) !important;
+    border: 1px solid transparent !important;
+    font-weight: 700 !important;
+}
+.booking-calendar-inline .flatpickr-day:hover:not(.flatpickr-disabled):not(.selected) {
+    background: rgba(42, 52, 147, 0.08) !important;
+    border-radius: 8px !important;
+}
+.booking-calendar-inline .flatpickr-day.selected,
+.booking-calendar-inline .flatpickr-day.selected:hover,
+.booking-calendar-inline .flatpickr-day.today.selected,
+.booking-calendar-inline .flatpickr-day.today.selected:hover {
+    background: #2A3493 !important;
+    color: #fff !important;
+    border: 1px solid #2A3493 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+}
+
+.booking-time-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.booking-time-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px;
+    gap: 4px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--background-global-paper2, #FAFAFA);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+    text-align: center;
+}
+.booking-time-slot:hover:not(.disabled):not(.selected) {
+    border-color: #2A3493;
+}
+.booking-time-slot.selected {
+    background: #2A3493;
+    border-color: #2A3493;
+    color: #fff;
+}
+.booking-time-slot.disabled {
+    color: var(--text-disabled, #999);
+    cursor: not-allowed;
+    background: transparent;
+}
+.booking-time-slot.disabled .booking-time-slot-time {
+    text-decoration: line-through;
+}
+.booking-time-slot .booking-time-slot-time {
+    font-weight: 700;
+    font-size: 16px;
+}
+.booking-time-slot .booking-time-slot-avail {
+    font-size: 12px;
+    color: var(--text-secondary, #888);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.booking-time-slot.selected .booking-time-slot-avail {
+    color: rgba(255, 255, 255, 0.85);
+}
+.booking-time-slot.disabled .booking-time-slot-avail {
+    color: var(--text-disabled, #999);
+}
+.booking-time-slots-empty,
+.booking-time-slots-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-secondary, #666);
+    padding: 18px 0;
+    font-size: 14px;
+}
+
 /* Tab della scheda prodotto: scroll orizzontale (mobile e desktop quando overflow) */
 .product-tabs-scroll {
     overflow-x: auto;

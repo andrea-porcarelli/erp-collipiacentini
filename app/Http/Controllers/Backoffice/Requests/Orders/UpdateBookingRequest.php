@@ -17,6 +17,8 @@ class UpdateBookingRequest extends FormRequest
         return [
             'booking_date' => ['required', 'date'],
             'booking_time' => ['required', 'date_format:H:i'],
+            'slot_type'    => ['nullable', 'in:weekly,special'],
+            'slot_id'      => ['nullable', 'integer'],
         ];
     }
 
