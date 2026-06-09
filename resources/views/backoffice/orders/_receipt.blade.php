@@ -135,7 +135,7 @@
             color: {{ $t['text-main'] }};
         }
         .ticket-card .qr {
-            width: 140px;
+            width: 210px;
             text-align: right;
         }
         .qr-box {
@@ -145,11 +145,11 @@
             border-spacing: 0;
         }
         .qr-box td {
-            padding: 10px;
+            padding: 4px;
         }
         .qr-box img {
-            width: 100px;
-            height: 100px;
+            width: 130px;
+            height: 130px;
             display: block;
         }
         .ticket-card .qr .code {
@@ -158,7 +158,7 @@
             color: {{ $t['text-secondary'] }};
             letter-spacing: 0.3px;
             text-align: center;
-            padding-top: 6px;
+            padding-top: 3px;
         }
 
         /* --- Section --- */
@@ -193,13 +193,14 @@
         }
         .meta-grid .label {
             font-size: 10.5px;
-            color: {{ $t['text-secondary'] }};
+            color: {{ $t['text-main'] }};
             margin-bottom: 6px;
+            font-weight: 700;
         }
         .meta-grid .value {
             font-size: 12px;
-            font-weight: 400;
             color: {{ $t['text-main'] }};
+            font-weight: 300;
         }
 
         /* --- Terms --- */
@@ -265,7 +266,7 @@
     $qrRenderer = new QRCode(new QROptions([
         'outputInterface' => QRGdImagePNG::class,
         'eccLevel'        => EccLevel::M,
-        'scale'           => 6,
+        'scale'           => 8,
         'outputBase64'    => true,
         'addQuietzone'    => true,
         'quietzoneSize'   => 1,
@@ -426,7 +427,7 @@
                     <table class="ticket-card-body">
                         <tr>
                             <td class="left">
-                                <div class="product-title">{{ $product?->label ?? '—' }}</div>
+                                <div class="product-title">{{ $product?->contentField('short_title') ?? '—' }}</div>
                                 <div class="product-variant">
                                     {{ $variantLabel ?? '—' }}
                                     @if($unitPrice !== null)
@@ -450,7 +451,7 @@
                                             @if($qrDataUri)
                                                 <img src="{{ $qrDataUri }}" alt="QR {{ $code }}">
                                             @else
-                                                <div style="width:100px;height:100px;border:1px dashed #B89C8B;border-radius:6px;"></div>
+                                                <div style="width:130px;height:130px;border:1px dashed #B89C8B;border-radius:6px;"></div>
                                             @endif
                                             <div class="code">{{ $code }}</div>
                                         </td>

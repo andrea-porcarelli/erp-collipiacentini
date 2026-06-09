@@ -32,7 +32,9 @@
                     @livewire('product-gallery', ['product' => $product])
                 </x-card>
                 <x-card title="Descrizione" class="product-card" h1="true" leading="fa-shield-check">
-                    {!! $product->description !!}
+                    <div class="product-description">
+                        {!! $product->description !!}
+                    </div>
                 </x-card>
                 @if($product->features->count() > 0)
                     @php($grouped = $product->features->groupBy('category'))
@@ -115,6 +117,12 @@
     let maxAvailability = 0;
 </script>
 <style>
+    .product-description img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
     .flatpickr-calendar.inline {
         width: 100% !important;
         max-width: none !important;
