@@ -36,7 +36,7 @@
                             <x-textarea :value="$model->contentField('short_description')" name="short_description" maxlength="110" label="Descrizione breve (card prodotto)" required message="Indica l’esperienza che offri: non usare il nome della tua attività e non inserire il prezzo (es. Visita guidata completa con degustazione)" icon="fa-regular fa-circle-info" />
                         </div>
                         <div class="col-12 mt-spacing-l">
-                            <x-input :value="$model->contentField('long_title')" name="long_title" maxlength="62" label="Nome completo nella pagina prodotto dedicata" required message="Scrivi il nome dell’attività includendo: cosa faranno i clienti, il prezzo ed il nome della tua attività (es. Visita guidata completa con degustazione 15€ a Veleia Romana)" icon="fa-regular fa-circle-info"/>
+                            <x-input :value="$model->contentField('long_title')" name="long_title" maxlength="108" label="Nome completo nella pagina prodotto dedicata" required message="Scrivi il nome dell’attività includendo: cosa faranno i clienti, il prezzo ed il nome della tua attività (es. Visita guidata completa con degustazione 15€ a Veleia Romana)" icon="fa-regular fa-circle-info"/>
                         </div>
                     </div>
                 </form>
