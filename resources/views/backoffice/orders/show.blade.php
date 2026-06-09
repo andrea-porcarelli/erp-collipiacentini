@@ -343,6 +343,26 @@
                 </div>
             </x-card>
 
+            <x-card title="Consensi utente">
+                @if($customerConsents->isEmpty())
+                    <div class="text-secondary">Nessun consenso registrato per questo cliente.</div>
+                @else
+                    @foreach($customerConsents as $i => $consent)
+                        <div class="consent-block @if($i > 0) mt-spacing-l @endif">
+                            <div class="detail-value"><i class="fa-solid fa-check"></i> {{ $consent['label'] }}</div>
+                            <div class="detail-label mt-spacing-xs">
+                                <i class="fa-regular fa-calendar"></i>
+                                Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
+                            </div>
+                            <div class="detail-label">
+                                <i class="fa-regular fa-hourglass"></i>
+                                Scadenza: {{ $consent['expires_at']?->translatedFormat('j M Y') ?? 'Nessuna' }}
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </x-card>
+
             <div class="d-flex gap-2 order-show-footer-actions">
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />

@@ -11,7 +11,9 @@ use App\Http\Controllers\Backoffice\Requests\Orders\UpdateNotesRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
 use App\Mail\OrderConfirmationMail;
+use App\Models\CustomerConsent;
 use App\Models\Order;
+use App\Models\PartnerConsent;
 use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -149,12 +151,37 @@ class OrderController extends Controller
         $commissionPaymentAmount = round($amount * $commissionPaymentRate / 100, 2);
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
+        $customerConsents = CustomerConsent::with('partnerConsent')
+            ->where('customer_id', $order->customer_id)
+            ->where('partner_id', $order->partner_id)
+            ->where('accepted', true)
+            ->get()
+            ->filter(fn ($cc) => $cc->partnerConsent !== null)
+            ->sortBy(fn ($cc) => $cc->partnerConsent->position)
+            ->values()
+            ->map(function ($cc) {
+                $pc = $cc->partnerConsent;
+                if ($pc->code === PartnerConsent::CODE_TERMS) {
+                    $label = 'Privacy & Cookie Policy / Termini e Condizioni';
+                } else {
+                    $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
+                    $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
+                }
+
+                return [
+                    'label'         => $label,
+                    'subscribed_at' => $cc->subscribed_at,
+                    'expires_at'    => $cc->expires_at,
+                ];
+            });
+
         return view('backoffice.'.$this->path.'.show', [
             'model' => $order,
             'commissionPaymentRate' => $commissionPaymentRate,
             'commissionServiceRate' => $commissionServiceRate,
             'commissionPaymentAmount' => $commissionPaymentAmount,
             'commissionServiceAmount' => $commissionServiceAmount,
+            'customerConsents' => $customerConsents,
         ])->with('path', $this->path);
     }
 
