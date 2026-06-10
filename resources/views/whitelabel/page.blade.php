@@ -76,16 +76,20 @@
             }
             .contact-card {
                 background: #ffffff;
-                border-radius: 18px;
-                padding: 36px 24px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                gap: 18px;
-                min-height: 180px;
-                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+                padding: var(--card-padding, 24px);
+                gap: var(--card-spacing, 24px);
+                align-self: stretch;
+                border-radius: var(--card-border-radius, 24px);
+                border: var(--card-border-width, 1px) solid var(--card-border-color, #F2F2F2);
+                background: var(--card-background, #FFF);
+
+                /* Elevation */
+                box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
             }
             .contact-card-icon {
                 font-size: 36px;
