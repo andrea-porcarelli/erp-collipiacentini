@@ -14,7 +14,7 @@
         * { box-sizing: border-box; }
 
         body {
-            font-family: DejaVu Sans, sans-serif;
+            font-family: {{ $t['typography-web-body-font'] ?? '"DM Sans"' }}, DejaVu Sans, sans-serif;
             color: {{ $t['text-main'] }};
             font-size: 11px;
             line-height: 1.55;
@@ -162,9 +162,10 @@
         }
 
         @if($brand === 'veleia')
-        /* --- QR box override Veleia --- */
+        /* --- Override Veleia: bordi squadrati per ticket card e QR box --- */
+        .ticket-card { border-radius: 0; }
         .ticket-card .qr { width: 230px; }
-        .qr-box { border-radius: 16px; }
+        .qr-box { border-radius: 0; }
         .qr-box td { padding: 26px 28px 22px 28px; }
         .qr-box img { width: 150px; height: 150px; }
         .ticket-card .qr .code {
@@ -187,7 +188,6 @@
             font-weight: 300;
             line-height: normal;
             color: {{ $t['text-main'] }};
-            font-family: "DM Sans", DejaVu Sans, sans-serif;
         }
         .section p:last-child { margin-bottom: 0; }
 
@@ -284,12 +284,12 @@
         'quietzoneSize'   => 1,
     ]));
 
-    $partnerCover = $order->partner?->cover;
+    $partnerLogoMedia = $order->partner?->logo ?? $order->partner?->cover;
     $logoPath = null;
     $logoMime = null;
-    if ($partnerCover && \Illuminate\Support\Facades\Storage::disk('public')->exists($partnerCover->file_path)) {
-        $logoPath = \Illuminate\Support\Facades\Storage::disk('public')->path($partnerCover->file_path);
-        $logoMime = $partnerCover->file_type ?: 'image/png';
+    if ($partnerLogoMedia && \Illuminate\Support\Facades\Storage::disk('public')->exists($partnerLogoMedia->file_path)) {
+        $logoPath = \Illuminate\Support\Facades\Storage::disk('public')->path($partnerLogoMedia->file_path);
+        $logoMime = $partnerLogoMedia->file_type ?: 'image/png';
     }
     $hasLogo = $logoPath !== null;
     $logoSrc = $hasLogo ? 'data:' . $logoMime . ';base64,' . base64_encode(file_get_contents($logoPath)) : null;
@@ -528,9 +528,6 @@
 
         {{-- TERMS --}}
         <div class="section terms">
-            <p>
-                <strong>Condizioni di vendita.</strong> Il biglietto è strettamente personale, non cedibile e non rimborsabile salvo nei casi previsti dal D.lgs. 206/2005 (Codice del Consumo). La data e l'orario di visita non sono modificabili se non secondo le condizioni indicate al momento dell'acquisto e in base alla disponibilità. Mancato utilizzo: ogni responsabilità per smarrimento, furto o duplicazione del biglietto, l'organizzazione si riserva il diritto di modificare o annullare la visita per cause di forza maggiore. In tal caso il cliente sarà contattato tempestivamente e la modalità indicate al momento dell'acquisto.
-            </p>
             <p>
                 <strong>Trattamento dei dati personali.</strong> I dati personali raccolti sono trattati ai sensi del Regolamento (UE) 2016/679 (GDPR) e del D.lgs. 196/2003 esclusivamente per la gestione della prenotazione e degli obblighi fiscali correlati. L'informativa completa è disponibile su miticko.com/privacy. Il titolare del trattamento è Miticko S.r.l.
             </p>
