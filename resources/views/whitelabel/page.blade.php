@@ -129,6 +129,7 @@
                     padding: var(--card-padding, 24px);
                     gap: var(--card-spacing, 24px);
                     align-self: stretch;
+                    height: auto;
                     border-radius: var(--card-border-radius, 24px);
                     border: var(--card-border-width, 1px) solid var(--card-border-color, #F2F2F2);
                     background: var(--card-background, #FFF);
