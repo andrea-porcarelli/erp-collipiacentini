@@ -626,7 +626,7 @@
 
         /* Body */
         font-family: var(--typography-web-body-font), sans-serif;
-        font-size: var(--size, 16px);
+        font-size: var(--size, 14px);
         font-style: normal;
         font-weight: var(--weight, 400);
         line-height: var(--line-height, 22px);
@@ -635,7 +635,7 @@
     .checkbox-label a:hover {
         color: var(--brand-primary-brandlight);
         font-family: var(--typography-web-body-font), sans-serif;
-        font-size: var(--size, 16px);
+        font-size: var(--size, 14px);
         font-style: normal;
         opacity: 0.85;
     }
