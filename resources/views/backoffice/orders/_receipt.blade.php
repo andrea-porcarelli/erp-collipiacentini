@@ -3,22 +3,19 @@
     $t = config("design.brands.{$brand}.tokens")
         ?? config('design.brands.miticko.tokens', []);
 
-    $fontFamilies = [
-        'Work Sans' => [300, 400, 500, 600, 700],
-        'DM Sans'   => [300, 400, 500, 700],
-    ];
+    // La ricevuta è un documento del servizio Miticko: font sempre DM Sans
+    // a prescindere dal brand del partner (i colori restano per-brand).
+    $receiptFontFamily = 'DM Sans';
     $fontFaces = [];
-    foreach ($fontFamilies as $family => $weights) {
-        $slug = str_replace(' ', '', $family);
-        foreach ($weights as $w) {
-            $path = storage_path("fonts/{$slug}-{$w}.ttf");
-            if (is_file($path)) {
-                $fontFaces[] = [
-                    'family' => $family,
-                    'weight' => $w,
-                    'b64'    => base64_encode(file_get_contents($path)),
-                ];
-            }
+    foreach ([300, 400, 500, 700] as $w) {
+        $slug = str_replace(' ', '', $receiptFontFamily);
+        $path = storage_path("fonts/{$slug}-{$w}.ttf");
+        if (is_file($path)) {
+            $fontFaces[] = [
+                'family' => $receiptFontFamily,
+                'weight' => $w,
+                'src'    => 'file://' . $path,
+            ];
         }
     }
 @endphp
@@ -35,14 +32,14 @@
             font-family: "{{ $face['family'] }}";
             font-style: normal;
             font-weight: {{ $face['weight'] }};
-            src: url(data:font/ttf;base64,{{ $face['b64'] }}) format("truetype");
+            src: url({{ $face['src'] }}) format("truetype");
         }
         @endforeach
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: {{ $t['typography-web-body-font'] ?? '"DM Sans"' }}, DejaVu Sans, sans-serif;
+            font-family: "{{ $receiptFontFamily }}", DejaVu Sans, sans-serif;
             color: {{ $t['text-main'] }};
             font-size: 11px;
             line-height: 1.55;
