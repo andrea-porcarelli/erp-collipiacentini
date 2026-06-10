@@ -187,8 +187,9 @@
         }
 
         @if($brand === 'veleia')
-        /* --- Override Veleia: bordi squadrati per ticket card e QR box --- */
+        /* --- Override Veleia: bordi squadrati per ticket card, QR box e badge --- */
         .ticket-card { border-radius: 0; }
+        .ticket-card .badge { border-radius: 0; }
         .ticket-card .qr { width: 230px; }
         .qr-box { border-radius: 0; }
         .qr-box td { padding: 26px 28px 22px 28px; }
