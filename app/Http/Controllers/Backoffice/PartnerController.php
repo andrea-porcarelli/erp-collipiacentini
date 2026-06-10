@@ -137,6 +137,7 @@ class PartnerController extends CrudController
             match ($request->input('section')) {
                 'info' => $this->updateInfo($partner, $request),
                 'sale' => $this->updateSale($partner, $request),
+                'contatti' => $this->updateContatti($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
                     'commission_presale_low'       => $request->input('commission_presale_low'),
                     'commission_presale_high'      => $request->input('commission_presale_high'),
@@ -174,13 +175,25 @@ class PartnerController extends CrudController
         }
 
         $this->interface->edit($partner, [
-            'partner_name'      => $request->input('partner_name'),
-            'partner_code'      => $hasOrders ? $partner->partner_code : $newCode,
+            'partner_name' => $request->input('partner_name'),
+            'partner_code' => $hasOrders ? $partner->partner_code : $newCode,
+            'is_active'    => (int) $request->input('is_active'),
+        ]);
+    }
+
+    /**
+     * Salva i campi della tab Contatti: testo libero (contacts_content)
+     * + i tre campi diretti (email_notify, phone_number, structure_address).
+     */
+    private function updateContatti(Partner $partner, Request $request): void
+    {
+        $this->interface->edit($partner, [
             'email_notify'      => $request->input('email_notify'),
             'phone_number'      => $request->input('phone_number'),
             'structure_address' => $request->input('structure_address'),
-            'is_active'         => (int) $request->input('is_active'),
         ]);
+
+        $this->updateTranslatable($partner, $request);
     }
 
     private function updateSale(Partner $partner, Request $request): void

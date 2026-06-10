@@ -40,6 +40,20 @@
                     <i class="fa-regular fa-language icon"></i>
                 </button>
             </div>
+
+            @if($type === 'contatti')
+                <div class="row mt-spacing-l">
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$model" name="email_notify" label="Email notifiche" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$model" name="phone_number" label="Numero di telefono" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$model" name="structure_address" label="Indirizzo struttura" />
+                    </div>
+                </div>
+            @endif
         </form>
         <div class="button-card-absolute">
             <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />

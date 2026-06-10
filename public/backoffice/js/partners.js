@@ -62,7 +62,7 @@ const formConfigs = {
     'form-partner-policy-contatti': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',
-        section: 'translatable',
+        section: 'contatti',
         successMessage: 'Pagina contatti aggiornata con successo',
         validate: () => ({}),
         collect: () => ({ contacts_content: richEditors.get('contacts_content')?.getData() ?? '' }),
