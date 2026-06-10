@@ -26,7 +26,6 @@
 
                     <div class="contact-cards">
                         @foreach($contactCards as $card)
-
                             <x-card class="contact-card">
                                 <div class="contact-card-icon">
                                     <i class="fa-regular {{ $card['icon'] }}"></i>
@@ -75,7 +74,7 @@
                 gap: 24px;
                 margin-top: 24px;
             }
-            .contact-card {
+            .contact-card .card-body{
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -110,7 +109,7 @@
                     grid-template-columns: 1fr;
                     gap: 12px;
                 }
-                .contact-card {
+                .contact-card  .card-body{
                     flex-direction: row;
                     align-items: center;
                     justify-content: flex-start;
