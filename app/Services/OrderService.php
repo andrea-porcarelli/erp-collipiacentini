@@ -11,9 +11,11 @@ use App\Models\Order;
 use App\Models\OrderParticipant;
 use App\Models\OrderProduct;
 use App\Models\OrderProductItem;
+use App\Notifications\NewOrderTelegramNotify;
 use App\Services\OrderLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -173,9 +175,25 @@ class OrderService
         if (!$alreadyPaid) {
             $this->logger->logOrderPaid($order);
             $this->sendConfirmationEmail($order);
+            $this->notifyTelegramNewOrder($order);
         }
 
         return $order;
+    }
+
+    protected function notifyTelegramNewOrder(Order $order): void
+    {
+        try {
+            $chatId = config('services.telegram.group_id');
+            if (empty($chatId)) {
+                return;
+            }
+
+            Notification::route('telegram', $chatId)
+                ->notify(new NewOrderTelegramNotify($order));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     protected function sendConfirmationEmail(Order $order): void
