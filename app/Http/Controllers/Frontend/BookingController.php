@@ -7,9 +7,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Customer;
-use App\Models\CustomerConsent;
 use App\Models\Partner;
-use App\Models\PartnerConsent;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductAvailabilityService;
@@ -461,11 +459,13 @@ class BookingController extends Controller
                 $user->update($customerData);
             }
 
-            $cart->update(['customer_id' => $user->id]);
+            $cartUpdate = ['customer_id' => $user->id];
 
             if ($partnerConsents->isNotEmpty()) {
-                $this->persistCustomerConsents($user->id, $cart->partner_id, $partnerConsents, $validated['consents'] ?? []);
+                $cartUpdate['consents_payload'] = $this->buildConsentsPayload($partnerConsents, $validated['consents'] ?? []);
             }
+
+            $cart->update($cartUpdate);
 
             DB::commit();
 
@@ -480,26 +480,21 @@ class BookingController extends Controller
         }
     }
 
-    private function persistCustomerConsents(int $customerId, int $partnerId, $partnerConsents, array $consentInput): void
+    private function buildConsentsPayload($partnerConsents, array $consentInput): array
     {
         $now = now();
-        foreach ($partnerConsents as $pc) {
+
+        return $partnerConsents->map(function ($pc) use ($now, $consentInput) {
             $accepted = $pc->is_required
                 ? true
                 : (bool) ($consentInput[$pc->id] ?? false);
 
-            CustomerConsent::updateOrCreate(
-                [
-                    'customer_id'        => $customerId,
-                    'partner_consent_id' => $pc->id,
-                ],
-                [
-                    'partner_id'    => $partnerId,
-                    'accepted'      => $accepted,
-                    'subscribed_at' => $now,
-                    'expires_at'    => $pc->computeExpiresAt($now),
-                ]
-            );
-        }
+            return [
+                'partner_consent_id' => $pc->id,
+                'accepted'           => $accepted,
+                'subscribed_at'      => $now->toIso8601String(),
+                'expires_at'         => $pc->computeExpiresAt($now)?->toIso8601String(),
+            ];
+        })->values()->all();
     }
 }

@@ -18,11 +18,13 @@ class Cart extends LogsModel
         'slot_id',
         'applied_price_variation_id',
         'total',
+        'consents_payload',
     ];
 
     protected $casts = [
-        'date'  => 'date',
-        'total' => 'decimal:2',
+        'date'             => 'date',
+        'total'            => 'decimal:2',
+        'consents_payload' => 'array',
     ];
 
     public function customer(): BelongsTo

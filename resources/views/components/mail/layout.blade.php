@@ -4,6 +4,8 @@
     'supportEmail' => null,
     'preheader' => null,
     'brand' => null,
+    'partnerLogoPath' => null,
+    'partnerLogoUrl' => null,
 ])
 
 @php
@@ -15,9 +17,18 @@
 
     $signature = $partnerName ?: 'Lo staff di '.$brand;
 
-    $logoCandidate = public_path("assets/images/logo-{$brand}.png");
-    $logoPath = file_exists($logoCandidate) ? $logoCandidate : public_path("assets/images/logo-{$defaultBrand}.png");
-    $logoFallback = asset('assets/images/logo-'.(file_exists($logoCandidate) ? $brand : $defaultBrand).'.png');
+    $logoPath = null;
+    $logoFallback = null;
+
+    if ($partnerLogoPath && file_exists($partnerLogoPath)) {
+        $logoPath = $partnerLogoPath;
+        $logoFallback = $partnerLogoUrl ?: asset("assets/images/logo-{$defaultBrand}.png");
+    } else {
+        $logoCandidate = public_path("assets/images/logo-{$brand}.png");
+        $logoPath = file_exists($logoCandidate) ? $logoCandidate : public_path("assets/images/logo-{$defaultBrand}.png");
+        $logoFallback = asset('assets/images/logo-'.(file_exists($logoCandidate) ? $brand : $defaultBrand).'.png');
+    }
+
     $logoSrc = isset($message) ? $message->embed($logoPath) : $logoFallback;
 
     $t = config("design.brands.{$brand}.tokens") ?? config("design.brands.{$defaultBrand}.tokens", []);

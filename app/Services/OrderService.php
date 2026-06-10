@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Mail\OrderConfirmationMail;
 use App\Models\Cart;
 use App\Models\Customer;
+use App\Models\CustomerConsent;
 use App\Models\Order;
 use App\Models\OrderParticipant;
 use App\Models\OrderProduct;
@@ -89,8 +90,40 @@ class OrderService
                 }
             }
 
+            $this->snapshotCartConsents($cart, $order, $customer);
+
             return $order;
         });
+    }
+
+    /**
+     * Snapshot dei consensi (obbligatori e non) raccolti nel carrello al momento
+     * dell'ordine. Crea un record CustomerConsent per ogni consenso legato a questo
+     * ordine specifico, così il dettaglio ordine resta coerente anche se il cliente
+     * cambia le proprie scelte su ordini successivi.
+     */
+    protected function snapshotCartConsents(Cart $cart, Order $order, Customer $customer): void
+    {
+        $payload = $cart->consents_payload;
+        if (! is_array($payload) || empty($payload)) {
+            return;
+        }
+
+        foreach ($payload as $entry) {
+            if (! is_array($entry) || empty($entry['partner_consent_id'])) {
+                continue;
+            }
+
+            CustomerConsent::create([
+                'customer_id'        => $customer->id,
+                'order_id'           => $order->id,
+                'partner_consent_id' => $entry['partner_consent_id'],
+                'partner_id'         => $cart->partner_id,
+                'accepted'           => (bool) ($entry['accepted'] ?? false),
+                'subscribed_at'      => $entry['subscribed_at'] ?? now(),
+                'expires_at'         => $entry['expires_at'] ?? null,
+            ]);
+        }
     }
 
     /**

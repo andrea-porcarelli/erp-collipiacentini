@@ -31,6 +31,11 @@ class OrderConfirmationMail extends Mailable
 
     public function content(): Content
     {
+        $this->order->loadMissing([
+            'partner.logo',
+            'orderProducts.product',
+        ]);
+
         return new Content(
             view: 'emails.order-confirmation',
             with: ['order' => $this->order],
@@ -41,7 +46,7 @@ class OrderConfirmationMail extends Mailable
     {
         $this->order->loadMissing([
             'customer.country',
-            'partner',
+            'partner.logo',
             'orderProducts.product.category',
             'orderProducts.items.variant',
             'participants',

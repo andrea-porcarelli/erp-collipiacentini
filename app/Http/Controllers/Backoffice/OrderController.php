@@ -152,8 +152,7 @@ class OrderController extends Controller
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
         $customerConsents = CustomerConsent::with('partnerConsent')
-            ->where('customer_id', $order->customer_id)
-            ->where('partner_id', $order->partner_id)
+            ->where('order_id', $order->id)
             ->get()
             ->filter(fn ($cc) => $cc->partnerConsent !== null)
             ->sortBy(fn ($cc) => $cc->partnerConsent->position)

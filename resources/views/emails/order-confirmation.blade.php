@@ -1,6 +1,7 @@
 @php
     $firstOp = $order->orderProducts->first();
-    $eventTitle = $firstOp?->product?->label ?? '';
+    $product = $firstOp?->product;
+    $eventTitle = $product?->label ?? '';
     $eventDate = $firstOp?->booking_date
         ? \Carbon\Carbon::parse($firstOp->booking_date)->translatedFormat('j F Y')
         : '';
@@ -9,6 +10,16 @@
 
     $totalTickets = (int) $order->orderProducts->sum('quantity');
     $ticketsLabel = $totalTickets === 1 ? '1 persona' : $totalTickets . ' persone';
+
+    $partnerLogo = $order->partner?->logo;
+    $partnerLogoPath = $partnerLogo
+        ? \Illuminate\Support\Facades\Storage::disk('public')->path($partnerLogo->file_path)
+        : null;
+    $partnerLogoUrl = $partnerLogo
+        ? asset('storage/' . $partnerLogo->file_path)
+        : null;
+
+    $supportEmail = $product?->support_email ?: config('mail.support_address');
 @endphp
 
 <x-mail.layout
@@ -16,6 +27,9 @@
     :partner-name="$order->partner?->partner_name"
     :brand="$order->partner?->brand"
     :preheader="'La tua prenotazione è confermata · ' . $order->order_number"
+    :partner-logo-path="$partnerLogoPath"
+    :partner-logo-url="$partnerLogoUrl"
+    :support-email="$supportEmail"
 >
     <x-mail.card status="success" title="Prenotazione confermata">
         <p style="margin:0 0 12px 0;">Ciao {{ $order->customer->name }},</p>

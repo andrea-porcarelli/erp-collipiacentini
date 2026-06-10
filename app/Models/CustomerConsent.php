@@ -11,6 +11,7 @@ class CustomerConsent extends Model
         'customer_id',
         'partner_consent_id',
         'partner_id',
+        'order_id',
         'accepted',
         'subscribed_at',
         'expires_at',
@@ -35,5 +36,10 @@ class CustomerConsent extends Model
     public function partner(): BelongsTo
     {
         return $this->belongsTo(Partner::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 }
