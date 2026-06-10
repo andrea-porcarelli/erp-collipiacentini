@@ -23,6 +23,16 @@
     <!-- Stripe JS -->
     <script src="https://js.stripe.com/v3/"></script>
     @livewireStyles
+    @if(isset($partner) && $partner->domain_name == 'prenota.veleiaromana.it')
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQREBGDQWZ"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-YQREBGDQWZ');
+        </script>
+    @endif
 </head>
 
 <body data-mode="{{ ($partner ?? null)?->css_style ?: 'Miticko' }} Light Desktop White">
