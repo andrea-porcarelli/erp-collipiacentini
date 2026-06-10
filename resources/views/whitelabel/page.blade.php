@@ -27,7 +27,7 @@
                     <div class="contact-cards">
                         @foreach($contactCards as $card)
 
-                            <x-card>
+                            <x-card class="contact-card">
                                 <div class="contact-card-icon">
                                     <i class="fa-regular {{ $card['icon'] }}"></i>
                                 </div>
@@ -76,22 +76,11 @@
                 margin-top: 24px;
             }
             .contact-card {
-                background: #ffffff;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: var(--card-padding, 24px);
-                gap: var(--card-spacing, 24px);
-                align-self: stretch;
-                height: 189px;
-                border-radius: var(--card-border-radius, 24px);
-                border: var(--card-border-width, 1px) solid var(--card-border-color, #F2F2F2);
-                background: var(--card-background, #FFF);
-
-                /* Elevation */
-                box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
             }
             .contact-card-icon {
                 font-size: 36px;
@@ -127,16 +116,6 @@
                     justify-content: flex-start;
                     text-align: left;
                     display: flex;
-                    padding: var(--card-padding, 24px);
-                    gap: var(--card-spacing, 24px);
-                    align-self: stretch;
-                    height: auto;
-                    border-radius: var(--card-border-radius, 24px);
-                    border: var(--card-border-width, 1px) solid var(--card-border-color, #F2F2F2);
-                    background: var(--card-background, #FFF);
-
-                    /* Elevation */
-                    box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
                 }
                 .contact-card-icon {
                     font-size: 24px;
