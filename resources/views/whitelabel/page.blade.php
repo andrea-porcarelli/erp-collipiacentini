@@ -109,12 +109,13 @@
                     grid-template-columns: 1fr;
                     gap: 12px;
                 }
-                .contact-card  .card-body{
+                .contact-card .card-body{
                     flex-direction: row;
                     align-items: center;
                     justify-content: flex-start;
                     text-align: left;
                     display: flex;
+                    gap: var(--spacing-l);
                 }
                 .contact-card-icon {
                     font-size: 24px;
