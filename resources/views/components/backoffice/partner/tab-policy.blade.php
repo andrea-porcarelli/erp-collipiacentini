@@ -43,14 +43,14 @@
 
             @if($type === 'contatti')
                 <div class="row mt-spacing-l">
-                    <div class="col-12 col-sm-4">
-                        <x-input :model="$model" name="email_notify" label="Email notifiche" />
+                    <div class="col-12">
+                        <x-input :model="$model" leading="fa-envelope" name="email_notify" label="Email notifiche" />
                     </div>
-                    <div class="col-12 col-sm-4">
-                        <x-input :model="$model" name="phone_number" label="Numero di telefono" />
+                    <div class="col-12">
+                        <x-input :model="$model" leading="fa-phone" name="phone_number" label="Numero di telefono" />
                     </div>
-                    <div class="col-12 col-sm-4">
-                        <x-input :model="$model" name="structure_address" label="Indirizzo struttura" />
+                    <div class="col-12">
+                        <x-input :model="$model" leading="fa-map-pin" name="structure_address" label="Indirizzo struttura" />
                     </div>
                 </div>
             @endif
