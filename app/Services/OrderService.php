@@ -11,13 +11,17 @@ use App\Models\Order;
 use App\Models\OrderParticipant;
 use App\Models\OrderProduct;
 use App\Models\OrderProductItem;
+use App\Services\OrderLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class OrderService
 {
-    public function __construct(private ProductAvailabilityService $availabilityService) {}
+    public function __construct(
+        private ProductAvailabilityService $availabilityService,
+        private OrderLogger $logger,
+    ) {}
 
     /**
      * Create an order from the cart, transferring cart items to order_product_items.
@@ -92,6 +96,12 @@ class OrderService
 
             $this->snapshotCartConsents($cart, $order, $customer);
 
+            // Promuovi i log del cart sull'ordine appena creato e logga la nascita
+            // dell'ordine attribuendola al customer (o al sistema se manca).
+            $this->logger->promoteCartLogs($cart, $order);
+            $this->logger->as($customer)->logOrderCreated($order);
+            $this->logger->endBatch();
+
             return $order;
         });
     }
@@ -161,6 +171,7 @@ class OrderService
         // Invio email di conferma solo alla prima transizione verso PAID
         // (evita doppio invio quando webhook + confirm passano entrambi qui).
         if (!$alreadyPaid) {
+            $this->logger->logOrderPaid($order);
             $this->sendConfirmationEmail($order);
         }
 
@@ -173,6 +184,7 @@ class OrderService
             $order->loadMissing(['customer', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
             if ($order->customer?->email) {
                 Mail::to($order->customer->email)->send(new OrderConfirmationMail($order));
+                $this->logger->logEmailSent($order, $order->customer->email);
             }
         } catch (\Throwable $e) {
             report($e);
@@ -188,6 +200,8 @@ class OrderService
             'order_status'  => OrderStatus::FAILED,
             'payment_error' => $errorMessage,
         ]);
+
+        $this->logger->logOrderFailed($order, $errorMessage);
 
         return $order->fresh();
     }

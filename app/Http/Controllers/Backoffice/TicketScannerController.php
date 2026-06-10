@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderParticipant;
+use App\Services\OrderLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,8 +35,16 @@ class TicketScannerController extends Controller
             $wasCheckedIn = false;
             $alreadyCheckedIn = false;
             if ($participant->status === 'booked') {
+                $oldStatus = $participant->status;
                 $participant->update(['status' => 'checked_in']);
                 $wasCheckedIn = true;
+                app(OrderLogger::class)->logCheckinChanged($order, [[
+                    'participant_id' => $participant->id,
+                    'code'           => $code,
+                    'from'           => $oldStatus,
+                    'to'             => 'checked_in',
+                    'source'         => 'scan',
+                ]]);
             } elseif ($participant->status === 'checked_in') {
                 $alreadyCheckedIn = true;
             }
@@ -66,7 +75,18 @@ class TicketScannerController extends Controller
                 'status' => ['required', Rule::in(self::STATUSES)],
             ]);
 
+            $oldStatus = $participant->status;
             $participant->update($data);
+
+            if ($oldStatus !== $data['status']) {
+                app(OrderLogger::class)->logCheckinChanged($participant->order, [[
+                    'participant_id' => $participant->id,
+                    'code'           => $participant->code,
+                    'from'           => $oldStatus,
+                    'to'             => $data['status'],
+                    'source'         => 'manual',
+                ]]);
+            }
 
             return $this->success([
                 'status' => $participant->status,
@@ -93,10 +113,31 @@ class TicketScannerController extends Controller
                 $this->authorizeOrderAccess($group->first()->order);
             }
 
+            $changesByOrder = [];
             foreach ($data['participants'] as $item) {
                 $p = $participants->firstWhere('id', $item['id']);
-                if ($p) {
-                    $p->update(['status' => $item['status']]);
+                if (! $p) {
+                    continue;
+                }
+                $oldStatus = $p->status;
+                if ($oldStatus === $item['status']) {
+                    continue;
+                }
+                $p->update(['status' => $item['status']]);
+                $changesByOrder[$p->order_id][] = [
+                    'participant_id' => $p->id,
+                    'code'           => $p->code,
+                    'from'           => $oldStatus,
+                    'to'             => $item['status'],
+                    'source'         => 'batch',
+                ];
+            }
+
+            $logger = app(OrderLogger::class);
+            foreach ($changesByOrder as $orderId => $changes) {
+                $order = $participants->firstWhere('order_id', $orderId)?->order;
+                if ($order) {
+                    $logger->logCheckinChanged($order, $changes);
                 }
             }
 

@@ -14,6 +14,7 @@ use App\Mail\OrderConfirmationMail;
 use App\Models\CustomerConsent;
 use App\Models\Order;
 use App\Models\PartnerConsent;
+use App\Services\OrderLogger;
 use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -174,6 +175,15 @@ class OrderController extends Controller
                 ];
             });
 
+        $orderLogs = collect();
+        if (in_array(Auth::user()->role, ['god', 'admin'])) {
+            $orderLogs = $order->logs()
+                ->with('causer')
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->get();
+        }
+
         return view('backoffice.'.$this->path.'.show', [
             'model' => $order,
             'commissionPaymentRate' => $commissionPaymentRate,
@@ -181,6 +191,7 @@ class OrderController extends Controller
             'commissionPaymentAmount' => $commissionPaymentAmount,
             'commissionServiceAmount' => $commissionServiceAmount,
             'customerConsents' => $customerConsents,
+            'orderLogs' => $orderLogs,
         ])->with('path', $this->path);
     }
 
@@ -188,7 +199,14 @@ class OrderController extends Controller
     {
         try {
             $this->authorizeOrderAccess($order);
-            $order->update($request->validated());
+            $data = $request->validated();
+            $oldStatus = $order->customer_status?->value ?? (string) $order->customer_status;
+            $order->update($data);
+            $newStatus = $order->fresh()->customer_status?->value;
+
+            if ($oldStatus !== $newStatus) {
+                app(OrderLogger::class)->logCustomerStatusChanged($order, $oldStatus, $newStatus);
+            }
 
             return $this->success();
         } catch (\Exception $e) {
@@ -200,7 +218,18 @@ class OrderController extends Controller
     {
         try {
             $this->authorizeOrderAccess($order);
-            $order->update($request->validated());
+            $data = $request->validated();
+            $changes = [];
+            foreach (['customer_note', 'internal_note'] as $field) {
+                if (array_key_exists($field, $data) && ($order->{$field} ?? null) !== ($data[$field] ?? null)) {
+                    $changes[$field] = ['from' => $order->{$field}, 'to' => $data[$field]];
+                }
+            }
+            $order->update($data);
+
+            if (! empty($changes)) {
+                app(OrderLogger::class)->logNotesUpdated($order, $changes);
+            }
 
             return $this->success();
         } catch (\Exception $e) {
@@ -212,7 +241,20 @@ class OrderController extends Controller
     {
         try {
             $this->authorizeOrderAccess($order);
-            $order->customer->update($request->validated());
+            $data = $request->validated();
+            $customer = $order->customer;
+            $changes = [];
+            foreach ($data as $field => $newValue) {
+                $oldValue = $customer->{$field} ?? null;
+                if ($oldValue !== $newValue) {
+                    $changes[$field] = ['from' => $oldValue, 'to' => $newValue];
+                }
+            }
+            $customer->update($data);
+
+            if (! empty($changes)) {
+                app(OrderLogger::class)->logCustomerUpdated($order, $changes);
+            }
 
             return $this->success();
         } catch (\Exception $e) {
@@ -228,7 +270,16 @@ class OrderController extends Controller
             if (! $orderProduct) {
                 return $this->error(['response' => 'Nessun prodotto associato all\'ordine']);
             }
-            $orderProduct->update($request->validated());
+            $oldDate = $orderProduct->booking_date;
+            $oldTime = $orderProduct->booking_time;
+            $data = $request->validated();
+            $orderProduct->update($data);
+
+            $newDate = $data['booking_date'] ?? $oldDate;
+            $newTime = $data['booking_time'] ?? $oldTime;
+            if ($oldDate !== $newDate || $oldTime !== $newTime) {
+                app(OrderLogger::class)->logBookingChanged($order, $oldDate, $oldTime, $newDate, $newTime);
+            }
 
             return $this->success();
         } catch (\Exception $e) {
@@ -304,6 +355,8 @@ class OrderController extends Controller
 
             Mail::to($order->customer->email)->send(new OrderConfirmationMail($order));
 
+            app(OrderLogger::class)->logEmailSent($order, $order->customer->email);
+
             return $this->success(['response' => 'Email inviata correttamente']);
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -323,6 +376,8 @@ class OrderController extends Controller
 
         $pdf = Pdf::loadView('backoffice.orders._receipt', ['order' => $order]);
 
+        app(OrderLogger::class)->logReceiptDownloaded($order);
+
         return $pdf->download("biglietto-MTK-{$order->order_number}.pdf");
     }
 
@@ -341,6 +396,8 @@ class OrderController extends Controller
             app(StripePaymentService::class)->refund($order->stripe_payment_intent_id);
 
             $order->update(['order_status' => OrderStatus::REFUNDED]);
+
+            app(OrderLogger::class)->logRefunded($order, (float) $order->amount);
 
             return $this->success(['response' => 'Rimborso eseguito correttamente']);
         } catch (\Exception $e) {

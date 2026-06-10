@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Backoffice;
 use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CustomerInterface;
+use App\Models\CustomerConsent;
+use App\Models\PartnerConsent;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +30,43 @@ class CustomerController extends Controller
     public function index(): View
     {
         return view('backoffice.' . $this->path . '.index')
+            ->with('path', $this->path);
+    }
+
+    public function show(int $id): View
+    {
+        $model = $this->interface->find($id);
+        $model->loadMissing('country');
+
+        $orders = $model->orders()
+            ->with(['partner:id,partner_name', 'orderProducts.product'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        $customerConsents = CustomerConsent::with('partnerConsent')
+            ->where('customer_id', $model->id)
+            ->get()
+            ->filter(fn ($cc) => $cc->partnerConsent !== null)
+            ->sortBy(fn ($cc) => $cc->partnerConsent->position)
+            ->values()
+            ->map(function ($cc) {
+                $pc = $cc->partnerConsent;
+                if ($pc->code === PartnerConsent::CODE_TERMS) {
+                    $label = 'Privacy & Cookie Policy / Termini e Condizioni';
+                } else {
+                    $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
+                    $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
+                }
+
+                return [
+                    'label'         => $label,
+                    'accepted'      => (bool) $cc->accepted,
+                    'subscribed_at' => $cc->subscribed_at,
+                    'expires_at'    => $cc->expires_at,
+                ];
+            });
+
+        return view('backoffice.' . $this->path . '.show', compact('model', 'orders', 'customerConsents'))
             ->with('path', $this->path);
     }
 

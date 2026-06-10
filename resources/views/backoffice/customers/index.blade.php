@@ -1,7 +1,7 @@
 @extends('backoffice.layout', ['title' => 'Dashboard', 'active' => $path])
 
 @section('main-content')
-    <x-header-page title="CLienti" />
+    <x-header-page title="Clienti" />
     <div class="w-100">
         <div class="row">
             <div class="col-12">

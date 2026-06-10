@@ -193,6 +193,9 @@
                     <div class="col-12 col-md-6">
                         <div class="detail-label">Prodotto</div>
                         <div class="detail-value">{{ $product?->label ?? '—' }}</div>
+                        @if($product)
+                            <a href="{{ route('products.show', $product->id) }}" class="detail-link">Apri scheda prodotto</a>
+                        @endif
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="detail-label">Categoria</div>
@@ -320,6 +323,7 @@
                 <div class="customer-block">
                     <div class="detail-label">Nome</div>
                     <div class="detail-value"><i class="fa-regular fa-user"></i> {{ $order->customer->full_name }}</div>
+                    <a href="{{ route('customers.show', $order->customer->id) }}" class="detail-link">Apri scheda cliente</a>
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Email</div>
@@ -378,6 +382,14 @@
             </div>
         </div>
     </div>
+
+    @if(in_array(auth()->user()->role, ['god', 'admin']))
+        <div class="row g-3 mt-spacing-xl">
+            <div class="col-12">
+                @include('backoffice.orders._activity_log', ['logs' => $orderLogs])
+            </div>
+        </div>
+    @endif
 
     {{-- MODALI --}}
     @include('backoffice.orders._modal-edit-booking', ['order' => $order])

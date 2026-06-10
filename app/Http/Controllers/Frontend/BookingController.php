@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\OrderLogger;
 use App\Services\ProductAvailabilityService;
 use App\Services\ProductSeoService;
 use Illuminate\Http\JsonResponse;
@@ -26,6 +27,7 @@ class BookingController extends Controller
     public function __construct(
         private ProductAvailabilityService $availabilityService,
         private ProductSeoService $seoService,
+        private OrderLogger $logger,
     ) {}
 
     public function index(Request $request): View
@@ -316,8 +318,13 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Single-product cart: remove existing cart for this session
-            Cart::where('session_id', $sessionId)->delete();
+            // Se esisteva un cart precedente, logghiamo che è stato svuotato
+            // prima di sovrascriverlo (cliente che cambia idea su data/varianti).
+            $previousCart = Cart::where('session_id', $sessionId)->first();
+            if ($previousCart) {
+                $this->logger->logCartRemoved($previousCart, 'sostituito da nuovo carrello');
+                $previousCart->delete();
+            }
 
             $cart = Cart::create([
                 'session_id' => $sessionId,
@@ -334,6 +341,13 @@ class BookingController extends Controller
             foreach ($cartItemsData as $itemData) {
                 CartItem::create(array_merge(['cart_id' => $cart->id], $itemData));
             }
+
+            $itemsSummary = collect($cartItemsData)->map(fn ($i) => [
+                'variant_id' => $i['product_variant_id'],
+                'quantity'   => $i['quantity'],
+                'unit_price' => $i['unit_price'],
+            ])->all();
+            $this->logger->logCartStarted($cart, $itemsSummary, round($total, 2));
 
             DB::commit();
 
@@ -374,6 +388,7 @@ class BookingController extends Controller
             return response()->json(['error' => 'Carrello non trovato'], 404);
         }
 
+        $this->logger->logCartRemoved($cart, 'rimosso dal cliente');
         $cart->delete();
 
         return response()->json([
@@ -466,6 +481,13 @@ class BookingController extends Controller
             }
 
             $cart->update($cartUpdate);
+
+            // Attribuiamo i log al Customer appena collegato.
+            $this->logger->as($user)->logCartCustomerAssigned($cart, $user);
+            if (! empty($cartUpdate['consents_payload'])) {
+                $this->logger->as($user)->logCartConsentsAccepted($cart, $cartUpdate['consents_payload']);
+            }
+            $this->logger->endBatch();
 
             DB::commit();
 
