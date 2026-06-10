@@ -112,9 +112,9 @@
                         'phone'      => ['label' => 'Cellulare',              'type' => 'tel',  'payload' => 'phone'],
                         'tax_code'   => ['label' => 'Codice fiscale',         'type' => 'text', 'payload' => 'fiscal_code'],
                     ])
-                    <x-card class="cart-card step-card" title="Inserisci i tuoi dati" sub_title="i dati richiesti sono solo quelli necessari per questo prodotto">
-                        <div class="cart-item">
-                            <form id="customer-form" class="customer-form">
+                    <form id="customer-form" class="customer-form">
+                        <x-card class="cart-card step-card" title="Inserisci i tuoi dati" sub_title="i dati richiesti sono solo quelli necessari per questo prodotto">
+                            <div class="cart-item">
                                 <div class="form-row">
                                     <div class="form-group">
                                         <x-input name="name" label="Nome" required />
@@ -141,40 +141,42 @@
                                         </div>
                                     @endif
                                 @endforeach
+                            </div>
+                        </x-card>
 
-                                @if($partnerConsents->isNotEmpty())
-                                    @foreach($partnerConsents as $pc)
-                                        @php($pcText = $pc->contentField('content', app()->getLocale()) ?: ($pc->contentField('content', 'it') ?? ''))
-                                        <div class="form-group">
-                                            <label class="checkbox-label">
-                                                <input type="checkbox"
-                                                       class="partner-consent"
-                                                       name="consents[{{ $pc->id }}]"
-                                                       value="1"
-                                                       data-consent-id="{{ $pc->id }}"
-                                                       data-required="{{ $pc->is_required ? '1' : '0' }}"
-                                                       @if($pc->is_required) required @endif>
-                                                <span>{!! $pcText !!} @if($pc->is_required)*@endif</span>
-                                            </label>
-                                        </div>
-                                    @endforeach
-                                @else
+                        <div class="consents-block">
+                            @if($partnerConsents->isNotEmpty())
+                                @foreach($partnerConsents as $pc)
+                                    @php($pcText = $pc->contentField('content', app()->getLocale()) ?: ($pc->contentField('content', 'it') ?? ''))
                                     <div class="form-group">
                                         <label class="checkbox-label">
-                                            <input type="checkbox" id="privacy" name="privacy" required>
-                                            <span>Accetto la <a href="#" target="_blank">Privacy Policy</a> *</span>
+                                            <input type="checkbox"
+                                                   class="partner-consent"
+                                                   name="consents[{{ $pc->id }}]"
+                                                   value="1"
+                                                   data-consent-id="{{ $pc->id }}"
+                                                   data-required="{{ $pc->is_required ? '1' : '0' }}"
+                                                   @if($pc->is_required) required @endif>
+                                            <span class="consent-text">{!! $pcText !!}@if($pc->is_required)<span class="required-asterisk">*</span>@endif</span>
                                         </label>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" id="newsletter" name="newsletter">
-                                            <span>Desidero ricevere comunicazioni commerciali</span>
-                                        </label>
-                                    </div>
-                                @endif
-                            </form>
+                                @endforeach
+                            @else
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="privacy" name="privacy" required>
+                                        <span class="consent-text">Accetto la <a href="#" target="_blank">Privacy Policy</a><span class="required-asterisk">*</span></span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="newsletter" name="newsletter">
+                                        <span class="consent-text">Desidero ricevere comunicazioni commerciali</span>
+                                    </label>
+                                </div>
+                            @endif
                         </div>
-                    </x-card>
+                    </form>
                     </div>
 
                     <div class="cart-actions" id="step2-actions" style="display: none;">
@@ -620,8 +622,44 @@
     }
 
     .checkbox-label a {
-        color: var(--secondary-brand, #2A3493);
+        color: var(--primary-brand);
         text-decoration: underline;
+    }
+
+    .checkbox-label a:hover {
+        color: var(--primary-brand);
+        opacity: 0.85;
+    }
+
+    .consent-text {
+        display: inline;
+    }
+
+    .consent-text > p,
+    .consent-text > div {
+        display: inline;
+        margin: 0;
+    }
+
+    .required-asterisk {
+        color: var(--error, #DC3545);
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 1;
+        margin-left: 3px;
+        vertical-align: baseline;
+    }
+
+    .consents-block {
+        margin-top: 20px;
+        padding: 0 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .consents-block .form-group {
+        margin-bottom: 0;
     }
 
     .step-card {
