@@ -625,7 +625,7 @@
         color: var(--brand-primary-brand, #D24600);
 
         /* Body */
-        font-family: var(--typography-web-body-font, "DM Sans");
+        font-family: var(--typography-web-body-font), sans-serif;
         font-size: var(--size, 16px);
         font-style: normal;
         font-weight: var(--weight, 400);
@@ -634,7 +634,7 @@
 
     .checkbox-label a:hover {
         color: var(--brand-primary-brandlight);
-        font-family: var(--typography-web-body-font, "DM Sans");
+        font-family: var(--typography-web-body-font), sans-serif;
         font-size: var(--size, 16px);
         font-style: normal;
         opacity: 0.85;
