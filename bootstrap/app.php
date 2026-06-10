@@ -3,11 +3,16 @@
 use App\Http\Middleware\ApiToken;
 use App\Http\Middleware\CartExists;
 use App\Http\Middleware\Token;
+use App\Notifications\ErrorTelegramNotify;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -46,5 +51,40 @@ return Application::configure(basePath: dirname(__DIR__))
                 'user_agent' => $request->userAgent(),
                 'ip'       => $request->ip(),
             ]);
+        });
+
+        $exceptions->report(function (Throwable $e) {
+            try {
+                if ($e instanceof NotFoundHttpException) {
+                    return;
+                }
+
+                $chatId = config('services.telegram.error_chat_id');
+                if (empty($chatId)) {
+                    return;
+                }
+
+                $fingerprint = 'tg_err:' . md5(get_class($e) . '|' . $e->getFile() . ':' . $e->getLine() . '|' . $e->getMessage());
+                if (Cache::has($fingerprint)) {
+                    return;
+                }
+                Cache::put($fingerprint, 1, now()->addMinutes(5));
+
+                $context = [];
+                if (app()->bound('request') && Request::instance() !== null) {
+                    $context['url'] = Request::fullUrl();
+                    $context['method'] = Request::method();
+                }
+                if (Auth::check()) {
+                    $context['user_id'] = Auth::id();
+                }
+
+                Notification::route('telegram', $chatId)
+                    ->notify(new ErrorTelegramNotify($e, $context));
+            } catch (Throwable $inner) {
+                logger()->error('ErrorTelegramNotify failed', [
+                    'message' => $inner->getMessage(),
+                ]);
+            }
         });
     })->create();

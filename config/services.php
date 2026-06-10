@@ -41,4 +41,10 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_ID'),
+        'group_id' => env('TELEGRAM_GROUP_ID'),
+        'error_chat_id' => env('TELEGRAM_ERROR_CHAT_ID'),
+    ],
+
 ];

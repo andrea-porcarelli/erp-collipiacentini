@@ -10,14 +10,14 @@
 | Sorgente      : public/backoffice/css/Miticko.css
 | Mode          : Light
 | Default brand : miticko
-| Generato     : 2026-06-05 13:58:25
+| Generato     : 2026-06-10 10:49:28
 */
 
 return [
     'meta' => [
         'source'    => 'public/backoffice/css/Miticko.css',
         'mode'      => 'Light',
-        'synced_at' => '2026-06-05 13:58:25',
+        'synced_at' => '2026-06-10 10:49:28',
     ],
 
     'default_brand' => 'miticko',
