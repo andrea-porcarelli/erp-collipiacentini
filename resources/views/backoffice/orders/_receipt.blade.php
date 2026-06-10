@@ -161,6 +161,18 @@
             padding-top: 3px;
         }
 
+        @if($brand === 'veleia')
+        /* --- QR box override Veleia --- */
+        .ticket-card .qr { width: 230px; }
+        .qr-box { border-radius: 16px; }
+        .qr-box td { padding: 26px 28px 22px 28px; }
+        .qr-box img { width: 150px; height: 150px; }
+        .ticket-card .qr .code {
+            font-size: 10.5px;
+            padding-top: 8px;
+        }
+        @endif
+
         /* --- Section --- */
         .section { margin: 0 0 24px; }
         .section h3 {
@@ -272,10 +284,15 @@
         'quietzoneSize'   => 1,
     ]));
 
-    $logoCandidate = public_path("assets/images/logo-{$brand}.png");
-    $logoPath = file_exists($logoCandidate) ? $logoCandidate : public_path('assets/images/logo-miticko.png');
-    $hasLogo  = file_exists($logoPath);
-    $logoSrc  = $hasLogo ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+    $partnerCover = $order->partner?->cover;
+    $logoPath = null;
+    $logoMime = null;
+    if ($partnerCover && \Illuminate\Support\Facades\Storage::disk('public')->exists($partnerCover->file_path)) {
+        $logoPath = \Illuminate\Support\Facades\Storage::disk('public')->path($partnerCover->file_path);
+        $logoMime = $partnerCover->file_type ?: 'image/png';
+    }
+    $hasLogo = $logoPath !== null;
+    $logoSrc = $hasLogo ? 'data:' . $logoMime . ';base64,' . base64_encode(file_get_contents($logoPath)) : null;
 
     // Il footer riporta sempre il marchio Miticko, indipendentemente dal brand del partner.
     $footerLogoPath = public_path('assets/images/logo-miticko.png');
