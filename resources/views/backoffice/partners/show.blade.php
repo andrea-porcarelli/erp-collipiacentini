@@ -25,8 +25,8 @@
                 <x-chip label="Privacy Policy"        appearance="Resting" :dataset="['tab-target' => '#partner-privacy-panel']" />
                 <x-chip label="Cookie Policy"         appearance="Resting" :dataset="['tab-target' => '#partner-cookie-panel']" />
                 <x-chip label="Termini e Condizioni"  appearance="Resting" :dataset="['tab-target' => '#partner-terms-panel']" />
+                <x-chip label="Consensi utente"           appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
             @endif
-            <x-chip label="Consensi utente"           appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
         </div>
 
         {{-- Tabs Content --}}
@@ -38,8 +38,8 @@
                 <x-backoffice.partner.tab-policy :model="$model" type="privacy-policy"     field="privacy_policy"   label="Privacy Policy"        slug="privacy-policy"     panelId="partner-privacy-panel" />
                 <x-backoffice.partner.tab-policy :model="$model" type="cookie-policy"      field="cookie_policy"    label="Cookie Policy"         slug="cookie-policy"      panelId="partner-cookie-panel" />
                 <x-backoffice.partner.tab-policy :model="$model" type="termini-condizioni" field="terms_conditions" label="Termini e Condizioni"  slug="termini-condizioni" panelId="partner-terms-panel" />
+                <x-backoffice.partner.tab-consents :model="$model" />
             @endif
-            <x-backoffice.partner.tab-consents :model="$model" />
         </div>
     </div>
 
