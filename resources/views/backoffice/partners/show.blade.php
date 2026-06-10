@@ -78,6 +78,10 @@
     }
     </script>
     <style>
+        @if(Auth::user()->role === 'partner')
+        /* Ruolo partner: nasconde i pulsanti "Salva modifiche" su tutte le card del dettaglio. */
+        .btn-save-card { display: none !important; }
+        @endif
         .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content { border: none !important; }
         .text-field .text-field-container:has(.ck-editor) { display: block; padding: 0; overflow: hidden; }
         .text-field .text-field-container .ck.ck-editor { width: 100%; border: none; box-shadow: none; }
