@@ -622,12 +622,18 @@
     }
 
     .checkbox-label a {
-        color: var(--primary-brand);
-        text-decoration: underline;
+        color: var(--brand-primary-brand, #D24600);
+
+        /* Body */
+        font-family: var(--typography-web-body-font, "DM Sans");
+        font-size: var(--size, 16px);
+        font-style: normal;
+        font-weight: var(--weight, 400);
+        line-height: var(--line-height, 22px);
     }
 
     .checkbox-label a:hover {
-        color: var(--primary-brand);
+        color: var(--brand-primary-brandlight);
         opacity: 0.85;
     }
 
