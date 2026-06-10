@@ -44,13 +44,15 @@
                             </div>
                         @endforeach
                     </div>
-                    <div class="partner-page-content">
-                        @if(trim(strip_tags($content)) === '')
-                            <p class="text-muted">{{ __('whitelabel.page.empty') }}</p>
-                        @else
-                            {!! $content !!}
-                        @endif
-                    </div>
+                    <x-card class="mt-spacing-2xl">
+                        <div class="partner-page-content">
+                            @if(trim(strip_tags($content)) === '')
+                                <p class="text-muted">{{ __('whitelabel.page.empty') }}</p>
+                            @else
+                                {!! $content !!}
+                            @endif
+                        </div>
+                    </x-card>
                 @else
                     <div class="partner-page-content">
                         @if(trim(strip_tags($content)) === '')
