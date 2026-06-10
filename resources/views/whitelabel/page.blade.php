@@ -26,7 +26,8 @@
 
                     <div class="contact-cards">
                         @foreach($contactCards as $card)
-                            <div class="contact-card">
+
+                            <x-card>
                                 <div class="contact-card-icon">
                                     <i class="fa-regular {{ $card['icon'] }}"></i>
                                 </div>
@@ -41,7 +42,7 @@
                                         <span class="contact-card-empty">—</span>
                                     @endif
                                 </div>
-                            </div>
+                            </x-card>
                         @endforeach
                     </div>
                     <x-card class="mt-spacing-2xl">
