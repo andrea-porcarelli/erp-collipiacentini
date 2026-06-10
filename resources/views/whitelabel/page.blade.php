@@ -80,6 +80,7 @@
                 align-items: center;
                 justify-content: center;
                 text-align: center;
+                gap: var(--spacing-l);
             }
             .contact-card-icon {
                 font-size: 36px;
