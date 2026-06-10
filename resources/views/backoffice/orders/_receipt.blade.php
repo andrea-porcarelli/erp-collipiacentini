@@ -2,6 +2,25 @@
     $brand = $order->partner?->brand ?? config('design.default_brand', 'miticko');
     $t = config("design.brands.{$brand}.tokens")
         ?? config('design.brands.miticko.tokens', []);
+
+    $fontFamilies = [
+        'Work Sans' => [300, 400, 500, 600, 700],
+        'DM Sans'   => [300, 400, 500, 700],
+    ];
+    $fontFaces = [];
+    foreach ($fontFamilies as $family => $weights) {
+        $slug = str_replace(' ', '', $family);
+        foreach ($weights as $w) {
+            $path = storage_path("fonts/{$slug}-{$w}.ttf");
+            if (is_file($path)) {
+                $fontFaces[] = [
+                    'family' => $family,
+                    'weight' => $w,
+                    'b64'    => base64_encode(file_get_contents($path)),
+                ];
+            }
+        }
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="it">
@@ -10,6 +29,15 @@
     <title>Biglietto MTK-{{ $order->order_number }}</title>
     <style>
         @page { margin: 0; }
+
+        @foreach($fontFaces as $face)
+        @font-face {
+            font-family: "{{ $face['family'] }}";
+            font-style: normal;
+            font-weight: {{ $face['weight'] }};
+            src: url(data:font/ttf;base64,{{ $face['b64'] }}) format("truetype");
+        }
+        @endforeach
 
         * { box-sizing: border-box; }
 
