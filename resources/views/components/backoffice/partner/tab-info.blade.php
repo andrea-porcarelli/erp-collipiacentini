@@ -20,6 +20,12 @@
                 <div class="col-12 col-sm-4 mt-3">
                     <x-input :model="$model" name="email_notify" label="Email notifiche" />
                 </div>
+                <div class="col-12 col-sm-4 mt-3">
+                    <x-input :model="$model" name="phone_number" label="Numero di telefono" />
+                </div>
+                <div class="col-12 col-sm-4 mt-3">
+                    <x-input :model="$model" name="structure_address" label="Indirizzo struttura" />
+                </div>
             </div>
         </form>
 

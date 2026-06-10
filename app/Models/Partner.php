@@ -25,6 +25,8 @@ class Partner extends LogsModel
         'partner_code',
         'has_notify',
         'email_notify',
+        'phone_number',
+        'structure_address',
         'is_active',
         'sale_method',
         'domain_name',

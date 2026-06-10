@@ -163,10 +163,12 @@ class PartnerController extends CrudController
         }
 
         $this->interface->edit($partner, [
-            'partner_name' => $request->input('partner_name'),
-            'partner_code' => $hasOrders ? $partner->partner_code : $newCode,
-            'email_notify' => $request->input('email_notify'),
-            'is_active'    => (int) $request->input('is_active'),
+            'partner_name'      => $request->input('partner_name'),
+            'partner_code'      => $hasOrders ? $partner->partner_code : $newCode,
+            'email_notify'      => $request->input('email_notify'),
+            'phone_number'      => $request->input('phone_number'),
+            'structure_address' => $request->input('structure_address'),
+            'is_active'         => (int) $request->input('is_active'),
         ]);
     }
 
