@@ -9,18 +9,16 @@
         <div class="row w-100">
             <div class="col-12 col-md-10 offset-md-1">
                 <div class="hero mt-spacing-2xl mb-spacing-xl">
-                    <h1>{{ $title }}</h1>
+                    <h1>{{ $title }} - {{ $partner->partner_name }}</h1>
                 </div>
 
-                <x-card class="card-spacing">
-                    <div class="partner-page-content">
-                        @if(trim(strip_tags($content)) === '')
-                            <p class="text-muted">{{ __('whitelabel.page.empty') }}</p>
-                        @else
-                            {!! $content !!}
-                        @endif
-                    </div>
-                </x-card>
+                <div class="partner-page-content">
+                    @if(trim(strip_tags($content)) === '')
+                        <p class="text-muted">{{ __('whitelabel.page.empty') }}</p>
+                    @else
+                        {!! $content !!}
+                    @endif
+                </div>
             </div>
         </div>
     </div>
