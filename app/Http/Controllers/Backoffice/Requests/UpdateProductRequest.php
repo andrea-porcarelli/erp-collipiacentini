@@ -25,7 +25,7 @@ class UpdateProductRequest extends FormRequest
             'ecommerce' => [
                 'short_title' => ['required', 'string', 'max:55'],
                 'short_description' => ['required', 'string', 'max:110'],
-                'long_title' => ['required', 'string', 'max:62'],
+                'long_title' => ['required', 'string', 'max:108'],
             ],
             'duration' => [
                 'duration_days' => ['nullable', 'integer', 'min:0'],
@@ -68,7 +68,7 @@ class UpdateProductRequest extends FormRequest
             'short_description.required' => 'La descrizione breve è obbligatoria',
             'short_description.max' => 'La descrizione breve non può superare 110 caratteri',
             'long_title.required' => 'Il nome completo è obbligatorio',
-            'long_title.max' => 'Il nome completo non può superare 62 caratteri',
+            'long_title.max' => 'Il nome completo non può superare 108 caratteri',
             'meta_title.required' => 'Il nome prodotto pubblico è obbligatorio',
             'category_id.exists' => 'La categoria selezionata non è valida',
             'visit_info.max' => 'Le informazioni sulla visita non possono superare 600 caratteri',
