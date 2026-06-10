@@ -30,7 +30,7 @@
                     :name="$field"
                     rows="12"
                     label="Testo"
-                    maxlenght="$type === 'contatti' ? 600 : null"
+                    :maxlength="$type === 'contatti' ? 600 : null"
                 />
                 <button type="button"
                         class="btn-legal-translations bt-miticko bt-m-light position-absolute"
