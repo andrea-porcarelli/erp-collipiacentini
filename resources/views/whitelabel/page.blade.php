@@ -120,10 +120,17 @@
                     align-items: center;
                     justify-content: flex-start;
                     text-align: left;
-                    padding: 18px 22px;
-                    min-height: 0;
-                    gap: 18px;
-                    border-radius: 14px;
+                    display: flex;
+                    height: 189px;
+                    padding: var(--card-padding, 24px);
+                    gap: var(--card-spacing, 24px);
+                    align-self: stretch;
+                    border-radius: var(--card-border-radius, 24px);
+                    border: var(--card-border-width, 1px) solid var(--card-border-color, #F2F2F2);
+                    background: var(--card-background, #FFF);
+
+                    /* Elevation */
+                    box-shadow: var(--x) var(--y) var(--blur) var(--spread) var(--color);
                 }
                 .contact-card-icon {
                     font-size: 24px;
