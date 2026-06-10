@@ -64,6 +64,17 @@ class PartnerController extends CrudController
             ->with('path', $this->path);
     }
 
+    public function settings(): View
+    {
+        $partnerId = Auth::user()->partner_id;
+
+        if (! $partnerId) {
+            abort(404);
+        }
+
+        return $this->show($partnerId);
+    }
+
     public function uploadLogo(Request $request, Partner $partner): JsonResponse
     {
         $request->validate([

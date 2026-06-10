@@ -17,6 +17,8 @@
         @endif
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
+        @elseif(Auth::user()->role == 'partner' && Auth::user()->partner_id)
+            <x-navigation-item label="Impostazioni" icon="fa fa-gear" route="settings" :is_active="$active === 'settings'" />
         @endif
         <form method="POST" action="{{ route('logout') }}" class="item">
             @csrf

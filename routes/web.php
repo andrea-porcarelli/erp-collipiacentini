@@ -75,6 +75,9 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+        // Impostazioni partner (utente con ruolo "partner"): rende la show del proprio partner.
+        Route::get('/settings', [PartnerController::class, 'settings'])->name('settings');
+
         // Ticket scanner (FAB)
         Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');
         Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
