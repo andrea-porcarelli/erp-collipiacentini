@@ -634,6 +634,9 @@
 
     .checkbox-label a:hover {
         color: var(--brand-primary-brandlight);
+        font-family: var(--typography-web-body-font, "DM Sans");
+        font-size: var(--size, 16px);
+        font-style: normal;
         opacity: 0.85;
     }
 
