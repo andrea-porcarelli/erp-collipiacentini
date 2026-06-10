@@ -189,7 +189,10 @@
         @if($brand === 'veleia')
         /* --- Override Veleia: bordi squadrati per ticket card, QR box e badge --- */
         .ticket-card { border-radius: 0; }
-        .ticket-card .badge { border-radius: 0; }
+        .ticket-card .badge {
+            border-radius: 0;
+            text-transform: none; /* preserva "BIGLIETTO 1 di 4" (di minuscolo) */
+        }
         .ticket-card .qr { width: 230px; }
         .qr-box { border-radius: 0; }
         .qr-box td { padding: 26px 28px 22px 28px; }
@@ -465,7 +468,7 @@
             <tr>
                 <td class="ticket-card-cell">
                     <div class="badge-wrap">
-                        <span class="badge">Biglietto {{ $index + 1 }} di {{ $totalTickets }}</span>
+                        <span class="badge">BIGLIETTO {{ $index + 1 }} di {{ $totalTickets }}</span>
                     </div>
                     <table class="ticket-card-body">
                         <tr>
