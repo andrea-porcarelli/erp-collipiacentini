@@ -171,7 +171,7 @@ class OrderController extends Controller
                 return [
                     'label'         => $label,
                     'accepted'      => (bool) $cc->accepted,
-                    'is_required'   => (bool) $pc->is_required,
+                    'is_expired'    => (bool) $cc->accepted && $cc->expires_at && $cc->expires_at->isPast(),
                     'subscribed_at' => $cc->subscribed_at,
                     'expires_at'    => $cc->expires_at,
                 ];

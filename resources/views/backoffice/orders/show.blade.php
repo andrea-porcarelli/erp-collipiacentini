@@ -43,23 +43,6 @@
             font-style: normal;
             font-weight: var(--weight, 700);
         }
-        .consent-not-accepted-badge {
-            display: inline-block;
-            background: #FEE2E2;
-            color: #B91C1C;
-            font-size: .7rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 999px;
-            margin-left: 6px;
-            letter-spacing: .03em;
-        }
-        .consent-optional-hint {
-            color: #6B7280;
-            font-size: .8rem;
-            font-style: italic;
-            margin-left: 4px;
-        }
     </style>
     @endsection
     <div class="order-show-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3 mb-spacing-2xl">
@@ -371,26 +354,30 @@
                     @foreach($customerConsents as $i => $consent)
                         <div class="consent-block @if($i > 0) mt-spacing-l @endif">
                             <div class="detail-value">
-                                @if($consent['accepted'])
-                                    <i class="fa-solid fa-check text-success"></i>
-                                    {{ $consent['label'] }}
+                                @if($consent['is_expired'])
+                                    <i class="fa-regular fa-triangle-exclamation"></i>
+                                @elseif($consent['accepted'])
+                                    <i class="fa-solid fa-check"></i>
                                 @else
-                                    <i class="fa-solid fa-xmark text-danger"></i>
-                                    {{ $consent['label'] }}
-                                    <span class="consent-not-accepted-badge">NON ACCETTATO</span>
-                                    @if(!$consent['is_required'])
-                                        <span class="consent-optional-hint">(facoltativo)</span>
-                                    @endif
+                                    <i class="fa-solid fa-xmark"></i>
                                 @endif
+                                {{ $consent['label'] }}
                             </div>
-                            <div class="detail-label mt-spacing-xs">
-                                <i class="fa-regular fa-calendar"></i>
-                                Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
-                            </div>
-                            <div class="detail-label">
-                                <i class="fa-regular fa-hourglass"></i>
-                                Scadenza: {{ $consent['expires_at']?->translatedFormat('j M Y') ?? 'Nessuna' }}
-                            </div>
+                            @if($consent['accepted'])
+                                <div class="detail-label mt-spacing-xs">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
+                                </div>
+                                <div class="detail-label">
+                                    @if($consent['is_expired'])
+                                        <i class="fa-solid fa-hourglass-end"></i>
+                                        Scaduto il {{ $consent['expires_at']->translatedFormat('j M Y') }}
+                                    @else
+                                        <i class="fa-regular fa-hourglass"></i>
+                                        Scadenza: {{ $consent['expires_at']?->translatedFormat('j M Y') ?? 'Nessuna' }}
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 @endif
