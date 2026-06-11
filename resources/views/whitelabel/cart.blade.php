@@ -9,8 +9,8 @@
                         <h1>Il tuo carrello</h1>
                     </div>
                 </div>
-                @php($isFree = (float) $cart->total <= 0)
                 @if($cart)
+                    @php($isFree = (float) $cart->total <= 0)
                     <div class="button-progress mt-spacing-2xl" data-is-free="{{ $isFree ? '1' : '0' }}">
                         <button id="btn-step-riepilogo" data-mode="buttonAppearance-Neutral buttonSize-Small buttonEmphasis-MediumLow" type="button" class="bt-miticko">
                             Riepilogo
