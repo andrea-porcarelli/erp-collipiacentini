@@ -182,14 +182,6 @@
         drawer.setAttribute('aria-hidden', 'false');
         document.body.classList.add('ticket-scanner-drawer-open');
 
-        if (window.toastr) {
-            if (payload && payload.was_checked_in) {
-                toastr.success('Biglietto registrato come presentato');
-            } else if (payload && payload.already_checked_in) {
-                toastr.info('Biglietto già presentato');
-            }
-        }
-
         flashScannedRow(payload && payload.scanned_id);
         bindDrawerEvents();
         updateCheckinCounter();

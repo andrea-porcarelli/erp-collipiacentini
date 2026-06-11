@@ -32,34 +32,15 @@ class TicketScannerController extends Controller
 
             $this->authorizeOrderAccess($order);
 
-            $wasCheckedIn = false;
-            $alreadyCheckedIn = false;
-            if ($participant->status === 'booked') {
-                $oldStatus = $participant->status;
-                $participant->update(['status' => 'checked_in']);
-                $wasCheckedIn = true;
-                app(OrderLogger::class)->logCheckinChanged($order, [[
-                    'participant_id' => $participant->id,
-                    'code'           => $code,
-                    'from'           => $oldStatus,
-                    'to'             => 'checked_in',
-                    'source'         => 'scan',
-                ]]);
-            } elseif ($participant->status === 'checked_in') {
-                $alreadyCheckedIn = true;
-            }
-
             $this->loadOrder($order);
 
             return $this->success([
-                'response'           => view('backoffice.orders._ticket_scanner_preview', [
+                'response'   => view('backoffice.orders._ticket_scanner_preview', [
                     'order'              => $order,
                     'scannedParticipant' => $participant->id,
                 ])->render(),
-                'scanned_id'         => $participant->id,
-                'was_checked_in'     => $wasCheckedIn,
-                'already_checked_in' => $alreadyCheckedIn,
-                'order_id'           => $order->id,
+                'scanned_id' => $participant->id,
+                'order_id'   => $order->id,
             ]);
         } catch (\Throwable $e) {
             return $this->exception($e);

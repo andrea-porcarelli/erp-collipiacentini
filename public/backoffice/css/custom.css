@@ -1903,4 +1903,7 @@ table.order-detail-tickets tbody tr:last-child td {
     font-weight: var(--weight, 300);
     line-height: var(--line-height, 16px); /* 114.286% */
 }
+.consent-block .detail-label {
+    margin-top: var(--spacing-xs);
+}
 
