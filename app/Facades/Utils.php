@@ -11,7 +11,7 @@ class Utils
 {
     public static  function site_title() : string
     {
-        return 'Sito Test';
+        return 'Miticko';
     }
     public static  function company_id() : string
     {
