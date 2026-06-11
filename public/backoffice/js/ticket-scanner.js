@@ -261,8 +261,10 @@
             }
         });
 
+        var toastOptions = { positionClass: 'toast-top-center' };
+
         if (!changes.length) {
-            if (window.toastr) toastr.info('Nessuna modifica da salvare');
+            if (window.toastr) toastr.info('Nessuna modifica da salvare', '', toastOptions);
             return;
         }
 
@@ -278,14 +280,14 @@
             $selects.each(function () {
                 $(this).attr('data-original', $(this).val());
             });
-            if (window.toastr) toastr.success('Modifiche salvate');
+            if (window.toastr) toastr.success('Modifiche salvate', '', toastOptions);
         })
         .fail(function (xhr) {
             var msg = 'Errore durante il salvataggio';
             if (xhr && xhr.responseJSON) {
                 msg = xhr.responseJSON.response || xhr.responseJSON.message || msg;
             }
-            if (window.toastr) toastr.error(msg);
+            if (window.toastr) toastr.error(msg, '', toastOptions);
         })
         .always(function () {
             if ($btn) $btn.prop('disabled', false);
