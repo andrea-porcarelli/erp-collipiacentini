@@ -13,7 +13,6 @@ use App\Interfaces\OrderInterface;
 use App\Mail\OrderConfirmationMail;
 use App\Models\CustomerConsent;
 use App\Models\Order;
-use App\Models\PartnerConsent;
 use App\Services\OrderLogger;
 use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
@@ -161,12 +160,8 @@ class OrderController extends Controller
             ->values()
             ->map(function ($cc) {
                 $pc = $cc->partnerConsent;
-                if ($pc->code === PartnerConsent::CODE_TERMS) {
-                    $label = 'Privacy & Cookie Policy / Termini e Condizioni';
-                } else {
-                    $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
-                    $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
-                }
+                $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
+                $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
 
                 return [
                     'label'         => $label,

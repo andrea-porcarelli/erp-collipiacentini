@@ -157,7 +157,7 @@
                                                    data-consent-id="{{ $pc->id }}"
                                                    data-required="{{ $pc->is_required ? '1' : '0' }}"
                                                    @if($pc->is_required) required @endif>
-                                            <span class="consent-text">{!! $pcText !!}@if($pc->is_required)<span class="required-asterisk">*</span>@endif</span>
+                                            <span class="consent-text">{!! $pcText !!}</span>
                                         </label>
                                     </div>
                                 @endforeach
@@ -165,7 +165,7 @@
                                 <div class="form-group">
                                     <label class="checkbox-label">
                                         <input type="checkbox" id="privacy" name="privacy" required>
-                                        <span class="consent-text">Accetto la <a href="#" target="_blank">Privacy Policy</a><span class="required-asterisk">*</span></span>
+                                        <span class="consent-text">Accetto la <a href="#" target="_blank">Privacy Policy</a></span>
                                     </label>
                                 </div>
                                 <div class="form-group">

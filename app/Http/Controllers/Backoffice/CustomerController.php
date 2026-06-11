@@ -6,7 +6,6 @@ use App\Facades\Utils;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CustomerInterface;
 use App\Models\CustomerConsent;
-use App\Models\PartnerConsent;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -51,16 +50,13 @@ class CustomerController extends Controller
             ->values()
             ->map(function ($cc) {
                 $pc = $cc->partnerConsent;
-                if ($pc->code === PartnerConsent::CODE_TERMS) {
-                    $label = 'Privacy & Cookie Policy / Termini e Condizioni';
-                } else {
-                    $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
-                    $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
-                }
+                $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
+                $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
 
                 return [
                     'label'         => $label,
                     'accepted'      => (bool) $cc->accepted,
+                    'is_expired'    => (bool) $cc->accepted && $cc->expires_at && $cc->expires_at->isPast(),
                     'subscribed_at' => $cc->subscribed_at,
                     'expires_at'    => $cc->expires_at,
                 ];

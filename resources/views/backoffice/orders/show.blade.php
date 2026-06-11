@@ -353,16 +353,24 @@
                 @else
                     @foreach($customerConsents as $i => $consent)
                         <div class="consent-block @if($i > 0) mt-spacing-l @endif">
-                            <div class="detail-value">
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <div class="detail-value flex-grow-1">{{ $consent['label'] }}</div>
+
                                 @if($consent['is_expired'])
-                                    <i class="fa-regular fa-triangle-exclamation"></i>
+                                    <span class="consent-status consent-status--expired">
+                                        <i class="fa-regular fa-triangle-exclamation"></i> SCADUTO
+                                    </span>
                                 @elseif($consent['accepted'])
-                                    <i class="fa-solid fa-check"></i>
+                                    <span class="consent-status consent-status--granted">
+                                        <i class="fa-solid fa-check"></i> CONCESSO
+                                    </span>
                                 @else
-                                    <i class="fa-solid fa-xmark"></i>
+                                    <span class="consent-status consent-status--denied">
+                                        <i class="fa-solid fa-xmark"></i> NON CONCESSO
+                                    </span>
                                 @endif
-                                {{ $consent['label'] }}
                             </div>
+
                             @if($consent['accepted'])
                                 <div class="detail-label mt-spacing-xs">
                                     <i class="fa-regular fa-calendar"></i>

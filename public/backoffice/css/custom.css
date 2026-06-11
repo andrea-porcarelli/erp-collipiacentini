@@ -1868,3 +1868,24 @@ table.order-detail-tickets tbody tr:last-child td {
     }
 }
 
+/* Consensi utente — pill di stato */
+.consent-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    background: #F5F5F5;
+    color: #4A4A4A;
+    border: 1px solid #E5E5E5;
+    flex-shrink: 0;
+}
+.consent-status i { font-size: 10px; }
+.consent-status--granted i { color: var(--brand-success-brand, #1F9F5A); }
+.consent-status--expired i { color: var(--brand-warning-brand, #C77A1E); }
+.consent-status--denied  i { color: var(--brand-error-brand, #B83A3A); }
+

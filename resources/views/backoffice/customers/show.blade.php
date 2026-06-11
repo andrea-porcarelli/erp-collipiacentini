@@ -151,22 +151,39 @@
                 @else
                     @foreach($customerConsents as $i => $consent)
                         <div class="consent-block @if($i > 0) mt-spacing-l @endif">
-                            <div class="detail-value">
-                                @if($consent['accepted'])
-                                    <i class="fa-solid fa-check"></i>
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <div class="detail-value flex-grow-1">{{ $consent['label'] }}</div>
+
+                                @if($consent['is_expired'])
+                                    <span class="consent-status consent-status--expired">
+                                        <i class="fa-regular fa-triangle-exclamation"></i> SCADUTO
+                                    </span>
+                                @elseif($consent['accepted'])
+                                    <span class="consent-status consent-status--granted">
+                                        <i class="fa-solid fa-check"></i> CONCESSO
+                                    </span>
                                 @else
-                                    <i class="fa-solid fa-xmark text-secondary"></i>
+                                    <span class="consent-status consent-status--denied">
+                                        <i class="fa-solid fa-xmark"></i> NON CONCESSO
+                                    </span>
                                 @endif
-                                {{ $consent['label'] }}
                             </div>
-                            <div class="detail-label mt-spacing-xs">
-                                <i class="fa-regular fa-calendar"></i>
-                                Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
-                            </div>
-                            <div class="detail-label">
-                                <i class="fa-regular fa-hourglass"></i>
-                                Scadenza: {{ $consent['expires_at']?->translatedFormat('j M Y') ?? 'Nessuna' }}
-                            </div>
+
+                            @if($consent['accepted'])
+                                <div class="detail-label mt-spacing-xs">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    Sottoscrizione: {{ $consent['subscribed_at']?->translatedFormat('j M Y') ?? '—' }}
+                                </div>
+                                <div class="detail-label">
+                                    @if($consent['is_expired'])
+                                        <i class="fa-solid fa-hourglass-end"></i>
+                                        Scaduto il {{ $consent['expires_at']->translatedFormat('j M Y') }}
+                                    @else
+                                        <i class="fa-regular fa-hourglass"></i>
+                                        Scadenza: {{ $consent['expires_at']?->translatedFormat('j M Y') ?? 'Nessuna' }}
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 @endif
