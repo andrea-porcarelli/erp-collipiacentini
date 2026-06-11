@@ -32,6 +32,7 @@
 
             gtag('config', 'G-YQREBGDQWZ');
         </script>
+        <script src="https://t.contentsquare.net/uxa/7ae0090746cfd.js" defer></script>
     @endif
 </head>
 
