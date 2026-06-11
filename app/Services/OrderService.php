@@ -109,10 +109,12 @@ class OrderService
     }
 
     /**
-     * Snapshot dei consensi (obbligatori e non) raccolti nel carrello al momento
-     * dell'ordine. Crea un record CustomerConsent per ogni consenso legato a questo
-     * ordine specifico, così il dettaglio ordine resta coerente anche se il cliente
-     * cambia le proprie scelte su ordini successivi.
+     * Upsert dei consensi raccolti nel carrello.
+     *
+     * Modello: un solo record per (customer_id, partner_consent_id). Su riacquisto
+     * lasciamo invariato il subscribed_at originario (data del primo consenso) e
+     * aggiorniamo solo expires_at e accepted. Se il consenso non esiste ancora,
+     * viene creato con subscribed_at = ora corrente.
      */
     protected function snapshotCartConsents(Cart $cart, Order $order, Customer $customer): void
     {
@@ -126,15 +128,26 @@ class OrderService
                 continue;
             }
 
-            CustomerConsent::create([
-                'customer_id'        => $customer->id,
-                'order_id'           => $order->id,
-                'partner_consent_id' => $entry['partner_consent_id'],
-                'partner_id'         => $cart->partner_id,
-                'accepted'           => (bool) ($entry['accepted'] ?? false),
-                'subscribed_at'      => $entry['subscribed_at'] ?? now(),
-                'expires_at'         => $entry['expires_at'] ?? null,
-            ]);
+            $existing = CustomerConsent::where('customer_id', $customer->id)
+                ->where('partner_consent_id', $entry['partner_consent_id'])
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'partner_id' => $cart->partner_id,
+                    'accepted'   => (bool) ($entry['accepted'] ?? false),
+                    'expires_at' => $entry['expires_at'] ?? null,
+                ]);
+            } else {
+                CustomerConsent::create([
+                    'customer_id'        => $customer->id,
+                    'partner_consent_id' => $entry['partner_consent_id'],
+                    'partner_id'         => $cart->partner_id,
+                    'accepted'           => (bool) ($entry['accepted'] ?? false),
+                    'subscribed_at'      => $entry['subscribed_at'] ?? now(),
+                    'expires_at'         => $entry['expires_at'] ?? null,
+                ]);
+            }
         }
     }
 

@@ -153,9 +153,10 @@ class OrderController extends Controller
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
         $customerConsents = CustomerConsent::with('partnerConsent')
-            ->where('order_id', $order->id)
+            ->where('customer_id', $order->customer_id)
+            ->where('partner_id', $order->partner_id)
             ->get()
-            ->filter(fn ($cc) => $cc->partnerConsent !== null)
+            ->filter(fn ($cc) => $cc->partnerConsent !== null && $cc->partnerConsent->is_active)
             ->sortBy(fn ($cc) => $cc->partnerConsent->position)
             ->values()
             ->map(function ($cc) {
@@ -170,6 +171,7 @@ class OrderController extends Controller
                 return [
                     'label'         => $label,
                     'accepted'      => (bool) $cc->accepted,
+                    'is_required'   => (bool) $pc->is_required,
                     'subscribed_at' => $cc->subscribed_at,
                     'expires_at'    => $cc->expires_at,
                 ];

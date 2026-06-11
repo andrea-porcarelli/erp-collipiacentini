@@ -43,6 +43,23 @@
             font-style: normal;
             font-weight: var(--weight, 700);
         }
+        .consent-not-accepted-badge {
+            display: inline-block;
+            background: #FEE2E2;
+            color: #B91C1C;
+            font-size: .7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+            letter-spacing: .03em;
+        }
+        .consent-optional-hint {
+            color: #6B7280;
+            font-size: .8rem;
+            font-style: italic;
+            margin-left: 4px;
+        }
     </style>
     @endsection
     <div class="order-show-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3 mb-spacing-2xl">
@@ -355,11 +372,16 @@
                         <div class="consent-block @if($i > 0) mt-spacing-l @endif">
                             <div class="detail-value">
                                 @if($consent['accepted'])
-                                    <i class="fa-solid fa-check"></i>
+                                    <i class="fa-solid fa-check text-success"></i>
+                                    {{ $consent['label'] }}
                                 @else
-                                    <i class="fa-solid fa-xmark text-secondary"></i>
+                                    <i class="fa-solid fa-xmark text-danger"></i>
+                                    {{ $consent['label'] }}
+                                    <span class="consent-not-accepted-badge">NON ACCETTATO</span>
+                                    @if(!$consent['is_required'])
+                                        <span class="consent-optional-hint">(facoltativo)</span>
+                                    @endif
                                 @endif
-                                {{ $consent['label'] }}
                             </div>
                             <div class="detail-label mt-spacing-xs">
                                 <i class="fa-regular fa-calendar"></i>
