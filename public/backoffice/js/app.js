@@ -416,6 +416,7 @@ const datatable = (parameters) => {
         d.filters = filterData;
         return d;
     };
+    $.fn.dataTable.ext.errMode = 'none';
     let table = new DataTable('.datatable', {
         responsive: true,
         searching: false,
@@ -445,10 +446,23 @@ const datatable = (parameters) => {
         ajax: {
             url: parameters.path,
             type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
             },
-            data:  filters
+            data:  filters,
+            error: function(xhr) {
+                if (xhr.status === 419 || xhr.status === 401) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning('Sessione scaduta, ricarico la pagina');
+                    }
+                    setTimeout(function() { location.reload(); }, 1500);
+                    return;
+                }
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Errore nel caricamento dei dati');
+                }
+                console.error('DataTable AJAX error', xhr.status, (xhr.responseText || '').slice(0, 200));
+            }
         },
         drawCallback: function (api) {
             if (parameters.drawCallback !== undefined) {
