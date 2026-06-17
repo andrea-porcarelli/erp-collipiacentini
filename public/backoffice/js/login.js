@@ -18,6 +18,18 @@ const login = () => {
         }, 1000)
     }).catch(errors => {
         console.error(errors);
+        if (errors.status === 419 || errors.status === 401) {
+            const supporting_text = $('.form-login')
+                .find("input:last")
+                .parent()
+                .parent()
+                .find(".supporting-text");
+            supporting_text
+                .addClass("danger")
+                .show()
+                .html('Ricarica la pagina o cambia connessione');
+            return;
+        }
         App.renderErrors(errors, $('.form-login'))
     })
 }
