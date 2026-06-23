@@ -9,7 +9,7 @@ use App\Services\OrderService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Http\Response;
 
 class PaymentController extends Controller
 {
@@ -96,6 +96,7 @@ class PaymentController extends Controller
             if ($existingOrder) {
                 // Ordine già esistente, elimina il carrello e ritorna successo
                 $cart->delete();
+                $this->grantSuccessAccess($existingOrder->order_number);
 
                 return response()->json([
                     'success' => true,
@@ -117,6 +118,7 @@ class PaymentController extends Controller
 
             // Elimina il carrello
             $cart->delete();
+            $this->grantSuccessAccess($order->order_number);
 
             return response()->json([
                 'success' => true,
@@ -167,6 +169,7 @@ class PaymentController extends Controller
             $this->orderService->completeOrder($order);
 
             $cart->delete();
+            $this->grantSuccessAccess($order->order_number);
 
             return response()->json([
                 'success' => true,
@@ -184,16 +187,39 @@ class PaymentController extends Controller
     }
 
     /**
-     * Pagina di successo ordine
+     * Pagina di successo ordine.
+     * Visibile solo a chi ha appena completato l'ordine in questa sessione browser.
      */
-    public function success_payment(string $orderNumber): View
+    public function success_payment(string $orderNumber): Response
     {
+        $allowed = array_map('strval', (array) session('completed_orders', []));
+
+        if (!in_array($orderNumber, $allowed, true)) {
+            abort(404);
+        }
+
         $order = Order::where('order_number', $orderNumber)
             ->with(['customer', 'orderProducts.product', 'partner'])
             ->firstOrFail();
 
         $partner = $order->partner;
 
-        return view('whitelabel.order-success', compact('order', 'partner'));
+        return response()
+            ->view('whitelabel.order-success', compact('order', 'partner'))
+            ->header('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    }
+
+    /**
+     * Registra in sessione l'ordine appena completato, abilitando l'accesso
+     * alla pagina di successo per questo visitatore.
+     */
+    protected function grantSuccessAccess(string $orderNumber): void
+    {
+        $completed = array_map('strval', (array) session('completed_orders', []));
+
+        if (!in_array($orderNumber, $completed, true)) {
+            $completed[] = $orderNumber;
+            session(['completed_orders' => $completed]);
+        }
     }
 }

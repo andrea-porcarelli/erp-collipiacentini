@@ -1,5 +1,10 @@
 @extends('whitelabel.layout', compact('partner'))
 
+@section('head')
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <title>Ordine confermato{{ $partner ? ' - ' . $partner->partner_name : '' }}</title>
+@endsection
+
 @section('content')
     <div class="container mt-5" style="min-height: 600px">
         <div class="row w-100">
