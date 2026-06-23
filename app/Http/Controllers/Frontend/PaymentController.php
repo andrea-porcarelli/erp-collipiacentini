@@ -8,8 +8,9 @@ use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class PaymentController extends Controller
 {
@@ -195,7 +196,7 @@ class PaymentController extends Controller
         $allowed = array_map('strval', (array) session('completed_orders', []));
 
         if (!in_array($orderNumber, $allowed, true)) {
-            abort(404);
+            return redirect('/shop');
         }
 
         $order = Order::where('order_number', $orderNumber)
