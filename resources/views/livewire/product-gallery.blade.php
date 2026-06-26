@@ -4,7 +4,7 @@
         <div class="gallery-main-image">
             @if ($selectedImage)
                 <img src="{{ asset('storage/' . $selectedImage->file_path) }}"
-                     alt="{{ $selectedImage->description ?? 'Gallery image' }}"
+                     alt="{{ $selectedImage->description ?? \App\Support\ImageAltNormalizer::normalize($selectedImage->file_name, $product->image_alt) }}"
                      class="main-image"
                      onerror="this.onerror=null; this.src='https://via.placeholder.com/800x600/2A3493/ffffff?text=Immagine+Non+Disponibile';">
             @endif
@@ -19,7 +19,7 @@
                              wire:click="selectImage({{ $index }})"
                              data-index="{{ $index }}">
                             <img src="{{ asset('storage/' . $image->file_path) }}"
-                                 alt="{{ $image->description ?? 'Thumbnail ' . ($index + 1) }}"
+                                 alt="{{ $image->description ?? \App\Support\ImageAltNormalizer::normalize($image->file_name, $product->image_alt) }}"
                                  onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100/2A3493/ffffff?text={{ $index + 1 }}';">
                         </div>
                     @endforeach

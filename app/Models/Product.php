@@ -246,6 +246,14 @@ class Product extends LogsModel
         return $this->contentField('visit_info');
     }
 
+    public function getImageAltAttribute(): string
+    {
+        $media    = $this->cover->first() ?? $this->gallery->first();
+        $fallback = $this->meta_title ?: $this->label ?: '';
+
+        return \App\Support\ImageAltNormalizer::normalize($media?->file_name, $fallback);
+    }
+
     public function getRouteAttribute(): string
     {
         try {
