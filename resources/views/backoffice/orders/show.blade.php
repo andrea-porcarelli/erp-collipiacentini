@@ -399,7 +399,8 @@
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
-                <x-button id="btn-cancel-order" label="Annulla ordine" status="Error" emphasis="MediumLow" />
+                <x-button id="btn-cancel-order" label="Annulla ordine" status="Error" emphasis="MediumLow"
+                    :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-cancel-order']" />
             </div>
         </div>
     </div>

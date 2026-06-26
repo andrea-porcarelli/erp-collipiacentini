@@ -1,7 +1,9 @@
 import './bootstrap';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import toastr from 'toastr';
 import Sortable from 'sortablejs';
+
+window.bootstrap = bootstrap;
 
 // Configura toastr globalmente
 toastr.options = {

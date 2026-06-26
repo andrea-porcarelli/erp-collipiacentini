@@ -346,12 +346,7 @@ $(function () {
         });
     }
 
-    // Annulla ordine (apre il modale con scelta rimborso sì/no)
-    const cancelModalEl = document.getElementById('modal-cancel-order');
-    $('#btn-cancel-order').on('click', function () {
-        if (cancelModalEl) bootstrap.Modal.getOrCreateInstance(cancelModalEl).show();
-    });
-
+    // Annulla ordine — il bottone apre il modale via data-bs-toggle
     $(document).on('click', '#modal-cancel-order .btn-success', function () {
         const $btn = $(this);
         if ($btn.prop('disabled')) return;
@@ -367,9 +362,8 @@ $(function () {
             data: { issue_refund: issueRefund },
         }).then((res) => {
             toastr.success(res?.response || 'Ordine annullato');
-            if (cancelModalEl) {
-                try { bootstrap.Modal.getOrCreateInstance(cancelModalEl).hide(); } catch (_) {}
-            }
+            const closeBtn = document.querySelector('#modal-cancel-order [data-bs-dismiss="modal"]');
+            if (closeBtn) closeBtn.click();
             setTimeout(() => location.reload(), 1000);
         }).catch((errors) => {
             $btn.prop('disabled', false);
