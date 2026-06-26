@@ -7,10 +7,13 @@
         $productImageUrl = $productImage
             ? asset('storage/' . $productImage->file_path)
             : asset('whitelabel/images/product.jpg');
+        $productImageName = $productImage
+            ? $productImage->file_name
+            : '';
     @endphp
     <div class="card-product-container @if(!$product->is_available) is-unavailable @endif">
         <figure>
-            <img title="{{ $product->contentField('short_title') }}" alt="{{ $product->contentField('short_title') }}" src="{{ $productImageUrl }}">
+            <img alt="{{ $productImageName }}" src="{{ $productImageUrl }}">
         </figure>
         <section>
             <div class="product-detail mr-spacing-4xl">
