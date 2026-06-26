@@ -19,7 +19,7 @@
                 @else
                     <x-label appearance="Error">NON DISPONIBILE</x-label>
                 @endif
-                <h3 class="mt-2">{{ $product->contentField('short_title') }}</h3>
+                <h2 class="mt-2">{{ $product->contentField('short_title') }}</h2>
                 <div class=" d-none d-sm-block">
                     <div class="details">
                         <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->category->label" />

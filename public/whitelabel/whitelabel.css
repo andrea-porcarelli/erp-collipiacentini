@@ -342,7 +342,7 @@ body {
     flex: 1;
     min-width: 0;
 }
-.card-product .card-body section h3 {
+.card-product .card-body section h2 {
     color: var(--text-main, #0D0D0D);
     font-family: var(--font-font-1, "DM Sans"), sans-serif;
     font-size: var(--typography-title-size-large, 28px);
