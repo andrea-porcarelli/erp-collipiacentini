@@ -27,7 +27,7 @@
             </div>
             <div class="logo">
                 <a href="{{ route('booking.index') }}">
-                    <img src="{{ asset('storage/' . Utils::partner_path()) }}" title="{{$partner->partner_name}}" />
+                    <img src="{{ asset('storage/' . Utils::partner_path()) }}" title="{{$partner->partner_name ?? ''}}" />
                 </a>
             </div>
             <div class="languages">
