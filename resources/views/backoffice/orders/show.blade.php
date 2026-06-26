@@ -405,6 +405,7 @@
             </x-card>
 
             <div class="d-flex gap-2 order-show-footer-actions">
+                @dump($isOrderCancelled)
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
