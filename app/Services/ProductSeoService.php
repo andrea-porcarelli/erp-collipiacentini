@@ -113,7 +113,10 @@ class ProductSeoService
     private function buildListingJsonLd(Partner $partner, Collection $products): array
     {
         $items = $products->values()->map(function (Product $p, int $i) use ($partner) {
-            $price = (float) ($p->lowest_price_with_commission ?? 0);
+            $price        = (float) ($p->lowest_price_with_commission ?? 0);
+            $availability = $p->is_available && $price > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock';
 
             return [
                 '@type'    => 'ListItem',
@@ -125,18 +128,17 @@ class ProductSeoService
                     '@type'       => 'Product',
                     'name'        => $p->meta_title ?: $p->label,
                     'description' => $p->intro ?? $p->description,
+                    'sku'         => $p->product_code,
                     'image'       => $this->productImage($p),
                     'url'         => $p->route,
                     'brand'       => $partner->partner_name ? ['@type' => 'Brand', 'name' => $partner->partner_name] : null,
-                    'offers'      => $price > 0 ? [
+                    'offers'      => [
                         '@type'         => 'AggregateOffer',
                         'priceCurrency' => 'EUR',
                         'lowPrice'      => number_format($price, 2, '.', ''),
-                        'availability'  => $p->is_available
-                            ? 'https://schema.org/InStock'
-                            : 'https://schema.org/OutOfStock',
+                        'availability'  => $availability,
                         'url'           => $p->route,
-                    ] : null,
+                    ],
                 ]),
             ];
         })->all();
@@ -159,36 +161,60 @@ class ProductSeoService
         return [
             '@context' => 'https://schema.org',
             '@graph'   => array_merge(
-                [$this->buildProductNode($product)],
+                [$this->buildProductNode($product, $events)],
                 $events,
             ),
         ];
     }
 
-    private function buildProductNode(Product $product): array
+    private function buildProductNode(Product $product, array $events = []): array
     {
-        $price = (float) ($product->lowest_price_with_commission ?? 0);
+        $price       = (float) ($product->lowest_price_with_commission ?? 0);
+        $available   = (bool) $product->is_available;
+        $availability = $available && $price > 0
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock';
+
+        $offers = [
+            '@type'         => 'AggregateOffer',
+            'priceCurrency' => 'EUR',
+            'lowPrice'      => number_format($price, 2, '.', ''),
+            'availability'  => $availability,
+            'url'           => $product->route,
+            'offerCount'    => max(count($events), 1),
+        ];
+
+        if ($validUntil = $this->priceValidUntil($events)) {
+            $offers['priceValidUntil'] = $validUntil;
+        }
 
         return array_filter([
             '@type'       => 'Product',
             '@id'         => $product->route . '#product',
             'name'        => $product->meta_title ?: $product->label,
             'description' => $product->intro ?? $product->description,
+            'sku'         => $product->product_code,
             'image'       => $this->productImage($product),
             'url'         => $product->route,
             'brand'       => $product->partner?->partner_name
                 ? ['@type' => 'Brand', 'name' => $product->partner->partner_name]
                 : null,
-            'offers'      => $price > 0 ? [
-                '@type'         => 'AggregateOffer',
-                'priceCurrency' => 'EUR',
-                'lowPrice'      => number_format($price, 2, '.', ''),
-                'availability'  => $product->is_available
-                    ? 'https://schema.org/InStock'
-                    : 'https://schema.org/OutOfStock',
-                'url'           => $product->route,
-            ] : null,
+            'offers'      => $offers,
         ]);
+    }
+
+    private function priceValidUntil(array $events): ?string
+    {
+        $dates = array_filter(array_map(
+            fn ($e) => $e['startDate'] ?? null,
+            $events,
+        ));
+
+        if (empty($dates)) {
+            return null;
+        }
+
+        return substr(max($dates), 0, 10);
     }
 
     private function buildEvents(Product $product, int $days): array

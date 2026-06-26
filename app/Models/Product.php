@@ -155,12 +155,17 @@ class Product extends LogsModel
 
     public function getLowestPriceAttribute(): string
     {
-        $variant = $this->variants
+        $generic = $this->variants
             ->whereNull('availability_id')
-            ->whereNull('special_schedule_id')
-            ->first();
+            ->whereNull('special_schedule_id');
 
-        return (float) ($variant?->full_price ?? 0);
+        $pool = $generic->isNotEmpty() ? $generic : $this->variants;
+
+        $min = $pool->map(fn ($v) => (float) $v->full_price)
+            ->filter(fn ($p) => $p > 0)
+            ->min();
+
+        return (float) ($min ?? 0);
     }
 
     public function getLowestPriceWithCommissionAttribute(): float
