@@ -163,8 +163,13 @@
                                 </li>
                             @endforeach
                         </ul>
-
-                        <button type="button" class="ts-btn-save-inline order-checkin-save" data-role="card-save-changes" @disabled($isOrderCancelled)>Salva</button>
+                        <x-button
+                            label="Salva"
+                            :status="$isOrderCancelled ? 'Disabled' : 'Primary'"
+                            emphasis="MediumLow"
+                            class="ts-btn-save-inline order-checkin-save"
+                            :dataset="['role' => 'card-save-changes']"
+                        />
                     </div>
                 @endif
             </x-card>
@@ -403,7 +408,12 @@
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
-                <x-button id="btn-cancel-order" label="Annulla ordine" status="Error" emphasis="MediumLow"
+                <x-button
+                    id="btn-cancel-order"
+                    :status="$isOrderCancelled ? 'Disabled' : 'Primary'"
+                    label="Annulla ordine"
+                    status="Error"
+                    emphasis="MediumLow"
                     :disabled="$isOrderCancelled"
                     :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-cancel-order']" />
             </div>
