@@ -24,7 +24,7 @@
             @isset($title)
                 @if(isset($h1))
                     <h1 class="mb-0">{{ $title }}</h1>
-                @if(isset($h2))
+                @elseif(isset($h2))
                     <h2 class="mb-0">{{ $title }}</h2>
                 @else
                     <h3 class="mb-0">{{ $title }}</h3>
