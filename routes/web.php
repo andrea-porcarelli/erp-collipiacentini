@@ -29,7 +29,7 @@ use App\Http\Controllers\Frontend\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => '/', 'middleware' => 'token'], function () {
-    Route::get('/', [BookingController::class, 'index']);
+    Route::get('/', [BookingController::class, 'index'])->name('booking.index');
     Route::get('/filter-products', [BookingController::class, 'filterProducts']);
     Route::get('/product/{productId}/available-times', [BookingController::class, 'getAvailableTimes']);
     Route::get('/product/{productId}/available-days', [BookingController::class, 'getAvailableDays']);
@@ -193,7 +193,7 @@ Route::domain('admin.miticko.com')->group(function () {
 });
 Route::fallback(function () {
     if (request()->getHost() !== 'admin.miticko.com') {
-        return redirect('/shop');
+        return redirect('/');
     }
     abort(404);
 });

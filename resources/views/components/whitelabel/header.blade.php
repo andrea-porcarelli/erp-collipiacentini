@@ -26,8 +26,8 @@
                 </div>
             </div>
             <div class="logo">
-                <a href="/shop">
-                    <img src="{{ asset('storage/' . Utils::partner_path()) }}" />
+                <a href="{{ route('booking.index') }}">
+                    <img src="{{ asset('storage/' . Utils::partner_path()) }}" title="{{$partner->partner_name}}" />
                 </a>
             </div>
             <div class="languages">
