@@ -16,6 +16,9 @@
         .modal {
             --bs-modal-width: 350px !important;
         }
+        #modal-cancel-order {
+            --bs-modal-width: 520px !important;
+        }
         .flatpickr-day {
             font-weight:var(--weight,700);
         }
