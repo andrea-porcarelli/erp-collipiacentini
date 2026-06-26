@@ -28,17 +28,17 @@
                         <div id="ticket-quantity"></div>
                     </div>
                 </x-card>
-                <x-card title="Galleria" class="product-card" h1="true" leading="fa-shield-check">
+                <x-card title="Galleria" class="product-card" h2="true" leading="fa-shield-check">
                     @livewire('product-gallery', ['product' => $product])
                 </x-card>
-                <x-card title="Descrizione" class="product-card" h1="true" leading="fa-shield-check">
+                <x-card title="Descrizione" class="product-card" h2="true" leading="fa-shield-check">
                     <div class="product-description">
                         {!! $product->description !!}
                     </div>
                 </x-card>
                 @if($product->features->count() > 0)
                     @php($grouped = $product->features->groupBy('category'))
-                    <x-card title="Caratteristiche dell'esperienza" class="product-card" h1="true" leading="fa-shield-check">
+                    <x-card title="Caratteristiche dell'esperienza" class="product-card" h2="true" leading="fa-shield-check">
                         <div class="row">
                             @foreach(\App\Models\ProductFeature::CATEGORIES as $category => $categoryLabel)
                                 @if(isset($grouped[$category]))
@@ -59,7 +59,7 @@
                     </x-card>
                 @endif
                 @if($product->relatedProducts->count() > 0)
-                    <x-card title="Altri prodotti" class="product-card" h1="true" leading="fa-shield-check">
+                    <x-card title="Altri prodotti" class="product-card" h2="true" leading="fa-shield-check">
                         <ul class="list-unstyled mb-0">
                             @foreach($product->relatedProducts as $related)
                                 <li class="border-bottom py-2">
@@ -72,7 +72,7 @@
                     </x-card>
                 @endif
                 @if($product->faqs->count() > 0)
-                    <x-card title="Domande frequenti" class="product-card" h1="true" leading="fa-shield-check">
+                    <x-card title="Domande frequenti" class="product-card" h2="true" leading="fa-shield-check">
                         <div class="accordion" id="faq-accordion">
                             @foreach($product->faqs as $faq)
                                 <div class="accordion-item border-0 border-bottom">

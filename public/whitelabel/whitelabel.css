@@ -105,7 +105,8 @@ body {
     font-weight: var(--typography-body-weight-small, 300);
     line-height: var(--typography-body-lineheight-small, 16px); /* 114.286% */
 }
-.card-miticko .card-header h1 {
+.card-miticko .card-header h1,
+.card-miticko .card-header h2 {
     color: var(--text-main, #0D0D0D);
     font-family: var(--typography-title-font, "DM Sans"), sans-serif;
     font-size: var(--size, 28px);
