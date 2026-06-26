@@ -3,11 +3,11 @@
     'date' => true
 ])
 @if($date)
-    <x-card :title="__('whitelabel.sidebar.know_date_title')" >
+    <x-card-whitelabel :title="__('whitelabel.sidebar.know_date_title')" >
         <p>{{ __('whitelabel.sidebar.know_date_subtitle') }}</p>
         <x-button :label="__('whitelabel.sidebar.select_date')" status="Secondary" emphasis="Medium" leading="fa-calendar" class="btn-open-calendar"/>
         <input type="hidden" name="filter_date" />
-    </x-card>
+    </x-card-whitelabel>
 @endif
 <div class="d-none d-sm-block">
     <x-card-whitelabel :title="$partner->partner_name" class="card-spacing">
