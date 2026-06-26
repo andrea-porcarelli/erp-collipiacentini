@@ -25,10 +25,15 @@ use App\Http\Controllers\Backoffice\TicketScannerController;
 use App\Http\Controllers\Backoffice\UserController;
 use App\Http\Controllers\Frontend\BookingController;
 use App\Http\Controllers\Frontend\PaymentController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => '/', 'middleware' => 'token'], function () {
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('partner.sitemap.index');
+    Route::get('/sitemap-products.xml', [SitemapController::class, 'products'])->name('partner.sitemap.products');
+    Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('partner.sitemap.pages');
+
     Route::get('/', [BookingController::class, 'index'])->name('booking.index');
     Route::get('/filter-products', [BookingController::class, 'filterProducts']);
     Route::get('/product/{productId}/available-times', [BookingController::class, 'getAvailableTimes']);
