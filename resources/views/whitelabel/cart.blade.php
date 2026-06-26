@@ -227,7 +227,7 @@
                         Sfoglia i prodotti e aggiungili al carrello
                     </x-card>
 
-                    <a href="{{ url('/shop') }}" class="bt-miticko bt-m-default w-100 mt-4" data-mode="buttonAppearance-Primary buttonSize-Small buttonEmphasis-High">
+                    <a href="{{ url('/') }}" class="bt-miticko bt-m-default w-100 mt-4" data-mode="buttonAppearance-Primary buttonSize-Small buttonEmphasis-High">
                          Vai ai prodotti <i class="fa-regular fa-arrow-right icon"></i>
                     </a>
                 @endif
@@ -1110,7 +1110,7 @@
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvataggio...';
 
-                fetch('/shop/cart/customer', {
+                fetch('/cart/customer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1131,7 +1131,7 @@
                     // Carrello gratuito: crea direttamente l'ordine senza Stripe
                     if (btn.dataset.isFree === '1') {
                         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creazione prenotazione...';
-                        return fetch('/shop/order/complete-free', {
+                        return fetch('/order/complete-free', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1189,7 +1189,7 @@
                 this.disabled = true;
                 this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Rimozione...';
 
-                fetch('/shop/cart/remove', {
+                fetch('/cart/remove', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1233,7 +1233,7 @@
 
             try {
                 // Crea PaymentIntent sul server
-                const response = await fetch('/shop/payment/create-intent', {
+                const response = await fetch('/payment/create-intent', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1326,7 +1326,7 @@
                     const { error, paymentIntent } = await stripe.confirmPayment({
                         elements,
                         confirmParams: {
-                            return_url: window.location.origin + '/shop/cart',
+                            return_url: window.location.origin + '/cart',
                         },
                         redirect: 'if_required'
                     });
@@ -1349,7 +1349,7 @@
                     // Pagamento riuscito o in elaborazione
                     if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
                         // Conferma l'ordine sul server
-                        const confirmResponse = await fetch('/shop/payment/confirm', {
+                        const confirmResponse = await fetch('/payment/confirm', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

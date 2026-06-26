@@ -68,7 +68,7 @@
                 const params = new URLSearchParams();
                 if (filter) params.set('filter', filter);
                 if (date) params.set('date', date);
-                const url = `/shop/filter-products${params.toString() ? '?' + params.toString() : ''}`;
+                const url = `/filter-products${params.toString() ? '?' + params.toString() : ''}`;
 
                 fetch(url, {
                     method: 'GET',

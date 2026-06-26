@@ -637,7 +637,7 @@
             btnDate.appendChild(document.createTextNode(dateText));
 
             // Chiamata AJAX per recuperare gli orari
-            fetch(`/shop/product/${productId}/available-times?date=${date}`)
+            fetch(`/product/${productId}/available-times?date=${date}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.times && data.times.length > 0) {
@@ -815,7 +815,7 @@
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Caricamento...';
 
-                fetch('/shop/cart/add', {
+                fetch('/cart/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
