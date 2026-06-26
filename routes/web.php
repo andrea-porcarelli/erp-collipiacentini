@@ -28,7 +28,7 @@ use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\Frontend\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => '/shop', 'middleware' => 'token'], function () {
+Route::group(['prefix' => '/', 'middleware' => 'token'], function () {
     Route::get('/', [BookingController::class, 'index']);
     Route::get('/filter-products', [BookingController::class, 'filterProducts']);
     Route::get('/product/{productId}/available-times', [BookingController::class, 'getAvailableTimes']);
