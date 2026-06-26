@@ -9,7 +9,9 @@
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Data" type="daterange" name="dates" />
+                            <x-filter label="Codice prenotazione" type="text" name="order_number" />
                             <x-filter label="Prodotto" type="text" name="label" />
+                            <x-filter label="Cliente" type="text" name="customer" />
                             <x-filter label="Tipo di acquisto" name="types" type="status" />
                             <x-filter label="Stato" name="status" />
                         </div>

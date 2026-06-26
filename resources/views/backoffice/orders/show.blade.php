@@ -148,7 +148,11 @@
                                     <div class="ts-ticket-status">
                                         <select class="ts-status-select ts-status-{{ $participant->status }}" data-role="card-status-select" data-original="{{ $participant->status }}">
                                             @foreach($statusOptions as $value => $label)
-                                                <option value="{{ $value }}" {{ $participant->status === $value ? 'selected' : '' }}>{{ mb_strtoupper($label) }}</option>
+                                                @php($isRefunded = $value === 'refunded')
+                                                @php($lockedRefunded = $isRefunded && $participant->status !== 'refunded')
+                                                <option value="{{ $value }}"
+                                                    {{ $participant->status === $value ? 'selected' : '' }}
+                                                    {{ $lockedRefunded ? 'disabled' : '' }}>{{ mb_strtoupper($label) }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -395,7 +399,7 @@
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
-                <x-button id="btn-refund" label="Rimborsa ordine" status="Error" emphasis="MediumLow" />
+                <x-button id="btn-cancel-order" label="Annulla ordine" status="Error" emphasis="MediumLow" />
             </div>
         </div>
     </div>
@@ -412,6 +416,7 @@
     @include('backoffice.orders._modal-edit-booking', ['order' => $order])
     @include('backoffice.orders._modal-edit-notes', ['order' => $order])
     @include('backoffice.orders._modal-edit-customer', ['order' => $order])
+    @include('backoffice.orders._modal-cancel-order', ['order' => $order])
 @endsection
 
 @push('scripts')
@@ -423,7 +428,7 @@
             updateBooking:        @json(route('orders.updateBooking', $model)),
             sendEmail:            @json(route('orders.sendEmail', $model)),
             receipt:              @json(route('orders.receipt', $model)),
-            refund:               @json(route('orders.refund', $model)),
+            cancel:               @json(route('orders.cancel', $model)),
             ticketsBatchStatus:   @json(route('tickets.batchStatus')),
             availabilityDays:     @json(route('orders.availabilityDays', $model)),
             availabilitySlots:    @json(route('orders.availabilitySlots', $model)),

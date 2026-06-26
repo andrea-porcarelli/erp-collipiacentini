@@ -285,6 +285,7 @@ class OrderLogger
     {
         $kindLabels = [
             'confirmation' => 'conferma ordine',
+            'cancellation' => 'annullamento ordine',
         ];
         $label = $kindLabels[$kind] ?? $kind;
 
@@ -344,6 +345,23 @@ class OrderLogger
             'event_type'  => 'refunded',
             'description' => sprintf('Rimborso di %s € emesso via Stripe', number_format($amount, 2, ',', '.')),
             'properties'  => ['amount' => $amount],
+        ]);
+    }
+
+    public function logCancelled(Order $order, bool $refundIssued, ?float $amount = null): OrderLog
+    {
+        $description = $refundIssued
+            ? sprintf('Ordine annullato con rimborso di %s € via Stripe', number_format((float) $amount, 2, ',', '.'))
+            : 'Ordine annullato senza rimborso';
+
+        return $this->write([
+            'order_id'    => $order->id,
+            'event_type'  => $refundIssued ? 'cancelled_refunded' : 'cancelled',
+            'description' => $description,
+            'properties'  => [
+                'refund_issued' => $refundIssued,
+                'amount'        => $amount,
+            ],
         ]);
     }
 

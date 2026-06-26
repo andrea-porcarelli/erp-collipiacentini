@@ -655,6 +655,11 @@ const init = () => {
         if (filter_type === 'text') {
             const hiddenInput = filter.find('input');
             const modalInput = modal.find('input[type="text"]').first();
+            const modalTitle = modal.find('.modal-title');
+            if (modalTitle.length) {
+                modalTitle.text(`Filtra per ${label.toLowerCase()}`);
+            }
+            modalInput.attr('placeholder', `Cerca per ${label.toLowerCase()}`);
             modalInput.val(hiddenInput.val() || '');
             modal.modal('show');
             setTimeout(() => modalInput.trigger('focus'), 200);

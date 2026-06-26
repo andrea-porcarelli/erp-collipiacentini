@@ -91,7 +91,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
         Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');
-        Route::post('orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
+        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
         Route::put('orders/{order}/customer-status', [OrderController::class, 'updateCustomerStatus'])->name('orders.updateCustomerStatus');
         Route::put('orders/{order}/notes', [OrderController::class, 'updateNotes'])->name('orders.updateNotes');
         Route::put('orders/{order}/customer', [OrderController::class, 'updateCustomer'])->name('orders.updateCustomer');

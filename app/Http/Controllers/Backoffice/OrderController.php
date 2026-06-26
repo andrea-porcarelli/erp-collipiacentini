@@ -10,6 +10,7 @@ use App\Http\Controllers\Backoffice\Requests\Orders\UpdateCustomerStatusRequest;
 use App\Http\Controllers\Backoffice\Requests\Orders\UpdateNotesRequest;
 use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
+use App\Mail\OrderCancellationMail;
 use App\Mail\OrderConfirmationMail;
 use App\Models\CustomerConsent;
 use App\Models\Order;
@@ -378,25 +379,52 @@ class OrderController extends Controller
         return $pdf->download("biglietto-MTK-{$order->order_number}.pdf");
     }
 
-    public function refund(Order $order): JsonResponse
+    public function cancel(Request $request, Order $order): JsonResponse
     {
         try {
             $this->authorizeOrderAccess($order);
 
-            if (! $order->stripe_payment_intent_id) {
-                return $this->error(['response' => 'PaymentIntent Stripe non disponibile per questo ordine']);
+            $data = $request->validate([
+                'issue_refund' => ['required', 'boolean'],
+            ]);
+            $issueRefund = (bool) $data['issue_refund'];
+
+            if (in_array($order->order_status, [OrderStatus::CANCELLED, OrderStatus::REFUNDED], true)) {
+                return $this->error(['response' => 'Ordine già annullato']);
             }
-            if ($order->order_status === OrderStatus::REFUNDED) {
-                return $this->error(['response' => 'Ordine già rimborsato']);
+
+            if ($issueRefund) {
+                if (! $order->stripe_payment_intent_id) {
+                    return $this->error(['response' => 'PaymentIntent Stripe non disponibile per questo ordine']);
+                }
+                app(StripePaymentService::class)->refund($order->stripe_payment_intent_id);
             }
 
-            app(StripePaymentService::class)->refund($order->stripe_payment_intent_id);
+            $newOrderStatus = $issueRefund ? OrderStatus::REFUNDED : OrderStatus::CANCELLED;
+            $participantStatus = $issueRefund ? 'refunded' : 'cancelled';
+            $refundAmount = $issueRefund ? (float) $order->amount : null;
 
-            $order->update(['order_status' => OrderStatus::REFUNDED]);
+            $order->update(['order_status' => $newOrderStatus]);
+            $order->participants()->update(['status' => $participantStatus]);
 
-            app(OrderLogger::class)->logRefunded($order, (float) $order->amount);
+            app(OrderLogger::class)->logCancelled($order, $issueRefund, $refundAmount);
 
-            return $this->success(['response' => 'Rimborso eseguito correttamente']);
+            if ($order->customer?->email) {
+                try {
+                    Mail::to($order->customer->email)->send(new OrderCancellationMail(
+                        order: $order->fresh(['customer', 'partner.logo', 'orderProducts.product']),
+                        refundIssued: $issueRefund,
+                        refundAmount: $refundAmount,
+                    ));
+                    app(OrderLogger::class)->logEmailSent($order, $order->customer->email, 'cancellation');
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+
+            return $this->success(['response' => $issueRefund
+                ? 'Ordine annullato e rimborso emesso'
+                : 'Ordine annullato']);
         } catch (\Exception $e) {
             return $this->exception($e);
         }

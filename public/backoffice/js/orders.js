@@ -28,7 +28,7 @@ $(function () {
     const routes = window.orderRoutes || {};
 
     // Modali: chiudi su click "Annulla" (il componente x-modal non aggiunge data-bs-dismiss)
-    $(document).on('click', '#modal-edit-booking .btn-cancel, #modal-edit-notes .btn-cancel, #modal-edit-customer .btn-cancel', function () {
+    $(document).on('click', '#modal-edit-booking .btn-cancel, #modal-edit-notes .btn-cancel, #modal-edit-customer .btn-cancel, #modal-cancel-order .btn-cancel', function () {
         const modalEl = this.closest('.modal');
         if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).hide();
     });
@@ -346,16 +346,34 @@ $(function () {
         });
     }
 
-    // Rimborso (con conferma SweetAlert)
-    $('#btn-refund').on('click', function () {
-        App.sweetConfirm(
-            'Confermi il rimborso totale di questo ordine? L\'azione non è reversibile.',
-            () => {
-                App.ajax({ path: routes.refund, method: 'POST' }).then((res) => {
-                    toastr.success(res?.response || 'Rimborso eseguito');
-                    setTimeout(() => location.reload(), 1000);
-                }).catch(showError);
+    // Annulla ordine (apre il modale con scelta rimborso sì/no)
+    const cancelModalEl = document.getElementById('modal-cancel-order');
+    $('#btn-cancel-order').on('click', function () {
+        if (cancelModalEl) bootstrap.Modal.getOrCreateInstance(cancelModalEl).show();
+    });
+
+    $(document).on('click', '#modal-cancel-order .btn-success', function () {
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const issueRefund = $('#form-cancel-order input[name="issue_refund"]:checked').val();
+        if (typeof issueRefund === 'undefined') {
+            toastr.error('Seleziona un\'opzione');
+            return;
+        }
+        $btn.prop('disabled', true);
+        App.ajax({
+            path: routes.cancel,
+            method: 'POST',
+            data: { issue_refund: issueRefund },
+        }).then((res) => {
+            toastr.success(res?.response || 'Ordine annullato');
+            if (cancelModalEl) {
+                try { bootstrap.Modal.getOrCreateInstance(cancelModalEl).hide(); } catch (_) {}
             }
-        );
+            setTimeout(() => location.reload(), 1000);
+        }).catch((errors) => {
+            $btn.prop('disabled', false);
+            showError(errors);
+        });
     });
 });

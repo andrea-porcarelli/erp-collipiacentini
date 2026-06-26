@@ -1471,7 +1471,7 @@ table.order-detail-tickets tbody tr:last-child td {
 .order-show-footer-actions .bt-miticko {
     flex: 1;
 }
-.order-show-footer-actions .bt-miticko[id="btn-refund"] {
+.order-show-footer-actions .bt-miticko[id="btn-cancel-order"] {
     color: var(--brand-error-brand, #C62828);
     border-color: var(--brand-error-brand, #C62828);
 }

@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 
 class TicketScannerController extends Controller
 {
-    private const STATUSES = ['booked', 'checked_in', 'no_show', 'refunded', 'cancelled'];
+    private const STATUSES = ['booked', 'checked_in', 'no_show', 'cancelled'];
 
     public function scan(string $code): JsonResponse
     {

@@ -130,15 +130,28 @@ class ProductAvailabilityService
 
     /**
      * Count confirmed bookings for a slot on a given date.
-     * Excludes failed, cancelled, and refunded orders.
+     * Excludes failed, cancelled, and refunded orders, and excludes
+     * participants that have been individually cancelled or refunded.
+     * For legacy orders without participants, falls back to OrderProduct.quantity.
      */
     public function getBookedQuantity(string $slotType, int $slotId, string $date): int
     {
-        return (int) OrderProduct::whereHas('order', fn ($q) => $q->whereNotIn('order_status', ['failed', 'cancelled', 'refunded']))
+        $orderProducts = OrderProduct::query()
             ->where('slot_type', $slotType)
             ->where('slot_id', $slotId)
             ->where('booking_date', $date)
-            ->sum('quantity');
+            ->whereHas('order', fn ($q) => $q->whereNotIn('order_status', ['failed', 'cancelled', 'refunded']))
+            ->with('items.participants')
+            ->get();
+
+        return (int) $orderProducts->sum(function (OrderProduct $op) {
+            $participants = $op->items->flatMap->participants;
+            if ($participants->isEmpty()) {
+                return (int) $op->quantity;
+            }
+
+            return $participants->whereNotIn('status', ['cancelled', 'refunded'])->count();
+        });
     }
 
     /**

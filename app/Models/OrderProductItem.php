@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderProductItem extends LogsModel
 {
@@ -37,6 +38,11 @@ class OrderProductItem extends LogsModel
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    public function participants(): HasMany
+    {
+        return $this->hasMany(OrderParticipant::class);
     }
 
     public function getSubtotalAttribute(): float

@@ -453,6 +453,7 @@
 .ticket-scanner-content .ts-ticket-status:has(.ts-status-checked_in)::before { background: var(--ts-success); }
 .ticket-scanner-content .ts-ticket-status:has(.ts-status-no_show)::before { background: var(--ts-danger); }
 .ticket-scanner-content .ts-ticket-status:has(.ts-status-cancelled)::before { background: var(--ts-muted); }
+.ticket-scanner-content .ts-ticket-status:has(.ts-status-refunded)::before { background: #8B5CF6; }
 .ticket-scanner-content .ts-status-checked_in {
     background-color: rgba(16, 185, 129, 0.10);
     border-color: rgba(16, 185, 129, 0.45);
@@ -470,6 +471,15 @@
     border-color: rgba(107, 114, 128, 0.40);
     color: var(--ts-muted);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236B7280' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+}
+.ticket-scanner-content .ts-status-refunded {
+    background-color: rgba(139, 92, 246, 0.10);
+    border-color: rgba(139, 92, 246, 0.40);
+    color: #8B5CF6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238B5CF6' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+}
+.ticket-scanner-content .ts-status-select option:disabled {
+    color: rgba(107, 114, 128, 0.6);
 }
 
 /* Sales table */
