@@ -365,17 +365,11 @@
     margin-top: 12px;
     padding: 10px 16px;
     background: transparent;
-    color: var(--ts-orange);
-    border: 1px solid var(--ts-orange);
     border-radius: 999px;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
     transition: background 120ms ease, color 120ms ease;
-}
-.ticket-scanner-content .ts-btn-save-inline:hover {
-    background: var(--ts-orange);
-    color: #fff;
 }
 
 /* Tickets list */

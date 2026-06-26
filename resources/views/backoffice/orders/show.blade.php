@@ -166,6 +166,7 @@
                         <x-button
                             label="Salva"
                             :status="$isOrderCancelled ? 'Disabled' : 'Primary'"
+                            :disabled="$isOrderCancelled"
                             emphasis="MediumLow"
                             class="ts-btn-save-inline order-checkin-save"
                             :dataset="['role' => 'card-save-changes']"
