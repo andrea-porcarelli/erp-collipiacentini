@@ -2,6 +2,7 @@
 
 @section('main-content')
     @php($order = $model)
+    @php($isOrderCancelled = in_array($order->order_status, [\App\Enums\OrderStatus::CANCELLED, \App\Enums\OrderStatus::REFUNDED], true))
     @php($firstOp = $order->orderProducts->first())
     @php($product = $firstOp?->product)
     @php($category = $product?->category)
@@ -163,7 +164,7 @@
                             @endforeach
                         </ul>
 
-                        <button type="button" class="ts-btn-save-inline order-checkin-save" data-role="card-save-changes">Salva</button>
+                        <button type="button" class="ts-btn-save-inline order-checkin-save" data-role="card-save-changes" @disabled($isOrderCancelled)>Salva</button>
                     </div>
                 @endif
             </x-card>
@@ -403,6 +404,7 @@
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
                 <x-button id="btn-cancel-order" label="Annulla ordine" status="Error" emphasis="MediumLow"
+                    :disabled="$isOrderCancelled"
                     :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-cancel-order']" />
             </div>
         </div>
