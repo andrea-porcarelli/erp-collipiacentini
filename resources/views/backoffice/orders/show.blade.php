@@ -405,15 +405,13 @@
             </x-card>
 
             <div class="d-flex gap-2 order-show-footer-actions">
-                @dump($isOrderCancelled)
                 <a href="{{ route('orders.index') }}" class="text-decoration-none flex-grow-1">
                     <x-button label="Torna agli ordini" status="Neutral" emphasis="Medium" class="w-100" />
                 </a>
                 <x-button
                     id="btn-cancel-order"
-                    :status="$isOrderCancelled ? 'Disabled' : 'Primary'"
+                    :status="$isOrderCancelled ? 'Disabled' : 'Error'"
                     label="Annulla ordine"
-                    status="Error"
                     emphasis="MediumLow"
                     :disabled="$isOrderCancelled"
                     :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-cancel-order']" />
