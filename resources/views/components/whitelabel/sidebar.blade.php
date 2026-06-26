@@ -10,18 +10,18 @@
     </x-card>
 @endif
 <div class="d-none d-sm-block">
-    <x-card :title="$partner->partner_name" class="card-spacing">
+    <x-card-whitelabel :title="$partner->partner_name" class="card-spacing">
         {!!   $partner->contentField('description_short') !!}
-    </x-card>
+    </x-card-whitelabel>
 
-    <x-card :title="__('whitelabel.sidebar.useful_links_title')" class="card-spacing">
+    <x-card-whitelabel :title="__('whitelabel.sidebar.useful_links_title')" class="card-spacing">
         <ul class="utils">
             <li><a href="{{ $partner->pageUrl('contatti') }}">{{ __('whitelabel.sidebar.contacts') }}</a></li>
             <li><a href="{{ $partner->pageUrl('privacy-policy') }}">{{ __('whitelabel.sidebar.privacy_policy') }}</a></li>
             <li><a href="{{ $partner->pageUrl('cookie-policy') }}">{{ __('whitelabel.sidebar.cookie_policy') }}</a></li>
             <li><a href="{{ $partner->pageUrl('termini-condizioni') }}">{{ __('whitelabel.sidebar.terms_conditions') }}</a></li>
         </ul>
-    </x-card>
+    </x-card-whitelabel>
 </div>
 
 <!-- Modale per la selezione della data -->
