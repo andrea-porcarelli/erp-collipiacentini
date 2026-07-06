@@ -1,7 +1,7 @@
 @props([
     'product' => null
 ])
-<x-card class="card-product">
+<x-card :class="'card-product ' . (!$product->is_available ? 'is-unavailable' : '')">
     @php
         $productImage = $product->cover->first() ?? $product->gallery->first();
         $productImageUrl = $productImage

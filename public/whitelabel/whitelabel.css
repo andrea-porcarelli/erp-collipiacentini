@@ -386,9 +386,13 @@ body {
     font-weight: var(--typography-title-weight-medium, 700);
     line-height: var(--typography-title-line-height-medium, 24px); /* 133.333% */
 }
-.card-product-container.is-unavailable h3,
-.card-product-container.is-unavailable .description,
-.card-product-container.is-unavailable .price b {
+.card-product.is-unavailable h2,
+.card-product.is-unavailable h3,
+.card-product.is-unavailable .description,
+.card-product.is-unavailable .details,
+.card-product.is-unavailable .details *,
+.card-product.is-unavailable .price,
+.card-product.is-unavailable .price b {
     color: var(--text-disabled, #999) !important;
 }
 .flatpickr-calendar.inline {
