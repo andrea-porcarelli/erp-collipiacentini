@@ -114,7 +114,7 @@ class BookingController extends Controller
         return view('whitelabel.page', compact('partner', 'title', 'content', 'page'));
     }
 
-    public function product(Request $request, string $slugProduct, string $productCode): View|RedirectResponse
+    public function product(Request $request, string $slugProduct, string $productCode): View|RedirectResponsez
     {
         // productCode format (see Product::getProductCodeAttribute):
         // {category_code}-{partner_code}{5-digit-zero-padded-id}

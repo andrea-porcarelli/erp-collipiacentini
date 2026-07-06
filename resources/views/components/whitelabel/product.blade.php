@@ -36,7 +36,7 @@
                     <x-button
                         :label="$product->is_free ? __('whitelabel.products.book') : __('whitelabel.products.buy')"
                         emphasis="High"
-                        status="Primary"
+                        :status="$product->is_available ? 'Primary' : 'Disabled'"
                         trailing="fa-ticket-perforated"
                         :href="$product->route"
                     />
@@ -54,6 +54,7 @@
                 <b>{{ $product->is_free ? __('whitelabel.products.free') : Utils::price($product->lowest_price_with_commission) }}</b>
                 <x-button
                     :label="$product->is_free ? __('whitelabel.products.book') : __('whitelabel.products.buy')"
+                    :status="$product->is_available ? 'Primary' : 'Disabled'"
                     trailing="fa-ticket-perforated"
                     :href="$product->route"
                 />
