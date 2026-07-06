@@ -189,16 +189,25 @@ class Product extends LogsModel
         if (! $this->is_active) {
             return false;
         }
-        // Has weekly template slots
-        if ($this->availabilities()->whereNotNull('day_of_week')->exists()) {
-            return true;
+
+        $service = app(\App\Services\ProductAvailabilityService::class);
+        $ref = now()->startOfMonth();
+
+        for ($m = 0; $m < 12; $m++) {
+            $days = $service->getAvailableDaysForMonth($this, $ref->year, $ref->month);
+
+            foreach ($days as $date) {
+                foreach ($service->getSlotsForDate($this, $date) as $slot) {
+                    if (is_null($slot['availability']) || $slot['availability'] > 0) {
+                        return true;
+                    }
+                }
+            }
+
+            $ref->addMonth();
         }
 
-        // Has future special schedule slots (override "veri", non blacklist)
-        return $this->specialSchedules()
-            ->where('is_disabled', false)
-            ->where('date', '>=', date('Y-m-d'))
-            ->exists();
+        return false;
     }
 
     public function getButtonAttribute(): string
