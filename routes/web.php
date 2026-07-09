@@ -109,7 +109,7 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('orders/{order}/booking', [OrderController::class, 'updateBooking'])->name('orders.updateBooking');
         Route::get('orders/{order}/availability/days', [OrderController::class, 'availabilityDays'])->name('orders.availabilityDays');
         Route::get('orders/{order}/availability/slots', [OrderController::class, 'availabilitySlots'])->name('orders.availabilitySlots');
-        Route::resource('orders', OrderController::class);
+        Route::resource('orders', OrderController::class)->except(['create']);
         Route::resource('products', ProductController::class);
         Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');
         Route::post('products/{product}/price-variations', [ProductPriceVariationController::class, 'store'])->name('products.price-variations.store');

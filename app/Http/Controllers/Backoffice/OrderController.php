@@ -451,11 +451,6 @@ class OrderController extends Controller
     // Registrazione manuale di un ordine dal backoffice
     // ---------------------------------------------------------------------
 
-    public function create(): View
-    {
-        return view('backoffice.'.$this->path.'.create')->with('path', $this->path);
-    }
-
     public function store(StoreOrderRequest $request, OrderService $orderService): JsonResponse
     {
         try {

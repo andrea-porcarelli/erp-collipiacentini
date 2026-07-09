@@ -7,7 +7,9 @@
             <div class="col-12">
                 <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto" brelative="true">
                     <div class="position-absolute" style="top: -70px; right: 0">
-                        <x-button label="Registra ordine" status="Primary" leading="fa-plus" :href="url('/orders/create')" />
+                        <x-button label="Registra ordine" status="Primary" leading="fa-plus"
+                                  id="btn-open-register-order"
+                                  :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-register-order']" />
                     </div>
                     <x-table-header>
                         <div class="filters-miticko">
@@ -61,6 +63,9 @@
     <x-modal id="order-detail" title="Riepilogo ordine">
         <div id="order-detail-body"></div>
     </x-modal>
+
+    {{-- MODAL "Registra ordine" ---------------------------------------------------- --}}
+    @include('backoffice.orders._modal-register-order')
 @endsection
 
 @section('custom-script')
@@ -110,4 +115,19 @@
             });
         })
     </script>
+
+    <script>
+        window.orderCreateRoutes = {
+            partners:          @json(route('orders.create.partners')),
+            products:          @json(route('orders.create.products')),
+            availabilityDays:  @json(route('orders.create.availabilityDays')),
+            availabilitySlots: @json(route('orders.create.availabilitySlots')),
+            variants:          @json(route('orders.create.variants')),
+            customers:         @json(route('orders.create.customers')),
+            store:             @json(route('orders.store')),
+            ordersIndex:       @json(route('orders.index')),
+            paymentLinkTpl:    @json(url('/orders')) + '/{order}/payment-link',
+        };
+    </script>
+    <script type="module" src="{{ asset('backoffice/js/order-create.js') }}?v={{ filemtime(public_path('backoffice/js/order-create.js')) }}"></script>
 @endsection
