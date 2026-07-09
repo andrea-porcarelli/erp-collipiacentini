@@ -85,7 +85,7 @@
                 <div class="register-order-step" data-step="partner-product">
                     <h3><span class="step-badge" data-role="badge-1">1</span>Partner e prodotto</h3>
                     <div class="row g-3">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-6" id="reg-partner-wrap">
                             <div class="text-field" data-mode="textfieldSize-Medium">
                                 <label>Partner *</label>
                                 <div class="text-field-container">
@@ -95,7 +95,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-6" id="reg-product-wrap">
                             <div class="text-field" data-mode="textfieldSize-Medium">
                                 <label>Prodotto *</label>
                                 <div class="text-field-container">

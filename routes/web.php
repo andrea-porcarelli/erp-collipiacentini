@@ -29,6 +29,13 @@ use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
+// Root di admin.miticko.com: senza questa override, la route "/" del gruppo
+// token qui sotto matcha prima e restituisce un 401 JSON perché il dominio
+// backoffice non ha un Partner associato.
+Route::domain('admin.miticko.com')->get('/', function () {
+    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+});
+
 Route::group(['prefix' => '/', 'middleware' => 'token'], function () {
     Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('partner.sitemap.index');
     Route::get('/sitemap-products.xml', [SitemapController::class, 'products'])->name('partner.sitemap.products');

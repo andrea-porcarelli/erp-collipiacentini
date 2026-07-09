@@ -493,7 +493,14 @@ class OrderController extends Controller
                 ->map(fn ($p) => ['id' => $p->id, 'label' => $p->partner_name])
                 ->values();
 
-            return $this->success(['partners' => $partners]);
+            // Ruoli partner/admin sono forzati a un solo partner: il frontend
+            // nasconde la select e preseleziona automaticamente.
+            $locked = in_array($user->role, ['partner', 'admin']);
+
+            return $this->success([
+                'partners' => $partners,
+                'locked'   => $locked,
+            ]);
         } catch (\Exception $e) {
             return $this->exception($e);
         }

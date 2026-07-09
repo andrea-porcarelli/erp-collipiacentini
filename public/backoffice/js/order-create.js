@@ -85,16 +85,37 @@ const resetStepsFrom = (step) => {
 const loadPartners = () => {
     $.get(routes.partners).done((res) => {
         const $sel = $('#reg-partner');
+        const $wrap = $('#reg-partner-wrap');
+        const $prodWrap = $('#reg-product-wrap');
+        const partners = res.partners || [];
+
         $sel.empty().append('<option value="">Seleziona partner</option>').prop('disabled', false);
-        (res.partners || []).forEach((p) => {
+        partners.forEach((p) => {
             $sel.append(`<option value="${p.id}">${p.label}</option>`);
         });
-        if ((res.partners || []).length === 1) {
-            const only = res.partners[0];
-            $sel.val(only.id).prop('disabled', true);
-            onPartnerChanged(only.id, only.label);
+
+        if (!partners.length) {
+            toastr.error('Nessun partner disponibile per la registrazione');
+            return;
         }
-    }).fail(() => toastr.error('Errore nel caricamento dei partner'));
+
+        // Se il ruolo forza un unico partner, nascondiamo del tutto la select
+        // e mostriamo il campo prodotto a piena larghezza. Se invece la select
+        // è opzionale ma c'è un solo partner attivo, la preselezioniamo ma
+        // lasciamo il campo visibile.
+        if (res.locked && partners.length === 1) {
+            $wrap.addClass('d-none');
+            $prodWrap.removeClass('col-md-6').addClass('col-md-12');
+            $sel.val(partners[0].id);
+            onPartnerChanged(partners[0].id, partners[0].label);
+        } else if (partners.length === 1) {
+            $sel.val(partners[0].id).prop('disabled', true);
+            onPartnerChanged(partners[0].id, partners[0].label);
+        }
+    }).fail((xhr) => {
+        console.error('loadPartners failed', xhr.status, xhr.responseText);
+        toastr.error('Errore nel caricamento dei partner (HTTP ' + xhr.status + ')');
+    });
 };
 
 const onPartnerChanged = (id, label) => {
@@ -121,9 +142,10 @@ const loadProducts = (partnerId) => {
         (res.products || []).forEach((p) => {
             $sel.append(`<option value="${p.id}">${p.label}</option>`);
         });
-    }).fail(() => {
+    }).fail((xhr) => {
+        console.error('loadProducts failed', xhr.status, xhr.responseText);
         $sel.empty().append('<option value="">Errore nel caricamento</option>');
-        toastr.error('Errore nel caricamento dei prodotti');
+        toastr.error('Errore nel caricamento dei prodotti (HTTP ' + xhr.status + ')');
     });
 };
 
@@ -465,6 +487,8 @@ const resetAll = () => {
     state.partnerLabel = null;
     $('#reg-partner').val('');
     setBadgeDone(1, false);
+    $('#reg-partner-wrap').removeClass('d-none');
+    $('#reg-product-wrap').removeClass('col-md-12').addClass('col-md-6');
     $('#reg-product').empty().append('<option value="">Prima seleziona un partner</option>').prop('disabled', true);
 
     $('#reg-customer-id').val('');
