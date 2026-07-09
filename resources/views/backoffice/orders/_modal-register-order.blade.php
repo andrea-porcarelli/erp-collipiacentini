@@ -1,7 +1,9 @@
 {{-- Wizard di registrazione ordine manuale, aperto come modale dalla lista ordini. --}}
 <style>
     #modal-register-order .modal-dialog { max-width: 1300px; width: 95%; }
-    #modal-register-order .modal-body { max-height: calc(100vh - 200px); overflow-y: auto; }
+    #modal-register-order .modal-content { overflow-x: hidden; }
+    #modal-register-order .modal-body { max-height: calc(100vh - 200px); overflow-y: auto; overflow-x: hidden; }
+    #modal-register-order .register-order-step { max-width: 100%; }
 
     .register-order-step { position: relative; padding: 12px 0; }
     .register-order-step + .register-order-step { border-top: 1px solid #F0F1F5; margin-top: 8px; }
