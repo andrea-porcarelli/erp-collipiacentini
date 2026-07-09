@@ -483,7 +483,11 @@ class OrderController extends Controller
             $q = Partner::where('is_active', 1);
 
             if ($user->role === 'company') {
-                $q->where('company_id', $user->company_id);
+                // I partner accessibili a una company sono quelli i cui prodotti
+                // sono agganciati alla company via pivot company_product.
+                $q->whereHas('products.companies', function ($qq) use ($user) {
+                    $qq->where('companies.id', $user->company_id);
+                });
             } elseif (in_array($user->role, ['partner', 'admin'])) {
                 $q->where('id', $user->partner_id);
             }
@@ -642,7 +646,7 @@ class OrderController extends Controller
             } elseif ($user->role === 'company') {
                 $query->where(function ($qq) use ($user) {
                     $qq->where('company_id', $user->company_id)
-                        ->orWhereHas('orders.partner', fn ($p) => $p->where('company_id', $user->company_id));
+                        ->orWhereHas('orders.partner.products.companies', fn ($c) => $c->where('companies.id', $user->company_id));
                 });
             } elseif (in_array($user->role, ['partner', 'admin'])) {
                 $query->where(function ($qq) use ($user) {
@@ -685,8 +689,13 @@ class OrderController extends Controller
             abort(403);
         }
         $user = Auth::user();
-        if ($user->role === 'company' && $partner->company_id !== $user->company_id) {
-            abort(403);
+        if ($user->role === 'company') {
+            $allowed = $partner->products()
+                ->whereHas('companies', fn ($q) => $q->where('companies.id', $user->company_id))
+                ->exists();
+            if (! $allowed) {
+                abort(403);
+            }
         }
         if (in_array($user->role, ['partner', 'admin']) && $partner->id !== $user->partner_id) {
             abort(403);
