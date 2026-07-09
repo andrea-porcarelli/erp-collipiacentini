@@ -489,8 +489,9 @@ class OrderController extends Controller
                     $qq->where('companies.id', $user->company_id);
                 });
             } elseif (in_array($user->role, ['partner', 'admin'])) {
-                $q->where('id', $user->partner_id);
+                $q->where('id', (int) $user->partner_id);
             }
+            // I ruoli god/operator (staff Miticko) vedono tutti i partner attivi.
 
             $partners = $q->orderBy('partner_name')
                 ->get(['id', 'partner_name'])
@@ -689,6 +690,12 @@ class OrderController extends Controller
             abort(403);
         }
         $user = Auth::user();
+
+        // Staff Miticko: accesso pieno a qualunque partner.
+        if (in_array($user->role, ['god', 'operator'])) {
+            return;
+        }
+
         if ($user->role === 'company') {
             $allowed = $partner->products()
                 ->whereHas('companies', fn ($q) => $q->where('companies.id', $user->company_id))
@@ -696,9 +703,20 @@ class OrderController extends Controller
             if (! $allowed) {
                 abort(403);
             }
+            return;
         }
-        if (in_array($user->role, ['partner', 'admin']) && $partner->id !== $user->partner_id) {
-            abort(403);
+
+        // partner/admin: solo il proprio partner. Cast a int perché PDO in
+        // produzione può restituire stringhe e il confronto strict fallirebbe
+        // (es. int 7 !== string "7").
+        if (in_array($user->role, ['partner', 'admin'])) {
+            if ((int) $partner->id !== (int) $user->partner_id) {
+                abort(403);
+            }
+            return;
         }
+
+        // Ruoli sconosciuti: nega di default.
+        abort(403);
     }
 }
