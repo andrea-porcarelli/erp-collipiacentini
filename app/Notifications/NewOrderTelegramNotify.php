@@ -41,8 +41,6 @@ class NewOrderTelegramNotify extends Notification
             ? '💳 Pagato <b>' . $this->money($amount) . '</b>'
             : '🎁 <b>Gratuito</b>';
 
-        $customer = trim(($order->customer?->name ?? '') . ' ' . ($order->customer?->surname ?? ''));
-        $customerLine = $customer !== '' ? "\n👤 " . $this->escape($customer) : '';
 
         $text = "🎟️ <b>Nuovo ordine #{$order->order_number}</b>\n"
             . '📦 ' . $this->escape($product?->label ?? '—') . "\n"
@@ -50,8 +48,7 @@ class NewOrderTelegramNotify extends Notification
             . "📅 {$date}\n"
             . "🕐 {$time}\n"
             . "👥 {$pax} " . ($pax === 1 ? 'persona' : 'persone') . "\n"
-            . $payment
-            . $customerLine;
+            . $payment;
 
         return ['text' => $text];
     }
