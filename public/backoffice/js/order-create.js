@@ -298,7 +298,7 @@ const setQty = (variantId, qty) => {
 // STEP 4: Cliente
 // -----------------------------------------------------------------------------
 const searchCustomers = App.debounce(() => {
-    const q = $('#reg-customer-search').val();
+    const q = $('#reg_customer_search').val();
     if (!q || q.length < 2) {
         $('#reg-customer-results').addClass('d-none').empty();
         return;
@@ -340,7 +340,7 @@ const selectCustomer = (c) => {
     $('input[name="customer[zip_code]"]').val(c.zip_code || '');
     $('input[name="customer[fiscal_code]"]').val(c.fiscal_code || '');
     $('#reg-customer-results').addClass('d-none').empty();
-    $('#reg-customer-search').val('');
+    $('#reg_customer_search').val('');
     const label = `${c.name || ''} ${c.surname || ''}`.trim() + ` (${c.email || ''})`;
     $('#reg-customer-selected-label').text(label);
     $('#reg-customer-selected').removeClass('d-none');
@@ -468,7 +468,7 @@ const resetAll = () => {
     $('#reg-product').empty().append('<option value="">Prima seleziona un partner</option>').prop('disabled', true);
 
     $('#reg-customer-id').val('');
-    $('#reg-customer-search').val('');
+    $('#reg_customer_search').val('');
     $('#reg-customer-results').addClass('d-none').empty();
     $('#reg-customer-selected').addClass('d-none');
     $('input[name^="customer["]').val('');
@@ -501,7 +501,7 @@ $(document).on('input', '#reg-variants [data-role="qty"]', function () {
     const variantId = Number($(this).closest('.reg-variant-row').data('variant'));
     setQty(variantId, this.value);
 });
-$(document).on('input', '#reg-customer-search', searchCustomers);
+$(document).on('input', '#reg_customer_search', searchCustomers);
 $(document).on('click', '#reg-customer-deselect', () => {
     $('#reg-customer-id').val('');
     $('#reg-customer-selected').addClass('d-none');

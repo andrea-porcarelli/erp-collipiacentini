@@ -1,6 +1,6 @@
 {{-- Wizard di registrazione ordine manuale, aperto come modale dalla lista ordini. --}}
 <style>
-    #modal-register-order .modal-dialog { max-width: 1000px; width: 95%; }
+    #modal-register-order .modal-dialog { max-width: 1300px; width: 95%; }
     #modal-register-order .modal-body { max-height: calc(100vh - 200px); overflow-y: auto; }
 
     .register-order-step { position: relative; padding: 12px 0; }
@@ -141,7 +141,7 @@
 
                     <div class="row g-3">
                         <div class="col-12">
-                            <x-input name="reg_customer_search" id="reg-customer-search"
+                            <x-input name="reg_customer_search"
                                      label="Cerca cliente esistente"
                                      placeholder="Nome, cognome, email o telefono"
                                      leading="fa-magnifying-glass" />
