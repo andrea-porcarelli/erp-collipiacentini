@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\Customer;
+use App\Models\Order;
+use Stripe\Checkout\Session as CheckoutSession;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
 use Stripe\Refund;
@@ -80,6 +82,62 @@ class StripePaymentService
     public function retrievePaymentMethod(string $paymentMethodId): PaymentMethod
     {
         return PaymentMethod::retrieve($paymentMethodId);
+    }
+
+    /**
+     * Crea una Stripe Checkout Session per un Order già esistente e ne restituisce
+     * l'URL condivisibile (da inviare al cliente per il pagamento).
+     *
+     * La metadata `order_id` viene propagata anche al PaymentIntent, così il webhook
+     * `payment_intent.succeeded` può marcare l'ordine come PAID.
+     */
+    public function createPaymentLinkForOrder(Order $order): CheckoutSession
+    {
+        $order->loadMissing(['orderProducts.product', 'orderProducts.items.variant', 'customer']);
+
+        $lineItems = [];
+        foreach ($order->orderProducts as $orderProduct) {
+            $productLabel = $orderProduct->product?->label ?? 'Prodotto';
+            foreach ($orderProduct->items as $item) {
+                $variantLabel = $item->variant?->label ?? 'Variante';
+                $lineItems[] = [
+                    'quantity' => (int) $item->quantity,
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'unit_amount' => (int) round(((float) $item->unit_price) * 100),
+                        'product_data' => [
+                            'name' => sprintf('%s — %s', $productLabel, $variantLabel),
+                        ],
+                    ],
+                ];
+            }
+        }
+
+        $successUrl = url("/order/success/{$order->order_number}");
+        $cancelUrl = url("/order/success/{$order->order_number}");
+
+        $params = [
+            'mode' => 'payment',
+            'line_items' => $lineItems,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'metadata' => [
+                'order_id' => (string) $order->id,
+                'order_number' => (string) $order->order_number,
+            ],
+            'payment_intent_data' => [
+                'metadata' => [
+                    'order_id' => (string) $order->id,
+                    'order_number' => (string) $order->order_number,
+                ],
+            ],
+        ];
+
+        if ($order->customer?->email) {
+            $params['customer_email'] = $order->customer->email;
+        }
+
+        return CheckoutSession::create($params);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Enums\OrderStatus;
 use App\Facades\Utils;
+use App\Http\Controllers\Backoffice\Requests\Orders\StoreOrderRequest;
 use App\Http\Controllers\Backoffice\Requests\Orders\UpdateBookingRequest;
 use App\Http\Controllers\Backoffice\Requests\Orders\UpdateCustomerRequest;
 use App\Http\Controllers\Backoffice\Requests\Orders\UpdateCustomerStatusRequest;
@@ -12,9 +13,13 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
 use App\Mail\OrderCancellationMail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Customer;
 use App\Models\CustomerConsent;
 use App\Models\Order;
+use App\Models\Partner;
+use App\Models\Product;
 use App\Services\OrderLogger;
+use App\Services\OrderService;
 use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -438,6 +443,250 @@ class OrderController extends Controller
             abort(403);
         }
         if ($user->role === 'partner' && $order->partner_id !== $user->partner_id) {
+            abort(403);
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Registrazione manuale di un ordine dal backoffice
+    // ---------------------------------------------------------------------
+
+    public function create(): View
+    {
+        return view('backoffice.'.$this->path.'.create')->with('path', $this->path);
+    }
+
+    public function store(StoreOrderRequest $request, OrderService $orderService): JsonResponse
+    {
+        try {
+            $data = $request->validated();
+
+            // Il partner scelto deve essere accessibile dal ruolo dell'utente:
+            // partner/admin → solo il proprio; company → solo partner della propria company.
+            $partner = Partner::findOrFail($data['partner_id']);
+            $this->authorizePartnerAccess($partner);
+
+            $order = $orderService->createOrderManually($data);
+
+            return $this->success([
+                'response'     => 'Ordine registrato',
+                'order_id'     => $order->id,
+                'order_number' => $order->order_number,
+                'redirect_url' => route('orders.show', $order),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error(['response' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createPartners(): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            $q = Partner::where('is_active', 1);
+
+            if ($user->role === 'company') {
+                $q->where('company_id', $user->company_id);
+            } elseif (in_array($user->role, ['partner', 'admin'])) {
+                $q->where('id', $user->partner_id);
+            }
+
+            $partners = $q->orderBy('partner_name')
+                ->get(['id', 'partner_name'])
+                ->map(fn ($p) => ['id' => $p->id, 'label' => $p->partner_name])
+                ->values();
+
+            return $this->success(['partners' => $partners]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createProducts(Request $request): JsonResponse
+    {
+        try {
+            $partnerId = (int) $request->query('partner_id');
+            if (! $partnerId) {
+                return $this->error(['response' => 'Partner non specificato']);
+            }
+
+            $partner = Partner::findOrFail($partnerId);
+            $this->authorizePartnerAccess($partner);
+
+            $products = Product::where('partner_id', $partnerId)
+                ->where('is_active', 1)
+                ->orderBy('label')
+                ->get(['id', 'label'])
+                ->map(fn ($p) => ['id' => $p->id, 'label' => $p->label])
+                ->values();
+
+            return $this->success(['products' => $products]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createAvailabilityDays(Request $request): JsonResponse
+    {
+        try {
+            $productId = (int) $request->query('product_id');
+            if (! $productId) {
+                return $this->error(['response' => 'Prodotto non specificato']);
+            }
+
+            $product = Product::findOrFail($productId);
+            $this->authorizePartnerAccess($product->partner);
+
+            $service = app(ProductAvailabilityService::class);
+            $ref = now()->startOfMonth();
+            $dates = [];
+            for ($m = 0; $m < 12; $m++) {
+                $dates = array_merge($dates, $service->getAvailableDaysForMonth($product, $ref->year, $ref->month));
+                $ref->addMonth();
+            }
+
+            return $this->success(['days' => array_values(array_unique($dates))]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createAvailabilitySlots(Request $request): JsonResponse
+    {
+        try {
+            $productId = (int) $request->query('product_id');
+            $date = $request->query('date');
+
+            if (! $productId || ! $date) {
+                return $this->error(['response' => 'Parametri mancanti']);
+            }
+
+            $product = Product::findOrFail($productId);
+            $this->authorizePartnerAccess($product->partner);
+
+            $service = app(ProductAvailabilityService::class);
+            if ($service->isDateClosed($product, $date)) {
+                return $this->success(['times' => [], 'closed' => true]);
+            }
+
+            $slots = $service->getSlotsForDate($product, $date);
+            $times = $slots->map(fn ($slot) => [
+                'time'         => $slot['time'],
+                'availability' => $slot['availability'],
+                'slot_type'    => $slot['slot_type'],
+                'slot_id'      => $slot['slot_id'],
+                'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
+            ])->values();
+
+            return $this->success(['times' => $times]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createVariants(Request $request, OrderService $orderService): JsonResponse
+    {
+        try {
+            $productId = (int) $request->query('product_id');
+            $date = $request->query('date');
+            $time = $request->query('time');
+
+            if (! $productId || ! $date || ! $time) {
+                return $this->error(['response' => 'Parametri mancanti']);
+            }
+
+            $product = Product::with(['variants.prices', 'partner'])->findOrFail($productId);
+            $this->authorizePartnerAccess($product->partner);
+
+            $quote = $orderService->quoteVariants($product, $date, $time);
+            if ($quote['slot'] === null) {
+                return $this->error(['response' => 'Slot non disponibile']);
+            }
+
+            return $this->success($quote);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function createCustomers(Request $request): JsonResponse
+    {
+        try {
+            $q = trim((string) $request->query('q', ''));
+            $partnerId = (int) $request->query('partner_id');
+            if (mb_strlen($q) < 2) {
+                return $this->success(['customers' => []]);
+            }
+
+            $user = Auth::user();
+            $query = Customer::query()
+                ->where(function ($qq) use ($q) {
+                    $qq->where('email', 'like', "%{$q}%")
+                        ->orWhere('name', 'like', "%{$q}%")
+                        ->orWhere('surname', 'like', "%{$q}%")
+                        ->orWhere('phone', 'like', "%{$q}%");
+                });
+
+            // Filtriamo per partner (o scope company) per non esporre customer
+            // di altri partner all'operatore. I customer possono essere condivisi
+            // se lo stesso email compare su più partner: matchiamo anche via orders.
+            if ($partnerId) {
+                $query->where(function ($qq) use ($partnerId) {
+                    $qq->where('partner_id', $partnerId)
+                        ->orWhereHas('orders', fn ($o) => $o->where('partner_id', $partnerId));
+                });
+            } elseif ($user->role === 'company') {
+                $query->where(function ($qq) use ($user) {
+                    $qq->where('company_id', $user->company_id)
+                        ->orWhereHas('orders.partner', fn ($p) => $p->where('company_id', $user->company_id));
+                });
+            } elseif (in_array($user->role, ['partner', 'admin'])) {
+                $query->where(function ($qq) use ($user) {
+                    $qq->where('partner_id', $user->partner_id)
+                        ->orWhereHas('orders', fn ($o) => $o->where('partner_id', $user->partner_id));
+                });
+            }
+
+            $customers = $query->orderBy('surname')->limit(15)->get([
+                'id', 'name', 'surname', 'email', 'phone', 'prefix_phone',
+                'address', 'city', 'zip_code', 'fiscal_code',
+            ]);
+
+            return $this->success(['customers' => $customers]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function paymentLink(Order $order, OrderService $orderService): JsonResponse
+    {
+        try {
+            $this->authorizeOrderAccess($order);
+
+            if ($order->order_status !== OrderStatus::PENDING) {
+                return $this->error(['response' => 'Il link di pagamento è disponibile solo per ordini pending']);
+            }
+
+            $url = $orderService->ensurePaymentLink($order);
+
+            return $this->success(['url' => $url]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    private function authorizePartnerAccess(?Partner $partner): void
+    {
+        if (! $partner) {
+            abort(403);
+        }
+        $user = Auth::user();
+        if ($user->role === 'company' && $partner->company_id !== $user->company_id) {
+            abort(403);
+        }
+        if (in_array($user->role, ['partner', 'admin']) && $partner->id !== $user->partner_id) {
             abort(403);
         }
     }

@@ -23,6 +23,8 @@ class Order extends LogsModel
         'card_last4',
         'paid_at',
         'payment_error',
+        'stripe_payment_link_id',
+        'stripe_payment_link_url',
     ];
 
 

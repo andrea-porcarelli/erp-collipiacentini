@@ -6,6 +6,9 @@
         <div class="row">
             <div class="col-12">
                 <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto" brelative="true">
+                    <div class="position-absolute" style="top: -70px; right: 0">
+                        <x-button label="Registra ordine" status="Primary" leading="fa-plus" :href="url('/orders/create')" />
+                    </div>
                     <x-table-header>
                         <div class="filters-miticko">
                             <x-filter label="Data" type="daterange" name="dates" />

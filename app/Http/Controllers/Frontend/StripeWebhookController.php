@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
@@ -74,6 +75,22 @@ class StripeWebhookController extends Controller
             'payment_intent_id' => $paymentIntentId,
             'metadata' => $paymentIntent->metadata->toArray(),
         ]);
+
+        // Payment Link generato da backoffice per un ordine manuale: il webhook
+        // deve trovare l'ordine via metadata.order_id e marcarlo come pagato.
+        $metadataOrderId = $paymentIntent->metadata->order_id ?? null;
+        if ($metadataOrderId) {
+            $manualOrder = Order::find($metadataOrderId);
+            if ($manualOrder && $manualOrder->paid_at === null) {
+                $manualOrder->update(['stripe_payment_intent_id' => $paymentIntentId]);
+                $this->orderService->completeOrder($manualOrder, $paymentIntent->payment_method);
+                Log::info('Manual order completed via checkout webhook', [
+                    'order_id' => $manualOrder->id,
+                    'order_number' => $manualOrder->order_number,
+                ]);
+                return;
+            }
+        }
 
         // Verifica se l'ordine esiste già
         $existingOrder = $this->orderService->findByPaymentIntent($paymentIntentId);

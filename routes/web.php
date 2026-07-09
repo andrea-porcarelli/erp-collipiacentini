@@ -88,6 +88,17 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
         Route::patch('tickets/{participant}/status', [TicketScannerController::class, 'updateStatus'])->name('tickets.updateStatus');
 
+        // Endpoint AJAX per il form "Registra ordine".
+        // IMPORTANTE: devono precedere le route parametriche orders/{order}/*
+        // per non venire intercettate dal binding {order}.
+        Route::get('orders/create/partners', [OrderController::class, 'createPartners'])->name('orders.create.partners');
+        Route::get('orders/create/products', [OrderController::class, 'createProducts'])->name('orders.create.products');
+        Route::get('orders/create/availability/days', [OrderController::class, 'createAvailabilityDays'])->name('orders.create.availabilityDays');
+        Route::get('orders/create/availability/slots', [OrderController::class, 'createAvailabilitySlots'])->name('orders.create.availabilitySlots');
+        Route::get('orders/create/variants', [OrderController::class, 'createVariants'])->name('orders.create.variants');
+        Route::get('orders/create/customers', [OrderController::class, 'createCustomers'])->name('orders.create.customers');
+
+        Route::post('orders/{order}/payment-link', [OrderController::class, 'paymentLink'])->name('orders.paymentLink');
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
         Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');

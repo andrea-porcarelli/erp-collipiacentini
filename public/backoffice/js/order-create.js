@@ -1,0 +1,468 @@
+import App from "./app.js";
+
+const routes = window.orderCreateRoutes || {};
+const monthsShort = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+const state = {
+    partnerId: null,
+    partnerLabel: null,
+    productId: null,
+    productLabel: null,
+    date: null,
+    time: null,
+    slotType: null,
+    slotId: null,
+    slotAvailability: null,
+    variants: [],
+    quantities: {},
+    customer: { id: null },
+    picker: null,
+    availableDays: [],
+};
+
+const formatDateChip = (d) => {
+    if (!d) return '';
+    const dt = new Date(d + 'T00:00:00');
+    return `${dt.getDate()} ${monthsShort[dt.getMonth()]} ${String(dt.getFullYear()).slice(-2)}`;
+};
+
+const money = (v) => `€ ${Number(v).toFixed(2).replace('.', ',')}`;
+
+const setStepLocked = (stepId, locked) => {
+    const el = document.getElementById(stepId);
+    if (!el) return;
+    el.classList.toggle('is-locked', locked);
+};
+
+const setBadgeDone = (n, done) => {
+    document.querySelectorAll(`[data-role="badge-${n}"]`).forEach((el) => el.classList.toggle('done', !!done));
+};
+
+// -----------------------------------------------------------------------------
+// STEP 1: Partner
+// -----------------------------------------------------------------------------
+const loadPartners = () => {
+    $.get(routes.partners).done((res) => {
+        const $sel = $('#reg-partner');
+        $sel.empty().append('<option value="">Seleziona partner</option>');
+        (res.partners || []).forEach((p) => {
+            $sel.append(`<option value="${p.id}">${p.label}</option>`);
+        });
+        if ((res.partners || []).length === 1) {
+            const only = res.partners[0];
+            $sel.val(only.id).prop('disabled', true);
+            onPartnerChanged(only.id, only.label);
+        }
+    }).fail(() => toastr.error('Errore nel caricamento dei partner'));
+};
+
+const onPartnerChanged = (id, label) => {
+    state.partnerId = id ? Number(id) : null;
+    state.partnerLabel = label || $('#reg-partner option:selected').text();
+    resetFromStep('product');
+    if (!state.partnerId) return;
+    setBadgeDone(1, false);
+    loadProducts(state.partnerId);
+};
+
+const loadProducts = (partnerId) => {
+    const $sel = $('#reg-product');
+    $sel.empty().append('<option value="">Caricamento…</option>').prop('disabled', true);
+    $.get(routes.products, { partner_id: partnerId }).done((res) => {
+        $sel.empty().append('<option value="">Seleziona prodotto</option>').prop('disabled', false);
+        (res.products || []).forEach((p) => {
+            $sel.append(`<option value="${p.id}">${p.label}</option>`);
+        });
+    }).fail(() => {
+        $sel.empty().append('<option value="">Errore nel caricamento</option>');
+        toastr.error('Errore nel caricamento dei prodotti');
+    });
+};
+
+const onProductChanged = (id, label) => {
+    state.productId = id ? Number(id) : null;
+    state.productLabel = label || $('#reg-product option:selected').text();
+    resetFromStep('date');
+    if (!state.productId) {
+        setBadgeDone(1, !!state.partnerId);
+        return;
+    }
+    setBadgeDone(1, true);
+    setStepLocked('reg-step-date', false);
+    loadAvailability(state.productId);
+    updateSummary();
+};
+
+// -----------------------------------------------------------------------------
+// STEP 2: Data / Slot
+// -----------------------------------------------------------------------------
+const loadAvailability = (productId) => {
+    $.get(routes.availabilityDays, { product_id: productId }).done((res) => {
+        state.availableDays = res.days || [];
+        initPicker(state.availableDays);
+    }).fail(() => toastr.error('Errore nel caricamento delle disponibilità'));
+};
+
+const initPicker = (days) => {
+    if (state.picker) state.picker.destroy();
+    state.picker = flatpickr('#reg-calendar-container', {
+        inline: true,
+        locale: 'it',
+        dateFormat: 'Y-m-d',
+        minDate: 'today',
+        disableMobile: true,
+        monthSelectorType: 'static',
+        enable: days,
+        onChange: (dates, dateStr) => {
+            if (!dateStr) return;
+            state.date = dateStr;
+            $('#reg-date').val(dateStr);
+            state.time = state.slotType = state.slotId = null;
+            $('#reg-time,#reg-slot-type,#reg-slot-id').val('');
+            loadSlots(dateStr);
+            updateSummary();
+        },
+        onReady: (_, __, instance) => {
+            if (days.length) {
+                const today = instance.formatDate(new Date(), 'Y-m-d');
+                const jumpTo = days.filter((d) => d >= today).sort()[0];
+                if (jumpTo) instance.jumpToDate(jumpTo);
+            }
+        },
+    });
+};
+
+const loadSlots = (date) => {
+    const $container = $('#reg-slots');
+    $container.html('<div class="text-muted">Caricamento orari…</div>');
+    $.get(routes.availabilitySlots, { product_id: state.productId, date }).done((res) => {
+        const times = res.times || [];
+        if (!times.length) {
+            $container.html('<div class="text-muted">Nessun orario disponibile per questa data.</div>');
+            return;
+        }
+        $container.empty();
+        times.forEach((slot) => {
+            const availLabel = slot.availability === null ? '∞' : slot.availability;
+            const $el = $(`
+                <div class="reg-slot ${slot.is_available ? '' : 'disabled'}">
+                    <div class="reg-slot-time">${slot.time}</div>
+                    <div class="reg-slot-avail"><i class="fa-regular fa-user"></i> ${availLabel}</div>
+                </div>
+            `);
+            if (slot.is_available) {
+                $el.on('click', () => {
+                    $container.find('.reg-slot').removeClass('selected');
+                    $el.addClass('selected');
+                    state.time = slot.time;
+                    state.slotType = slot.slot_type;
+                    state.slotId = slot.slot_id;
+                    state.slotAvailability = slot.availability;
+                    $('#reg-time').val(slot.time);
+                    $('#reg-slot-type').val(slot.slot_type || '');
+                    $('#reg-slot-id').val(slot.slot_id || '');
+                    setBadgeDone(2, true);
+                    setStepLocked('reg-step-variants', false);
+                    loadVariants();
+                    updateSummary();
+                });
+            }
+            $container.append($el);
+        });
+    }).fail(() => $container.html('<div class="text-muted">Errore nel caricamento degli orari.</div>'));
+};
+
+// -----------------------------------------------------------------------------
+// STEP 3: Varianti / quantità
+// -----------------------------------------------------------------------------
+const loadVariants = () => {
+    const $container = $('#reg-variants');
+    $container.html('<div class="text-muted">Caricamento varianti…</div>');
+    state.variants = [];
+    state.quantities = {};
+
+    $.get(routes.variants, {
+        product_id: state.productId,
+        date: state.date,
+        time: state.time,
+    }).done((res) => {
+        state.variants = res.variants || [];
+        if (!state.variants.length) {
+            $container.html('<div class="text-muted">Nessuna variante disponibile.</div>');
+            return;
+        }
+        $container.empty();
+        state.variants.forEach((v) => {
+            state.quantities[v.id] = 0;
+            const $row = $(`
+                <div class="reg-variant-row" data-variant="${v.id}">
+                    <div class="reg-variant-label">${v.label}</div>
+                    <div class="reg-variant-price">${money(v.price)}</div>
+                    <div class="reg-qty-control">
+                        <button type="button" class="reg-qty-btn" data-role="dec">−</button>
+                        <input type="number" class="reg-qty-input" data-role="qty" value="0" min="0" />
+                        <button type="button" class="reg-qty-btn" data-role="inc">+</button>
+                    </div>
+                </div>
+            `);
+            $container.append($row);
+        });
+        updateSummary();
+    }).fail(() => $container.html('<div class="text-muted">Errore nel caricamento varianti.</div>'));
+};
+
+const totalQuantity = () => Object.values(state.quantities).reduce((a, b) => a + Number(b || 0), 0);
+
+const setQty = (variantId, qty) => {
+    qty = Math.max(0, Math.floor(Number(qty) || 0));
+    // Rispetta la disponibilità dello slot: la somma non può superare la capacità
+    const other = totalQuantity() - Number(state.quantities[variantId] || 0);
+    if (state.slotAvailability !== null && qty + other > state.slotAvailability) {
+        qty = Math.max(0, state.slotAvailability - other);
+        toastr.warning(`Disponibilità dello slot: ${state.slotAvailability} biglietti`);
+    }
+    state.quantities[variantId] = qty;
+    $(`.reg-variant-row[data-variant="${variantId}"] [data-role="qty"]`).val(qty);
+
+    const total = totalQuantity();
+    const hasVariants = total > 0;
+    setBadgeDone(3, hasVariants);
+    setStepLocked('reg-step-customer', !hasVariants);
+    setStepLocked('reg-step-summary', !hasVariants);
+    updateSummary();
+};
+
+$(document).on('click', '#reg-variants [data-role="inc"]', function () {
+    const $row = $(this).closest('.reg-variant-row');
+    const variantId = Number($row.data('variant'));
+    setQty(variantId, Number(state.quantities[variantId] || 0) + 1);
+});
+$(document).on('click', '#reg-variants [data-role="dec"]', function () {
+    const $row = $(this).closest('.reg-variant-row');
+    const variantId = Number($row.data('variant'));
+    setQty(variantId, Number(state.quantities[variantId] || 0) - 1);
+});
+$(document).on('input', '#reg-variants [data-role="qty"]', function () {
+    const $row = $(this).closest('.reg-variant-row');
+    const variantId = Number($row.data('variant'));
+    setQty(variantId, this.value);
+});
+
+// -----------------------------------------------------------------------------
+// STEP 4: Cliente
+// -----------------------------------------------------------------------------
+const searchCustomers = App.debounce(() => {
+    const q = $('#reg-customer-search').val();
+    if (!q || q.length < 2) {
+        $('#reg-customer-results').addClass('d-none').empty();
+        return;
+    }
+    $.get(routes.customers, { q, partner_id: state.partnerId }).done((res) => {
+        renderCustomerResults(res.customers || []);
+    });
+}, 300);
+
+const renderCustomerResults = (customers) => {
+    const $box = $('#reg-customer-results');
+    $box.empty();
+    if (!customers.length) {
+        $box.html('<div class="reg-customer-result-item text-muted">Nessun cliente trovato</div>').removeClass('d-none');
+        return;
+    }
+    customers.forEach((c) => {
+        const label = `${c.name || ''} ${c.surname || ''}`.trim();
+        const $el = $(`
+            <div class="reg-customer-result-item">
+                <div class="name">${label}</div>
+                <div class="meta">${c.email || ''}${c.phone ? ' · ' + c.phone : ''}</div>
+            </div>
+        `);
+        $el.on('click', () => selectCustomer(c));
+        $box.append($el);
+    });
+    $box.removeClass('d-none');
+};
+
+const selectCustomer = (c) => {
+    state.customer = { id: c.id };
+    $('#reg-customer-id').val(c.id);
+    $('input[name="customer[name]"]').val(c.name || '');
+    $('input[name="customer[surname]"]').val(c.surname || '');
+    $('input[name="customer[email]"]').val(c.email || '');
+    $('input[name="customer[phone]"]').val(c.phone || '');
+    $('input[name="customer[address]"]').val(c.address || '');
+    $('input[name="customer[city]"]').val(c.city || '');
+    $('input[name="customer[zip_code]"]').val(c.zip_code || '');
+    $('input[name="customer[fiscal_code]"]').val(c.fiscal_code || '');
+    $('#reg-customer-results').addClass('d-none').empty();
+    $('#reg-customer-search').val('');
+    const label = `${c.name || ''} ${c.surname || ''}`.trim() + ` (${c.email || ''})`;
+    $('#reg-customer-selected-label').text(label);
+    $('#reg-customer-selected').removeClass('d-none');
+};
+
+$(document).on('input', '#reg-customer-search', searchCustomers);
+$(document).on('click', '#reg-customer-deselect', () => {
+    state.customer = { id: null };
+    $('#reg-customer-id').val('');
+    $('#reg-customer-selected').addClass('d-none');
+});
+
+// -----------------------------------------------------------------------------
+// STEP 5: Riepilogo
+// -----------------------------------------------------------------------------
+const computeTotal = () => {
+    return state.variants.reduce((sum, v) => {
+        const qty = Number(state.quantities[v.id] || 0);
+        return sum + qty * Number(v.price || 0);
+    }, 0);
+};
+
+const updateSummary = () => {
+    const $box = $('#reg-summary');
+    if (!state.partnerId || !state.productId) {
+        $box.html('<div class="text-muted">Compila i passaggi precedenti.</div>');
+        return;
+    }
+    const lines = [];
+    lines.push(`<div class="reg-summary-row"><span>Partner</span><span>${state.partnerLabel || '-'}</span></div>`);
+    lines.push(`<div class="reg-summary-row"><span>Prodotto</span><span>${state.productLabel || '-'}</span></div>`);
+    if (state.date) lines.push(`<div class="reg-summary-row"><span>Data</span><span>${formatDateChip(state.date)}</span></div>`);
+    if (state.time) lines.push(`<div class="reg-summary-row"><span>Orario</span><span>${state.time}</span></div>`);
+    state.variants.forEach((v) => {
+        const qty = Number(state.quantities[v.id] || 0);
+        if (qty > 0) {
+            lines.push(`<div class="reg-summary-row"><span>${qty} × ${v.label}</span><span>${money(qty * v.price)}</span></div>`);
+        }
+    });
+    const total = computeTotal();
+    lines.push(`<div class="reg-summary-row total"><span>Totale</span><span>${money(total)}</span></div>`);
+    $box.html(lines.join(''));
+};
+
+// -----------------------------------------------------------------------------
+// Reset a cascata
+// -----------------------------------------------------------------------------
+const resetFromStep = (step) => {
+    if (['product', 'date', 'variants', 'customer', 'summary'].includes(step)) {
+        state.productId = null; state.productLabel = null;
+        $('#reg-product').val('');
+    }
+    if (['date', 'variants', 'customer', 'summary'].includes(step)) {
+        state.date = state.time = state.slotType = state.slotId = null;
+        state.slotAvailability = null;
+        $('#reg-date,#reg-time,#reg-slot-type,#reg-slot-id').val('');
+        if (state.picker) { state.picker.destroy(); state.picker = null; }
+        $('#reg-slots').html('<div class="text-muted">Seleziona prima una data.</div>');
+        setBadgeDone(2, false);
+        setStepLocked('reg-step-date', true);
+    }
+    if (['variants', 'customer', 'summary'].includes(step)) {
+        state.variants = []; state.quantities = {};
+        $('#reg-variants').html('<div class="text-muted">Seleziona prima data e orario.</div>');
+        setBadgeDone(3, false);
+        setStepLocked('reg-step-variants', true);
+        setStepLocked('reg-step-customer', true);
+        setStepLocked('reg-step-summary', true);
+    }
+    updateSummary();
+};
+
+// -----------------------------------------------------------------------------
+// Submit
+// -----------------------------------------------------------------------------
+$(document).on('click', '#reg-submit', function () {
+    const $btn = $(this);
+    if ($btn.prop('disabled')) return;
+
+    if (!state.partnerId) { toastr.error('Seleziona un partner'); return; }
+    if (!state.productId) { toastr.error('Seleziona un prodotto'); return; }
+    if (!state.date || !state.time) { toastr.error('Seleziona data e orario'); return; }
+
+    const items = state.variants
+        .map((v) => ({ variant_id: v.id, quantity: Number(state.quantities[v.id] || 0) }))
+        .filter((i) => i.quantity > 0);
+    if (!items.length) { toastr.error('Aggiungi almeno un biglietto'); return; }
+
+    const customer = {
+        id:           $('#reg-customer-id').val() || null,
+        name:         $('input[name="customer[name]"]').val(),
+        surname:      $('input[name="customer[surname]"]').val(),
+        email:        $('input[name="customer[email]"]').val(),
+        phone:        $('input[name="customer[phone]"]').val(),
+        address:      $('input[name="customer[address]"]').val(),
+        city:         $('input[name="customer[city]"]').val(),
+        zip_code:     $('input[name="customer[zip_code]"]').val(),
+        fiscal_code:  $('input[name="customer[fiscal_code]"]').val(),
+    };
+    if (!customer.name || !customer.surname || !customer.email) {
+        toastr.error('Nome, cognome ed email del cliente sono obbligatori'); return;
+    }
+
+    const orderStatus = $('input[name="order_status"]:checked').val() || 'paid';
+    const sendEmail = $('#reg-send-email').is(':checked');
+
+    const payload = {
+        partner_id: state.partnerId,
+        product_id: state.productId,
+        date: state.date,
+        time: state.time,
+        items,
+        customer,
+        order_status: orderStatus,
+        send_email: sendEmail ? 1 : 0,
+    };
+
+    $btn.prop('disabled', true);
+    App.ajax({ path: routes.store, method: 'POST', data: payload }).then((res) => {
+        toastr.success('Ordine registrato con successo');
+        if (orderStatus === 'pending' && res.order_id) {
+            // Genera il payment link Stripe e mostra il modal per copiarlo
+            const linkUrl = routes.paymentLinkTpl.replace('{order}', res.order_id);
+            App.ajax({ path: linkUrl, method: 'POST' }).then((linkRes) => {
+                $('#reg-payment-link-url').val(linkRes.url || '');
+                const modalEl = document.getElementById('reg-payment-link-modal');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+                $('#reg-payment-link-modal .btn-success').off('click').on('click', () => {
+                    location.href = res.redirect_url;
+                });
+                $('#reg-payment-link-modal .btn-cancel').off('click').on('click', () => modal.hide());
+            }).catch(() => {
+                toastr.warning('Ordine creato ma link di pagamento non disponibile');
+                setTimeout(() => location.href = res.redirect_url, 1000);
+            });
+        } else {
+            setTimeout(() => location.href = res.redirect_url, 800);
+        }
+    }).catch((xhr) => {
+        $btn.prop('disabled', false);
+        const msg = xhr?.responseJSON?.message
+            || xhr?.responseJSON?.response
+            || (xhr?.responseJSON?.errors ? Object.values(xhr.responseJSON.errors).flat().join(', ') : null)
+            || 'Errore durante la registrazione dell\'ordine';
+        toastr.error(msg);
+    });
+});
+
+// Copia payment link negli appunti
+$(document).on('click', '#reg-payment-link-copy', function () {
+    const $inp = $('#reg-payment-link-url');
+    $inp.select();
+    try {
+        document.execCommand('copy');
+        toastr.success('Link copiato negli appunti');
+    } catch (_) {
+        navigator.clipboard?.writeText($inp.val() || '');
+    }
+});
+
+// Handlers select partner/prodotto
+$(document).on('change', '#reg-partner', function () { onPartnerChanged(this.value, $(this).find('option:selected').text()); });
+$(document).on('change', '#reg-product', function () { onProductChanged(this.value, $(this).find('option:selected').text()); });
+
+// Boot
+$(function () {
+    loadPartners();
+    updateSummary();
+});
