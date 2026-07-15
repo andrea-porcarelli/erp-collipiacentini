@@ -361,6 +361,36 @@
                 </div>
             </x-card>
 
+            @php($attributionFields = [
+                ['label' => 'UTM Source',   'value' => $order->utm_source,   'icon' => 'fa-bullhorn'],
+                ['label' => 'UTM Medium',   'value' => $order->utm_medium,   'icon' => 'fa-signal-stream'],
+                ['label' => 'UTM Campaign', 'value' => $order->utm_campaign, 'icon' => 'fa-flag'],
+                ['label' => 'UTM Term',     'value' => $order->utm_term,     'icon' => 'fa-tag'],
+                ['label' => 'UTM Content',  'value' => $order->utm_content,  'icon' => 'fa-file-lines'],
+                ['label' => 'Referer',      'value' => $order->referrer,     'icon' => 'fa-arrow-turn-down-right'],
+                ['label' => 'Google Click ID (gclid)', 'value' => $order->gclid, 'icon' => 'fa-google'],
+                ['label' => 'Meta Click ID (fbclid)',  'value' => $order->fbclid, 'icon' => 'fa-facebook'],
+            ])
+            @php($attributionAny = collect($attributionFields)->contains(fn($f) => filled($f['value'])))
+            <x-card title="UTM e Referer">
+                @if(! $attributionAny)
+                    <div class="text-secondary">Nessun dato di attribuzione registrato per questo ordine.</div>
+                @else
+                    @php($first = true)
+                    @foreach($attributionFields as $field)
+                        @continue(! filled($field['value']))
+                        <div class="customer-block @if(! $first) mt-spacing-l @endif">
+                            <div class="detail-label">{{ $field['label'] }}</div>
+                            <div class="detail-value text-break">
+                                <i class="fa-regular {{ $field['icon'] }}"></i>
+                                {{ $field['value'] }}
+                            </div>
+                        </div>
+                        @php($first = false)
+                    @endforeach
+                @endif
+            </x-card>
+
             <x-card title="Consensi utente">
                 @if($customerConsents->isEmpty())
                     <div class="text-secondary">Nessun consenso registrato per questo cliente.</div>
