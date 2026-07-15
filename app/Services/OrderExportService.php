@@ -219,7 +219,7 @@ class OrderExportService
         $values[] = $orderStatusLabel;
         $values[] = null; // Stato pagamento
         $values[] = $paymentMethod;
-        $values[] = null; // Canale vendita
+        $values[] = $partner?->domain_name;
 
         // ESPERIENZA
         $values[] = $product?->label;
