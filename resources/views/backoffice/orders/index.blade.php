@@ -35,9 +35,9 @@
                                 <th style="width: 10%">#ordine</th>
                                 <th>Cliente</th>
                                 <th>Data</th>
-                                <th>Orario</th>
-                                <th>Acquisto</th>
-                                <th>Tipologia</th>
+                                <th class="col-hide-mobile">Orario</th>
+                                <th class="col-hide-mobile">Acquisto</th>
+                                <th class="col-hide-mobile">Tipologia</th>
                                 <th>Stato</th>
                                 <th></th>
                             </tr>
@@ -99,9 +99,9 @@
                         {data: 'order_number', width: '200px'},
                         {data: 'customer'},
                         {data: 'created_at'},
-                        {data: 'timing'},
-                        {data: 'details'},
-                        {data: 'type'},
+                        {data: 'timing', className: 'col-hide-mobile'},
+                        {data: 'details', className: 'col-hide-mobile'},
+                        {data: 'type', className: 'col-hide-mobile'},
                         {data: 'status'},
                         {data: 'action', class: 'text-end'},
                     ],

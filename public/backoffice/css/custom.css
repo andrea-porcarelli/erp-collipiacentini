@@ -1862,6 +1862,58 @@ table.order-detail-tickets tbody tr:last-child td {
         --button-paddingtop: var(--button-small-paddingtop);
         --button-spacing: var(--button-small-spacing);
     }
+
+    /* Table header (filtri + totale + opzioni) in colonna e wrappabile */
+    .table-header {
+        position: static !important;
+        top: auto !important;
+        flex-wrap: wrap;
+        gap: var(--spacing-s);
+        padding-bottom: var(--spacing-m);
+    }
+    .filters-miticko {
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+    .filters-miticko .filter {
+        font-size: 12px;
+        line-height: 14px;
+        padding: 4px 8px;
+        gap: 4px;
+        max-width: 100%;
+    }
+    .filters-miticko .filter .label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .table-header .table-header-total,
+    .table-header .table-options {
+        font-size: 12px;
+    }
+
+    /* Nasconde colonne meno critiche (visibili dal preview ordine) */
+    .table-miticko .col-hide-mobile {
+        display: none !important;
+    }
+
+    /* Compatta padding tabella e codice ordine per stare nel viewport */
+    .table-miticko thead tr th {
+        font-size: 12px !important;
+        padding: var(--spacing-m) var(--spacing-s) !important;
+    }
+    .table-miticko > tbody > tr > th,
+    .table-miticko > tbody > tr > td {
+        padding: var(--spacing-m) var(--spacing-s) !important;
+        font-size: 12px !important;
+        line-height: 16px !important;
+    }
+    .table-miticko > tbody > tr > td:first-child {
+        font-size: 11px !important;
+        word-break: break-all;
+        max-width: 120px;
+    }
 }
 
 /* Consensi utente — pill di stato */
