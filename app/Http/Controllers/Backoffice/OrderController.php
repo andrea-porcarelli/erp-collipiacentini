@@ -52,7 +52,18 @@ class OrderController extends Controller
     {
         $statuses = OrderStatus::statuses();
 
-        return view('backoffice.'.$this->path.'.index', compact('statuses'))
+        $user = Auth::user();
+        $partnersQuery = Partner::query()->orderBy('partner_name');
+        if ($user->role === 'company') {
+            $partnersQuery->whereHas('products.companies', function ($q) use ($user) {
+                $q->where('companies.id', $user->company_id);
+            });
+        } elseif (in_array($user->role, ['partner', 'admin'])) {
+            $partnersQuery->where('id', (int) $user->partner_id);
+        }
+        $partners = $partnersQuery->get(['id', 'partner_name']);
+
+        return view('backoffice.'.$this->path.'.index', compact('statuses', 'partners'))
             ->with('path', $this->path);
     }
 

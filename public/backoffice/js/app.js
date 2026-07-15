@@ -689,30 +689,40 @@ const init = () => {
                 }
             });
         }
-        if (filter_type === 'status') {
+        if (filter_type === 'status' || filter_type === 'partner') {
             modal.modal('show');
             const btn_success = modal.find(`.btn-success`);
             const btn_cancel = modal.find(`.btn-cancel`);
-            btn_success.on('click', function () {
-                const inputs = JSON.stringify(modal.find('input').filter((i, el) => $(el).val() !== '0')
+            btn_success.off('click').on('click', function () {
+                const selected = modal.find('input').filter((i, el) => $(el).val() !== '0')
                     .map(function() {
                         return {
                             name: $(this).attr('name'),
                             value: $(this).val()
                         };
-                    }).get());
-                filter.find('input').val(inputs)
-
+                    }).get();
+                const hiddenInput = filter.find('input');
+                if (selected.length > 0) {
+                    hiddenInput.val(JSON.stringify(selected));
+                    const container = filter.find(`.label-container`);
+                    const chipLabel = selected.length === 1
+                        ? (modal.find(`input[name='${selected[0].name}']`).closest('.checkbox-miticko').children('span').not('.fa-regular').text().trim() || label)
+                        : `${label} (${selected.length})`;
+                    const safe = $('<div>').text(chipLabel).html();
+                    container.html(`<span class="fa-regular fa-xmark remove-filter" data-name="${name}"></span><span class="filter-filled">${safe}</span>`);
+                    filter.addClass('filled');
+                } else {
+                    hiddenInput.val('');
+                    const container = filter.find(`.label-container`);
+                    container.html(`<span class="fa fa-square-plus"></span><span class="label">${label}</span>`);
+                    filter.removeClass('filled');
+                }
                 modal.modal('hide');
-                App.reloadTable()
+                App.reloadTable();
             });
-            btn_cancel.on('click', function () {
+            btn_cancel.off('click').on('click', function () {
                 modal.modal('hide');
-                filter.find('input').val('')
-
-                modal.modal('hide');
-                App.reloadTable()
-            })
+            });
         }
     });
 

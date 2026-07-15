@@ -49,6 +49,12 @@ class OrderRepository extends CrudRepository implements OrderInterface
                 if (count($types) > 0) {
                     $q->whereIn('order_status', $types);
                 }
+            })
+            ->when(! empty($filters['partners']), function($q) use($filters) {
+                $partners = collect(json_decode($filters['partners'], true))->pluck('name')->filter()->toArray();
+                if (count($partners) > 0) {
+                    $q->whereIn('partner_id', $partners);
+                }
             });
     }
 }

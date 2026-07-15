@@ -7,7 +7,7 @@
             <div class="col-12">
                 <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto" brelative="true">
                     <div class="position-absolute d-flex gap-2" style="top: -70px; right: 0">
-                        <x-button label="Esporta" status="Neutral" emphasis="Low" leading="fa-file-export"
+                        <x-button label="Esporta" status="Primary" trailing="fa-arrow-down-to-bracket"
                                   id="btn-export-orders" />
                         <x-button label="Registra ordine" status="Primary" leading="fa-plus"
                                   id="btn-open-register-order"
@@ -19,6 +19,9 @@
                             <x-filter label="Codice prenotazione" type="text" name="order_number" />
                             <x-filter label="Prodotto" type="text" name="label" />
                             <x-filter label="Cliente" type="text" name="customer" />
+                            @if($partners->count() > 1)
+                                <x-filter label="Partner" name="partners" type="partner" />
+                            @endif
                             <x-filter label="Tipo di acquisto" name="types" type="status" />
                             <x-filter label="Stato" name="status" />
                         </div>
@@ -62,6 +65,17 @@
         @endforeach
         </ul>
     </x-modal>
+    @if($partners->count() > 1)
+        <x-modal id="filter-partner" title="Filtra per partner" primary="Salva" secondary="annulla" width="400px">
+            <ul class="order-statuses">
+                @foreach($partners as $partner)
+                    <li>
+                        <x-checkbox :label="$partner->partner_name" :name="(string) $partner->id" />
+                    </li>
+                @endforeach
+            </ul>
+        </x-modal>
+    @endif
     <x-modal id="order-detail" title="Riepilogo ordine">
         <div id="order-detail-body"></div>
     </x-modal>
