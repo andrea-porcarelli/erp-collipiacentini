@@ -58,7 +58,7 @@
                 <x-breadcrumb :first="['Ordini', 'orders.index']" :second="['#' . $order->order_number]" />
                 <x-header-page :title="'#' . $order->order_number" />
                 <div class="order-show-meta">
-                    Ordine creato il {{ $order->created_at->translatedFormat('j F Y') }} alle {{ $order->created_at->format('H:i') }}
+                    Ordine creato il {{ $order->created_at?->translatedFormat('j F Y') ?? '—' }} @if($order->created_at) alle {{ $order->created_at->format('H:i') }} @endif
                 </div>
             </div>
         </div>
