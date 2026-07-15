@@ -18,13 +18,24 @@ class CustomerRepository extends CrudRepository implements CustomerInterface
     public function filters(array $filters): Builder
     {
         return $this->builder()
-            ->when(isset($filters['label']), function($q) use($filters) {
-                $q->whereHas('languages', function($q)  use($filters) {
-                    $q->where('label', 'like', '%' . $filters['label']. '%')
-                        ->whereHas('language', function($q) {
-                            $q->where('iso_code', Utils::default_language());
-                        });
+            ->when(! empty($filters['customer']), function($q) use($filters) {
+                $term = $filters['customer'];
+                $q->where(function($q) use($term) {
+                    $q->where('surname', 'like', '%' . $term . '%')
+                      ->orWhere('email', 'like', '%' . $term . '%')
+                      ->orWhere('phone', 'like', '%' . $term . '%');
                 });
-            });
+            })
+            ->when(! empty($filters['purchased']), function($q) use($filters) {
+                $values = collect(json_decode($filters['purchased'], true))->pluck('name')->filter()->toArray();
+                $wantsYes = in_array('yes', $values, true);
+                $wantsNo = in_array('no', $values, true);
+                if ($wantsYes && ! $wantsNo) {
+                    $q->has('orders');
+                } elseif ($wantsNo && ! $wantsYes) {
+                    $q->doesntHave('orders');
+                }
+            })
+            ->orderByDesc('id');
     }
 }

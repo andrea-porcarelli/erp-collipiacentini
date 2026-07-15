@@ -26,7 +26,6 @@
                             <x-filter label="Stato" name="status" />
                         </div>
                         <span class="table-header-total"> - </span>
-                        <span class="table-options">Esporta</span>
                     </x-table-header>
                     <div class="table-responsive">
                         <table class="table-miticko datatable">

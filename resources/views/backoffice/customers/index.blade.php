@@ -8,6 +8,8 @@
                 <x-card title="Lista clienti" class="position-relative" brelative="true" sub_title="visualizza i clienti">
                     <x-table-header>
                         <div class="filters-miticko">
+                            <x-filter label="Cliente" type="text" name="customer" />
+                            <x-filter label="Ha acquistato" type="status" name="purchased" />
                         </div>
                         <span class="table-header-total"> - </span>
                         <span class="table-options">Esporta</span>
@@ -34,6 +36,19 @@
         <div class="d-flex align-items-center justify-content-center">
             <div id="calendar-container" data-filter="dates"></div>
         </div>
+    </x-modal>
+    <x-modal id="filter-text" title="Filtra per cliente" primary="Salva" secondary="annulla" width="400px">
+        <x-input name="filter_text_value" label="Cognome, email o telefono" placeholder="Cerca per cognome, email o telefono" />
+    </x-modal>
+    <x-modal id="filter-status" title="Filtra per acquisto" primary="Salva" secondary="annulla" width="350px">
+        <ul class="order-statuses">
+            <li>
+                <x-checkbox label="Sì" name="yes" />
+            </li>
+            <li>
+                <x-checkbox label="No" name="no" />
+            </li>
+        </ul>
     </x-modal>
 @endsection
 
