@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Mail\OrderConfirmationMail;
+use App\Http\Middleware\CaptureAttribution;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\CustomerConsent;
@@ -19,6 +20,7 @@ use App\Services\OrderLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -41,7 +43,7 @@ class OrderService
             $cart->loadMissing('partner');
             $orderNumber = $this->generateOrderNumber($cart->partner->partner_code);
 
-            $order = Order::create([
+            $order = Order::create(array_merge([
                 'customer_id'               => $customer->id,
                 'partner_id'                => $cart->partner_id,
                 'order_number'              => $orderNumber,
@@ -49,7 +51,7 @@ class OrderService
                 'order_status'              => OrderStatus::PENDING,
                 'stripe_payment_intent_id'  => $stripePaymentIntentId,
                 'stripe_payment_method'     => $stripePaymentMethod,
-            ]);
+            ], $this->attributionPayload()));
 
             $cart->loadMissing('items');
             $totalQuantity = $cart->items->sum('quantity');
@@ -246,6 +248,27 @@ class OrderService
     public function findByPaymentIntent(string $paymentIntentId): ?Order
     {
         return Order::where('stripe_payment_intent_id', $paymentIntentId)->first();
+    }
+
+    /**
+     * Restituisce i campi di attribuzione (utm_*, referrer, gclid, fbclid) da
+     * inserire sull'ordine. Legge dalla sessione popolata da CaptureAttribution
+     * e ripulisce dopo l'uso per non attribuire ordini successivi allo stesso
+     * canale (l'attribuzione è per singola conversione, non per sessione persistente).
+     */
+    protected function attributionPayload(): array
+    {
+        if (! Session::isStarted() || ! Session::has(CaptureAttribution::SESSION_KEY)) {
+            return [];
+        }
+
+        $data = Session::get(CaptureAttribution::SESSION_KEY, []);
+        Session::forget(CaptureAttribution::SESSION_KEY);
+
+        return array_intersect_key($data, array_flip([
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+            'referrer', 'gclid', 'fbclid',
+        ]));
     }
 
     protected function generateOrderNumber(string $partnerCode): string

@@ -282,10 +282,10 @@ class OrderExportService
 
         // MARKETING
         $values[] = null; // Codice sconto
-        $values[] = null; // UTM Source
-        $values[] = null; // UTM Medium
-        $values[] = null; // UTM Campaign
-        $values[] = null; // Referral
+        $values[] = $order->utm_source;
+        $values[] = $order->utm_medium;
+        $values[] = $order->utm_campaign;
+        $values[] = $order->referrer;
         $values[] = null; // Dispositivo
         $values[] = null; // Browser
         $values[] = 'it'; // Lingua

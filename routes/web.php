@@ -36,7 +36,7 @@ Route::domain('admin.miticko.com')->get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-Route::group(['prefix' => '/', 'middleware' => 'token'], function () {
+Route::group(['prefix' => '/', 'middleware' => ['token', 'attribution']], function () {
     Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('partner.sitemap.index');
     Route::get('/sitemap-products.xml', [SitemapController::class, 'products'])->name('partner.sitemap.products');
     Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('partner.sitemap.pages');

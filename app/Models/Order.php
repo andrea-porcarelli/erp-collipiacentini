@@ -25,6 +25,14 @@ class Order extends LogsModel
         'payment_error',
         'stripe_payment_link_id',
         'stripe_payment_link_url',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_term',
+        'utm_content',
+        'referrer',
+        'gclid',
+        'fbclid',
     ];
 
 

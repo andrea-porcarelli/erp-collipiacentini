@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ApiToken;
+use App\Http\Middleware\CaptureAttribution;
 use App\Http\Middleware\CartExists;
 use App\Http\Middleware\Token;
 use App\Notifications\ErrorTelegramNotify;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'token' => Token::class,
             'api.token' => ApiToken::class,
             'cart.exists' => CartExists::class,
+            'attribution' => CaptureAttribution::class,
         ]);
 
         // Escludi webhook Stripe dalla verifica CSRF
