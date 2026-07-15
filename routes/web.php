@@ -98,6 +98,7 @@ Route::domain('admin.miticko.com')->group(function () {
         // Endpoint AJAX per il form "Registra ordine".
         // IMPORTANTE: devono precedere le route parametriche orders/{order}/*
         // per non venire intercettate dal binding {order}.
+        Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
         Route::get('orders/create/partners', [OrderController::class, 'createPartners'])->name('orders.create.partners');
         Route::get('orders/create/products', [OrderController::class, 'createProducts'])->name('orders.create.products');
         Route::get('orders/create/availability/days', [OrderController::class, 'createAvailabilityDays'])->name('orders.create.availabilityDays');

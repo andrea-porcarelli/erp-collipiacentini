@@ -6,7 +6,9 @@
         <div class="row">
             <div class="col-12">
                 <x-card title="Lista ordini" sub_title="visualizza gli ordini che hai ricevuto" brelative="true">
-                    <div class="position-absolute" style="top: -70px; right: 0">
+                    <div class="position-absolute d-flex gap-2" style="top: -70px; right: 0">
+                        <x-button label="Esporta" status="Neutral" emphasis="Low" leading="fa-file-export"
+                                  id="btn-export-orders" />
                         <x-button label="Registra ordine" status="Primary" leading="fa-plus"
                                   id="btn-open-register-order"
                                   :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-register-order']" />
@@ -97,6 +99,52 @@
                     }
                 }])
             })
+
+            $('#btn-export-orders').on('click', function () {
+                const $btn = $(this);
+                if ($btn.prop('disabled')) return;
+                const filters = {};
+                $('.filters-miticko input, .filters-miticko select').each(function () {
+                    const name = $(this).attr('name');
+                    const value = $(this).val();
+                    if (name && value !== null && value !== undefined && value !== '') {
+                        filters[name] = value;
+                    }
+                });
+                $btn.prop('disabled', true);
+                const originalHtml = $btn.html();
+                $btn.html('<i class="fa-regular fa-spinner fa-spin icon"></i> Esportando...');
+                const url = @json(route('orders.export')) + '?' + $.param({ filters });
+                // Uso di fetch per poter intercettare errori JSON prima del download.
+                fetch(url, { credentials: 'same-origin' })
+                    .then(async (res) => {
+                        const contentType = res.headers.get('content-type') || '';
+                        if (!res.ok || contentType.includes('application/json')) {
+                            const body = await res.json().catch(() => ({}));
+                            const msg = body?.response || body?.message || 'Errore durante l\'export';
+                            toastr.error(msg);
+                            return;
+                        }
+                        const blob = await res.blob();
+                        const disposition = res.headers.get('content-disposition') || '';
+                        let filename = 'miticko-ordini.xlsx';
+                        const m = disposition.match(/filename\s*=\s*"?([^\";]+)"?/i);
+                        if (m) filename = m[1];
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            URL.revokeObjectURL(link.href);
+                            link.remove();
+                        }, 100);
+                    })
+                    .catch(() => toastr.error('Errore durante l\'export'))
+                    .finally(() => {
+                        $btn.prop('disabled', false).html(originalHtml);
+                    });
+            });
 
             $(document).on('click', '.btn-preview-order', function() {
                 const orderId = $(this).data('order-id');

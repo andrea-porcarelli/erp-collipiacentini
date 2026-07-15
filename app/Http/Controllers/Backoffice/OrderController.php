@@ -18,6 +18,7 @@ use App\Models\CustomerConsent;
 use App\Models\Order;
 use App\Models\Partner;
 use App\Models\Product;
+use App\Services\OrderExportService;
 use App\Services\OrderLogger;
 use App\Services\OrderService;
 use App\Services\ProductAvailabilityService;
@@ -31,6 +32,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OrderController extends Controller
 {
@@ -107,6 +109,57 @@ class OrderController extends Controller
                 })
                 ->rawColumns(['status', 'options'])
                 ->toJson();
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
+    public function export(Request $request, OrderExportService $exportService)
+    {
+        try {
+            $user = Auth::user();
+            $filters = $request->get('filters') ?? [];
+
+            $query = $this->interface->filters($filters)
+                ->with(['orderProducts.items.variant', 'customer', 'partner'])
+                ->orderBy('created_at', 'desc');
+
+            if ($user->role === 'company') {
+                $query->whereHas('partner', function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
+                });
+            } elseif (in_array($user->role, ['partner', 'admin'])) {
+                $query->where('partner_id', $user->partner_id);
+            }
+
+            $orders = $query->get();
+
+            if ($orders->isEmpty()) {
+                return $this->error(['response' => 'Nessun ordine da esportare con i filtri correnti']);
+            }
+
+            $partnerIds = $orders->pluck('partner_id')->filter()->unique();
+            if ($partnerIds->count() > 1) {
+                return $this->error([
+                    'response' => 'L\'export supporta un solo partner alla volta. Filtra gli ordini in modo che appartengano a un unico partner.',
+                ]);
+            }
+
+            $partnerId = $partnerIds->first();
+            $partnerConsents = $partnerId
+                ? \App\Models\PartnerConsent::where('partner_id', $partnerId)
+                    ->where('is_active', true)
+                    ->orderBy('position')
+                    ->get()
+                : collect();
+
+            $path = $exportService->generate($orders, $partnerConsents);
+
+            $filename = 'miticko-ordini-'.now()->format('Ymd-His').'.xlsx';
+
+            return response()->download($path, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             return $this->exception($e);
         }
