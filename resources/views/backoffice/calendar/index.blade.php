@@ -13,16 +13,13 @@
                 @if($partners->isEmpty())
                     <p class="text-muted mb-0">Nessun partner accessibile al tuo account.</p>
                 @else
-                    <label class="d-block mb-spacing-xs" for="calendar-partner-select">Partner</label>
-                    <select id="calendar-partner-select" class="input-miticko">
-                        <option value="">Seleziona un partner…</option>
-                        @foreach($partners as $partner)
-                            <option value="{{ $partner->id }}"
-                                @if($selectedPartner && $selectedPartner->id === $partner->id) selected @endif>
-                                {{ $partner->partner_name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-select
+                        label="Partner"
+                        name="calendar_partner_id"
+                        class="js-calendar-partner-select"
+                        :value="$selectedPartner?->id"
+                        :options="$partners->map(fn($p) => ['id' => $p->id, 'label' => $p->partner_name])->all()"
+                    />
                 @endif
             </div>
         @endif
@@ -84,26 +81,37 @@
                         <div class="calendar-arrivals-filters">
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label class="small">Stato ordine</label>
-                                    <select class="input-miticko js-arrivals-filter" data-filter="order_status">
-                                        <option value="all">Tutti</option>
-                                        @foreach($orderStatuses as $value => $label)
-                                            <option value="{{ $value }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
+                                    <x-select
+                                        label="Stato ordine"
+                                        name="calendar_arrivals_order_status"
+                                        class="js-arrivals-filter"
+                                        data-filter="order_status"
+                                        value="all"
+                                        :options="array_merge([['id' => 'all', 'label' => 'Tutti']], collect($orderStatuses)->map(fn($label, $value) => ['id' => $value, 'label' => $label])->values()->all())"
+                                    />
                                 </div>
                                 <div class="col-6">
-                                    <label class="small">Check-in</label>
-                                    <select class="input-miticko js-arrivals-filter" data-filter="check_in">
-                                        <option value="all">Tutti</option>
-                                        <option value="none">Nessun arrivo</option>
-                                        <option value="partial">Parziale</option>
-                                        <option value="complete">Completo</option>
-                                    </select>
+                                    <x-select
+                                        label="Check-in"
+                                        name="calendar_arrivals_check_in"
+                                        class="js-arrivals-filter"
+                                        data-filter="check_in"
+                                        value="all"
+                                        :options="[
+                                            ['id' => 'all', 'label' => 'Tutti'],
+                                            ['id' => 'none', 'label' => 'Nessun arrivo'],
+                                            ['id' => 'partial', 'label' => 'Parziale'],
+                                            ['id' => 'complete', 'label' => 'Completo'],
+                                        ]"
+                                    />
                                 </div>
                                 <div class="col-12">
-                                    <input type="text" class="input-miticko js-arrivals-search"
-                                           placeholder="Nome cliente o numero ordine…">
+                                    <x-input
+                                        name="calendar_arrivals_search"
+                                        class="js-arrivals-search"
+                                        leading="fa-magnifying-glass"
+                                        placeholder="Cerca tra gli arrivi previsti"
+                                    />
                                 </div>
                             </div>
                         </div>

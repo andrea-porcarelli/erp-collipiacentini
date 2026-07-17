@@ -24,13 +24,6 @@
 .calendar-partner-picker {
     max-width: 340px;
 }
-.calendar-partner-picker label {
-    font-weight: 600;
-    color: var(--cal-muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-}
 
 /* -------- Toolbar (week selector + segmented) -------- */
 .calendar-toolbar {
@@ -306,14 +299,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-.calendar-arrivals-filters label {
-    font-size: 11px;
-    color: var(--cal-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 4px;
-    display: block;
 }
 .calendar-arrivals-placeholder {
     text-align: center;

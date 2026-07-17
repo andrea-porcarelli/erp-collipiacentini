@@ -232,7 +232,7 @@ function toastError(msg) {
 
 function bindEvents() {
     // Selettore partner (god/operator/company)
-    const partnerSelect = document.getElementById("calendar-partner-select");
+    const partnerSelect = document.querySelector(".js-calendar-partner-select");
     if (partnerSelect) {
         partnerSelect.addEventListener("change", () => {
             const value = partnerSelect.value ? parseInt(partnerSelect.value, 10) : null;
