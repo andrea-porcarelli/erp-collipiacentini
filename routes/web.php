@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backoffice\CalendarController;
 use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\CustomerController;
@@ -94,6 +95,14 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');
         Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
         Route::patch('tickets/{participant}/status', [TicketScannerController::class, 'updateStatus'])->name('tickets.updateStatus');
+
+        // Calendario prenotazioni (settimana → giorno → slot → ordini).
+        Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+        Route::get('calendar/week', [CalendarController::class, 'week'])->name('calendar.week');
+        Route::get('calendar/day', [CalendarController::class, 'day'])->name('calendar.day');
+        Route::get('calendar/slot/orders', [CalendarController::class, 'slotOrders'])->name('calendar.slot.orders');
+        Route::get('calendar/orders/{order}', [CalendarController::class, 'orderDetail'])->name('calendar.order.detail');
+        Route::put('calendar/participants/batch-status', [CalendarController::class, 'batchStatus'])->name('calendar.participants.batchStatus');
 
         // Endpoint AJAX per il form "Registra ordine".
         // IMPORTANTE: devono precedere le route parametriche orders/{order}/*

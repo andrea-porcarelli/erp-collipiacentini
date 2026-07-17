@@ -39,6 +39,9 @@ use App\Repositories\ProductCustomerFieldRepository;
 use App\Interfaces\PartnerConsentInterface;
 use App\Repositories\PartnerConsentRepository;
 
+use App\Interfaces\CalendarInterface;
+use App\Repositories\CalendarRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -61,6 +64,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductRelatedInterface::class, ProductRelatedRepository::class);
         $this->app->bind(ProductCustomerFieldInterface::class, ProductCustomerFieldRepository::class);
         $this->app->bind(PartnerConsentInterface::class, PartnerConsentRepository::class);
+        $this->app->bind(CalendarInterface::class, CalendarRepository::class);
 
     }
 

@@ -20,5 +20,6 @@
         @stack('styles')
         <link rel="stylesheet" type="text/css" href="{{ asset('backoffice/css/helpers.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/custom.css') }}?v={{ filemtime(public_path('backoffice/css/custom.css')) }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/calendar.css') }}?v={{ filemtime(public_path('backoffice/css/calendar.css')) }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('/backoffice/css/device.css') }}">
     </head>
