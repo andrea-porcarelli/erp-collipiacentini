@@ -137,15 +137,11 @@ class CalendarRepository implements CalendarInterface
         }
 
         if (! empty($filters['check_in']) && $filters['check_in'] !== 'all') {
+            // Mostra ordini con almeno un partecipante nello stato selezionato
+            // (booked, checked_in, no_show, refunded, cancelled).
             $orders = $orders->filter(function (Order $order) use ($filters) {
-                $summary = $this->checkinSummary($order);
-
-                return match ($filters['check_in']) {
-                    'none'     => $summary['checked_in'] === 0,
-                    'partial'  => $summary['checked_in'] > 0 && $summary['checked_in'] < $summary['expected'],
-                    'complete' => $summary['expected'] > 0 && $summary['checked_in'] >= $summary['expected'],
-                    default    => true,
-                };
+                return $order->participants
+                    ->contains(fn ($p) => $p->status === $filters['check_in']);
             })->values();
         }
 

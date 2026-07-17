@@ -75,7 +75,12 @@
                     @endif
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 calendar-arrivals-column" id="calendar-arrivals-column">
+                <div class="calendar-arrivals-backdrop" id="calendar-arrivals-backdrop"></div>
+                <div class="calendar-arrivals-panel">
+                    <button type="button" class="calendar-arrivals-close js-arrivals-close" aria-label="Chiudi">
+                        <i class="fa fa-xmark"></i>
+                    </button>
                 <x-card title="Arrivi previsti">
                     <div class="calendar-arrivals" id="calendar-arrivals" data-empty>
                         <div class="calendar-arrivals-filters">
@@ -99,9 +104,11 @@
                                         value="all"
                                         :options="[
                                             ['id' => 'all', 'label' => 'Tutti'],
-                                            ['id' => 'none', 'label' => 'Nessun arrivo'],
-                                            ['id' => 'partial', 'label' => 'Parziale'],
-                                            ['id' => 'complete', 'label' => 'Completo'],
+                                            ['id' => 'booked', 'label' => 'Prenotato'],
+                                            ['id' => 'checked_in', 'label' => 'Arrivato'],
+                                            ['id' => 'no_show', 'label' => 'No show'],
+                                            ['id' => 'refunded', 'label' => 'Rimborsato'],
+                                            ['id' => 'cancelled', 'label' => 'Annullato'],
                                         ]"
                                     />
                                 </div>
@@ -123,6 +130,7 @@
                         </div>
                     </div>
                 </x-card>
+                </div>
             </div>
         </div>
     </div>

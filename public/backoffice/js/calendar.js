@@ -133,6 +133,27 @@ function selectSlot(card) {
     };
     applySlotSelection();
     loadArrivals();
+    if (isMobileViewport()) {
+        openArrivalsDrawer();
+    }
+}
+
+function isMobileViewport() {
+    return window.matchMedia("(max-width: 991.98px)").matches;
+}
+
+function openArrivalsDrawer() {
+    const column = document.getElementById("calendar-arrivals-column");
+    if (!column) return;
+    column.classList.add("is-open");
+    document.body.classList.add("calendar-drawer-open");
+}
+
+function closeArrivalsDrawer() {
+    const column = document.getElementById("calendar-arrivals-column");
+    if (!column) return;
+    column.classList.remove("is-open");
+    document.body.classList.remove("calendar-drawer-open");
 }
 
 function loadArrivals() {
@@ -340,6 +361,23 @@ function bindEvents() {
         const item = e.target.closest(".js-arrival-item");
         if (!item) return;
         openOrderModal(parseInt(item.dataset.orderId, 10));
+    });
+
+    // Chiusura drawer arrivi (mobile)
+    document.addEventListener("click", (e) => {
+        if (e.target.closest(".js-arrivals-close")) {
+            closeArrivalsDrawer();
+        }
+        if (e.target.matches("#calendar-arrivals-backdrop")) {
+            closeArrivalsDrawer();
+        }
+    });
+
+    // Se ridimensiono da mobile a desktop mentre il drawer è aperto, lo chiudo per evitare inconsistenze.
+    window.addEventListener("resize", () => {
+        if (!isMobileViewport()) {
+            closeArrivalsDrawer();
+        }
     });
 
     // Cambio stato singolo partecipante
