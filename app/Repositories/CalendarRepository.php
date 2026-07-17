@@ -103,7 +103,7 @@ class CalendarRepository implements CalendarInterface
                 'product' => $product,
                 'slots'   => $slots->merge($orphans)->sortBy('time')->values(),
             ];
-        });
+        })->filter(fn ($entry) => $entry['slots']->isNotEmpty())->values();
 
         if ($groupBy === 'slot') {
             return $this->pivotByTime($enrichedProducts);

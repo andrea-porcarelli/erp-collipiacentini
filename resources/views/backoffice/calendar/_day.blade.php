@@ -20,19 +20,15 @@
                         <i class="fa fa-chevron-down chevron"></i>
                     </button>
                     <div id="{{ $accordionId }}" class="calendar-accordion-body" @if(! $loop->first) hidden @endif>
-                        @if($slots->isEmpty())
-                            <p class="text-muted mb-0 p-3">Nessuno slot disponibile per questa data.</p>
-                        @else
-                            <div class="calendar-slot-grid">
-                                @foreach($slots as $slot)
-                                    @include('backoffice.calendar._slot_card', [
-                                        'product' => $product,
-                                        'slot'    => $slot,
-                                        'date'    => $date,
-                                    ])
-                                @endforeach
-                            </div>
-                        @endif
+                        <div class="calendar-slot-grid">
+                            @foreach($slots as $slot)
+                                @include('backoffice.calendar._slot_card', [
+                                    'product' => $product,
+                                    'slot'    => $slot,
+                                    'date'    => $date,
+                                ])
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             @endforeach

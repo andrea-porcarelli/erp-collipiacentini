@@ -16,6 +16,19 @@ const state = {
 
 const config = window.calendarConfig || {};
 
+// Aggiunge/sottrae giorni a una stringa "YYYY-MM-DD" restando su componenti locali.
+// Evita il drift di toISOString() quando il fuso locale è avanti rispetto a UTC
+// (es. CEST +02:00 farebbe scivolare la data al giorno precedente).
+function shiftDate(dateStr, days) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + days);
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+}
+
 function fmtWeekLabel(days) {
     if (!days || days.length === 0) return "—";
     const months = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
@@ -245,13 +258,11 @@ function bindEvents() {
         });
     }
 
-    // Navigazione settimana
+    // Navigazione settimana: sempre ±7 giorni, allineata a lunedì lato server.
     document.querySelectorAll(".calendar-week-nav").forEach((btn) => {
         btn.addEventListener("click", () => {
             const direction = btn.dataset.direction;
-            const d = new Date(state.weekStart + "T00:00:00");
-            d.setDate(d.getDate() + (direction === "prev" ? -7 : 7));
-            state.weekStart = d.toISOString().slice(0, 10);
+            state.weekStart = shiftDate(state.weekStart, direction === "prev" ? -7 : 7);
             state.selectedDate = null;
             loadWeek();
         });
