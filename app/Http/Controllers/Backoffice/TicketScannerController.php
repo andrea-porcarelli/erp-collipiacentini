@@ -20,6 +20,13 @@ class TicketScannerController extends Controller
         try {
             $participant = OrderParticipant::where('code', $code)->first();
 
+            // Fallback per QR legacy generati col bug di concatenazione dei segmenti
+            // (chillerlan/QRCode senza clearSegments): il payload conteneva tutti i
+            // codici dei biglietti dell'ordine, ma l'ultimo è sempre quello effettivo.
+            if (! $participant && strlen($code) > 9 && strlen($code) % 9 === 0) {
+                $participant = OrderParticipant::where('code', substr($code, -9))->first();
+            }
+
             if (! $participant) {
                 return $this->error(['response' => 'Biglietto non trovato']);
             }
