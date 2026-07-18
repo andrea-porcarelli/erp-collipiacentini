@@ -432,7 +432,9 @@
         $typeLabel = $product?->category?->label ?? ($product?->product_type ? __('products.types.' . $product->product_type) : null);
 
         try {
-            $qrDataUri = $qrRenderer->render($code);
+            // clearSegments(): senza reset chillerlan/php-qrcode accumula i codici
+            // dei biglietti precedenti nello stesso QR (vedi QRCode::render()).
+            $qrDataUri = $qrRenderer->clearSegments()->render($code);
         } catch (\Throwable $e) {
             $qrDataUri = null;
         }
