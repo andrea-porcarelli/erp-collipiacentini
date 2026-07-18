@@ -36,7 +36,7 @@ if (isset($model->{$name})){
             <i class="fa-{{ $leading_style }} {{ $leading }} icon"></i>
         @endisset
         <select
-            {{ $attributes->whereStartsWith(['wire:', 'x-', '@', ':']) }}
+            {{ $attributes->whereStartsWith(['wire:', 'x-', '@', ':', 'data-']) }}
             class="input-miticko {{ $class }}"
             name="{{ $name }}"
             id="{{ $name }}"
