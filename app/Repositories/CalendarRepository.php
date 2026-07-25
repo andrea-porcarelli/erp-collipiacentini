@@ -147,7 +147,10 @@ class CalendarRepository implements CalendarInterface
 
         if (! empty($filters['search'])) {
             $q = mb_strtolower(trim($filters['search']));
-            $digitsQ = preg_replace('/\D+/', '', $q);
+            // Cerchiamo per telefono solo se la query "assomiglia" a un numero:
+            // altrimenti stringhe come "capra74@gmail.com" matcherebbero telefoni con "74".
+            $isPhoneLikeQuery = $q !== '' && preg_match('/^[\d\s+\-().]+$/', $q) === 1;
+            $digitsQ = $isPhoneLikeQuery ? preg_replace('/\D+/', '', $q) : '';
             $orders = $orders->filter(function (Order $order) use ($q, $digitsQ) {
                 $name = mb_strtolower(($order->customer->name ?? '').' '.($order->customer->surname ?? ''));
                 $number = mb_strtolower($order->order_number ?? '');
