@@ -147,11 +147,19 @@ class CalendarRepository implements CalendarInterface
 
         if (! empty($filters['search'])) {
             $q = mb_strtolower(trim($filters['search']));
-            $orders = $orders->filter(function (Order $order) use ($q) {
+            $digitsQ = preg_replace('/\D+/', '', $q);
+            $orders = $orders->filter(function (Order $order) use ($q, $digitsQ) {
                 $name = mb_strtolower(($order->customer->name ?? '').' '.($order->customer->surname ?? ''));
                 $number = mb_strtolower($order->order_number ?? '');
+                $email = mb_strtolower($order->customer->email ?? '');
+                $phone = (string) ($order->customer->phone ?? '');
+                $phoneDigits = preg_replace('/\D+/', '', ($order->customer->prefix_phone ?? '').$phone);
 
-                return str_contains($name, $q) || str_contains($number, $q);
+                if (str_contains($name, $q) || str_contains($number, $q) || str_contains($email, $q)) {
+                    return true;
+                }
+
+                return $digitsQ !== '' && str_contains($phoneDigits, $digitsQ);
             })->values();
         }
 

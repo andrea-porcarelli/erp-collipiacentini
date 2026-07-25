@@ -6,7 +6,8 @@
 
     var libLoadingPromise = null;
     var scannerInstance = null;
-    var isScanning = false;
+    var cameraActive = false;
+    var scanConsumed = false;
     var currentOrderId = null;
     var $ = window.jQuery;
 
@@ -42,7 +43,8 @@
         $scannerError().hide().text('');
         $scannerStatus().text('Inquadra il QR code del biglietto');
 
-        loadLib()
+        stopScan()
+            .then(loadLib)
             .then(startScan)
             .catch(function (err) {
                 showScannerError(err && err.message ? err.message : 'Errore caricamento scanner');
@@ -50,7 +52,7 @@
     }
 
     function startScan() {
-        if (isScanning) return;
+        if (cameraActive) return;
         if (!window.Html5Qrcode) {
             showScannerError('Libreria scanner non disponibile');
             return;
@@ -77,17 +79,19 @@
             disableFlip: false,
         };
 
+        scanConsumed = false;
+
         scannerInstance.start(
             { facingMode: 'environment' },
             config,
             onScanSuccess,
             function () { /* silenzia errori frame */ }
         )
-        .then(function () { isScanning = true; })
+        .then(function () { cameraActive = true; })
         .catch(function (err) {
             // Fallback senza facingMode (alcuni browser desktop)
             scannerInstance.start(true, config, onScanSuccess, function () {})
-                .then(function () { isScanning = true; })
+                .then(function () { cameraActive = true; })
                 .catch(function (err2) {
                     showScannerError((err2 && err2.message) || (err && err.message) || 'Impossibile accedere alla fotocamera');
                 });
@@ -96,16 +100,17 @@
 
     function stopScan() {
         if (!scannerInstance) {
-            isScanning = false;
+            cameraActive = false;
             return Promise.resolve();
         }
         var inst = scannerInstance;
+        var wasActive = cameraActive;
         scannerInstance = null;
-        if (!isScanning) {
+        cameraActive = false;
+        if (!wasActive) {
             try { inst.clear(); } catch (e) {}
             return Promise.resolve();
         }
-        isScanning = false;
         return inst.stop()
             .then(function () { try { inst.clear(); } catch (e) {} })
             .catch(function () {});
@@ -137,10 +142,10 @@
     }
 
     function onScanSuccess(decodedText) {
-        if (!isScanning) return;
+        if (scanConsumed) return;
         var code = extractCode(decodedText);
         if (!code) return;
-        isScanning = false;
+        scanConsumed = true;
         $scannerStatus().text('Codice rilevato, caricamento dati…');
         stopScan().then(function () { fetchTicket(code); });
     }

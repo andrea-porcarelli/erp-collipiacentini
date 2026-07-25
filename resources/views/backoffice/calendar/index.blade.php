@@ -117,7 +117,7 @@
                                         name="calendar_arrivals_search"
                                         class="js-arrivals-search"
                                         leading="fa-magnifying-glass"
-                                        placeholder="Cerca tra gli arrivi previsti"
+                                        placeholder="Cerca per nome, ordine, email o telefono"
                                     />
                                 </div>
                             </div>

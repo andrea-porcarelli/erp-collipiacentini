@@ -13,20 +13,36 @@
             <div class="col-12 col-sm-9">
                 <x-card :pre_title="$product->partner?->partner_name" :title="$product->contentField('long_title')" class="product-card" h1="true" leading="fa-shield-check">
                     {!! $product->product_tags !!}
-                    <div class="button-progress">
-                        <x-button label="Data" id="btn-date" emphasis="MediumLow" class="btn-create-category" size="Small" leading="fa-calendar" class="btn-date " />
-                        <div class="progress-connector"></div>
-                        <x-button label="Orario" id="btn-time" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
-                        <div class="progress-connector"></div>
-                        <x-button label="Visitatori" id="btn-visitors" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-user" class="btn-date " />
-                    </div>
-                    <div id="calendar-container" class="w-100 mt-3">
-                        <div id="calendar" class="w-100"></div>
-                    </div>
-                    <div id="time-slots" class="time-slots-grid w-100 mt-3" style="display: none;"></div>
-                    <div id="ticket-selection" class="w-100 mt-3" style="display: none;">
-                        <div id="ticket-quantity"></div>
-                    </div>
+                    @if(! $product->is_available)
+                        <div class="product-unavailable" role="status" aria-live="polite">
+                            <div class="product-unavailable-icon">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                            </div>
+                            <div class="product-unavailable-content">
+                                <h3 class="product-unavailable-title">Al momento non prenotabile</h3>
+                                <p class="product-unavailable-text">Non ci sono date disponibili per questa esperienza. Torna a esplorare le altre esperienze del partner.</p>
+                                <a href="/shop" class="product-unavailable-cta">
+                                    <i class="fa-regular fa-arrow-left"></i>
+                                    Vedi tutte le esperienze
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <div class="button-progress">
+                            <x-button label="Data" id="btn-date" emphasis="MediumLow" class="btn-create-category" size="Small" leading="fa-calendar" class="btn-date " />
+                            <div class="progress-connector"></div>
+                            <x-button label="Orario" id="btn-time" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-clock-three" class="btn-date " />
+                            <div class="progress-connector"></div>
+                            <x-button label="Visitatori" id="btn-visitors" emphasis="High" status="Disabled" class="btn-create-category" size="Small" leading="fa-user" class="btn-date " />
+                        </div>
+                        <div id="calendar-container" class="w-100 mt-3">
+                            <div id="calendar" class="w-100"></div>
+                        </div>
+                        <div id="time-slots" class="time-slots-grid w-100 mt-3" style="display: none;"></div>
+                        <div id="ticket-selection" class="w-100 mt-3" style="display: none;">
+                            <div id="ticket-quantity"></div>
+                        </div>
+                    @endif
                 </x-card>
                 <x-card title="Galleria" class="product-card" h2="true" leading="fa-shield-check">
                     @livewire('product-gallery', ['product' => $product])
@@ -461,9 +477,101 @@
         color: var(--text-secondary, #666);
     }
 
+    /* Banner "prodotto non prenotabile" */
+    .product-unavailable {
+        margin-top: 16px;
+        padding: 20px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        border-radius: var(--border-radius-m, 12px);
+        background: #FFF6E5;
+        border: 1px solid #F5C876;
+    }
+
+    .product-unavailable-icon {
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #F59E0B;
+        color: #FFF;
+        font-size: 20px;
+    }
+
+    .product-unavailable-content {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .product-unavailable-title {
+        margin: 0 0 4px;
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #7A4B00;
+        line-height: 1.3;
+    }
+
+    .product-unavailable-text {
+        margin: 0 0 12px;
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+        font-size: 14px;
+        color: #7A4B00;
+        line-height: 1.5;
+    }
+
+    .product-unavailable-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: var(--border-radius-s, 8px);
+        background: #FFF;
+        border: 1px solid #F5C876;
+        color: #7A4B00;
+        font-family: var(--font-font-1, "DM Sans"), sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 120ms ease, color 120ms ease;
+    }
+
+    .product-unavailable-cta:hover,
+    .product-unavailable-cta:focus-visible {
+        background: #F59E0B;
+        color: #FFF;
+        outline: none;
+    }
+
+    @media (max-width: 575.98px) {
+        .product-unavailable {
+            flex-direction: column;
+            padding: 16px;
+            gap: 12px;
+        }
+        .product-unavailable-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+        .product-unavailable-title {
+            font-size: 16px;
+        }
+        .product-unavailable-cta {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Prodotto non prenotabile: niente calendario da inizializzare.
+        if (!document.getElementById('calendar')) return;
+
         // Configurazione italiana
         const Italian = {
             weekdays: {
