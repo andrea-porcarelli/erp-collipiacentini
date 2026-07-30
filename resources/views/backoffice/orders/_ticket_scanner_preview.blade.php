@@ -115,10 +115,6 @@
                 </li>
             @endforeach
         </ul>
-
-        <button type="button" class="ts-btn-save-inline" data-role="save-changes">
-            Salva
-        </button>
     </div>
 
     <div class="ts-section">

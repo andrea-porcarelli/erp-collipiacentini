@@ -7,8 +7,10 @@
     var libLoadingPromise = null;
     var scannerInstance = null;
     var cameraActive = false;
+    var scannerPaused = false;
     var scanConsumed = false;
     var currentOrderId = null;
+    var snackbarTimer = null;
     var $ = window.jQuery;
 
     function $overlay() { return $('#ticket-scanner-overlay'); }
@@ -16,6 +18,15 @@
     function $drawerBody() { return $drawer().find('[data-role="drawer-body"]'); }
     function $scannerStatus() { return $overlay().find('[data-role="scanner-status"]'); }
     function $scannerError() { return $overlay().find('[data-role="scanner-error"]'); }
+    function $snackbar() { return $('#ticket-scanner-snackbar'); }
+
+    function showSnackbar(msg, type) {
+        var $s = $snackbar();
+        if (!$s.length) return;
+        $s.attr('data-type', type || 'success').text(msg).addClass('is-visible');
+        if (snackbarTimer) clearTimeout(snackbarTimer);
+        snackbarTimer = setTimeout(function () { $s.removeClass('is-visible'); }, 2500);
+    }
 
     function loadLib() {
         if (window.Html5Qrcode) return Promise.resolve();
@@ -43,8 +54,18 @@
         $scannerError().hide().text('');
         $scannerStatus().text('Inquadra il QR code del biglietto');
 
-        stopScan()
-            .then(loadLib)
+        if (scannerInstance && cameraActive && scannerPaused) {
+            try {
+                scannerInstance.resume();
+                scannerPaused = false;
+                scanConsumed = false;
+                return;
+            } catch (e) {
+                scannerPaused = false;
+            }
+        }
+
+        loadLib()
             .then(startScan)
             .catch(function (err) {
                 showScannerError(err && err.message ? err.message : 'Errore caricamento scanner');
@@ -105,12 +126,14 @@
     function stopScan() {
         if (!scannerInstance) {
             cameraActive = false;
+            scannerPaused = false;
             return Promise.resolve();
         }
         var inst = scannerInstance;
         var wasActive = cameraActive;
         scannerInstance = null;
         cameraActive = false;
+        scannerPaused = false;
         if (!wasActive) {
             try { inst.clear(); } catch (e) {}
             return Promise.resolve();
@@ -120,6 +143,16 @@
             .catch(function () {});
     }
 
+    function pauseScan() {
+        if (!scannerInstance || !cameraActive || scannerPaused) return;
+        try {
+            scannerInstance.pause(false);
+            scannerPaused = true;
+        } catch (e) {
+            stopScan();
+        }
+    }
+
     function closeScanner() {
         var overlay = $overlay()[0];
         if (overlay) {
@@ -127,7 +160,7 @@
             overlay.setAttribute('aria-hidden', 'true');
         }
         document.body.classList.remove('ticket-scanner-open');
-        stopScan();
+        pauseScan();
     }
 
     function showScannerError(msg) {
@@ -151,7 +184,8 @@
         if (!code) return;
         scanConsumed = true;
         $scannerStatus().text('Codice rilevato, caricamento dati…');
-        stopScan().then(function () { fetchTicket(code); });
+        pauseScan();
+        fetchTicket(code);
     }
 
     function fetchTicket(code) {
@@ -174,7 +208,17 @@
                 if ($overlay().hasClass('is-open')) {
                     $scannerStatus().text('Inquadra il QR code del biglietto');
                     $scannerError().hide();
-                    startScan();
+                    scanConsumed = false;
+                    if (scannerInstance && scannerPaused) {
+                        try {
+                            scannerInstance.resume();
+                            scannerPaused = false;
+                        } catch (e) {
+                            startScan();
+                        }
+                    } else {
+                        startScan();
+                    }
                 }
             }, 1800);
         });
@@ -186,6 +230,7 @@
         if (!drawer) return;
 
         $drawerBody().html(html);
+        $drawerBody().scrollTop(0);
         currentOrderId = (payload && payload.order_id) || null;
         drawer.classList.add('is-open');
         drawer.setAttribute('aria-hidden', 'false');
@@ -202,10 +247,6 @@
         if (!$row.length) return;
         $row.addClass('ts-ticket-row-flash');
         setTimeout(function () { $row.removeClass('ts-ticket-row-flash'); }, 1800);
-        var rowEl = $row[0];
-        if (rowEl && rowEl.scrollIntoView) {
-            try { rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
-        }
     }
 
     function closeDrawer() {
@@ -270,10 +311,8 @@
             }
         });
 
-        var toastOptions = { positionClass: 'toast-top-center' };
-
         if (!changes.length) {
-            if (window.toastr) toastr.info('Nessuna modifica da salvare', '', toastOptions);
+            showSnackbar('Nessuna modifica da salvare', 'info');
             return;
         }
 
@@ -289,14 +328,14 @@
             $selects.each(function () {
                 $(this).attr('data-original', $(this).val());
             });
-            if (window.toastr) toastr.success('Modifiche salvate', '', toastOptions);
+            showSnackbar('Modifiche salvate', 'success');
         })
         .fail(function (xhr) {
             var msg = 'Errore durante il salvataggio';
             if (xhr && xhr.responseJSON) {
                 msg = xhr.responseJSON.response || xhr.responseJSON.message || msg;
             }
-            if (window.toastr) toastr.error(msg, '', toastOptions);
+            showSnackbar(msg, 'error');
         })
         .always(function () {
             if ($btn) $btn.prop('disabled', false);

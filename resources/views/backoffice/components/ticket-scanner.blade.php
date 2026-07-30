@@ -39,6 +39,7 @@
                     <div class="ticket-scanner-loading">Caricamento…</div>
                 </div>
                 <div class="ticket-scanner-drawer-footer">
+                    <div class="ticket-scanner-snackbar" id="ticket-scanner-snackbar" data-role="drawer-snackbar" aria-live="polite"></div>
                     <button type="button" class="ts-btn-primary" data-role="save-changes">
                         Salva
                     </button>
