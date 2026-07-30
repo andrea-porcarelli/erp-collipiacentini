@@ -76,7 +76,11 @@
                 return { width: size, height: size };
             },
             aspectRatio: 1.0,
-            disableFlip: false,
+            // 0 = Html5QrcodeSupportedFormats.QR_CODE: evita cicli sprecati su altri formati
+            formatsToSupport: [0],
+            // Usa BarcodeDetector nativo (Chrome/Edge/Android) quando disponibile:
+            // molto più veloce e affidabile del fallback ZXing pure-JS incluso nella libreria.
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true },
         };
 
         scanConsumed = false;
