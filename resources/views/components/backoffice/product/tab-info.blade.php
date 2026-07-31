@@ -61,7 +61,7 @@
                             </div>
                         </div>
                         <div class="col-12 col-sm-8 mt-3 mt-sm-0">
-                            <x-input :model="$model" name="booking_deadline_hours" type="number" label="Tempo limite prenotazione (minuti prima dell’inizio dell’orario di visita)" type="number" min="0" message="indica in minuti entro quando i clienti possono prenotare a ridosso dell'inizio del turno" icon="fa-regular fa-circle-info"/>
+                            <x-input :model="$model" name="booking_deadline_hours" type="number" label="Tempo limite prenotazione (ore prima dell’inizio dell’orario di visita)" type="number" min="0" message="indica in ore entro quando i clienti possono prenotare a ridosso dell'inizio del turno" icon="fa-regular fa-circle-info"/>
                         </div>
                     </div>
                 </form>

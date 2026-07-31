@@ -1,24 +1,25 @@
 @import 'bootstrap';
 @import 'toastr/toastr';
 
-// Personalizzazione colori Toastr
-.toast-success {
-    background-color: var(--background-color, #29670E) !important;
-}
+// Snackbar (toastr) → consuma i token Miticko definiti nel blocco
+// [data-mode*="snackbarAppearance-*"] (Miticko.css righe 3835-3889).
+// L'attributo data-mode viene applicato via JS in resources/js/app.js.
+#toast-container > div[data-mode*="snackbarAppearance-"] {
+    background-image: none !important;
+    background-color: var(--background-color) !important;
+    color: var(--font-color) !important;
+    border: var(--border-width, 0) solid var(--border-color);
+    border-radius: var(--cornerradius);
+    font-family: var(--font-type);
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+    line-height: var(--font-line-height);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+    padding: 12px 16px;
 
-.toast-error {
-    background-color: var(--background-color, #C00) !important;
-}
-
-.toast-info {
-    background-color: #2F96B4 !important;
-}
-
-.toast-warning {
-    background-color: var(--background-color, #EED202) !important;
-}
-
-.toast {
-    border-radius: var(--border-radius, 16px) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    .toast-close-button,
+    .toast-progress {
+        display: none !important;
+    }
 }
