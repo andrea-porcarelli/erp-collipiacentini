@@ -31,7 +31,7 @@ class UpdateProductRequest extends FormRequest
                 'duration_days' => ['nullable', 'integer', 'min:0'],
                 'duration_hours' => ['nullable', 'integer', 'min:0', 'max:23'],
                 'duration_minutes' => ['nullable', 'integer', 'min:0', 'max:59'],
-                'booking_deadline_hours' => ['nullable', 'integer', 'min:0', 'max:65535'],
+                'booking_deadline_minutes' => ['nullable', 'integer', 'min:0', 'max:65535'],
             ],
             'occupancy' => [
                 'occupancy' => ['required', 'integer', 'min:1'],

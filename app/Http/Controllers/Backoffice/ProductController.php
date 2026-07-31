@@ -205,14 +205,14 @@ class ProductController extends CrudController
 
         $duration = ($days * 1440) + ($hours * 60) + $minutes;
 
-        $bookingDeadline = $request->input('booking_deadline_hours');
+        $bookingDeadline = $request->input('booking_deadline_minutes');
 
         $this->interface->edit($product, [
             'duration' => $duration,
             'duration_days' => $days,
             'duration_hours' => $hours,
             'duration_minutes' => $minutes,
-            'booking_deadline_hours' => $bookingDeadline === null || $bookingDeadline === '' ? null : (int) $bookingDeadline,
+            'booking_deadline_minutes' => $bookingDeadline === null || $bookingDeadline === '' ? null : (int) $bookingDeadline,
         ]);
     }
 

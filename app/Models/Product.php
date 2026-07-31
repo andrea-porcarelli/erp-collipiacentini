@@ -34,7 +34,7 @@ class Product extends LogsModel
         'occupancy_for_price',
         'free_occupancy_rule',
         'max_tickets_per_session',
-        'booking_deadline_hours',
+        'booking_deadline_minutes',
         'support_email',
     ];
 

@@ -99,9 +99,9 @@ class ProductAvailabilityService
      */
     private function bookingCutoff(Product $product): Carbon
     {
-        $hours = (int) ($product->booking_deadline_hours ?? 0);
+        $minutes = (int) ($product->booking_deadline_minutes ?? 0);
 
-        return Carbon::now()->addHours($hours);
+        return Carbon::now()->addMinutes($minutes);
     }
 
     /**
