@@ -32,8 +32,9 @@
 
     $statusOptions = [
         'booked'     => 'Prenotato',
-        'checked_in' => 'Presentato',
-        'no_show'    => 'Non presentato',
+        'checked_in' => 'Arrivato',
+        'no_show'    => 'No show',
+        'refunded'   => 'Rimborsato',
         'cancelled'  => 'Annullato',
     ];
 
@@ -108,7 +109,10 @@
                     <div class="ts-ticket-status">
                         <select class="ts-status-select ts-status-{{ $participant->status }}" data-role="status-select" data-original="{{ $participant->status }}">
                             @foreach($statusOptions as $value => $label)
-                                <option value="{{ $value }}" {{ $participant->status === $value ? 'selected' : '' }}>{{ mb_strtoupper($label) }}</option>
+                                @php($lockedRefunded = $value === 'refunded' && $participant->status !== 'refunded')
+                                <option value="{{ $value }}"
+                                    {{ $participant->status === $value ? 'selected' : '' }}
+                                    {{ $lockedRefunded ? 'disabled' : '' }}>{{ mb_strtoupper($label) }}</option>
                             @endforeach
                         </select>
                     </div>
