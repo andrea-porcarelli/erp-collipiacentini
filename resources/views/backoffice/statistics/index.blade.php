@@ -145,9 +145,9 @@
                                 <tr>
                                     <td>#MTK-{{ $order->order_number }}</td>
                                     <td>
-                                        {{ $order->customer?->full_name }}
-                                        @if($order->customer?->phone)
-                                            <div class="text-muted small">{{ $order->customer->phone }}</div>
+                                        {{ $order->full_name }}
+                                        @if($order->phone)
+                                            <div class="text-muted small">{{ $order->phone }}</div>
                                         @endif
                                     </td>
                                     <td>

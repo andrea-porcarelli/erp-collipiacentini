@@ -199,7 +199,7 @@ class PaymentController extends Controller
         }
 
         $order = Order::where('order_number', $orderNumber)
-            ->with(['customer', 'orderProducts.product', 'partner'])
+            ->with(['orderProducts.product', 'partner'])
             ->firstOrFail();
 
         $partner = $order->partner;

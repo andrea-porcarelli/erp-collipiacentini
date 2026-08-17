@@ -119,7 +119,6 @@ class CalendarController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $order->load([
-                'customer',
                 'partner',
                 'orderProducts.product',
                 'orderProducts.items.variant',

@@ -122,7 +122,6 @@ class CalendarRepository implements CalendarInterface
                     ->whereRaw('SUBSTRING(booking_time, 1, 5) = ?', [$normalizedTime]);
             })
             ->with([
-                'customer',
                 'orderProducts.items.variant',
                 'orderProducts.product',
                 'participants',
@@ -150,11 +149,11 @@ class CalendarRepository implements CalendarInterface
             $isPhoneLikeQuery = $q !== '' && preg_match('/^[\d\s+\-().]+$/', $q) === 1;
             $digitsQ = $isPhoneLikeQuery ? preg_replace('/\D+/', '', $q) : '';
             $orders = $orders->filter(function (Order $order) use ($q, $digitsQ) {
-                $name = mb_strtolower(($order->customer->name ?? '').' '.($order->customer->surname ?? ''));
+                $name = mb_strtolower(($order->name ?? '').' '.($order->surname ?? ''));
                 $number = mb_strtolower($order->order_number ?? '');
-                $email = mb_strtolower($order->customer->email ?? '');
-                $phone = (string) ($order->customer->phone ?? '');
-                $phoneDigits = preg_replace('/\D+/', '', ($order->customer->prefix_phone ?? '').$phone);
+                $email = mb_strtolower($order->email ?? '');
+                $phone = (string) ($order->phone ?? '');
+                $phoneDigits = preg_replace('/\D+/', '', ($order->prefix_phone ?? '').$phone);
 
                 if (str_contains($name, $q) || str_contains($number, $q) || str_contains($email, $q)) {
                     return true;

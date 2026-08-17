@@ -18,7 +18,7 @@ class NewOrderTelegramNotify extends Notification
     public function toTelegram($notifiable)
     {
         $order = $this->order;
-        $order->loadMissing(['partner', 'customer', 'orderProducts.product']);
+        $order->loadMissing(['partner', 'orderProducts.product']);
 
         $op = $order->orderProducts->first();
         $product = $op?->product;
