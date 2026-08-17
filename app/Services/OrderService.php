@@ -153,8 +153,6 @@ class OrderService
      */
     public function completeOrder(Order $order, ?string $paymentMethod = null): Order
     {
-        $alreadyPaid = $order->order_status === OrderStatus::PAID;
-
         $effectivePaymentMethod = $paymentMethod ?? $order->stripe_payment_method;
 
         $cardBrand = null;
@@ -169,20 +167,24 @@ class OrderService
             }
         }
 
-        $order->update([
-            'order_status' => OrderStatus::PAID,
-            'paid_at' => now(),
-            'stripe_payment_method' => $effectivePaymentMethod,
-            'card_brand' => $cardBrand ?? $order->card_brand,
-            'card_last4' => $cardLast4 ?? $order->card_last4,
-            'payment_error' => null,
-        ]);
+        // Transizione atomica: solo l'esecuzione che effettivamente sposta
+        // l'ordine da non-PAID a PAID invia email e notifiche. Se una seconda
+        // chiamata concorrente (webhook Stripe vs frontend confirm) arriva,
+        // l'update ritorna 0 righe modificate e non ripete la notifica.
+        $wasPaid = Order::where('id', $order->id)
+            ->where('order_status', '!=', OrderStatus::PAID->value)
+            ->update([
+                'order_status' => OrderStatus::PAID->value,
+                'paid_at' => now(),
+                'stripe_payment_method' => $effectivePaymentMethod,
+                'card_brand' => $cardBrand ?? $order->card_brand,
+                'card_last4' => $cardLast4 ?? $order->card_last4,
+                'payment_error' => null,
+            ]) === 1;
 
         $order = $order->fresh();
 
-        // Invio email di conferma solo alla prima transizione verso PAID
-        // (evita doppio invio quando webhook + confirm passano entrambi qui).
-        if (! $alreadyPaid) {
+        if ($wasPaid) {
             $this->logger->logOrderPaid($order);
             $this->sendConfirmationEmail($order);
             $this->notifyTelegramNewOrder($order);
