@@ -7,18 +7,20 @@ use Illuminate\Support\Facades\Auth;
 
 class StoreCompanyRequest extends FormRequest
 {
-    public function authorize() : bool {
+    public function authorize(): bool
+    {
         return Auth::check();
     }
 
-    public function rules() : array {
+    public function rules(): array
+    {
         return [
             'company_name' => ['required', 'unique:companies,company_name'],
             'vat_number' => ['required', 'unique:companies,vat_number'],
         ];
     }
 
-    public function messages() : array
+    public function messages(): array
     {
         return [
             'company_name.required' => 'Il nome dell\'azienda è obbligatorio',

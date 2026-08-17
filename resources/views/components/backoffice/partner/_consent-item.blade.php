@@ -9,9 +9,9 @@
     $consentId    = $consent ? (string) $consent->id : '';
     $titleLabel   = $isLocked ? 'Checkbox (obbligatorio)' : 'Checkbox';
     $disAttr      = $isLocked ? 'disabled' : '';
-    $hasCustomers = $consent ? (($consent->customer_consents_count ?? null) !== null
-                                  ? (int) $consent->customer_consents_count > 0
-                                  : $consent->customerConsents()->exists())
+    $hasCustomers = $consent ? (($consent->order_consents_count ?? null) !== null
+                                  ? (int) $consent->order_consents_count > 0
+                                  : $consent->orderConsents()->exists())
                               : false;
     $canDelete    = ! $isLocked && ! $hasCustomers;
 @endphp

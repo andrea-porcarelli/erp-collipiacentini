@@ -257,7 +257,7 @@ class Product extends LogsModel
 
     public function getImageAltAttribute(): string
     {
-        $media    = $this->cover->first() ?? $this->gallery->first();
+        $media = $this->cover->first() ?? $this->gallery->first();
         $fallback = $this->meta_title ?: $this->label ?: '';
 
         return \App\Support\ImageAltNormalizer::normalize($media?->file_name, $fallback);

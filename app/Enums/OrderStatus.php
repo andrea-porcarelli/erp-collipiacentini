@@ -14,12 +14,13 @@ enum OrderStatus: string
     public static function statuses(): array
     {
         return collect(self::cases())
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
+
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => __('orders.status.pending'),
             self::PAID => __('orders.status.paid'),
             self::COMPLETED => __('orders.status.completed'),
@@ -31,7 +32,7 @@ enum OrderStatus: string
 
     public function status(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'Warning',
             self::PAID => 'Success',
             self::COMPLETED => 'Success',
@@ -43,7 +44,7 @@ enum OrderStatus: string
 
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'triangle-exclamation',
             self::PAID => 'check',
             self::COMPLETED => 'check',

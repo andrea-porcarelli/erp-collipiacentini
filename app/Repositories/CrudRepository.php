@@ -43,18 +43,22 @@ class CrudRepository
         $model = $this->find($id);
         if ($model->id) {
             $model->delete();
+
             return true;
         }
+
         return false;
     }
 
-    public function for_select() : array {
+    public function for_select(): array
+    {
         return $this->model->get()->map(function ($item) {
             return ['id' => $item->id, 'label' => $item->label, 'is_active' => $item->is_active ?? 1];
         })->toArray();
     }
 
-    public function updateOrCreate(array $update, array $create) : Model {
+    public function updateOrCreate(array $update, array $create): Model
+    {
         return $this->model->updateOrCreate($update, $create);
     }
 }

@@ -34,12 +34,12 @@ return new class extends Migration
             }
 
             DB::table('categories')->insert([
-                'is_active'     => 1,
-                'iva'           => 22.00,
+                'is_active' => 1,
+                'iva' => 22.00,
                 'category_code' => $category['category_code'],
-                'label'         => $category['label'],
-                'created_at'    => $now,
-                'updated_at'    => $now,
+                'label' => $category['label'],
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }

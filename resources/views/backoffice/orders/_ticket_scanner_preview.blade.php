@@ -38,9 +38,7 @@
         'cancelled'  => 'Annullato',
     ];
 
-    $phoneDigits = $order->customer
-        ? preg_replace('/\D+/', '', (string) ($order->customer->prefix_phone ?? '') . (string) ($order->customer->phone ?? ''))
-        : '';
+    $phoneDigits = preg_replace('/\D+/', '', (string) ($order->prefix_phone ?? '') . (string) ($order->phone ?? ''));
 @endphp
 
 <div class="ticket-scanner-content" data-order-id="{{ $order->id }}" data-order-number="{{ $order->order_number }}">
@@ -53,7 +51,7 @@
 
     <div class="ts-section ts-customer-section">
         <div class="ts-customer-line">
-            <span class="ts-customer-name">{{ $order->customer?->full_name }}</span>
+            <span class="ts-customer-name">{{ $order->full_name }}</span>
             @if($phoneDigits)
                 <a href="https://wa.me/{{ $phoneDigits }}" target="_blank" rel="noopener" class="ts-whatsapp" title="Apri WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i>

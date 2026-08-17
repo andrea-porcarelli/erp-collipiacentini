@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\StripePaymentService;
@@ -88,6 +87,7 @@ class StripeWebhookController extends Controller
                     'order_id' => $manualOrder->id,
                     'order_number' => $manualOrder->order_number,
                 ]);
+
                 return;
             }
         }
@@ -111,35 +111,28 @@ class StripeWebhookController extends Controller
         // L'ordine non esiste, proviamo a crearlo
         $metadata = $paymentIntent->metadata;
         $sessionId = $metadata->session_id ?? null;
-        $customerId = $metadata->customer_id ?? null;
 
-        if (!$sessionId && !$customerId) {
-            Log::warning('Cannot create order from webhook: missing session_id and customer_id', [
+        if (! $sessionId) {
+            Log::warning('Cannot create order from webhook: missing session_id metadata', [
                 'payment_intent_id' => $paymentIntentId,
             ]);
 
             return;
         }
 
-        // Prova a recuperare il carrello
-        $cart = $sessionId ? Cart::where('session_id', $sessionId)->first() : null;
+        $cart = Cart::where('session_id', $sessionId)->first();
 
-        if (!$cart && $customerId) {
-            $cart = Cart::where('customer_id', $customerId)->first();
-        }
-
-        if (!$cart) {
+        if (! $cart) {
             Log::warning('Cannot create order from webhook: cart not found', [
                 'payment_intent_id' => $paymentIntentId,
                 'session_id' => $sessionId,
-                'customer_id' => $customerId,
             ]);
 
             return;
         }
 
-        if (!$cart->customer) {
-            Log::warning('Cannot create order from webhook: customer not found', [
+        if (! $cart->email) {
+            Log::warning('Cannot create order from webhook: cart missing customer data', [
                 'payment_intent_id' => $paymentIntentId,
                 'cart_id' => $cart->id,
             ]);
@@ -148,10 +141,8 @@ class StripeWebhookController extends Controller
         }
 
         try {
-            // Crea l'ordine
             $order = $this->orderService->createOrderFromCart(
                 $cart,
-                $cart->customer,
                 $paymentIntentId,
                 $paymentIntent->payment_method
             );

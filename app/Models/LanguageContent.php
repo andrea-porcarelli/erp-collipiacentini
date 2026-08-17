@@ -1,6 +1,6 @@
 <?php
-namespace App\Models;
 
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -15,11 +15,13 @@ class LanguageContent extends LogsModel
         'value',
     ];
 
-    public function language() : BelongsTo {
+    public function language(): BelongsTo
+    {
         return $this->belongsTo(Language::class);
     }
 
-    public function entity() : MorphTo {
+    public function entity(): MorphTo
+    {
         return $this->morphTo();
     }
 }

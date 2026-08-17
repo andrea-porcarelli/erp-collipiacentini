@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::table('language_contents', function (Blueprint $table) {
             $columns = ['intro', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
-            $toDrop = array_filter($columns, fn($col) => Schema::hasColumn('language_contents', $col));
-            if (!empty($toDrop)) {
+            $toDrop = array_filter($columns, fn ($col) => Schema::hasColumn('language_contents', $col));
+            if (! empty($toDrop)) {
                 $table->dropColumn(array_values($toDrop));
             }
         });

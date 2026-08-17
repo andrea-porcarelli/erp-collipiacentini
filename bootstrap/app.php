@@ -8,7 +8,6 @@ use App\Notifications\ErrorTelegramNotify;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -43,15 +42,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->report(function (NotFoundHttpException $e) {
             $request = request();
             Log::channel('single')->warning('404 NotFound', [
-                'host'     => $request->getHost(),
-                'method'   => $request->getMethod(),
+                'host' => $request->getHost(),
+                'method' => $request->getMethod(),
                 'full_url' => $request->fullUrl(),
-                'path'     => $request->path(),
-                'route'    => optional($request->route())->uri(),
+                'path' => $request->path(),
+                'route' => optional($request->route())->uri(),
                 'route_name' => optional($request->route())->getName(),
-                'referer'  => $request->headers->get('referer'),
+                'referer' => $request->headers->get('referer'),
                 'user_agent' => $request->userAgent(),
-                'ip'       => $request->ip(),
+                'ip' => $request->ip(),
             ]);
         });
 
@@ -66,7 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return;
                 }
 
-                $fingerprint = 'tg_err:' . md5(get_class($e) . '|' . $e->getFile() . ':' . $e->getLine() . '|' . $e->getMessage());
+                $fingerprint = 'tg_err:'.md5(get_class($e).'|'.$e->getFile().':'.$e->getLine().'|'.$e->getMessage());
                 if (Cache::has($fingerprint)) {
                     return;
                 }

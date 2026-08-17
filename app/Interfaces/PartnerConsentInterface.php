@@ -2,6 +2,4 @@
 
 namespace App\Interfaces;
 
-interface PartnerConsentInterface extends CrudInterface
-{
-}
+interface PartnerConsentInterface extends CrudInterface {}

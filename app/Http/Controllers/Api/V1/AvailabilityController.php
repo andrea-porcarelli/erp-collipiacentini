@@ -19,7 +19,7 @@ class AvailabilityController extends Controller
             $q->where('company_id', $company->id);
         })->find($numericId);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'error' => 'not_found',
                 'message' => 'Prodotto non trovato',
@@ -29,7 +29,7 @@ class AvailabilityController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        if (!$startDate || !$endDate) {
+        if (! $startDate || ! $endDate) {
             return response()->json([
                 'error' => 'validation_error',
                 'message' => 'I parametri start_date e end_date sono obbligatori',
@@ -55,7 +55,7 @@ class AvailabilityController extends Controller
                 $timeSlots = $dateAvailabilities
                     ->whereNotNull('time')
                     ->where('time', '!=', '')
-                    ->map(fn($avail) => [
+                    ->map(fn ($avail) => [
                         'start' => $avail->time,
                         'available_slots' => (int) $avail->availability,
                         'max_capacity' => (int) $avail->availability,
@@ -86,7 +86,7 @@ class AvailabilityController extends Controller
         }
 
         return response()->json([
-            'product_id' => 'ERP-PROD-' . $product->id,
+            'product_id' => 'ERP-PROD-'.$product->id,
             'availability' => $availability,
         ]);
     }
@@ -100,7 +100,7 @@ class AvailabilityController extends Controller
             $q->where('company_id', $company->id);
         })->find($numericId);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'error' => 'not_found',
                 'message' => 'Prodotto non trovato',
@@ -111,7 +111,7 @@ class AvailabilityController extends Controller
         $quantity = (int) $request->input('quantity', 1);
         $timeSlot = $request->input('time_slot');
 
-        if (!$date) {
+        if (! $date) {
             return response()->json([
                 'error' => 'validation_error',
                 'message' => 'Il parametro date è obbligatorio',

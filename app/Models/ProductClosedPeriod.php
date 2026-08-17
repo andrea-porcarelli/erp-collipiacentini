@@ -14,7 +14,7 @@ class ProductClosedPeriod extends Model
 
     protected $casts = [
         'date_from' => 'date',
-        'date_to'   => 'date',
+        'date_to' => 'date',
     ];
 
     public function product(): BelongsTo

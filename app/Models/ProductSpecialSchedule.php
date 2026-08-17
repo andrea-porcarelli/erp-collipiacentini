@@ -14,9 +14,9 @@ class ProductSpecialSchedule extends Model
     protected $fillable = ['product_id', 'date', 'time', 'is_disabled'];
 
     protected $casts = [
-        'date'         => 'date',
+        'date' => 'date',
         'availability' => 'integer',
-        'is_disabled'  => 'boolean',
+        'is_disabled' => 'boolean',
     ];
 
     public function product(): BelongsTo
@@ -32,7 +32,7 @@ class ProductSpecialSchedule extends Model
     public function generic_variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class, 'product_id', 'product_id')
-                    ->whereNull('availability_id')
-                    ->whereNull('special_schedule_id');
+            ->whereNull('availability_id')
+            ->whereNull('special_schedule_id');
     }
 }

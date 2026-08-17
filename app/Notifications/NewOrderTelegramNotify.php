@@ -38,17 +38,16 @@ class NewOrderTelegramNotify extends Notification
 
         $amount = (float) $order->amount;
         $payment = $amount > 0
-            ? '💳 Pagato <b>' . $this->money($amount) . '</b>'
+            ? '💳 Pagato <b>'.$this->money($amount).'</b>'
             : '🎁 <b>Gratuito</b>';
 
-
         $text = "🎟️ <b>Nuovo ordine #{$order->order_number}</b>\n"
-            . '📦 ' . $this->escape($product?->label ?? '—') . "\n"
-            . '🏷️ ' . $this->escape($partner?->partner_name ?? '—') . "\n"
-            . "📅 {$date}\n"
-            . "🕐 {$time}\n"
-            . "👥 {$pax} " . ($pax === 1 ? 'persona' : 'persone') . "\n"
-            . $payment;
+            .'📦 '.$this->escape($product?->label ?? '—')."\n"
+            .'🏷️ '.$this->escape($partner?->partner_name ?? '—')."\n"
+            ."📅 {$date}\n"
+            ."🕐 {$time}\n"
+            ."👥 {$pax} ".($pax === 1 ? 'persona' : 'persone')."\n"
+            .$payment;
 
         return ['text' => $text];
     }
@@ -60,6 +59,6 @@ class NewOrderTelegramNotify extends Notification
 
     private function money(float $amount): string
     {
-        return number_format($amount, 2, ',', '.') . ' €';
+        return number_format($amount, 2, ',', '.').' €';
     }
 }

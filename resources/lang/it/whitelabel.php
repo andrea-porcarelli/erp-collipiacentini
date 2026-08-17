@@ -3,10 +3,10 @@
 return [
     // Header
     'menu' => [
-        'contacts'           => 'Contatti',
-        'privacy_policy'     => 'Privacy Policy',
-        'cookie_policy'      => 'Cookie Policy',
-        'terms_conditions'   => 'Termini e Condizioni',
+        'contacts' => 'Contatti',
+        'privacy_policy' => 'Privacy Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'terms_conditions' => 'Termini e Condizioni',
     ],
     'languages' => [
         'italian' => 'Italiano',
@@ -26,9 +26,9 @@ return [
     // Products
     'products' => [
         'no_availability' => 'Nessuna disponibilità trovata',
-        'free'            => 'Gratis',
-        'buy'             => 'Acquista',
-        'book'            => 'Prenota',
+        'free' => 'Gratis',
+        'buy' => 'Acquista',
+        'book' => 'Prenota',
     ],
 
     // Filters
@@ -46,10 +46,10 @@ return [
         'select_date' => 'Seleziona data',
         'castle_title' => 'Il castello',
         'useful_links_title' => 'Link utili',
-        'contacts'           => 'Contatti',
-        'privacy_policy'     => 'Privacy Policy',
-        'cookie_policy'      => 'Cookie Policy',
-        'terms_conditions'   => 'Termini e Condizioni',
+        'contacts' => 'Contatti',
+        'privacy_policy' => 'Privacy Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'terms_conditions' => 'Termini e Condizioni',
     ],
 
     // Generic page

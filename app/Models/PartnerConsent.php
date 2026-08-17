@@ -16,6 +16,7 @@ class PartnerConsent extends LogsModel
     public $fillable = [
         'partner_id',
         'code',
+        'version',
         'is_required',
         'is_locked',
         'is_active',
@@ -23,12 +24,15 @@ class PartnerConsent extends LogsModel
         'expiry_months',
         'expiry_years',
         'position',
+        'superseded_at',
+        'superseded_by_id',
     ];
 
     protected $casts = [
         'is_required' => 'boolean',
-        'is_locked'   => 'boolean',
-        'is_active'   => 'boolean',
+        'is_locked' => 'boolean',
+        'is_active' => 'boolean',
+        'superseded_at' => 'datetime',
     ];
 
     public function partner(): BelongsTo
@@ -36,9 +40,24 @@ class PartnerConsent extends LogsModel
         return $this->belongsTo(Partner::class);
     }
 
-    public function customerConsents(): HasMany
+    public function orderConsents(): HasMany
     {
-        return $this->hasMany(CustomerConsent::class);
+        return $this->hasMany(OrderConsent::class);
+    }
+
+    public function supersededBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'superseded_by_id');
+    }
+
+    public function previousVersion()
+    {
+        return $this->hasOne(self::class, 'superseded_by_id');
+    }
+
+    public function scopeCurrent($query)
+    {
+        return $query->whereNull('superseded_at');
     }
 
     public function computeExpiresAt(?Carbon $from = null): ?Carbon

@@ -62,9 +62,9 @@
     <div class="order-preview-section mt-spacing-2xl mb-spacing-2xl">
         <div class="order-preview-title mb-spacing-xl">Dettagli cliente</div>
         <div class="order-preview-customer">
-            <span>{{ $order->customer->full_name }}</span>
-            @if($order->customer->phone)
-                <span class="order-preview-phone">{{ trim($order->customer->prefix_phone . ' ' . $order->customer->phone) }}</span>
+            <span>{{ $order->full_name }}</span>
+            @if($order->phone)
+                <span class="order-preview-phone">{{ trim($order->prefix_phone . ' ' . $order->phone) }}</span>
             @endif
         </div>
     </div>

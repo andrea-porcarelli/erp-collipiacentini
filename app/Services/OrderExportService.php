@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\CustomerConsent;
 use App\Models\Order;
+use App\Models\OrderConsent;
 use App\Models\PartnerConsent;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -24,14 +24,14 @@ class OrderExportService
     public function generate(Collection $orders, Collection $partnerConsents): string
     {
         $orders->loadMissing([
-            'customer.country',
+            'country',
             'partner',
             'orderProducts.product.category',
             'orderProducts.items.variant',
             'orderProducts.items.participants',
         ]);
 
-        $consentAcceptanceByCustomer = $this->loadCustomerConsents($orders, $partnerConsents);
+        $consentAcceptanceByOrder = $this->loadOrderConsents($orders, $partnerConsents);
 
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -45,7 +45,7 @@ class OrderExportService
         $rowIndex = 3;
         foreach ($orders as $order) {
             $participantCounter = 0;
-            $consentsForOrder = $consentAcceptanceByCustomer[$order->customer_id.'|'.$order->partner_id] ?? [];
+            $consentsForOrder = $consentAcceptanceByOrder[$order->id] ?? [];
 
             foreach ($order->orderProducts as $orderProduct) {
                 foreach ($orderProduct->items as $item) {
@@ -57,6 +57,7 @@ class OrderExportService
                             $participantCounter++;
                             $this->writeRow($sheet, $rowIndex++, $order, $orderProduct, $item, null, $participantCounter, $partnerConsents, $consentsForOrder);
                         }
+
                         continue;
                     }
                     foreach ($participants as $participant) {
@@ -104,7 +105,7 @@ class OrderExportService
                 'Variante', 'Totale',
             ]],
             ['label' => 'CLIENTE', 'columns' => [
-                'ID Cliente', 'Nome completo', 'Email', 'Telefono', 'Data di nascita',
+                'Nome completo', 'Email', 'Telefono', 'Data di nascita',
                 'Codice fiscale', 'Azienda', 'Partita IVA', 'Indirizzo', 'CAP',
                 'Città', 'Provincia', 'Regione', 'Paese',
             ]],
@@ -178,7 +179,6 @@ class OrderExportService
 
     private function writeRow($sheet, int $rowIndex, Order $order, $orderProduct, $item, $participant, int $participantIndex, Collection $partnerConsents, array $consentsForOrder): void
     {
-        $customer = $order->customer;
         $partner = $order->partner;
         $product = $orderProduct->product;
         $variant = $item?->variant;
@@ -240,24 +240,23 @@ class OrderExportService
         $values[] = $itemSubtotal ?: null;
 
         // CLIENTE
-        $values[] = $customer?->id;
-        $values[] = trim(($customer?->name ?? '').' '.($customer?->surname ?? '')) ?: null;
-        $values[] = $customer?->email;
-        $values[] = $customer?->phone
-            ? trim(($customer->prefix_phone ?? '').' '.$customer->phone)
+        $values[] = $order->full_name ?: null;
+        $values[] = $order->email;
+        $values[] = $order->phone
+            ? trim(($order->prefix_phone ?? '').' '.$order->phone)
             : null;
-        $values[] = $customer?->birth_date
-            ? (\Carbon\Carbon::parse($customer->birth_date))->format('d/m/Y')
+        $values[] = $order->birth_date
+            ? (\Carbon\Carbon::parse($order->birth_date))->format('d/m/Y')
             : null;
-        $values[] = $customer?->fiscal_code;
+        $values[] = $order->fiscal_code;
         $values[] = null; // Azienda
         $values[] = null; // Partita IVA
-        $values[] = $customer?->address;
-        $values[] = $customer?->zip_code;
-        $values[] = $customer?->city;
+        $values[] = $order->address;
+        $values[] = $order->zip_code;
+        $values[] = $order->city;
         $values[] = null; // Provincia
         $values[] = null; // Regione
-        $values[] = $customer?->country?->name;
+        $values[] = $order->country?->name;
 
         // PRIVACY (consensi dinamici)
         if ($partnerConsents->isEmpty()) {
@@ -318,29 +317,23 @@ class OrderExportService
     }
 
     /**
-     * Ritorna un array indicizzato per "customer_id|partner_id" contenente
-     * i CustomerConsent indicizzati per partner_consent_id, così durante la
-     * scrittura riga possiamo fare lookup O(1).
+     * Ritorna un array indicizzato per order_id contenente gli OrderConsent
+     * indicizzati per partner_consent_id, così durante la scrittura riga
+     * possiamo fare lookup O(1).
      */
-    private function loadCustomerConsents(Collection $orders, Collection $partnerConsents): array
+    private function loadOrderConsents(Collection $orders, Collection $partnerConsents): array
     {
         if ($partnerConsents->isEmpty() || $orders->isEmpty()) {
             return [];
         }
 
-        $consentIds = $partnerConsents->pluck('id')->all();
-        $customerIds = $orders->pluck('customer_id')->filter()->unique()->all();
-        $partnerIds = $orders->pluck('partner_id')->filter()->unique()->all();
+        $orderIds = $orders->pluck('id')->all();
 
-        $records = CustomerConsent::whereIn('partner_consent_id', $consentIds)
-            ->whereIn('customer_id', $customerIds)
-            ->whereIn('partner_id', $partnerIds)
-            ->get();
+        $records = OrderConsent::whereIn('order_id', $orderIds)->get();
 
         $indexed = [];
         foreach ($records as $r) {
-            $key = $r->customer_id.'|'.$r->partner_id;
-            $indexed[$key][$r->partner_consent_id] = $r;
+            $indexed[$r->order_id][$r->partner_consent_id] = $r;
         }
 
         return $indexed;
@@ -357,6 +350,7 @@ class OrderExportService
             // Rimuove il prefisso "Consenso" se già presente nel testo, per non
             // duplicare la parola nell'intestazione "Consenso X" / "Scadenza X".
             $raw = preg_replace('/^\s*consenso\s+/i', '', $raw);
+
             return Str::limit($raw, 40, '…');
         }
 

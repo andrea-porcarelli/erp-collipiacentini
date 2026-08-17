@@ -41,7 +41,7 @@ class OrderCancellationMail extends Mailable
         return new Content(
             view: 'emails.order-cancellation',
             with: [
-                'order'        => $this->order,
+                'order' => $this->order,
                 'refundIssued' => $this->refundIssued,
                 'refundAmount' => $this->refundAmount,
             ],

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Cart;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderLog;
 use App\Models\User;
@@ -55,11 +54,11 @@ class OrderLogger
 
         return OrderLog::create(array_merge([
             'causer_type' => $causer ? $causer::class : null,
-            'causer_id'   => $causer?->getKey(),
+            'causer_id' => $causer?->getKey(),
             'causer_name' => $this->causerName($causer),
-            'properties'  => null,
-            'context'     => $this->buildContext($request),
-            'batch_uuid'  => $this->batchUuid,
+            'properties' => null,
+            'context' => $this->buildContext($request),
+            'batch_uuid' => $this->batchUuid,
         ], $attributes));
     }
 
@@ -72,9 +71,9 @@ class OrderLogger
         $tickets = collect($itemsSummary)->sum('quantity');
 
         return $this->write([
-            'cart_id'     => $cart->id,
-            'session_id'  => $cart->session_id,
-            'event_type'  => 'cart_started',
+            'cart_id' => $cart->id,
+            'session_id' => $cart->session_id,
+            'event_type' => 'cart_started',
             'description' => sprintf(
                 'Carrello avviato per il %s alle %s · %d biglietti · %s €',
                 $date,
@@ -82,30 +81,29 @@ class OrderLogger
                 $tickets,
                 number_format($total, 2, ',', '.')
             ),
-            'properties'  => [
-                'date'      => $cart->date,
-                'time'      => $cart->time,
+            'properties' => [
+                'date' => $cart->date,
+                'time' => $cart->time,
                 'slot_type' => $cart->slot_type,
-                'slot_id'   => $cart->slot_id,
-                'items'     => $itemsSummary,
-                'total'     => $total,
+                'slot_id' => $cart->slot_id,
+                'items' => $itemsSummary,
+                'total' => $total,
             ],
         ]);
     }
 
-    public function logCartCustomerAssigned(Cart $cart, Customer $customer): OrderLog
+    public function logCartCustomerAssignedByEmail(Cart $cart): OrderLog
     {
+        $label = trim(($cart->name ?? '').' '.($cart->surname ?? '')) ?: ($cart->email ?? '#'.$cart->id);
+
         return $this->write([
-            'cart_id'     => $cart->id,
-            'session_id'  => $cart->session_id,
-            'event_type'  => 'cart_customer_assigned',
-            'description' => sprintf(
-                'Cliente %s associato al carrello',
-                trim(($customer->name ?? '') . ' ' . ($customer->surname ?? '')) ?: ($customer->email ?? '#' . $customer->id)
-            ),
-            'properties'  => [
-                'customer_id'    => $customer->id,
-                'customer_email' => $customer->email,
+            'cart_id' => $cart->id,
+            'session_id' => $cart->session_id,
+            'event_type' => 'cart_customer_assigned',
+            'description' => sprintf('Dati cliente %s associati al carrello', $label),
+            'properties' => [
+                'customer_email' => $cart->email,
+                'customer_name' => trim(($cart->name ?? '').' '.($cart->surname ?? '')) ?: null,
             ],
         ]);
     }
@@ -116,22 +114,22 @@ class OrderLogger
         $total = count($consentsPayload);
 
         return $this->write([
-            'cart_id'     => $cart->id,
-            'session_id'  => $cart->session_id,
-            'event_type'  => 'cart_consents_accepted',
+            'cart_id' => $cart->id,
+            'session_id' => $cart->session_id,
+            'event_type' => 'cart_consents_accepted',
             'description' => sprintf('Consensi compilati: %d/%d accettati', $accepted, $total),
-            'properties'  => ['consents' => $consentsPayload],
+            'properties' => ['consents' => $consentsPayload],
         ]);
     }
 
     public function logCartRemoved(Cart $cart, string $reason = 'manuale'): OrderLog
     {
         return $this->write([
-            'cart_id'     => $cart->id,
-            'session_id'  => $cart->session_id,
-            'event_type'  => 'cart_removed',
+            'cart_id' => $cart->id,
+            'session_id' => $cart->session_id,
+            'event_type' => 'cart_removed',
             'description' => sprintf('Carrello svuotato (%s)', $reason),
-            'properties'  => ['reason' => $reason],
+            'properties' => ['reason' => $reason],
         ]);
     }
 
@@ -155,13 +153,13 @@ class OrderLogger
         $time = $op?->booking_time ? substr($op->booking_time, 0, 5) : '—';
 
         return $this->write([
-            'order_id'    => $order->id,
-            'cart_id'     => null,
-            'event_type'  => 'order_created',
+            'order_id' => $order->id,
+            'cart_id' => null,
+            'event_type' => 'order_created',
             'description' => sprintf('Ordine #%s creato per il %s alle %s', $order->order_number, $date, $time),
-            'properties'  => [
+            'properties' => [
                 'order_number' => $order->order_number,
-                'amount'       => (float) $order->amount,
+                'amount' => (float) $order->amount,
             ],
         ]);
     }
@@ -169,17 +167,17 @@ class OrderLogger
     public function logOrderPaid(Order $order): OrderLog
     {
         $cardLabel = $order->card_brand
-            ? ucfirst($order->card_brand) . ' · ' . ($order->card_last4 ?? '••••')
+            ? ucfirst($order->card_brand).' · '.($order->card_last4 ?? '••••')
             : 'metodo non specificato';
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'order_paid',
+            'order_id' => $order->id,
+            'event_type' => 'order_paid',
             'description' => sprintf('Pagamento di %s € completato (%s)', number_format((float) $order->amount, 2, ',', '.'), $cardLabel),
-            'properties'  => [
-                'amount'       => (float) $order->amount,
-                'card_brand'   => $order->card_brand,
-                'card_last4'   => $order->card_last4,
+            'properties' => [
+                'amount' => (float) $order->amount,
+                'card_brand' => $order->card_brand,
+                'card_last4' => $order->card_last4,
             ],
         ]);
     }
@@ -187,10 +185,10 @@ class OrderLogger
     public function logOrderFailed(Order $order, ?string $error): OrderLog
     {
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'order_failed',
-            'description' => 'Pagamento fallito' . ($error ? ': ' . $error : ''),
-            'properties'  => ['error' => $error],
+            'order_id' => $order->id,
+            'event_type' => 'order_failed',
+            'description' => 'Pagamento fallito'.($error ? ': '.$error : ''),
+            'properties' => ['error' => $error],
         ]);
     }
 
@@ -204,15 +202,15 @@ class OrderLogger
         $newTimeFmt = $newTime ? substr($newTime, 0, 5) : '—';
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'booking_changed',
+            'order_id' => $order->id,
+            'event_type' => 'booking_changed',
             'description' => sprintf(
                 'Data/orario visita: %s ore %s → %s ore %s',
                 $oldDateFmt, $oldTimeFmt, $newDateFmt, $newTimeFmt
             ),
-            'properties'  => [
+            'properties' => [
                 'from' => ['date' => $oldDate, 'time' => $oldTime],
-                'to'   => ['date' => $newDate, 'time' => $newTime],
+                'to' => ['date' => $newDate, 'time' => $newTime],
             ],
         ]);
     }
@@ -220,22 +218,22 @@ class OrderLogger
     public function logCustomerStatusChanged(Order $order, ?string $oldStatus, ?string $newStatus): OrderLog
     {
         $labels = [
-            'booked'    => 'Prenotato',
+            'booked' => 'Prenotato',
             'confirmed' => 'Confermato',
             'completed' => 'Completato',
-            'no_show'   => 'No show',
+            'no_show' => 'No show',
             'cancelled' => 'Annullato',
         ];
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'customer_status_changed',
+            'order_id' => $order->id,
+            'event_type' => 'customer_status_changed',
             'description' => sprintf(
                 'Stato cliente: %s → %s',
                 $labels[$oldStatus] ?? ($oldStatus ?: '—'),
                 $labels[$newStatus] ?? ($newStatus ?: '—')
             ),
-            'properties'  => ['from' => $oldStatus, 'to' => $newStatus],
+            'properties' => ['from' => $oldStatus, 'to' => $newStatus],
         ]);
     }
 
@@ -250,34 +248,34 @@ class OrderLogger
         }
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'notes_updated',
-            'description' => 'Aggiornate ' . (empty($fields) ? 'note' : implode(' e ', $fields)),
-            'properties'  => $changes,
+            'order_id' => $order->id,
+            'event_type' => 'notes_updated',
+            'description' => 'Aggiornate '.(empty($fields) ? 'note' : implode(' e ', $fields)),
+            'properties' => $changes,
         ]);
     }
 
     public function logCustomerUpdated(Order $order, array $changes): OrderLog
     {
         $labelsByField = [
-            'name'        => 'nome',
-            'surname'     => 'cognome',
-            'email'       => 'email',
-            'phone'       => 'telefono',
+            'name' => 'nome',
+            'surname' => 'cognome',
+            'email' => 'email',
+            'phone' => 'telefono',
             'prefix_phone' => 'prefisso',
-            'address'     => 'indirizzo',
-            'country_id'  => 'paese',
+            'address' => 'indirizzo',
+            'country_id' => 'paese',
             'fiscal_code' => 'codice fiscale',
         ];
         $changedFields = array_values(array_intersect_key($labelsByField, $changes));
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'customer_updated',
+            'order_id' => $order->id,
+            'event_type' => 'customer_updated',
             'description' => empty($changedFields)
                 ? 'Aggiornati dati cliente'
-                : 'Aggiornati dati cliente: ' . implode(', ', $changedFields),
-            'properties'  => $changes,
+                : 'Aggiornati dati cliente: '.implode(', ', $changedFields),
+            'properties' => $changes,
         ]);
     }
 
@@ -290,18 +288,18 @@ class OrderLogger
         $label = $kindLabels[$kind] ?? $kind;
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'email_sent',
+            'order_id' => $order->id,
+            'event_type' => 'email_sent',
             'description' => sprintf('Email di %s inviata a %s', $label, $recipient),
-            'properties'  => ['recipient' => $recipient, 'kind' => $kind],
+            'properties' => ['recipient' => $recipient, 'kind' => $kind],
         ]);
     }
 
     public function logReceiptDownloaded(Order $order): OrderLog
     {
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'receipt_downloaded',
+            'order_id' => $order->id,
+            'event_type' => 'receipt_downloaded',
             'description' => sprintf('Ricevuta dell\'ordine #%s scaricata', $order->order_number),
         ]);
     }
@@ -313,38 +311,38 @@ class OrderLogger
     public function logCheckinChanged(Order $order, array $changes): OrderLog
     {
         $statusLabels = [
-            'booked'     => 'Prenotato',
+            'booked' => 'Prenotato',
             'checked_in' => 'Arrivato',
-            'no_show'    => 'No show',
-            'refunded'   => 'Rimborsato',
-            'cancelled'  => 'Annullato',
+            'no_show' => 'No show',
+            'refunded' => 'Rimborsato',
+            'cancelled' => 'Annullato',
         ];
 
         $count = count($changes);
         $description = $count === 1
             ? sprintf(
                 'Biglietto %s: %s → %s',
-                $changes[0]['code'] ?? ('#' . ($changes[0]['participant_id'] ?? '?')),
+                $changes[0]['code'] ?? ('#'.($changes[0]['participant_id'] ?? '?')),
                 $statusLabels[$changes[0]['from'] ?? ''] ?? ($changes[0]['from'] ?? '—'),
                 $statusLabels[$changes[0]['to'] ?? ''] ?? ($changes[0]['to'] ?? '—'),
             )
             : sprintf('%d biglietti aggiornati', $count);
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'checkin_changed',
+            'order_id' => $order->id,
+            'event_type' => 'checkin_changed',
             'description' => $description,
-            'properties'  => ['changes' => $changes],
+            'properties' => ['changes' => $changes],
         ]);
     }
 
     public function logRefunded(Order $order, float $amount): OrderLog
     {
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => 'refunded',
+            'order_id' => $order->id,
+            'event_type' => 'refunded',
             'description' => sprintf('Rimborso di %s € emesso via Stripe', number_format($amount, 2, ',', '.')),
-            'properties'  => ['amount' => $amount],
+            'properties' => ['amount' => $amount],
         ]);
     }
 
@@ -355,12 +353,12 @@ class OrderLogger
             : 'Ordine annullato senza rimborso';
 
         return $this->write([
-            'order_id'    => $order->id,
-            'event_type'  => $refundIssued ? 'cancelled_refunded' : 'cancelled',
+            'order_id' => $order->id,
+            'event_type' => $refundIssued ? 'cancelled_refunded' : 'cancelled',
             'description' => $description,
-            'properties'  => [
+            'properties' => [
                 'refund_issued' => $refundIssued,
-                'amount'        => $amount,
+                'amount' => $amount,
             ],
         ]);
     }
@@ -383,13 +381,13 @@ class OrderLogger
         }
 
         if ($causer instanceof User) {
-            $full = trim(($causer->name ?? '') . ' ' . ($causer->surname ?? ''));
+            $full = trim(($causer->name ?? '').' '.($causer->surname ?? ''));
 
             return $full !== '' ? $full : ($causer->email ?? null);
         }
 
         if ($causer instanceof Customer) {
-            $full = trim(($causer->name ?? '') . ' ' . ($causer->surname ?? ''));
+            $full = trim(($causer->name ?? '').' '.($causer->surname ?? ''));
 
             return $full !== '' ? $full : ($causer->email ?? null);
         }
@@ -404,9 +402,9 @@ class OrderLogger
         }
 
         return [
-            'url'        => $request->fullUrl(),
-            'method'     => $request->method(),
-            'ip'         => $request->ip(),
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'ip' => $request->ip(),
             'user_agent' => substr((string) $request->userAgent(), 0, 250),
         ];
     }

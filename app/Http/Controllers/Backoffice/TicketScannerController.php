@@ -42,12 +42,12 @@ class TicketScannerController extends Controller
             $this->loadOrder($order);
 
             return $this->success([
-                'response'   => view('backoffice.orders._ticket_scanner_preview', [
-                    'order'              => $order,
+                'response' => view('backoffice.orders._ticket_scanner_preview', [
+                    'order' => $order,
                     'scannedParticipant' => $participant->id,
                 ])->render(),
                 'scanned_id' => $participant->id,
-                'order_id'   => $order->id,
+                'order_id' => $order->id,
             ]);
         } catch (\Throwable $e) {
             return $this->exception($e);
@@ -69,16 +69,16 @@ class TicketScannerController extends Controller
             if ($oldStatus !== $data['status']) {
                 app(OrderLogger::class)->logCheckinChanged($participant->order, [[
                     'participant_id' => $participant->id,
-                    'code'           => $participant->code,
-                    'from'           => $oldStatus,
-                    'to'             => $data['status'],
-                    'source'         => 'manual',
+                    'code' => $participant->code,
+                    'from' => $oldStatus,
+                    'to' => $data['status'],
+                    'source' => 'manual',
                 ]]);
             }
 
             return $this->success([
                 'status' => $participant->status,
-                'label'  => $participant->status_label,
+                'label' => $participant->status_label,
             ]);
         } catch (\Throwable $e) {
             return $this->exception($e);
@@ -89,8 +89,8 @@ class TicketScannerController extends Controller
     {
         try {
             $data = $request->validate([
-                'participants'          => 'required|array|min:1',
-                'participants.*.id'     => 'required|integer',
+                'participants' => 'required|array|min:1',
+                'participants.*.id' => 'required|integer',
                 'participants.*.status' => ['required', Rule::in(self::STATUSES)],
             ]);
 
@@ -114,10 +114,10 @@ class TicketScannerController extends Controller
                 $p->update(['status' => $item['status']]);
                 $changesByOrder[$p->order_id][] = [
                     'participant_id' => $p->id,
-                    'code'           => $p->code,
-                    'from'           => $oldStatus,
-                    'to'             => $item['status'],
-                    'source'         => 'batch',
+                    'code' => $p->code,
+                    'from' => $oldStatus,
+                    'to' => $item['status'],
+                    'source' => 'batch',
                 ];
             }
 
@@ -131,7 +131,7 @@ class TicketScannerController extends Controller
 
             return $this->success([
                 'response' => 'Biglietti aggiornati',
-                'count'    => count($data['participants']),
+                'count' => count($data['participants']),
             ]);
         } catch (\Throwable $e) {
             return $this->exception($e);

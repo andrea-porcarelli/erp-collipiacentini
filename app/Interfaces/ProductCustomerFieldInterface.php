@@ -2,6 +2,4 @@
 
 namespace App\Interfaces;
 
-interface ProductCustomerFieldInterface extends CrudInterface
-{
-}
+interface ProductCustomerFieldInterface extends CrudInterface {}

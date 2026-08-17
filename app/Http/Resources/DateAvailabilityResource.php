@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class DateAvailabilityResource extends JsonResource
 {
     /**
-     * @param Request $request
      * @return array
      *
      * Expects a grouped collection item with keys:
@@ -26,7 +25,7 @@ class DateAvailabilityResource extends JsonResource
             $timeSlots = $availabilities
                 ->whereNotNull('time')
                 ->where('time', '!=', '')
-                ->map(fn($avail) => [
+                ->map(fn ($avail) => [
                     'start' => $avail->time,
                     'available_slots' => (int) $avail->availability,
                     'max_capacity' => (int) $avail->availability,

@@ -19,9 +19,7 @@
         'cancelled'  => 'Annullato',
     ];
 
-    $phoneDigits = $order->customer
-        ? preg_replace('/\D+/', '', (string) ($order->customer->prefix_phone ?? '') . (string) ($order->customer->phone ?? ''))
-        : '';
+    $phoneDigits = preg_replace('/\D+/', '', (string) ($order->prefix_phone ?? '') . (string) ($order->phone ?? ''));
 @endphp
 
 <div class="calendar-checkin-content" data-order-id="{{ $order->id }}" data-order-number="{{ $order->order_number }}">
@@ -36,18 +34,18 @@
         <div class="cc-section-title">Dati cliente</div>
         <div class="cc-customer-line">
             <i class="fa-regular fa-user"></i>
-            <span>{{ trim(($order->customer->name ?? '').' '.($order->customer->surname ?? '')) ?: 'Cliente' }}</span>
+            <span>{{ $order->full_name ?: 'Cliente' }}</span>
         </div>
-        @if($order->customer?->email)
+        @if($order->email)
             <div class="cc-customer-line">
                 <i class="fa-regular fa-envelope"></i>
-                <span>{{ $order->customer->email }}</span>
+                <span>{{ $order->email }}</span>
             </div>
         @endif
-        @if($order->customer?->phone)
+        @if($order->phone)
             <div class="cc-customer-line">
                 <i class="fa-solid fa-phone"></i>
-                <span>{{ trim(($order->customer->prefix_phone ?? '').' '.$order->customer->phone) }}</span>
+                <span>{{ trim(($order->prefix_phone ?? '').' '.$order->phone) }}</span>
             </div>
         @endif
         <a class="cc-open-order" href="{{ route('orders.show', $order) }}" target="_blank" rel="noopener">

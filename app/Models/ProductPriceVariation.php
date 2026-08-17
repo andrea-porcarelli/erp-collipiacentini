@@ -20,8 +20,8 @@ class ProductPriceVariation extends LogsModel
 
     protected $casts = [
         'date_from' => 'date',
-        'date_to'   => 'date',
-        'value'     => 'decimal:2',
+        'date_to' => 'date',
+        'value' => 'decimal:2',
     ];
 
     public function product(): BelongsTo

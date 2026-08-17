@@ -28,50 +28,54 @@ class SlotVariants extends Component
         string $maxQuantity,
         string $priceLabel,
         string $price,
-        int    $vatRate
+        int $vatRate
     ): bool {
         if (trim($label) === '') {
             $this->notify('error', 'Il nome variante è obbligatorio');
+
             return false;
         }
         if (trim($priceLabel) === '') {
             $this->notify('error', 'Il nome del servizio è obbligatorio');
+
             return false;
         }
-        if ($price === '' || !is_numeric($price) || (float) $price < 0) {
+        if ($price === '' || ! is_numeric($price) || (float) $price < 0) {
             $this->notify('error', 'Inserisci un prezzo valido');
+
             return false;
         }
 
         $variant = ProductVariant::create([
-            'product_id'      => $this->slot->product_id,
+            'product_id' => $this->slot->product_id,
             'availability_id' => $this->slot->id,
-            'label'           => trim($label),
-            'description'     => trim($description) ?: null,
-            'max_quantity'    => $maxQuantity !== '' ? (int) $maxQuantity : null,
-            'sort_order'      => count($this->variants) + 1,
+            'label' => trim($label),
+            'description' => trim($description) ?: null,
+            'max_quantity' => $maxQuantity !== '' ? (int) $maxQuantity : null,
+            'sort_order' => count($this->variants) + 1,
         ]);
 
         $newPrice = $variant->prices()->create([
-            'label'    => trim($priceLabel),
-            'price'    => (float) $price,
+            'label' => trim($priceLabel),
+            'price' => (float) $price,
             'vat_rate' => $vatRate,
         ]);
 
         $this->variants[] = [
-            'id'           => $variant->id,
-            'label'        => $variant->label,
-            'description'  => $variant->description ?? '',
+            'id' => $variant->id,
+            'label' => $variant->label,
+            'description' => $variant->description ?? '',
             'max_quantity' => $variant->max_quantity ?? '',
-            'prices'       => [[
-                'id'       => $newPrice->id,
-                'label'    => $newPrice->label,
-                'price'    => $newPrice->price,
+            'prices' => [[
+                'id' => $newPrice->id,
+                'label' => $newPrice->label,
+                'price' => $newPrice->price,
                 'vat_rate' => (int) $newPrice->vat_rate,
             ]],
         ];
 
         $this->notify('success', 'Variante creata');
+
         return true;
     }
 
@@ -85,7 +89,7 @@ class SlotVariants extends Component
 
         $indexed = collect($this->variants)->keyBy('id');
         $this->variants = collect($orderedIds)
-            ->map(fn($id) => $indexed[$id] ?? null)
+            ->map(fn ($id) => $indexed[$id] ?? null)
             ->filter()
             ->values()
             ->toArray();
@@ -104,46 +108,46 @@ class SlotVariants extends Component
 
     public function save(int $vi): void
     {
-        $rules      = [
-            "variants.{$vi}.label"        => 'required|string|max:255',
-            "variants.{$vi}.description"  => 'nullable|string|max:500',
+        $rules = [
+            "variants.{$vi}.label" => 'required|string|max:255',
+            "variants.{$vi}.description" => 'nullable|string|max:500',
             "variants.{$vi}.max_quantity" => 'nullable|integer|min:1',
         ];
         $attributes = [
-            "variants.{$vi}.label"        => 'nome variante',
-            "variants.{$vi}.description"  => 'descrizione',
+            "variants.{$vi}.label" => 'nome variante',
+            "variants.{$vi}.description" => 'descrizione',
             "variants.{$vi}.max_quantity" => 'massimi consentiti',
         ];
 
         foreach ($this->variants[$vi]['prices'] as $pi => $row) {
-            $rules["variants.{$vi}.prices.{$pi}.label"]    = 'required|string|max:255';
-            $rules["variants.{$vi}.prices.{$pi}.price"]    = 'required|numeric|min:0';
+            $rules["variants.{$vi}.prices.{$pi}.label"] = 'required|string|max:255';
+            $rules["variants.{$vi}.prices.{$pi}.price"] = 'required|numeric|min:0';
             $rules["variants.{$vi}.prices.{$pi}.vat_rate"] = 'required|numeric|min:0|max:100';
-            $attributes["variants.{$vi}.prices.{$pi}.label"]    = 'servizio';
-            $attributes["variants.{$vi}.prices.{$pi}.price"]    = 'prezzo';
+            $attributes["variants.{$vi}.prices.{$pi}.label"] = 'servizio';
+            $attributes["variants.{$vi}.prices.{$pi}.price"] = 'prezzo';
             $attributes["variants.{$vi}.prices.{$pi}.vat_rate"] = 'IVA';
         }
 
         $this->validate($rules, [], $attributes);
 
         $data = $this->variants[$vi];
-        $id   = $data['id'] ?? null;
+        $id = $data['id'] ?? null;
 
         if ($id) {
             $variant = ProductVariant::findOrFail($id);
             $variant->update([
-                'label'        => $data['label'],
-                'description'  => $data['description'] ?: null,
+                'label' => $data['label'],
+                'description' => $data['description'] ?: null,
                 'max_quantity' => $data['max_quantity'] ?: null,
             ]);
         } else {
             $variant = ProductVariant::create([
-                'product_id'      => $this->slot->product_id,
+                'product_id' => $this->slot->product_id,
                 'availability_id' => $this->slot->id,
-                'label'           => $data['label'],
-                'description'     => $data['description'] ?: null,
-                'max_quantity'    => $data['max_quantity'] ?: null,
-                'sort_order'      => count($this->variants),
+                'label' => $data['label'],
+                'description' => $data['description'] ?: null,
+                'max_quantity' => $data['max_quantity'] ?: null,
+                'sort_order' => count($this->variants),
             ]);
             $this->variants[$vi]['id'] = $variant->id;
         }
@@ -153,16 +157,16 @@ class SlotVariants extends Component
         $variant->prices()->whereNotIn('id', $keptIds)->delete();
 
         foreach ($data['prices'] as $pi => $row) {
-            if (!empty($row['id'])) {
+            if (! empty($row['id'])) {
                 ProductVariantPrice::where('id', $row['id'])->update([
-                    'label'    => $row['label'],
-                    'price'    => $row['price'],
+                    'label' => $row['label'],
+                    'price' => $row['price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
             } else {
                 $newPrice = $variant->prices()->create([
-                    'label'    => $row['label'],
-                    'price'    => $row['price'],
+                    'label' => $row['label'],
+                    'price' => $row['price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
                 $this->variants[$vi]['prices'][$pi]['id'] = $newPrice->id;
@@ -193,15 +197,15 @@ class SlotVariants extends Component
             ->where('availability_id', $this->slot->id)
             ->orderBy('sort_order')
             ->get()
-            ->map(fn($v) => [
-                'id'           => $v->id,
-                'label'        => $v->label,
-                'description'  => $v->description ?? '',
+            ->map(fn ($v) => [
+                'id' => $v->id,
+                'label' => $v->label,
+                'description' => $v->description ?? '',
                 'max_quantity' => $v->max_quantity ?? '',
-                'prices'       => $v->prices->map(fn($p) => [
-                    'id'       => $p->id,
-                    'label'    => $p->label,
-                    'price'    => $p->price,
+                'prices' => $v->prices->map(fn ($p) => [
+                    'id' => $p->id,
+                    'label' => $p->label,
+                    'price' => $p->price,
                     'vat_rate' => (int) $p->vat_rate,
                 ])->toArray(),
             ])

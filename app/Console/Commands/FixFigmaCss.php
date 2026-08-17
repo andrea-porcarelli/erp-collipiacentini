@@ -14,8 +14,9 @@ class FixFigmaCss extends Command
     {
         $path = base_path($this->argument('file'));
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $this->error("File non trovato: {$path}");
+
             return self::FAILURE;
         }
 
@@ -34,7 +35,8 @@ class FixFigmaCss extends Command
                     return $matches[0];
                 }
                 $pxCount++;
-                return $matches[1] . $matches[2] . 'px' . $matches[3];
+
+                return $matches[1].$matches[2].'px'.$matches[3];
             },
             $content
         );
@@ -61,7 +63,7 @@ class FixFigmaCss extends Command
                     $cleaned[] = $line;
                 }
 
-                return '{' . implode("\n", array_values($cleaned)) . '}';
+                return '{'.implode("\n", array_values($cleaned)).'}';
             },
             $content
         );

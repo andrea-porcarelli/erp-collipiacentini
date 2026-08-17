@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Auth;
 
 class StoreUserRequest extends FormRequest
 {
-    public function authorize() : bool {
+    public function authorize(): bool
+    {
         return Auth::check();
     }
 
-    public function rules() : array {
+    public function rules(): array
+    {
         $rules = [
             'name' => ['required'],
             'email' => ['required', 'email', 'unique:users,email'],
@@ -30,7 +32,7 @@ class StoreUserRequest extends FormRequest
         return $rules;
     }
 
-    public function messages() : array
+    public function messages(): array
     {
         return [
             'name.required' => 'Il nome è obbligatorio',

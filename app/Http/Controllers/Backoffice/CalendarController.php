@@ -20,9 +20,7 @@ class CalendarController extends Controller
 {
     private const PARTICIPANT_STATUSES = ['booked', 'checked_in', 'no_show', 'cancelled'];
 
-    public function __construct(private CalendarInterface $interface)
-    {
-    }
+    public function __construct(private CalendarInterface $interface) {}
 
     public function index(): View
     {
@@ -30,12 +28,12 @@ class CalendarController extends Controller
         $selectedPartner = $this->resolveSelectedPartner(request()->query('partner_id'), $partners);
 
         return view('backoffice.calendar.index', [
-            'partners'         => $partners,
-            'selectedPartner'  => $selectedPartner,
-            'canPickPartner'   => in_array(Auth::user()->role, ['god', 'operator', 'company'], true),
-            'orderStatuses'    => OrderStatus::statuses(),
-            'weekStart'        => Carbon::today()->startOfWeek(Carbon::MONDAY)->toDateString(),
-            'today'            => Carbon::today()->toDateString(),
+            'partners' => $partners,
+            'selectedPartner' => $selectedPartner,
+            'canPickPartner' => in_array(Auth::user()->role, ['god', 'operator', 'company'], true),
+            'orderStatuses' => OrderStatus::statuses(),
+            'weekStart' => Carbon::today()->startOfWeek(Carbon::MONDAY)->toDateString(),
+            'today' => Carbon::today()->toDateString(),
         ])->with('path', 'calendar')->with('active', 'calendar');
     }
 
@@ -49,9 +47,9 @@ class CalendarController extends Controller
 
             return $this->success([
                 'week_start' => $weekStart->toDateString(),
-                'week_end'   => $weekStart->copy()->addDays(6)->toDateString(),
-                'label'      => $this->weekLabel($weekStart),
-                'days'       => $days,
+                'week_end' => $weekStart->copy()->addDays(6)->toDateString(),
+                'label' => $this->weekLabel($weekStart),
+                'days' => $days,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -68,15 +66,15 @@ class CalendarController extends Controller
             $data = $this->interface->daySlots($partner->id, $date, $groupBy);
 
             $html = view('backoffice.calendar._day', [
-                'date'    => $date,
+                'date' => $date,
                 'groupBy' => $groupBy,
-                'data'    => $data,
+                'data' => $data,
             ])->render();
 
             return $this->success([
                 'group_by' => $groupBy,
-                'date'     => $date,
-                'html'     => $html,
+                'date' => $date,
+                'html' => $html,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -97,8 +95,8 @@ class CalendarController extends Controller
 
             $filters = [
                 'order_status' => $request->query('order_status'),
-                'check_in'     => $request->query('check_in'),
-                'search'       => $request->query('search'),
+                'check_in' => $request->query('check_in'),
+                'search' => $request->query('search'),
             ];
 
             $orders = $this->interface->slotOrders($partner->id, $productId, $date, $time, $filters);
@@ -109,7 +107,7 @@ class CalendarController extends Controller
 
             return $this->success([
                 'count' => $orders->count(),
-                'html'  => $html,
+                'html' => $html,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -143,8 +141,8 @@ class CalendarController extends Controller
     {
         try {
             $data = $request->validate([
-                'participants'          => 'required|array|min:1',
-                'participants.*.id'     => 'required|integer',
+                'participants' => 'required|array|min:1',
+                'participants.*.id' => 'required|integer',
                 'participants.*.status' => ['required', Rule::in(self::PARTICIPANT_STATUSES)],
             ]);
 
@@ -168,10 +166,10 @@ class CalendarController extends Controller
                 $p->update(['status' => $item['status']]);
                 $changesByOrder[$p->order_id][] = [
                     'participant_id' => $p->id,
-                    'code'           => $p->code,
-                    'from'           => $oldStatus,
-                    'to'             => $item['status'],
-                    'source'         => 'calendar',
+                    'code' => $p->code,
+                    'from' => $oldStatus,
+                    'to' => $item['status'],
+                    'source' => 'calendar',
                 ];
             }
 
@@ -185,7 +183,7 @@ class CalendarController extends Controller
 
             return $this->success([
                 'response' => 'Check-in aggiornati',
-                'updated'  => array_sum(array_map('count', $changesByOrder)),
+                'updated' => array_sum(array_map('count', $changesByOrder)),
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);

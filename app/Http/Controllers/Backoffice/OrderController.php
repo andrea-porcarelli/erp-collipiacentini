@@ -13,9 +13,8 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\OrderInterface;
 use App\Mail\OrderCancellationMail;
 use App\Mail\OrderConfirmationMail;
-use App\Models\Customer;
-use App\Models\CustomerConsent;
 use App\Models\Order;
+use App\Models\OrderConsent;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Services\OrderExportService;
@@ -32,7 +31,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OrderController extends Controller
 {
@@ -93,7 +91,7 @@ class OrderController extends Controller
                     return '#'.$item->order_number;
                 })
                 ->addColumn('customer', function ($item) {
-                    return $item->customer->full_name;
+                    return $item->full_name;
                 })
                 ->addColumn('timing', function ($item) {
                     return $item->product_time;
@@ -132,7 +130,7 @@ class OrderController extends Controller
             $filters = $request->get('filters') ?? [];
 
             $query = $this->interface->filters($filters)
-                ->with(['orderProducts.items.variant', 'customer', 'partner'])
+                ->with(['orderProducts.items.variant', 'country', 'partner'])
                 ->orderBy('created_at', 'desc');
 
             if ($user->role === 'company') {
@@ -159,6 +157,7 @@ class OrderController extends Controller
             $partnerId = $partnerIds->first();
             $partnerConsents = $partnerId
                 ? \App\Models\PartnerConsent::where('partner_id', $partnerId)
+                    ->current()
                     ->where('is_active', true)
                     ->orderBy('position')
                     ->get()
@@ -181,7 +180,7 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
 
-            $order->load(['customer', 'orderProducts.product', 'orderProducts.items.variant']);
+            $order->load(['orderProducts.product', 'orderProducts.items.variant']);
 
             return $this->success([
                 'response' => view('backoffice.orders._preview', compact('order'))->render(),
@@ -196,7 +195,7 @@ class OrderController extends Controller
         $this->authorizeOrderAccess($order);
 
         $order->load([
-            'customer.country',
+            'country',
             'partner',
             'orderProducts.product.category',
             'orderProducts.items.variant',
@@ -221,24 +220,23 @@ class OrderController extends Controller
         $commissionPaymentAmount = round($amount * $commissionPaymentRate / 100, 2);
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
-        $customerConsents = CustomerConsent::with('partnerConsent')
-            ->where('customer_id', $order->customer_id)
-            ->where('partner_id', $order->partner_id)
+        $customerConsents = OrderConsent::with('partnerConsent')
+            ->where('order_id', $order->id)
             ->get()
-            ->filter(fn ($cc) => $cc->partnerConsent !== null && $cc->partnerConsent->is_active)
-            ->sortBy(fn ($cc) => $cc->partnerConsent->position)
+            ->filter(fn ($oc) => $oc->partnerConsent !== null)
+            ->sortBy(fn ($oc) => $oc->partnerConsent->position)
             ->values()
-            ->map(function ($cc) {
-                $pc = $cc->partnerConsent;
+            ->map(function ($oc) {
+                $pc = $oc->partnerConsent;
                 $raw = trim(strip_tags($pc->contentField('content', 'it') ?? ''));
                 $label = \Illuminate\Support\Str::limit($raw, 80, '…') ?: '—';
 
                 return [
-                    'label'         => $label,
-                    'accepted'      => (bool) $cc->accepted,
-                    'is_expired'    => (bool) $cc->accepted && $cc->expires_at && $cc->expires_at->isPast(),
-                    'subscribed_at' => $cc->subscribed_at,
-                    'expires_at'    => $cc->expires_at,
+                    'label' => $label,
+                    'accepted' => (bool) $oc->accepted,
+                    'is_expired' => (bool) $oc->accepted && $oc->expires_at && $oc->expires_at->isPast(),
+                    'subscribed_at' => $oc->subscribed_at,
+                    'expires_at' => $oc->expires_at,
                 ];
             });
 
@@ -309,15 +307,14 @@ class OrderController extends Controller
         try {
             $this->authorizeOrderAccess($order);
             $data = $request->validated();
-            $customer = $order->customer;
             $changes = [];
             foreach ($data as $field => $newValue) {
-                $oldValue = $customer->{$field} ?? null;
+                $oldValue = $order->{$field} ?? null;
                 if ($oldValue !== $newValue) {
                     $changes[$field] = ['from' => $oldValue, 'to' => $newValue];
                 }
             }
-            $customer->update($data);
+            $order->update($data);
 
             if (! empty($changes)) {
                 app(OrderLogger::class)->logCustomerUpdated($order, $changes);
@@ -397,10 +394,10 @@ class OrderController extends Controller
 
             $slots = $service->getSlotsForDate($product, $date);
             $times = $slots->map(fn ($slot) => [
-                'time'         => $slot['time'],
+                'time' => $slot['time'],
                 'availability' => $slot['availability'],
-                'slot_type'    => $slot['slot_type'],
-                'slot_id'      => $slot['slot_id'],
+                'slot_type' => $slot['slot_type'],
+                'slot_id' => $slot['slot_id'],
                 'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
             ])->values();
 
@@ -414,15 +411,15 @@ class OrderController extends Controller
     {
         try {
             $this->authorizeOrderAccess($order);
-            $order->load(['customer', 'partner', 'orderProducts.product.category', 'orderProducts.items.variant']);
+            $order->load(['partner', 'country', 'orderProducts.product.category', 'orderProducts.items.variant']);
 
-            if (! $order->customer?->email) {
-                return $this->error(['response' => 'Il cliente non ha un\'email valida']);
+            if (! $order->email) {
+                return $this->error(['response' => 'L\'ordine non ha un\'email valida']);
             }
 
-            Mail::to($order->customer->email)->send(new OrderConfirmationMail($order));
+            Mail::to($order->email)->send(new OrderConfirmationMail($order));
 
-            app(OrderLogger::class)->logEmailSent($order, $order->customer->email);
+            app(OrderLogger::class)->logEmailSent($order, $order->email);
 
             return $this->success(['response' => 'Email inviata correttamente']);
         } catch (\Exception $e) {
@@ -434,7 +431,7 @@ class OrderController extends Controller
     {
         $this->authorizeOrderAccess($order);
         $order->load([
-            'customer.country',
+            'country',
             'partner',
             'orderProducts.product.category',
             'orderProducts.items.variant',
@@ -478,14 +475,14 @@ class OrderController extends Controller
 
             app(OrderLogger::class)->logCancelled($order, $issueRefund, $refundAmount);
 
-            if ($order->customer?->email) {
+            if ($order->email) {
                 try {
-                    Mail::to($order->customer->email)->send(new OrderCancellationMail(
-                        order: $order->fresh(['customer', 'partner.logo', 'orderProducts.product']),
+                    Mail::to($order->email)->send(new OrderCancellationMail(
+                        order: $order->fresh(['partner.logo', 'orderProducts.product']),
                         refundIssued: $issueRefund,
                         refundAmount: $refundAmount,
                     ));
-                    app(OrderLogger::class)->logEmailSent($order, $order->customer->email, 'cancellation');
+                    app(OrderLogger::class)->logEmailSent($order, $order->email, 'cancellation');
                 } catch (\Throwable $e) {
                     report($e);
                 }
@@ -528,8 +525,8 @@ class OrderController extends Controller
             $order = $orderService->createOrderManually($data);
 
             return $this->success([
-                'response'     => 'Ordine registrato',
-                'order_id'     => $order->id,
+                'response' => 'Ordine registrato',
+                'order_id' => $order->id,
                 'order_number' => $order->order_number,
                 'redirect_url' => route('orders.show', $order),
             ]);
@@ -568,7 +565,7 @@ class OrderController extends Controller
 
             return $this->success([
                 'partners' => $partners,
-                'locked'   => $locked,
+                'locked' => $locked,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -644,10 +641,10 @@ class OrderController extends Controller
 
             $slots = $service->getSlotsForDate($product, $date);
             $times = $slots->map(fn ($slot) => [
-                'time'         => $slot['time'],
+                'time' => $slot['time'],
                 'availability' => $slot['availability'],
-                'slot_type'    => $slot['slot_type'],
-                'slot_id'      => $slot['slot_id'],
+                'slot_type' => $slot['slot_type'],
+                'slot_id' => $slot['slot_id'],
                 'is_available' => is_null($slot['availability']) || $slot['availability'] > 0,
             ])->values();
 
@@ -691,8 +688,11 @@ class OrderController extends Controller
                 return $this->success(['customers' => []]);
             }
 
+            // Autocomplete "cliente" ricostruito dagli ordini esistenti: aggreghiamo
+            // per email e restituiamo l'ultima anagrafica registrata per quell'email.
             $user = Auth::user();
-            $query = Customer::query()
+            $query = Order::query()
+                ->whereNotNull('email')
                 ->where(function ($qq) use ($q) {
                     $qq->where('email', 'like', "%{$q}%")
                         ->orWhere('name', 'like', "%{$q}%")
@@ -700,30 +700,21 @@ class OrderController extends Controller
                         ->orWhere('phone', 'like', "%{$q}%");
                 });
 
-            // Filtriamo per partner (o scope company) per non esporre customer
-            // di altri partner all'operatore. I customer possono essere condivisi
-            // se lo stesso email compare su più partner: matchiamo anche via orders.
             if ($partnerId) {
-                $query->where(function ($qq) use ($partnerId) {
-                    $qq->where('partner_id', $partnerId)
-                        ->orWhereHas('orders', fn ($o) => $o->where('partner_id', $partnerId));
-                });
+                $query->where('partner_id', $partnerId);
             } elseif ($user->role === 'company') {
-                $query->where(function ($qq) use ($user) {
-                    $qq->where('company_id', $user->company_id)
-                        ->orWhereHas('orders.partner.products.companies', fn ($c) => $c->where('companies.id', $user->company_id));
-                });
+                $query->whereHas('partner', fn ($p) => $p->where('company_id', $user->company_id));
             } elseif (in_array($user->role, ['partner', 'admin'])) {
-                $query->where(function ($qq) use ($user) {
-                    $qq->where('partner_id', $user->partner_id)
-                        ->orWhereHas('orders', fn ($o) => $o->where('partner_id', $user->partner_id));
-                });
+                $query->where('partner_id', $user->partner_id);
             }
 
-            $customers = $query->orderBy('surname')->limit(15)->get([
-                'id', 'name', 'surname', 'email', 'phone', 'prefix_phone',
+            // Prendiamo l'ordine più recente per ciascuna email (ORDER BY id DESC + PHP dedup).
+            $orders = $query->orderByDesc('id')->limit(150)->get([
+                'id', 'email', 'name', 'surname', 'phone', 'prefix_phone',
                 'address', 'city', 'zip_code', 'fiscal_code',
             ]);
+
+            $customers = $orders->unique('email')->take(15)->values();
 
             return $this->success(['customers' => $customers]);
         } catch (\Exception $e) {
@@ -767,6 +758,7 @@ class OrderController extends Controller
             if (! $allowed) {
                 abort(403);
             }
+
             return;
         }
 
@@ -777,6 +769,7 @@ class OrderController extends Controller
             if ((int) $partner->id !== (int) $user->partner_id) {
                 abort(403);
             }
+
             return;
         }
 

@@ -48,12 +48,12 @@ class ProductSpecialScheduleController extends Controller
             ->exists();
 
         if ($overrides->isNotEmpty()) {
-            $html = $overrides->map(fn($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
+            $html = $overrides->map(fn ($s) => view('backoffice.products._special_slot_item', ['slot' => $s])->render())->join('');
 
             return response()->json([
-                'html'           => $html,
-                'is_override'    => true,
-                'is_preview'     => false,
+                'html' => $html,
+                'is_override' => true,
+                'is_preview' => false,
                 'has_exceptions' => $hasExceptions,
             ]);
         }
@@ -74,16 +74,16 @@ class ProductSpecialScheduleController extends Controller
             ->map(fn ($t) => substr($t, 0, 5))
             ->all();
 
-        $html = $templateSlots->map(fn($s) => view('backoffice.products._special_slot_item', [
-            'slot'       => $s,
-            'isPreview'  => true,
+        $html = $templateSlots->map(fn ($s) => view('backoffice.products._special_slot_item', [
+            'slot' => $s,
+            'isPreview' => true,
             'isDisabled' => in_array(substr($s->time, 0, 5), $blacklistTimes, true),
         ])->render())->join('');
 
         return response()->json([
-            'html'           => $html,
-            'is_override'    => false,
-            'is_preview'     => true,
+            'html' => $html,
+            'is_override' => false,
+            'is_preview' => true,
             'has_exceptions' => $hasExceptions,
         ]);
     }
@@ -114,9 +114,9 @@ class ProductSpecialScheduleController extends Controller
         }
 
         ProductSpecialSchedule::create([
-            'product_id'  => $product->id,
-            'date'        => $data['date'],
-            'time'        => $data['time'],
+            'product_id' => $product->id,
+            'date' => $data['date'],
+            'time' => $data['time'],
             'is_disabled' => true,
         ]);
 
@@ -136,8 +136,8 @@ class ProductSpecialScheduleController extends Controller
             ->with('prices')
             ->get();
 
-        $html = $variants->map(fn($v) => view('backoffice.products._special_variant_item', [
-            'variant'   => $v,
+        $html = $variants->map(fn ($v) => view('backoffice.products._special_variant_item', [
+            'variant' => $v,
             'isPreview' => true,
         ])->render())->join('');
 
@@ -195,26 +195,26 @@ class ProductSpecialScheduleController extends Controller
             foreach ($templateSlots as $tSlot) {
                 $newSlot = ProductSpecialSchedule::create([
                     'product_id' => $product->id,
-                    'date'       => $date,
-                    'time'       => $tSlot->time,
+                    'date' => $date,
+                    'time' => $tSlot->time,
                 ]);
 
                 $variantsMap = [];
                 foreach ($tSlot->variants->sortBy('sort_order') as $tVariant) {
                     $newVariant = ProductVariant::create([
-                        'product_id'          => $product->id,
+                        'product_id' => $product->id,
                         'special_schedule_id' => $newSlot->id,
-                        'label'               => $tVariant->label,
-                        'description'         => $tVariant->description,
-                        'max_quantity'        => $tVariant->max_quantity,
-                        'sort_order'          => $tVariant->sort_order,
+                        'label' => $tVariant->label,
+                        'description' => $tVariant->description,
+                        'max_quantity' => $tVariant->max_quantity,
+                        'sort_order' => $tVariant->sort_order,
                     ]);
 
                     $pricesMap = [];
                     foreach ($tVariant->prices as $price) {
                         $newPrice = $newVariant->prices()->create([
-                            'label'    => $price->label,
-                            'price'    => $price->price,
+                            'label' => $price->label,
+                            'price' => $price->price,
                             'vat_rate' => $price->vat_rate,
                         ]);
                         $pricesMap[] = ['template_id' => $price->id, 'id' => $newPrice->id];
@@ -222,14 +222,14 @@ class ProductSpecialScheduleController extends Controller
 
                     $variantsMap[] = [
                         'template_id' => $tVariant->id,
-                        'id'          => $newVariant->id,
-                        'prices'      => $pricesMap,
+                        'id' => $newVariant->id,
+                        'prices' => $pricesMap,
                     ];
                 }
 
                 $result[] = [
-                    'time'     => substr($newSlot->time, 0, 5),
-                    'id'       => $newSlot->id,
+                    'time' => substr($newSlot->time, 0, 5),
+                    'id' => $newSlot->id,
                     'variants' => $variantsMap,
                 ];
             }
@@ -244,9 +244,9 @@ class ProductSpecialScheduleController extends Controller
      */
     private function mapExistingSlotsResponse($slots): array
     {
-        return $slots->map(fn($s) => [
-            'time'     => substr($s->time, 0, 5),
-            'id'       => $s->id,
+        return $slots->map(fn ($s) => [
+            'time' => substr($s->time, 0, 5),
+            'id' => $s->id,
             'variants' => [],
         ])->values()->all();
     }
@@ -261,7 +261,7 @@ class ProductSpecialScheduleController extends Controller
         $dates = ProductSpecialSchedule::where('product_id', $product->id)
             ->distinct()
             ->pluck('date')
-            ->map(fn($d) => $d->format('Y-m-d'));
+            ->map(fn ($d) => $d->format('Y-m-d'));
 
         return response()->json(['dates' => $dates]);
     }
@@ -274,8 +274,8 @@ class ProductSpecialScheduleController extends Controller
         $this->authorizeAccess($product);
 
         $data = $request->validate([
-            'date'         => 'required|date_format:Y-m-d',
-            'time'         => 'required|date_format:H:i',
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
         ]);
 
         // Se esisteva un record blacklist per lo stesso (date, time), rimuovilo:
@@ -287,9 +287,9 @@ class ProductSpecialScheduleController extends Controller
             ->delete();
 
         $slot = ProductSpecialSchedule::create([
-            'product_id'   => $product->id,
-            'date'         => $data['date'],
-            'time'         => $data['time'],
+            'product_id' => $product->id,
+            'date' => $data['date'],
+            'time' => $data['time'],
         ]);
 
         return response()->json([
@@ -325,7 +325,7 @@ class ProductSpecialScheduleController extends Controller
         $slot->update(['availability' => $data['availability']]);
 
         return response()->json([
-            'id'           => $slot->id,
+            'id' => $slot->id,
             'availability' => $slot->availability,
         ]);
     }
@@ -343,7 +343,7 @@ class ProductSpecialScheduleController extends Controller
             ->with('prices')
             ->get();
 
-        $html = $variants->map(fn($v) => $this->renderVariantHtml($v))->join('');
+        $html = $variants->map(fn ($v) => $this->renderVariantHtml($v))->join('');
 
         return response()->json(['html' => $html]);
     }
@@ -357,30 +357,30 @@ class ProductSpecialScheduleController extends Controller
         $this->authorizeAccess($product);
 
         $data = $request->validate([
-            'label'             => 'required|string|max:255',
-            'description'       => 'nullable|string|max:500',
-            'max_quantity'      => 'nullable|integer|min:1',
-            'prices'            => 'required|array|min:1',
-            'prices.*.label'    => 'required|string|max:255',
-            'prices.*.price'    => 'required|numeric|min:0',
+            'label' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'max_quantity' => 'nullable|integer|min:1',
+            'prices' => 'required|array|min:1',
+            'prices.*.label' => 'required|string|max:255',
+            'prices.*.price' => 'required|numeric|min:0',
             'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
         ]);
 
         $maxOrder = ProductVariant::where('special_schedule_id', $slot->id)->max('sort_order') ?? 0;
 
         $variant = ProductVariant::create([
-            'product_id'          => $product->id,
+            'product_id' => $product->id,
             'special_schedule_id' => $slot->id,
-            'label'               => $data['label'],
-            'description'         => $data['description'] ?? null,
-            'max_quantity'        => $data['max_quantity'] ?? null,
-            'sort_order'          => $maxOrder + 1,
+            'label' => $data['label'],
+            'description' => $data['description'] ?? null,
+            'max_quantity' => $data['max_quantity'] ?? null,
+            'sort_order' => $maxOrder + 1,
         ]);
 
         foreach ($data['prices'] as $row) {
             $variant->prices()->create([
-                'label'    => $row['label'],
-                'price'    => $row['price'],
+                'label' => $row['label'],
+                'price' => $row['price'],
                 'vat_rate' => $row['vat_rate'],
             ]);
         }
@@ -398,19 +398,19 @@ class ProductSpecialScheduleController extends Controller
         $this->authorizeAccess($product);
 
         $data = $request->validate([
-            'label'             => 'required|string|max:255',
-            'description'       => 'nullable|string|max:500',
-            'max_quantity'      => 'nullable|integer|min:1',
-            'prices'            => 'required|array|min:1',
-            'prices.*.id'       => 'nullable|integer',
-            'prices.*.label'    => 'required|string|max:255',
-            'prices.*.price'    => 'required|numeric|min:0',
+            'label' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'max_quantity' => 'nullable|integer|min:1',
+            'prices' => 'required|array|min:1',
+            'prices.*.id' => 'nullable|integer',
+            'prices.*.label' => 'required|string|max:255',
+            'prices.*.price' => 'required|numeric|min:0',
             'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
         ]);
 
         $variant->update([
-            'label'        => $data['label'],
-            'description'  => $data['description'] ?? null,
+            'label' => $data['label'],
+            'description' => $data['description'] ?? null,
             'max_quantity' => $data['max_quantity'] ?? null,
         ]);
 
@@ -418,16 +418,16 @@ class ProductSpecialScheduleController extends Controller
         $variant->prices()->whereNotIn('id', $keptIds)->delete();
 
         foreach ($data['prices'] as $row) {
-            if (!empty($row['id'])) {
+            if (! empty($row['id'])) {
                 ProductVariantPrice::where('id', $row['id'])->update([
-                    'label'    => $row['label'],
-                    'price'    => $row['price'],
+                    'label' => $row['label'],
+                    'price' => $row['price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
             } else {
                 $variant->prices()->create([
-                    'label'    => $row['label'],
-                    'price'    => $row['price'],
+                    'label' => $row['label'],
+                    'price' => $row['price'],
                     'vat_rate' => $row['vat_rate'],
                 ]);
             }

@@ -24,11 +24,13 @@ class ProductAvailabilityController extends CrudController
                 ->orderBy('day_of_week')
                 ->orderBy('time')
                 ->get(['id', 'day_of_week', 'time']);
+
             return $this->success([
-                'response' => view('backoffice.products.slots', compact('product', 'slots'))->render()
+                'response' => view('backoffice.products.slots', compact('product', 'slots'))->render(),
             ]);
         } catch (\Exception $e) {
             dd($e);
+
             return $this->exception($e);
         }
     }
@@ -41,21 +43,21 @@ class ProductAvailabilityController extends CrudController
         try {
             $request->validate([
                 'day_of_week' => 'required|integer|min:1|max:7',
-                'time'        => 'required|date_format:H:i',
+                'time' => 'required|date_format:H:i',
             ]);
 
             $product = Product::findOrFail($productId);
 
             $slot = ProductAvailability::create([
-                'product_id'  => $product->id,
+                'product_id' => $product->id,
                 'day_of_week' => $request->integer('day_of_week'),
-                'time'        => $request->input('time'),
+                'time' => $request->input('time'),
             ]);
 
             return $this->success([
-                'id'          => $slot->id,
+                'id' => $slot->id,
                 'day_of_week' => $slot->day_of_week,
-                'time'        => $slot->time,
+                'time' => $slot->time,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -79,9 +81,9 @@ class ProductAvailabilityController extends CrudController
             $slot->update(['time' => $request->input('time')]);
 
             return $this->success([
-                'id'          => $slot->id,
+                'id' => $slot->id,
                 'day_of_week' => $slot->day_of_week,
-                'time'        => $slot->time,
+                'time' => $slot->time,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);

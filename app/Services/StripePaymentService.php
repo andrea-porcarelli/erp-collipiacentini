@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Cart;
-use App\Models\Customer;
 use App\Models\Order;
 use Stripe\Checkout\Session as CheckoutSession;
 use Stripe\PaymentIntent;
@@ -11,7 +10,6 @@ use Stripe\PaymentMethod;
 use Stripe\Refund;
 use Stripe\Stripe;
 use Stripe\Webhook;
-use Stripe\Exception\SignatureVerificationException;
 
 class StripePaymentService
 {
@@ -23,9 +21,9 @@ class StripePaymentService
     /**
      * Crea un PaymentIntent su Stripe
      */
-    public function createPaymentIntent(Cart $cart, ?Customer $customer = null): PaymentIntent
+    public function createPaymentIntent(Cart $cart): PaymentIntent
     {
-        $amount = (int) round($cart->total * 100); // Stripe vuole i centesimi
+        $amount = (int) round($cart->total * 100);
 
         $params = [
             'amount' => $amount,
@@ -41,9 +39,8 @@ class StripePaymentService
             ],
         ];
 
-        if ($customer && $customer->email) {
-            $params['receipt_email'] = $customer->email;
-            $params['metadata']['customer_id'] = $customer->id;
+        if ($cart->email) {
+            $params['receipt_email'] = $cart->email;
         }
 
         return PaymentIntent::create($params);
@@ -73,6 +70,7 @@ class StripePaymentService
     public function isPaymentSuccessful(string $paymentIntentId): bool
     {
         $paymentIntent = $this->retrievePaymentIntent($paymentIntentId);
+
         return $paymentIntent->status === 'succeeded';
     }
 
@@ -93,7 +91,7 @@ class StripePaymentService
      */
     public function createPaymentLinkForOrder(Order $order): CheckoutSession
     {
-        $order->loadMissing(['orderProducts.product', 'orderProducts.items.variant', 'customer']);
+        $order->loadMissing(['orderProducts.product', 'orderProducts.items.variant']);
 
         $lineItems = [];
         foreach ($order->orderProducts as $orderProduct) {
@@ -133,8 +131,8 @@ class StripePaymentService
             ],
         ];
 
-        if ($order->customer?->email) {
-            $params['customer_email'] = $order->customer->email;
+        if ($order->email) {
+            $params['customer_email'] = $order->email;
         }
 
         return CheckoutSession::create($params);

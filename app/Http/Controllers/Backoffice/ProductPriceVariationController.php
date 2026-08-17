@@ -13,16 +13,16 @@ class ProductPriceVariationController extends Controller
     private function serialize(ProductPriceVariation $v): array
     {
         return [
-            'id'              => $v->id,
-            'date_from'       => $v->date_from->locale('it')->isoFormat('D MMMM YYYY'),
-            'date_from_iso'   => $v->date_from->format('Y-m-d'),
-            'date_to'         => $v->date_to->locale('it')->isoFormat('D MMMM YYYY'),
-            'date_to_iso'     => $v->date_to->format('Y-m-d'),
-            'direction'       => $v->direction,
+            'id' => $v->id,
+            'date_from' => $v->date_from->locale('it')->isoFormat('D MMMM YYYY'),
+            'date_from_iso' => $v->date_from->format('Y-m-d'),
+            'date_to' => $v->date_to->locale('it')->isoFormat('D MMMM YYYY'),
+            'date_to_iso' => $v->date_to->format('Y-m-d'),
+            'direction' => $v->direction,
             'direction_label' => $v->direction_label,
-            'value'           => $v->value,
-            'unit'            => $v->unit,
-            'unit_label'      => $v->unit_label,
+            'value' => $v->value,
+            'unit' => $v->unit,
+            'unit_label' => $v->unit_label,
         ];
     }
 
@@ -31,7 +31,7 @@ class ProductPriceVariationController extends Controller
         $variations = $product->priceVariations()
             ->orderBy('date_from')
             ->get()
-            ->map(fn($v) => $this->serialize($v));
+            ->map(fn ($v) => $this->serialize($v));
 
         return response()->json(['data' => $variations]);
     }
@@ -39,7 +39,7 @@ class ProductPriceVariationController extends Controller
     private function checkOverlap(Product $product, string $dateFrom, string $dateTo, ?int $excludeId = null): bool
     {
         return $product->priceVariations()
-            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))
             ->where('date_from', '<=', $dateTo)
             ->where('date_to', '>=', $dateFrom)
             ->exists();
@@ -49,10 +49,10 @@ class ProductPriceVariationController extends Controller
     {
         $data = $request->validate([
             'date_from' => 'required|date',
-            'date_to'   => 'required|date|after_or_equal:date_from',
+            'date_to' => 'required|date|after_or_equal:date_from',
             'direction' => 'required|in:increment,decrement',
-            'value'     => 'required|numeric|min:0',
-            'unit'      => 'required|in:euro,percent',
+            'value' => 'required|numeric|min:0',
+            'unit' => 'required|in:euro,percent',
         ]);
 
         if ($this->checkOverlap($product, $data['date_from'], $data['date_to'])) {
@@ -72,10 +72,10 @@ class ProductPriceVariationController extends Controller
 
         $data = $request->validate([
             'date_from' => 'required|date',
-            'date_to'   => 'required|date|after_or_equal:date_from',
+            'date_to' => 'required|date|after_or_equal:date_from',
             'direction' => 'required|in:increment,decrement',
-            'value'     => 'required|numeric|min:0',
-            'unit'      => 'required|in:euro,percent',
+            'value' => 'required|numeric|min:0',
+            'unit' => 'required|in:euro,percent',
         ]);
 
         if ($this->checkOverlap($product, $data['date_from'], $data['date_to'], $variation->id)) {

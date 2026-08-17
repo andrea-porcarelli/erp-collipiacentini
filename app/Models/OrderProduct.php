@@ -22,8 +22,8 @@ class OrderProduct extends LogsModel
 
     protected $casts = [
         'booking_date' => 'date',
-        'price'        => 'decimal:2',
-        'total'        => 'decimal:2',
+        'price' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

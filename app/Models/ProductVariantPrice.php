@@ -25,7 +25,7 @@ class ProductVariantPrice extends LogsModel
     ];
 
     protected $casts = [
-        'price'    => 'decimal:2',
+        'price' => 'decimal:2',
         'vat_rate' => 'decimal:2',
     ];
 

@@ -8,7 +8,9 @@ use Livewire\Component;
 class ProductGallery extends Component
 {
     public Product $product;
+
     public $selectedImage = null;
+
     public $images = [];
 
     public function mount(Product $product)

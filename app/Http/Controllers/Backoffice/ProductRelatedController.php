@@ -13,6 +13,7 @@ class ProductRelatedController extends CrudController
     const MAX_RELATED = 5;
 
     public ProductRelatedInterface $interface;
+
     public string $path = 'product-related';
 
     public function __construct(ProductRelatedInterface $interface)
@@ -26,11 +27,11 @@ class ProductRelatedController extends CrudController
             $items = $this->interface->filters(['product_id' => $productId])
                 ->with('relatedProduct')
                 ->get()
-                ->map(fn($r) => [
-                    'id'                  => $r->id,
-                    'related_product_id'  => $r->related_product_id,
-                    'label'               => $r->relatedProduct?->label,
-                    'product_code'        => $r->relatedProduct?->product_code,
+                ->map(fn ($r) => [
+                    'id' => $r->id,
+                    'related_product_id' => $r->related_product_id,
+                    'label' => $r->relatedProduct?->label,
+                    'product_code' => $r->relatedProduct?->product_code,
                 ]);
 
             return $this->success(['data' => $items]);
@@ -54,7 +55,7 @@ class ProductRelatedController extends CrudController
 
             $count = $this->interface->filters(['product_id' => $productId])->count();
             if ($count >= self::MAX_RELATED) {
-                return $this->error(['message' => 'Puoi collegare al massimo ' . self::MAX_RELATED . ' prodotti correlati.']);
+                return $this->error(['message' => 'Puoi collegare al massimo '.self::MAX_RELATED.' prodotti correlati.']);
             }
 
             $existing = $this->interface->filters(['product_id' => $productId])
@@ -66,17 +67,17 @@ class ProductRelatedController extends CrudController
             }
 
             $related = $this->interface->store([
-                'product_id'         => $productId,
+                'product_id' => $productId,
                 'related_product_id' => $relatedProductId,
             ]);
 
             $related->load('relatedProduct');
 
             return $this->success([
-                'id'                  => $related->id,
-                'related_product_id'  => $related->related_product_id,
-                'label'               => $related->relatedProduct?->label,
-                'product_code'        => $related->relatedProduct?->product_code,
+                'id' => $related->id,
+                'related_product_id' => $related->related_product_id,
+                'label' => $related->relatedProduct?->label,
+                'product_code' => $related->relatedProduct?->product_code,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -87,13 +88,13 @@ class ProductRelatedController extends CrudController
     {
         try {
             $request->validate([
-                'related_ids'   => 'array|max:5',
+                'related_ids' => 'array|max:5',
                 'related_ids.*' => 'nullable|integer|exists:products,id',
             ]);
 
             $ids = collect($request->input('related_ids', []))
-                ->filter(fn($id) => !is_null($id) && $id !== '' && (int) $id !== $productId)
-                ->map(fn($id) => (int) $id)
+                ->filter(fn ($id) => ! is_null($id) && $id !== '' && (int) $id !== $productId)
+                ->map(fn ($id) => (int) $id)
                 ->unique()
                 ->values();
 
@@ -101,7 +102,7 @@ class ProductRelatedController extends CrudController
 
             foreach ($ids as $relatedId) {
                 $this->interface->store([
-                    'product_id'         => $productId,
+                    'product_id' => $productId,
                     'related_product_id' => $relatedId,
                 ]);
             }
@@ -116,6 +117,7 @@ class ProductRelatedController extends CrudController
     {
         try {
             $this->interface->remove($relatedId);
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);
@@ -138,9 +140,9 @@ class ProductRelatedController extends CrudController
                 })
                 ->limit(10)
                 ->get()
-                ->map(fn($p) => [
-                    'id'           => $p->id,
-                    'label'        => $p->label,
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'label' => $p->label,
                     'product_code' => $p->product_code,
                 ]);
 

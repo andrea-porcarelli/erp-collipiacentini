@@ -10,7 +10,6 @@ class LogsModel extends Model
 {
     use LogsActivity;
 
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();

@@ -32,7 +32,7 @@
     :support-email="$supportEmail"
 >
     <x-mail.card status="success" title="Prenotazione confermata">
-        <p style="margin:0 0 12px 0;">Ciao {{ $order->customer->name }},</p>
+        <p style="margin:0 0 12px 0;">Ciao {{ $order->name }},</p>
         <p style="margin:0 0 20px 0;">
             la tua prenotazione è confermata: trovi qui sotto il riepilogo e in allegato il PDF da presentare all'ingresso.
         </p>
@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <x-mail.data-cell label="Codice ordine" :value="$order->order_number" />
-                <x-mail.data-cell label="Nome" :value="$order->customer->full_name" />
+                <x-mail.data-cell label="Nome" :value="$order->full_name" />
             </tr>
         </x-mail.data-grid>
     </x-mail.card>

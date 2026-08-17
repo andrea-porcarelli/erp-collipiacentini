@@ -6,7 +6,6 @@ use App\Facades\Utils;
 
 trait FormatDates
 {
-
     public function getAttribute($key)
     {
         $value = parent::getAttribute($key);

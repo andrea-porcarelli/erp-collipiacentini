@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasMedia
 {
-    public function images() : MorphMany
+    public function images(): MorphMany
     {
         return $this->morphMany(Media::class, 'entity')
             ->where('media_type', 'images');
     }
 
-    public function preview() : string
+    public function preview(): string
     {
         $first = $this->morphMany(Media::class, 'entity')
             ->where('media_type', 'images')
@@ -22,10 +22,11 @@ trait HasMedia
         if (isset($first->filename)) {
             return $first->url;
         }
+
         return asset('storage/not-found.png');
     }
 
-    public function store_images($images, $element) : void
+    public function store_images($images, $element): void
     {
         if (isset($images)) {
             foreach ($images as $image) {

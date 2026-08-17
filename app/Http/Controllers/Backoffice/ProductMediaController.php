@@ -39,25 +39,25 @@ class ProductMediaController extends Controller
             return response()->json(['message' => 'Hai raggiunto il limite massimo di 5 immagini.'], 422);
         }
 
-        $file     = $request->file('image');
-        $path     = $file->store("products/{$product->id}", 'public');
+        $file = $request->file('image');
+        $path = $file->store("products/{$product->id}", 'public');
         $maxOrder = $product->gallery()->max('sort_order') ?? -1;
 
         $media = Media::create([
             'mediable_type' => Product::class,
-            'mediable_id'   => $product->id,
-            'media_type'    => 'gallery',
-            'file_name'     => $file->getClientOriginalName(),
-            'file_path'     => $path,
-            'file_type'     => $file->getMimeType(),
-            'file_size'     => $file->getSize(),
-            'sort_order'    => $maxOrder + 1,
+            'mediable_id' => $product->id,
+            'media_type' => 'gallery',
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_type' => $file->getMimeType(),
+            'file_size' => $file->getSize(),
+            'sort_order' => $maxOrder + 1,
         ]);
 
         return response()->json([
-            'id'        => $media->id,
+            'id' => $media->id,
             'file_name' => $media->file_name,
-            'url'       => asset('storage/' . $media->file_path),
+            'url' => asset('storage/'.$media->file_path),
         ]);
     }
 
@@ -69,7 +69,7 @@ class ProductMediaController extends Controller
         $this->authorizeAccess($product);
 
         $request->validate([
-            'ordered_ids'   => 'required|array',
+            'ordered_ids' => 'required|array',
             'ordered_ids.*' => 'integer',
         ]);
 
@@ -104,7 +104,7 @@ class ProductMediaController extends Controller
     {
         $this->authorizeAccess($product);
 
-        $lang  = Language::findOrFail($request->validate(['language_id' => 'required|integer|exists:languages,id'])['language_id']);
+        $lang = Language::findOrFail($request->validate(['language_id' => 'required|integer|exists:languages,id'])['language_id']);
         $value = $product->contentField('long_description', $lang->iso_code) ?? '';
 
         return response()->json(['long_description' => $value]);

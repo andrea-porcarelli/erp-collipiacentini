@@ -7,17 +7,19 @@ use Illuminate\Support\Facades\Auth;
 
 class StorePartnerRequest extends FormRequest
 {
-    public function authorize() : bool {
+    public function authorize(): bool
+    {
         return Auth::check();
     }
 
-    public function rules() : array {
+    public function rules(): array
+    {
         return [
             'partner_name' => ['required', 'unique:partners,partner_name'],
         ];
     }
 
-    public function messages() : array
+    public function messages(): array
     {
         return [
             'partner_name.required' => 'Il nome del partner è obbligatorio',

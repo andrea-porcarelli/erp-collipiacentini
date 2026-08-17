@@ -1,10 +1,8 @@
 <?php
+
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Mail\Mailables\Content;
 
 class Language extends LogsModel
 {
@@ -14,8 +12,8 @@ class Language extends LogsModel
         'iso_code',
     ];
 
-    public function contents() : HasMany {
+    public function contents(): HasMany
+    {
         return $this->hasMany(LanguageContent::class);
     }
-
 }

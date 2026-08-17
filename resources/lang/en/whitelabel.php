@@ -3,10 +3,10 @@
 return [
     // Header
     'menu' => [
-        'contacts'           => 'Contacts',
-        'privacy_policy'     => 'Privacy Policy',
-        'cookie_policy'      => 'Cookie Policy',
-        'terms_conditions'   => 'Terms and Conditions',
+        'contacts' => 'Contacts',
+        'privacy_policy' => 'Privacy Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'terms_conditions' => 'Terms and Conditions',
     ],
     'languages' => [
         'italian' => 'Italian',
@@ -26,9 +26,9 @@ return [
     // Products
     'products' => [
         'no_availability' => 'No availability found',
-        'free'            => 'FREE',
-        'buy'             => 'Buy',
-        'book'            => 'Book',
+        'free' => 'FREE',
+        'buy' => 'Buy',
+        'book' => 'Book',
     ],
 
     // Filters
@@ -46,10 +46,10 @@ return [
         'select_date' => 'Select date',
         'castle_title' => 'The castle',
         'useful_links_title' => 'Useful links',
-        'contacts'           => 'Contacts',
-        'privacy_policy'     => 'Privacy Policy',
-        'cookie_policy'      => 'Cookie Policy',
-        'terms_conditions'   => 'Terms and Conditions',
+        'contacts' => 'Contacts',
+        'privacy_policy' => 'Privacy Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'terms_conditions' => 'Terms and Conditions',
     ],
 
     // Generic page

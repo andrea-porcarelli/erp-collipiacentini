@@ -93,9 +93,9 @@
         <div class="col-12 col-md-6 col-xl">
             <x-card>
                 <div class="stat-label">CLIENTE</div>
-                <div class="stat-value">{{ $order->customer->name }} {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($order->customer->surname ?? '', 0, 1)) }}.</div>
-                @if($order->customer->phone)
-                    <div class="stat-sub">{{ trim(($order->customer->prefix_phone ?? '') . ' ' . $order->customer->phone) }}</div>
+                <div class="stat-value">{{ $order->name }} {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($order->surname ?? '', 0, 1)) }}.</div>
+                @if($order->phone)
+                    <div class="stat-sub">{{ trim(($order->prefix_phone ?? '') . ' ' . $order->phone) }}</div>
                 @endif
             </x-card>
         </div>
@@ -336,28 +336,30 @@
 
                 <div class="customer-block">
                     <div class="detail-label">Nome</div>
-                    <div class="detail-value"><i class="fa-regular fa-user"></i> {{ $order->customer->full_name }}</div>
-                    <a href="{{ route('customers.show', $order->customer->id) }}" class="detail-link">Apri scheda cliente</a>
+                    <div class="detail-value"><i class="fa-regular fa-user"></i> {{ $order->full_name ?: '—' }}</div>
+                    @if($order->email)
+                        <a href="{{ route('orders.index') }}?filters[customer]={{ urlencode($order->email) }}" class="detail-link">Altri ordini con questa email</a>
+                    @endif
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Email</div>
-                    <div class="detail-value"><i class="fa-regular fa-envelope"></i> {{ $order->customer->email ?: '—' }}</div>
+                    <div class="detail-value"><i class="fa-regular fa-envelope"></i> {{ $order->email ?: '—' }}</div>
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Telefono</div>
-                    <div class="detail-value"><i class="fa-regular fa-phone"></i> {{ $order->customer->phone ? trim(($order->customer->prefix_phone ?? '') . ' ' . $order->customer->phone) : '—' }}</div>
+                    <div class="detail-value"><i class="fa-regular fa-phone"></i> {{ $order->phone ? trim(($order->prefix_phone ?? '') . ' ' . $order->phone) : '—' }}</div>
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Indirizzo</div>
-                    <div class="detail-value"><i class="fa-regular fa-location-dot"></i> {{ $order->customer->address ? $order->customer->full_address : '—' }}</div>
+                    <div class="detail-value"><i class="fa-regular fa-location-dot"></i> {{ $order->address ? $order->full_address : '—' }}</div>
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Paese</div>
-                    <div class="detail-value"><i class="fa-regular fa-globe"></i> {{ $order->customer->country?->name ?? '—' }}</div>
+                    <div class="detail-value"><i class="fa-regular fa-globe"></i> {{ $order->country?->name ?? '—' }}</div>
                 </div>
                 <div class="customer-block mt-spacing-l">
                     <div class="detail-label">Codice fiscale</div>
-                    <div class="detail-value"><i class="fa-regular fa-id-card"></i> {{ $order->customer->fiscal_code ?: '—' }}</div>
+                    <div class="detail-value"><i class="fa-regular fa-id-card"></i> {{ $order->fiscal_code ?: '—' }}</div>
                 </div>
             </x-card>
 

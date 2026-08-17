@@ -13,13 +13,13 @@ enum CustomerStatus: string
     public static function statuses(): array
     {
         return collect(self::cases())
-            ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
             ->toArray();
     }
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BOOKED => __('orders.customer_status.booked'),
             self::CONFIRMED => __('orders.customer_status.confirmed'),
             self::COMPLETED => __('orders.customer_status.completed'),
@@ -30,7 +30,7 @@ enum CustomerStatus: string
 
     public function status(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BOOKED => 'Warning',
             self::CONFIRMED => 'Success',
             self::COMPLETED => 'Success',
@@ -41,7 +41,7 @@ enum CustomerStatus: string
 
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BOOKED => 'calendar-check',
             self::CONFIRMED => 'check',
             self::COMPLETED => 'flag-checkered',

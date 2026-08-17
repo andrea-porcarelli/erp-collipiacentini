@@ -18,7 +18,7 @@ class ProductController extends Controller
         $product = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
             ->find($numericId);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'error' => 'not_found',
                 'message' => 'Prodotto non trovato',
@@ -40,7 +40,7 @@ class ProductController extends Controller
             ], 422);
         }
 
-        $numericIds = array_map(fn($id) => $this->extractNumericId($id), $ids);
+        $numericIds = array_map(fn ($id) => $this->extractNumericId($id), $ids);
 
         $products = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
             ->whereIn('id', $numericIds)
@@ -49,7 +49,7 @@ class ProductController extends Controller
         $foundIds = $products->pluck('id')->toArray();
         $notFound = [];
         foreach ($ids as $i => $originalId) {
-            if (!in_array($numericIds[$i], $foundIds)) {
+            if (! in_array($numericIds[$i], $foundIds)) {
                 $notFound[] = $originalId;
             }
         }

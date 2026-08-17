@@ -110,7 +110,7 @@ class TokensSync extends Command
             $vars = [];
             if (preg_match_all('/--([a-zA-Z0-9-]+)\s*:\s*([^;]+);/', $body, $declarations, PREG_SET_ORDER)) {
                 foreach ($declarations as $declaration) {
-                    $vars['--' . $declaration[1]] = trim($declaration[2]);
+                    $vars['--'.$declaration[1]] = trim($declaration[2]);
                 }
             }
 
@@ -167,16 +167,16 @@ class TokensSync extends Command
             $tokenEntries = '';
             foreach ($data['tokens'] as $name => $value) {
                 $key = ltrim($name, '-');
-                $tokenEntries .= "                " . var_export($key, true) . ' => ' . var_export($value, true) . ",\n";
+                $tokenEntries .= '                '.var_export($key, true).' => '.var_export($value, true).",\n";
             }
-            $brandsBlock .= "        " . var_export($slug, true) . " => [\n";
-            $brandsBlock .= "            'meta' => " . var_export($data['meta'], true) . ",\n";
+            $brandsBlock .= '        '.var_export($slug, true)." => [\n";
+            $brandsBlock .= "            'meta' => ".var_export($data['meta'], true).",\n";
             $brandsBlock .= "            'tokens' => [\n{$tokenEntries}            ],\n";
             $brandsBlock .= "        ],\n";
         }
 
         $generatedAt = date('Y-m-d H:i:s');
-        $sourceRel = str_replace(base_path() . DIRECTORY_SEPARATOR, '', $sourcePath);
+        $sourceRel = str_replace(base_path().DIRECTORY_SEPARATOR, '', $sourcePath);
 
         return <<<PHP
 <?php

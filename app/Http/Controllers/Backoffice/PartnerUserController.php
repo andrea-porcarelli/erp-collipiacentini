@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 class PartnerUserController extends CrudController
 {
     public UserInterface $interface;
+
     public string $path = 'users';
 
     public function __construct(UserInterface $interface)
@@ -22,33 +23,33 @@ class PartnerUserController extends CrudController
     {
         try {
             $request->validate([
-                'name'      => 'required|string|max:255',
-                'email'     => 'required|email|unique:users,email',
-                'password'  => 'required|string|min:8',
-                'role'      => 'required|string|' . Rule::in(['partner', 'admin']),
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8',
+                'role' => 'required|string|'.Rule::in(['partner', 'admin']),
             ], [
-                'name.required'     => 'Il nome è obbligatorio',
-                'email.required'    => 'L\'email è obbligatoria',
-                'email.email'       => 'Inserisci un indirizzo email valido',
-                'email.unique'      => 'Questa email è già in uso',
+                'name.required' => 'Il nome è obbligatorio',
+                'email.required' => 'L\'email è obbligatoria',
+                'email.email' => 'Inserisci un indirizzo email valido',
+                'email.unique' => 'Questa email è già in uso',
                 'password.required' => 'La password è obbligatoria',
-                'password.min'      => 'La password deve avere almeno 8 caratteri',
-                'role.required'     => 'Il ruolo è obbligatorio',
+                'password.min' => 'La password deve avere almeno 8 caratteri',
+                'role.required' => 'Il ruolo è obbligatorio',
             ]);
 
             $user = $this->interface->store([
-                'name'       => $request->input('name'),
-                'email'      => $request->input('email'),
-                'password'   => $request->input('password'),
-                'role'       => $request->input('role'),
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => $request->input('password'),
+                'role' => $request->input('role'),
                 'partner_id' => $partnerId,
             ]);
 
             return $this->success([
-                'id'    => $user->id,
-                'name'  => $user->name,
+                'id' => $user->id,
+                'name' => $user->name,
                 'email' => $user->email,
-                'role'  => $user->role,
+                'role' => $user->role,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -59,21 +60,21 @@ class PartnerUserController extends CrudController
     {
         try {
             $request->validate([
-                'name'     => 'required|string|max:255',
-                'email'    => 'required|email|unique:users,email,' . $userId,
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,'.$userId,
                 'password' => 'nullable|string|min:8',
             ], [
-                'name.required'  => 'Il nome è obbligatorio',
+                'name.required' => 'Il nome è obbligatorio',
                 'email.required' => 'L\'email è obbligatoria',
-                'email.email'    => 'Inserisci un indirizzo email valido',
-                'email.unique'   => 'Questa email è già in uso',
-                'password.min'   => 'La password deve avere almeno 8 caratteri',
+                'email.email' => 'Inserisci un indirizzo email valido',
+                'email.unique' => 'Questa email è già in uso',
+                'password.min' => 'La password deve avere almeno 8 caratteri',
             ]);
 
             $user = $this->interface->find($userId);
 
             $data = [
-                'name'  => $request->input('name'),
+                'name' => $request->input('name'),
                 'email' => $request->input('email'),
             ];
 
@@ -93,6 +94,7 @@ class PartnerUserController extends CrudController
     {
         try {
             $this->interface->remove($userId);
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e);

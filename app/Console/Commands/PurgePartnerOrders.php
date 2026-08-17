@@ -37,15 +37,15 @@ class PurgePartnerOrders extends Command
         $orderIds = $orders->pluck('id');
 
         $stats = [
-            'orders'             => $orderIds->count(),
-            'order_products'     => OrderProduct::whereIn('order_id', $orderIds)->count(),
+            'orders' => $orderIds->count(),
+            'order_products' => OrderProduct::whereIn('order_id', $orderIds)->count(),
             'order_product_items' => DB::table('order_product_items')
                 ->whereIn('order_product_id', OrderProduct::whereIn('order_id', $orderIds)->pluck('id'))
                 ->count(),
-            'participants'       => DB::table('order_participants')->whereIn('order_id', $orderIds)->count(),
-            'order_logs'         => DB::table('order_logs')->whereIn('order_id', $orderIds)->count(),
-            'customer_consents'  => DB::table('customer_consents')->whereIn('order_id', $orderIds)->count(),
-            'amount_total'       => (float) Order::where('partner_id', $partnerId)->sum('amount'),
+            'participants' => DB::table('order_participants')->whereIn('order_id', $orderIds)->count(),
+            'order_logs' => DB::table('order_logs')->whereIn('order_id', $orderIds)->count(),
+            'customer_consents' => DB::table('customer_consents')->whereIn('order_id', $orderIds)->count(),
+            'amount_total' => (float) Order::where('partner_id', $partnerId)->sum('amount'),
         ];
 
         if ($includeCarts) {
@@ -62,7 +62,7 @@ class PurgePartnerOrders extends Command
             collect($stats)->map(fn ($v, $k) => [
                 $k,
                 $k === 'amount_total'
-                    ? number_format($v, 2, ',', '.') . ' €'
+                    ? number_format($v, 2, ',', '.').' €'
                     : number_format($v, 0, ',', '.'),
             ])->values()->all(),
         );
@@ -106,7 +106,7 @@ class PurgePartnerOrders extends Command
         });
 
         $this->info("Eliminati: {$deleted['orders']} ordini, {$deleted['order_products']} order_products"
-            . ($includeCarts ? ", {$deleted['carts']} carrelli" : '') . '.');
+            .($includeCarts ? ", {$deleted['carts']} carrelli" : '').'.');
 
         return self::SUCCESS;
     }

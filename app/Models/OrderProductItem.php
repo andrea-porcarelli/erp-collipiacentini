@@ -21,13 +21,13 @@ class OrderProductItem extends LogsModel
     ];
 
     protected $casts = [
-        'unit_price'                            => 'decimal:2',
-        'partner_commission_presale_low'        => 'decimal:2',
-        'partner_commission_presale_high'       => 'decimal:2',
-        'partner_commission_presale_threshold'  => 'decimal:2',
-        'partner_commission_miticko_fixed'      => 'decimal:2',
-        'partner_commission_miticko_variable'   => 'decimal:2',
-        'partner_commission_payment'            => 'decimal:2',
+        'unit_price' => 'decimal:2',
+        'partner_commission_presale_low' => 'decimal:2',
+        'partner_commission_presale_high' => 'decimal:2',
+        'partner_commission_presale_threshold' => 'decimal:2',
+        'partner_commission_miticko_fixed' => 'decimal:2',
+        'partner_commission_miticko_variable' => 'decimal:2',
+        'partner_commission_payment' => 'decimal:2',
     ];
 
     public function orderProduct(): BelongsTo

@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers\Backoffice;
 
-use App\Enums\OrderStatus;
-use App\Facades\Utils;
 use App\Http\Controllers\Backoffice\Requests\StorePartnerRequest;
-use App\Http\Controllers\Controller;
 use App\Interfaces\PartnerInterface;
 use App\Models\Language;
 use App\Models\Media;
@@ -13,12 +10,12 @@ use App\Models\Partner;
 use App\Models\PartnerBilling;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PartnerController extends CrudController
@@ -26,6 +23,7 @@ class PartnerController extends CrudController
     use AuthorizesRequests, ValidatesRequests;
 
     public PartnerInterface $interface;
+
     public string $path;
 
     /**
@@ -34,12 +32,12 @@ class PartnerController extends CrudController
      */
     private const TRANSLATABLE_FIELDS = [
         'description_short' => ['restricted' => false],
-        'hero_title'        => ['restricted' => false],
-        'hero_subtitle'     => ['restricted' => false],
-        'contacts_content'  => ['restricted' => false],
-        'privacy_policy'    => ['restricted' => true],
-        'cookie_policy'     => ['restricted' => true],
-        'terms_conditions'  => ['restricted' => true],
+        'hero_title' => ['restricted' => false],
+        'hero_subtitle' => ['restricted' => false],
+        'contacts_content' => ['restricted' => false],
+        'privacy_policy' => ['restricted' => true],
+        'cookie_policy' => ['restricted' => true],
+        'terms_conditions' => ['restricted' => true],
     ];
 
     public function __construct(PartnerInterface $interface)
@@ -50,7 +48,7 @@ class PartnerController extends CrudController
 
     public function index(): View
     {
-        return view('backoffice.' . $this->path . '.index')
+        return view('backoffice.'.$this->path.'.index')
             ->with('path', $this->path);
     }
 
@@ -60,7 +58,7 @@ class PartnerController extends CrudController
         $model->loadMissing('billing', 'logo');
         $hasOrders = $model->orders()->exists();
 
-        return view('backoffice.' . $this->path . '.show', compact('model', 'hasOrders'))
+        return view('backoffice.'.$this->path.'.show', compact('model', 'hasOrders'))
             ->with('path', $this->path);
     }
 
@@ -91,18 +89,18 @@ class PartnerController extends CrudController
 
         $media = Media::create([
             'mediable_type' => Partner::class,
-            'mediable_id'   => $partner->id,
-            'media_type'    => 'logo',
-            'file_name'     => $file->getClientOriginalName(),
-            'file_path'     => $path,
-            'file_type'     => $file->getMimeType(),
-            'file_size'     => $file->getSize(),
+            'mediable_id' => $partner->id,
+            'media_type' => 'logo',
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_type' => $file->getMimeType(),
+            'file_size' => $file->getSize(),
         ]);
 
         return response()->json([
-            'id'        => $media->id,
+            'id' => $media->id,
             'file_name' => $media->file_name,
-            'url'       => asset('storage/' . $media->file_path),
+            'url' => asset('storage/'.$media->file_path),
         ]);
     }
 
@@ -126,7 +124,7 @@ class PartnerController extends CrudController
             'is_active' => 0,
         ]);
 
-        return $this->success(['redirect' => route($this->path . '.show', $partner->id)]);
+        return $this->success(['redirect' => route($this->path.'.show', $partner->id)]);
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -139,12 +137,12 @@ class PartnerController extends CrudController
                 'sale' => $this->updateSale($partner, $request),
                 'contatti' => $this->updateContatti($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
-                    'commission_presale_low'       => $request->input('commission_presale_low'),
-                    'commission_presale_high'      => $request->input('commission_presale_high'),
+                    'commission_presale_low' => $request->input('commission_presale_low'),
+                    'commission_presale_high' => $request->input('commission_presale_high'),
                     'commission_presale_threshold' => $request->input('commission_presale_threshold'),
-                    'commission_miticko_fixed'     => $request->input('commission_miticko_fixed'),
-                    'commission_miticko_variable'  => $request->input('commission_miticko_variable'),
-                    'commission_payment'           => $request->input('commission_payment'),
+                    'commission_miticko_fixed' => $request->input('commission_miticko_fixed'),
+                    'commission_miticko_variable' => $request->input('commission_miticko_variable'),
+                    'commission_payment' => $request->input('commission_payment'),
                 ]),
                 'billing' => PartnerBilling::updateOrCreate(
                     ['partner_id' => $partner->id],
@@ -177,7 +175,7 @@ class PartnerController extends CrudController
         $this->interface->edit($partner, [
             'partner_name' => $request->input('partner_name'),
             'partner_code' => $hasOrders ? $partner->partner_code : $newCode,
-            'is_active'    => (int) $request->input('is_active'),
+            'is_active' => (int) $request->input('is_active'),
         ]);
     }
 
@@ -188,8 +186,8 @@ class PartnerController extends CrudController
     private function updateContatti(Partner $partner, Request $request): void
     {
         $this->interface->edit($partner, [
-            'email_notify'      => $request->input('email_notify'),
-            'phone_number'      => $request->input('phone_number'),
+            'email_notify' => $request->input('email_notify'),
+            'phone_number' => $request->input('phone_number'),
             'structure_address' => $request->input('structure_address'),
         ]);
 
@@ -213,7 +211,7 @@ class PartnerController extends CrudController
         $this->interface->edit($partner, [
             'sale_method' => $request->input('sale_method'),
             'domain_name' => $request->input('domain_name') ?: null,
-            'css_style'   => $request->input('css_style') ?: 'Miticko',
+            'css_style' => $request->input('css_style') ?: 'Miticko',
         ]);
     }
 
@@ -235,7 +233,7 @@ class PartnerController extends CrudController
             $fields[$field] = (string) ($request->input($field) ?? '');
         }
 
-        if (!empty($fields)) {
+        if (! empty($fields)) {
             $partner->setContentFields($fields, 'it');
         }
     }
@@ -250,9 +248,9 @@ class PartnerController extends CrudController
 
             $data = $languages->map(fn ($lang) => [
                 'language_id' => $lang->id,
-                'language'    => $lang->label,
-                'iso_code'    => $lang->iso_code,
-                'value'       => $partner->contentField($field, $lang->iso_code) ?? '',
+                'language' => $lang->label,
+                'iso_code' => $lang->iso_code,
+                'value' => $partner->contentField($field, $lang->iso_code) ?? '',
             ]);
 
             return $this->success(['data' => $data]);
@@ -287,7 +285,7 @@ class PartnerController extends CrudController
 
     private function authorizeField(string $field): void
     {
-        if (!array_key_exists($field, self::TRANSLATABLE_FIELDS)) {
+        if (! array_key_exists($field, self::TRANSLATABLE_FIELDS)) {
             throw new \Exception('Campo traducibile non valido');
         }
         if (self::TRANSLATABLE_FIELDS[$field]['restricted']) {
@@ -302,7 +300,8 @@ class PartnerController extends CrudController
         }
     }
 
-    public function data(Request $request) : JsonResponse {
+    public function data(Request $request): JsonResponse
+    {
         try {
             $filters = $request->get('filters') ?? [];
 
@@ -315,52 +314,55 @@ class PartnerController extends CrudController
                     return (string) $item->partner_code;
                 })
                 ->addColumn('domain', function ($item) {
-                    if (!$item->domain_name) {
+                    if (! $item->domain_name) {
                         return '—';
                     }
                     $url = preg_match('#^https?://#i', $item->domain_name)
                         ? $item->domain_name
-                        : 'https://' . $item->domain_name;
-                    return '<a href="' . e($url) . '" target="_blank" rel="noopener noreferrer">'
-                        . e($item->domain_name)
-                        . ' <i class="fa-regular fa-arrow-up-right-from-square ms-1 small"></i></a>';
+                        : 'https://'.$item->domain_name;
+
+                    return '<a href="'.e($url).'" target="_blank" rel="noopener noreferrer">'
+                        .e($item->domain_name)
+                        .' <i class="fa-regular fa-arrow-up-right-from-square ms-1 small"></i></a>';
                 })
                 ->addColumn('contacts', function ($item) {
                     $lines = [];
                     if ($item->email_notify) {
-                        $lines[] = '<i class="fa-regular fa-envelope text-secondary me-1"></i>' . e($item->email_notify);
+                        $lines[] = '<i class="fa-regular fa-envelope text-secondary me-1"></i>'.e($item->email_notify);
                     }
                     if ($item->billing?->pec_email) {
-                        $lines[] = '<i class="fa-regular fa-shield-check text-secondary me-1"></i>' . e($item->billing->pec_email) . ' <span class="text-secondary small">(PEC)</span>';
+                        $lines[] = '<i class="fa-regular fa-shield-check text-secondary me-1"></i>'.e($item->billing->pec_email).' <span class="text-secondary small">(PEC)</span>';
                     }
                     $addressParts = array_filter([
                         $item->billing?->street_address,
-                        trim(($item->billing?->postal_code ?? '') . ' ' . ($item->billing?->city ?? '')),
+                        trim(($item->billing?->postal_code ?? '').' '.($item->billing?->city ?? '')),
                         $item->billing?->province,
                     ]);
-                    if (!empty($addressParts)) {
-                        $lines[] = '<i class="fa-regular fa-location-dot text-secondary me-1"></i>' . e(implode(', ', $addressParts));
+                    if (! empty($addressParts)) {
+                        $lines[] = '<i class="fa-regular fa-location-dot text-secondary me-1"></i>'.e(implode(', ', $addressParts));
                     }
+
                     return empty($lines) ? '—' : implode('<br>', $lines);
                 })
                 ->addColumn('commissions', function ($item) {
                     $rows = [];
                     $threshold = $item->commission_presale_threshold;
-                    if (!is_null($item->commission_presale_low) || !is_null($item->commission_presale_high) || !is_null($threshold)) {
+                    if (! is_null($item->commission_presale_low) || ! is_null($item->commission_presale_high) || ! is_null($threshold)) {
                         $rows[] = 'Presale: '
-                            . '<span title="sotto soglia">'  . self::fmtEuro($item->commission_presale_low)  . '</span>'
-                            . ' / '
-                            . '<span title="sopra soglia">' . self::fmtEuro($item->commission_presale_high) . '</span>'
-                            . ' <span class="text-secondary small">soglia ' . self::fmtEuro($threshold) . '</span>';
+                            .'<span title="sotto soglia">'.self::fmtEuro($item->commission_presale_low).'</span>'
+                            .' / '
+                            .'<span title="sopra soglia">'.self::fmtEuro($item->commission_presale_high).'</span>'
+                            .' <span class="text-secondary small">soglia '.self::fmtEuro($threshold).'</span>';
                     }
-                    if (!is_null($item->commission_miticko_fixed) || !is_null($item->commission_miticko_variable)) {
+                    if (! is_null($item->commission_miticko_fixed) || ! is_null($item->commission_miticko_variable)) {
                         $rows[] = 'Miticko: '
-                            . self::fmtEuro($item->commission_miticko_fixed) . ' fissa + '
-                            . self::fmtPercent($item->commission_miticko_variable) . ' var.';
+                            .self::fmtEuro($item->commission_miticko_fixed).' fissa + '
+                            .self::fmtPercent($item->commission_miticko_variable).' var.';
                     }
-                    if (!is_null($item->commission_payment)) {
-                        $rows[] = 'Pagamento: ' . self::fmtPercent($item->commission_payment);
+                    if (! is_null($item->commission_payment)) {
+                        $rows[] = 'Pagamento: '.self::fmtPercent($item->commission_payment);
                     }
+
                     return empty($rows) ? '<span class="text-secondary">—</span>' : implode('<br>', $rows);
                 })
                 ->rawColumns(['status', 'domain', 'contacts', 'commissions'])
@@ -372,11 +374,11 @@ class PartnerController extends CrudController
 
     private static function fmtEuro($value): string
     {
-        return is_null($value) ? '—' : number_format((float) $value, 2, ',', '.') . ' €';
+        return is_null($value) ? '—' : number_format((float) $value, 2, ',', '.').' €';
     }
 
     private static function fmtPercent($value): string
     {
-        return is_null($value) ? '—' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',') . ' %';
+        return is_null($value) ? '—' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',').' %';
     }
 }

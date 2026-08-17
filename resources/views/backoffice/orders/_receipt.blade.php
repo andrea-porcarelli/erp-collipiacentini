@@ -331,7 +331,7 @@
     $orderCode    = $order->order_number;
     $partnerName  = $order->partner?->partner_name;
     $partnerSite  = $order->partner?->domain_name;
-    $guestName    = $order->customer?->full_name;
+    $guestName    = $order->full_name;
     $purchasedAt  = $order->paid_at ?? $order->created_at;
 
     $payment = match (true) {

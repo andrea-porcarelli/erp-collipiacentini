@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -14,12 +13,9 @@ use App\Services\OrderLogger;
 use App\Services\ProductAvailabilityService;
 use App\Services\ProductSeoService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -344,7 +340,7 @@ class BookingController extends Controller
 
             $itemsSummary = collect($cartItemsData)->map(fn ($i) => [
                 'variant_id' => $i['product_variant_id'],
-                'quantity'   => $i['quantity'],
+                'quantity' => $i['quantity'],
                 'unit_price' => $i['unit_price'],
             ])->all();
             $this->logger->logCartStarted($cart, $itemsSummary, round($total, 2));
@@ -417,7 +413,7 @@ class BookingController extends Controller
         ];
 
         $partnerConsents = ($cart->partner && $cart->partner->consents_enabled)
-            ? $cart->partner->consents()->where('is_active', true)->get()
+            ? $cart->partner->consents()->current()->where('is_active', true)->get()
             : collect();
 
         $rules = [
@@ -447,34 +443,18 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            $user = Customer::where('email', $validated['email'])->first();
-
-            $customerData = [
+            $cartUpdate = [
                 'name' => $validated['name'],
                 'surname' => $validated['surname'],
+                'email' => $validated['email'],
+                'privacy_accepted' => true,
+                'newsletter' => (bool) ($validated['newsletter'] ?? false),
             ];
             foreach ($activeColumns as $column) {
                 if (! empty($validated[$column])) {
-                    $customerData[$column] = $validated[$column];
+                    $cartUpdate[$column] = $validated[$column];
                 }
             }
-
-            if (! $user) {
-                $user = Customer::create(array_merge($customerData, [
-                    'email' => $validated['email'],
-                    'password' => Hash::make(Str::random(16)),
-                    'role' => 'customer',
-                    'company_id' => $cart->partner?->company_id,
-                    'partner_id' => $cart->partner_id,
-                    'privacy_accepted' => true,
-                    'newsletter' => $validated['newsletter'] ?? false,
-                ]));
-            } else {
-                $customerData['newsletter'] = $validated['newsletter'] ?? $user->newsletter;
-                $user->update($customerData);
-            }
-
-            $cartUpdate = ['customer_id' => $user->id];
 
             if ($partnerConsents->isNotEmpty()) {
                 $cartUpdate['consents_payload'] = $this->buildConsentsPayload($partnerConsents, $validated['consents'] ?? []);
@@ -482,10 +462,9 @@ class BookingController extends Controller
 
             $cart->update($cartUpdate);
 
-            // Attribuiamo i log al Customer appena collegato.
-            $this->logger->as($user)->logCartCustomerAssigned($cart, $user);
+            $this->logger->logCartCustomerAssignedByEmail($cart);
             if (! empty($cartUpdate['consents_payload'])) {
-                $this->logger->as($user)->logCartConsentsAccepted($cart, $cartUpdate['consents_payload']);
+                $this->logger->logCartConsentsAccepted($cart, $cartUpdate['consents_payload']);
             }
             $this->logger->endBatch();
 
@@ -493,7 +472,7 @@ class BookingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'user_id' => $user->id,
+                'cart_id' => $cart->id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -513,9 +492,9 @@ class BookingController extends Controller
 
             return [
                 'partner_consent_id' => $pc->id,
-                'accepted'           => $accepted,
-                'subscribed_at'      => $now->toIso8601String(),
-                'expires_at'         => $pc->computeExpiresAt($now)?->toIso8601String(),
+                'accepted' => $accepted,
+                'subscribed_at' => $now->toIso8601String(),
+                'expires_at' => $pc->computeExpiresAt($now)?->toIso8601String(),
             ];
         })->values()->all();
     }

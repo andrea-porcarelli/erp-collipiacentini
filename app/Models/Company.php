@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -22,11 +22,13 @@ class Company extends LogsModel
         'endpoint_woocommerce',
     ];
 
-    public function products(): BelongsToMany {
+    public function products(): BelongsToMany
+    {
         return $this->belongsToMany(Product::class)->withTimestamps();
     }
 
-    public function users(): HasMany {
+    public function users(): HasMany
+    {
         return $this->hasMany(User::class);
     }
 

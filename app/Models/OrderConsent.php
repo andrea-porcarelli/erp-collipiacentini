@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CustomerConsent extends Model
+class OrderConsent extends Model
 {
     public $fillable = [
-        'customer_id',
+        'order_id',
         'partner_consent_id',
         'partner_id',
         'accepted',
@@ -17,14 +17,14 @@ class CustomerConsent extends Model
     ];
 
     protected $casts = [
-        'accepted'      => 'boolean',
+        'accepted' => 'boolean',
         'subscribed_at' => 'datetime',
-        'expires_at'    => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
-    public function customer(): BelongsTo
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Order::class);
     }
 
     public function partnerConsent(): BelongsTo

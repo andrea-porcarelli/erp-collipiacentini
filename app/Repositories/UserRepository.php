@@ -2,14 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Facades\Utils;
 use App\Interfaces\UserInterface;
-use Illuminate\Database\Eloquent\Builder;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserRepository extends CrudRepository implements UserInterface
 {
-
     public function __construct(User $model)
     {
         parent::__construct($model);
@@ -19,8 +17,8 @@ class UserRepository extends CrudRepository implements UserInterface
     {
         return $this->builder()
             ->where('role', '!=', 'customer')
-            ->when(isset($filters['name']), function($q) use($filters) {
-                $q->where('name', 'like', '%' . $filters['name'] . '%');
+            ->when(isset($filters['name']), function ($q) use ($filters) {
+                $q->where('name', 'like', '%'.$filters['name'].'%');
             });
     }
 }

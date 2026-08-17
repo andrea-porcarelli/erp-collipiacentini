@@ -16,13 +16,11 @@ class Country extends Model
      */
     public $fillable = [
         'name',
-        'position'
+        'position',
     ];
 
-
-    public function getLabelAttribute() : string
+    public function getLabelAttribute(): string
     {
         return $this->name;
     }
-
 }

@@ -27,7 +27,7 @@ class ErpProductResource extends JsonResource
                 ->unique()
                 ->sort()
                 ->values()
-                ->map(fn($time) => ['start' => $time])
+                ->map(fn ($time) => ['start' => $time])
                 ->toArray();
         }
 
@@ -37,13 +37,13 @@ class ErpProductResource extends JsonResource
         $images = [];
         foreach ($this->cover as $media) {
             $images[] = [
-                'url' => asset('storage/' . $media->file_path),
+                'url' => asset('storage/'.$media->file_path),
                 'alt' => $media->description ?? $this->label,
             ];
         }
         foreach ($this->gallery as $media) {
             $images[] = [
-                'url' => asset('storage/' . $media->file_path),
+                'url' => asset('storage/'.$media->file_path),
                 'alt' => $media->description ?? $this->label,
             ];
         }
@@ -55,7 +55,7 @@ class ErpProductResource extends JsonResource
         };
 
         return [
-            'id' => 'ERP-PROD-' . $this->id,
+            'id' => 'ERP-PROD-'.$this->id,
             'sku' => $this->product_code,
             'name' => $this->label,
             'slug' => Str::slug($this->label),

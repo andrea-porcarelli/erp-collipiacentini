@@ -20,18 +20,21 @@ use Illuminate\View\View;
 class LoginController extends Controller
 {
     protected UserInterface $user;
+
     public function __construct(UserInterface $user)
     {
         $this->user = $user;
     }
 
-    public function index() : View {
+    public function index(): View
+    {
         return view('backoffice.login');
     }
 
-    public function login(LoginRequest $request) : JsonResponse {
+    public function login(LoginRequest $request): JsonResponse
+    {
         try {
-            if(!Auth::validate($request->all())) {
+            if (! Auth::validate($request->all())) {
                 return response()->json(['message' => 'I dati inseriti sono errati'], 422);
             }
             $user = Auth::getProvider()->retrieveByCredentials($request->all());
@@ -41,13 +44,15 @@ class LoginController extends Controller
                 Session::put('company', $user->company);
                 Session::put('company-to-be-select', true);
             }
+
             return response()->json(['response' => 'ok', 'url' => redirect()->getIntendedUrl() ?? '/index']);
         } catch (Exception $e) {
             $this->exception($e);
         }
     }
 
-    public function logout(Request $request) : JsonResponse|RedirectResponse {
+    public function logout(Request $request): JsonResponse|RedirectResponse
+    {
         Session::flush();
         Auth::logout();
         $request->session()->invalidate();
@@ -56,23 +61,28 @@ class LoginController extends Controller
         if ($request->expectsJson()) {
             return response()->json(['response' => 'ok']);
         }
+
         return redirect()->route('login');
     }
 
-    public function change_password() : View {
+    public function change_password(): View
+    {
         return view('change-password');
     }
 
-    public function reset_password(ChangePasswordRequest $request, MessageBag $messageBag) : JsonResponse {
+    public function reset_password(ChangePasswordRequest $request, MessageBag $messageBag): JsonResponse
+    {
         $old = Auth::user()->password;
         $new = Hash::make($request->password);
         if (Hash::check($request->password, $old)) {
-            $messageBag->add('error', "La nuova password non puà essere uguale alla vecchia!");
+            $messageBag->add('error', 'La nuova password non puà essere uguale alla vecchia!');
+
             return response()->json($messageBag, 422);
         }
         Auth::user()->update(['password' => $new, 'change_password_at' => Carbon::now()->format('Y-m-d H:i:s')]);
         $url_intended = session()->get('url-intended');
         session()->remove('url-intended');
+
         return response()->json(['response' => 'ok', 'url' => $url_intended ?? route('dashboard')]);
     }
 }

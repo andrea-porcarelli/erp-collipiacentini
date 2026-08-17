@@ -39,60 +39,58 @@ class CreateRepoCommand extends Command
     public function handle()
     {
         $model = $this->argument('model');
-        if (!isset($model)) {
+        if (! isset($model)) {
             $this->error('Devi indicare il model per la creazione del repository');
-            die();
+            exit();
         }
 
-        $interface = File::get(resource_path() . '/make-repository/BaseInterface.php');
+        $interface = File::get(resource_path().'/make-repository/BaseInterface.php');
         $new_interface = str_replace('Base', $model, $interface);
 
-        $repository = File::get(resource_path() . '/make-repository/BaseRepository.php');
+        $repository = File::get(resource_path().'/make-repository/BaseRepository.php');
         $new_repository = str_ireplace('BaseModel', $model, $repository);
         $new_repository = str_replace('Base', $model, $new_repository);
-        $new_repository = str_ireplace('App\Models\Model', 'App\Models\\' . $model, $new_repository);
+        $new_repository = str_ireplace('App\Models\Model', 'App\Models\\'.$model, $new_repository);
 
-        File::put(__DIR__ . '/../../Interfaces/' . $model . 'Interface.php', $new_interface);
-        File::put(__DIR__ . '/../../Repositories/' . $model . 'Repository.php', $new_repository);
+        File::put(__DIR__.'/../../Interfaces/'.$model.'Interface.php', $new_interface);
+        File::put(__DIR__.'/../../Repositories/'.$model.'Repository.php', $new_repository);
 
-        $service_provider = File::get(__DIR__ . '/../../Providers/RepositoryServiceProvider.php');
-
+        $service_provider = File::get(__DIR__.'/../../Providers/RepositoryServiceProvider.php');
 
         $content_before_string = strstr($service_provider, '#namespace here', true);
         $line1 = 0;
-        if (false !== $content_before_string) {
+        if ($content_before_string !== false) {
             $line1 = count(explode(PHP_EOL, $content_before_string));
         }
         $content_before_string = strstr($service_provider, '#register here', true);
         $line2 = 0;
-        if (false !== $content_before_string) {
+        if ($content_before_string !== false) {
             $line2 = count(explode(PHP_EOL, $content_before_string));
         }
 
         $lines = [];
-        $fc = fopen(__DIR__ . '/../../Providers/RepositoryServiceProvider.php', "r");
-        while (!feof($fc)) {
+        $fc = fopen(__DIR__.'/../../Providers/RepositoryServiceProvider.php', 'r');
+        while (! feof($fc)) {
             $buffer = fgets($fc, 4096);
             $lines[] = $buffer;
         }
         fclose($fc);
 
-
-        $f = fopen(__DIR__ . '/../../Providers/RepositoryServiceProvider.php', "w") or die("couldn't open $file");
+        $f = fopen(__DIR__.'/../../Providers/RepositoryServiceProvider.php', 'w') or exit("couldn't open $file");
 
         $lineCount = count($lines);
         $row = 0;
         for ($i = 0; $i < ($lineCount + $row) - 1; $i++) {
             fwrite($f, $lines[$i]);
             if ($i == ($line1 - 1)) {
-                fwrite($f, "\nuse App\Interfaces\\" . $model . "Interface;\nuse App\Repositories\\" . $model . "Repository;\n");
+                fwrite($f, "\nuse App\Interfaces\\".$model."Interface;\nuse App\Repositories\\".$model."Repository;\n");
             }
             if ($i == ($line2 - 1)) {
-                fwrite($f, "        \$this->app->bind(" . $model . "Interface::class, " . $model . "Repository::class);\n");
+                fwrite($f, '        $this->app->bind('.$model.'Interface::class, '.$model."Repository::class);\n");
             }
         }
 
-        fwrite($f, $lines[$lineCount-1]);
+        fwrite($f, $lines[$lineCount - 1]);
         fclose($f);
 
     }

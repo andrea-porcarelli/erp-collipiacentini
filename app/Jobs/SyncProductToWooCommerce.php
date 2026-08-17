@@ -24,8 +24,9 @@ class SyncProductToWooCommerce implements ShouldQueue
     {
         $endpoint = $this->company->endpoint_woocommerce;
 
-        if (!$endpoint) {
+        if (! $endpoint) {
             Log::warning("SyncProductToWooCommerce: endpoint mancante per company {$this->company->id}");
+
             return;
         }
 

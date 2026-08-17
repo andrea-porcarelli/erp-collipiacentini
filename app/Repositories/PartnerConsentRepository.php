@@ -16,7 +16,7 @@ class PartnerConsentRepository extends CrudRepository implements PartnerConsentI
     public function filters(array $filters): Builder
     {
         return $this->builder()
-            ->when(isset($filters['partner_id']), fn($q) => $q->where('partner_id', $filters['partner_id']))
+            ->when(isset($filters['partner_id']), fn ($q) => $q->where('partner_id', $filters['partner_id']))
             ->orderBy('position');
     }
 }

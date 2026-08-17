@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Media extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'mediable_type',
         'mediable_id',
@@ -39,7 +40,7 @@ class Media extends Model
             $bytes /= 1024;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     public function getFileExtensionAttribute(): string

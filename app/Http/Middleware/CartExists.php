@@ -13,7 +13,7 @@ class CartExists
         $sessionId = session()->getId();
         $cart = Cart::where('session_id', $sessionId)->first();
 
-        if (!$cart) {
+        if (! $cart) {
             return redirect('/shop')->with('error', 'Il carrello è vuoto');
         }
 

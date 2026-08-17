@@ -19,18 +19,29 @@ class Cart extends LogsModel
         'applied_price_variation_id',
         'total',
         'consents_payload',
+        'name',
+        'surname',
+        'email',
+        'prefix_phone',
+        'phone',
+        'address',
+        'city',
+        'zip_code',
+        'country_id',
+        'fiscal_code',
+        'birth_date',
+        'privacy_accepted',
+        'newsletter',
     ];
 
     protected $casts = [
-        'date'             => 'date',
-        'total'            => 'decimal:2',
+        'date' => 'date',
+        'total' => 'decimal:2',
         'consents_payload' => 'array',
+        'birth_date' => 'date',
+        'privacy_accepted' => 'boolean',
+        'newsletter' => 'boolean',
     ];
-
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
 
     public function partner(): BelongsTo
     {
@@ -60,6 +71,7 @@ class Cart extends LogsModel
     public static function getBySession(?string $sessionId = null): ?self
     {
         $sessionId = $sessionId ?? session()->getId();
+
         return self::where('session_id', $sessionId)->first();
     }
 }

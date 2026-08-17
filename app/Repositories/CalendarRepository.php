@@ -12,9 +12,7 @@ use Illuminate\Support\Collection;
 
 class CalendarRepository implements CalendarInterface
 {
-    public function __construct(private ProductAvailabilityService $availability)
-    {
-    }
+    public function __construct(private ProductAvailabilityService $availability) {}
 
     public function weekOverview(int $partnerId, Carbon $weekStart): Collection
     {
@@ -37,7 +35,7 @@ class CalendarRepository implements CalendarInterface
             $count = (int) ($counts[$date] ?? 0);
 
             return [
-                'date'         => $date,
+                'date' => $date,
                 'orders_count' => $count,
                 'has_bookings' => $count > 0,
             ];
@@ -56,7 +54,7 @@ class CalendarRepository implements CalendarInterface
 
             return [
                 'product' => $product,
-                'slots'   => $slots,
+                'slots' => $slots,
             ];
         });
 
@@ -75,13 +73,13 @@ class CalendarRepository implements CalendarInterface
                 $capacity = is_null($availability) ? null : ($availability + $booked);
 
                 return [
-                    'time'         => $slot['time'],
-                    'slot_type'    => $slot['slot_type'],
-                    'slot_id'      => $slot['slot_id'],
+                    'time' => $slot['time'],
+                    'slot_type' => $slot['slot_type'],
+                    'slot_id' => $slot['slot_id'],
                     'availability' => $availability,
-                    'booked'       => $booked,
+                    'booked' => $booked,
                     'orders_count' => $orders,
-                    'capacity'     => $capacity,
+                    'capacity' => $capacity,
                 ];
             })->values();
 
@@ -90,18 +88,18 @@ class CalendarRepository implements CalendarInterface
             $templateTimes = $slots->pluck('time')->all();
             $orphans = $productBookings->reject(fn ($stat, $time) => in_array($time, $templateTimes, true))
                 ->map(fn ($stat, $time) => [
-                    'time'         => $time,
-                    'slot_type'    => $stat['slot_type'] ?? 'weekly',
-                    'slot_id'      => $stat['slot_id'] ?? 0,
+                    'time' => $time,
+                    'slot_type' => $stat['slot_type'] ?? 'weekly',
+                    'slot_id' => $stat['slot_id'] ?? 0,
                     'availability' => null,
-                    'booked'       => $stat['booked'] ?? 0,
+                    'booked' => $stat['booked'] ?? 0,
                     'orders_count' => $stat['orders'] ?? 0,
-                    'capacity'     => null,
+                    'capacity' => null,
                 ])->values();
 
             return [
                 'product' => $product,
-                'slots'   => $slots->merge($orphans)->sortBy('time')->values(),
+                'slots' => $slots->merge($orphans)->sortBy('time')->values(),
             ];
         })->filter(fn ($entry) => $entry['slots']->isNotEmpty())->values();
 
@@ -170,8 +168,8 @@ class CalendarRepository implements CalendarInterface
             $summary = $this->checkinSummary($order);
 
             return [
-                'order'    => $order,
-                'checkin'  => $summary,
+                'order' => $order,
+                'checkin' => $summary,
             ];
         });
     }
@@ -206,11 +204,11 @@ class CalendarRepository implements CalendarInterface
 
             $productBucket = $out->get($op->product_id, collect());
             $current = $productBucket->get($time, [
-                'booked'    => 0,
-                'orders'    => 0,
+                'booked' => 0,
+                'orders' => 0,
                 'orders_ids' => [],
                 'slot_type' => $op->slot_type,
-                'slot_id'   => $op->slot_id,
+                'slot_id' => $op->slot_id,
             ]);
             $current['booked'] += $booked;
             if (! in_array($op->order_id, $current['orders_ids'], true)) {
@@ -236,13 +234,13 @@ class CalendarRepository implements CalendarInterface
             foreach ($entry['slots'] as $slot) {
                 $bucket = $byTime->get($slot['time'], ['time' => $slot['time'], 'products' => collect()]);
                 $bucket['products']->push([
-                    'product'      => $product,
+                    'product' => $product,
                     'availability' => $slot['availability'],
-                    'booked'       => $slot['booked'],
+                    'booked' => $slot['booked'],
                     'orders_count' => $slot['orders_count'],
-                    'capacity'     => $slot['capacity'],
-                    'slot_type'    => $slot['slot_type'],
-                    'slot_id'      => $slot['slot_id'],
+                    'capacity' => $slot['capacity'],
+                    'slot_type' => $slot['slot_type'],
+                    'slot_id' => $slot['slot_id'],
                 ]);
                 $byTime->put($slot['time'], $bucket);
             }
@@ -265,7 +263,7 @@ class CalendarRepository implements CalendarInterface
         $checkedIn = $participants->where('status', 'checked_in')->count();
 
         return [
-            'expected'   => $expected,
+            'expected' => $expected,
             'checked_in' => $checkedIn,
         ];
     }

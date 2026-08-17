@@ -14,9 +14,11 @@ use Illuminate\Support\Str;
 
 class ProductSeoService
 {
-    private const TIMEZONE      = 'Europe/Rome';
-    private const CACHE_TTL     = 86400; // 24h
-    private const CACHE_PREFIX  = 'product_seo_events';
+    private const TIMEZONE = 'Europe/Rome';
+
+    private const CACHE_TTL = 86400; // 24h
+
+    private const CACHE_PREFIX = 'product_seo_events';
 
     public function __construct(
         private ProductAvailabilityService $availabilityService,
@@ -30,13 +32,13 @@ class ProductSeoService
 
     private static function cacheKey(int $productId): string
     {
-        return self::CACHE_PREFIX . ':' . $productId;
+        return self::CACHE_PREFIX.':'.$productId;
     }
 
     public function forListing(Partner $partner, Collection $products): array
     {
         return [
-            'meta'   => $this->buildListingMeta($partner, $products),
+            'meta' => $this->buildListingMeta($partner, $products),
             'jsonLd' => $this->buildListingJsonLd($partner, $products),
         ];
     }
@@ -44,7 +46,7 @@ class ProductSeoService
     public function forProduct(Product $product, int $days = 60): array
     {
         return [
-            'meta'   => $this->buildProductMeta($product),
+            'meta' => $this->buildProductMeta($product),
             'jsonLd' => $this->buildProductJsonLd($product, $days),
         ];
     }
@@ -52,7 +54,7 @@ class ProductSeoService
     private function buildListingMeta(Partner $partner, Collection $products): array
     {
         $partnerName = $partner->partner_name ?? 'Shop';
-        $title       = sprintf('Esperienze e biglietti %s - Prenota online', $partnerName);
+        $title = sprintf('Esperienze e biglietti %s - Prenota online', $partnerName);
         $description = sprintf(
             'Scopri e prenota online le esperienze di %s. %d prodotti disponibili con pagamento sicuro.',
             $partnerName,
@@ -60,21 +62,21 @@ class ProductSeoService
         );
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => $description,
-            'canonical'   => URL::to('/shop'),
-            'keywords'    => $this->listingKeywords($partner, $products),
+            'canonical' => URL::to('/shop'),
+            'keywords' => $this->listingKeywords($partner, $products),
             'og' => [
-                'type'        => 'website',
-                'title'       => $title,
+                'type' => 'website',
+                'title' => $title,
                 'description' => $description,
-                'url'         => URL::to('/shop'),
-                'image'       => $this->partnerImage($partner) ?? $this->firstProductImage($products),
-                'site_name'   => $partnerName,
+                'url' => URL::to('/shop'),
+                'image' => $this->partnerImage($partner) ?? $this->firstProductImage($products),
+                'site_name' => $partnerName,
             ],
             'twitter' => [
-                'card'        => 'summary_large_image',
-                'title'       => $title,
+                'card' => 'summary_large_image',
+                'title' => $title,
                 'description' => $description,
             ],
         ];
@@ -82,30 +84,30 @@ class ProductSeoService
 
     private function buildProductMeta(Product $product): array
     {
-        $title       = $product->meta_title ?: $product->label;
+        $title = $product->meta_title ?: $product->label;
         $description = $product->meta_description
             ?: Str::limit(strip_tags((string) ($product->intro ?? $product->description ?? '')), 158);
-        $url         = $product->route;
-        $image       = $this->productImage($product);
+        $url = $product->route;
+        $image = $this->productImage($product);
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => $description,
-            'canonical'   => $url,
-            'keywords'    => $this->keywordsService->generate($product),
+            'canonical' => $url,
+            'keywords' => $this->keywordsService->generate($product),
             'og' => [
-                'type'        => 'product',
-                'title'       => $title,
+                'type' => 'product',
+                'title' => $title,
                 'description' => $description,
-                'url'         => $url,
-                'image'       => $image,
-                'site_name'   => $product->partner?->partner_name,
+                'url' => $url,
+                'image' => $image,
+                'site_name' => $product->partner?->partner_name,
             ],
             'twitter' => [
-                'card'        => 'summary_large_image',
-                'title'       => $title,
+                'card' => 'summary_large_image',
+                'title' => $title,
                 'description' => $description,
-                'image'       => $image,
+                'image' => $image,
             ],
         ];
     }
@@ -113,39 +115,39 @@ class ProductSeoService
     private function buildListingJsonLd(Partner $partner, Collection $products): array
     {
         $items = $products->values()->map(function (Product $p, int $i) use ($partner) {
-            $price        = (float) ($p->lowest_price_with_commission ?? 0);
+            $price = (float) ($p->lowest_price_with_commission ?? 0);
             $availability = $p->is_available && $price > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock';
 
             return [
-                '@type'    => 'ListItem',
+                '@type' => 'ListItem',
                 'position' => $i + 1,
-                'url'      => $p->route,
-                'name'     => $p->meta_title ?: $p->label,
-                'image'    => $this->productImage($p),
-                'item'     => array_filter([
-                    '@type'       => 'Product',
-                    'name'        => $p->meta_title ?: $p->label,
+                'url' => $p->route,
+                'name' => $p->meta_title ?: $p->label,
+                'image' => $this->productImage($p),
+                'item' => array_filter([
+                    '@type' => 'Product',
+                    'name' => $p->meta_title ?: $p->label,
                     'description' => $p->intro ?? $p->description,
-                    'sku'         => $p->product_code,
-                    'image'       => $this->productImage($p),
-                    'url'         => $p->route,
-                    'brand'       => $partner->partner_name ? ['@type' => 'Brand', 'name' => $partner->partner_name] : null,
-                    'offers'      => [
-                        '@type'         => 'AggregateOffer',
+                    'sku' => $p->product_code,
+                    'image' => $this->productImage($p),
+                    'url' => $p->route,
+                    'brand' => $partner->partner_name ? ['@type' => 'Brand', 'name' => $partner->partner_name] : null,
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
                         'priceCurrency' => 'EUR',
-                        'lowPrice'      => number_format($price, 2, '.', ''),
-                        'availability'  => $availability,
-                        'url'           => $p->route,
+                        'lowPrice' => number_format($price, 2, '.', ''),
+                        'availability' => $availability,
+                        'url' => $p->route,
                     ],
                 ]),
             ];
         })->all();
 
         return [
-            '@context'        => 'https://schema.org',
-            '@type'           => 'ItemList',
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
             'itemListElement' => $items,
         ];
     }
@@ -155,12 +157,12 @@ class ProductSeoService
         $events = Cache::remember(
             self::cacheKey($product->id),
             self::CACHE_TTL,
-            fn() => $this->buildEvents($product, $days),
+            fn () => $this->buildEvents($product, $days),
         );
 
         return [
             '@context' => 'https://schema.org',
-            '@graph'   => array_merge(
+            '@graph' => array_merge(
                 [$this->buildProductNode($product, $events)],
                 $events,
             ),
@@ -169,19 +171,19 @@ class ProductSeoService
 
     private function buildProductNode(Product $product, array $events = []): array
     {
-        $price       = (float) ($product->lowest_price_with_commission ?? 0);
-        $available   = (bool) $product->is_available;
+        $price = (float) ($product->lowest_price_with_commission ?? 0);
+        $available = (bool) $product->is_available;
         $availability = $available && $price > 0
             ? 'https://schema.org/InStock'
             : 'https://schema.org/OutOfStock';
 
         $offers = [
-            '@type'         => 'AggregateOffer',
+            '@type' => 'AggregateOffer',
             'priceCurrency' => 'EUR',
-            'lowPrice'      => number_format($price, 2, '.', ''),
-            'availability'  => $availability,
-            'url'           => $product->route,
-            'offerCount'    => max(count($events), 1),
+            'lowPrice' => number_format($price, 2, '.', ''),
+            'availability' => $availability,
+            'url' => $product->route,
+            'offerCount' => max(count($events), 1),
         ];
 
         if ($validUntil = $this->priceValidUntil($events)) {
@@ -189,17 +191,17 @@ class ProductSeoService
         }
 
         return array_filter([
-            '@type'       => 'Product',
-            '@id'         => $product->route . '#product',
-            'name'        => $product->meta_title ?: $product->label,
+            '@type' => 'Product',
+            '@id' => $product->route.'#product',
+            'name' => $product->meta_title ?: $product->label,
             'description' => $product->intro ?? $product->description,
-            'sku'         => $product->product_code,
-            'image'       => $this->productImage($product),
-            'url'         => $product->route,
-            'brand'       => $product->partner?->partner_name
+            'sku' => $product->product_code,
+            'image' => $this->productImage($product),
+            'url' => $product->route,
+            'brand' => $product->partner?->partner_name
                 ? ['@type' => 'Brand', 'name' => $product->partner->partner_name]
                 : null,
-            'offers'      => $offers,
+            'offers' => $offers,
         ]);
     }
 
@@ -221,11 +223,11 @@ class ProductSeoService
     {
         $product->loadMissing(['variants.prices', 'partner']);
 
-        $events    = [];
-        $today     = CarbonImmutable::now(self::TIMEZONE)->startOfDay();
-        $variantsByAvailability     = $product->variants->groupBy('availability_id');
-        $variantsBySpecial          = $product->variants->groupBy('special_schedule_id');
-        $genericVariants            = $product->variants
+        $events = [];
+        $today = CarbonImmutable::now(self::TIMEZONE)->startOfDay();
+        $variantsByAvailability = $product->variants->groupBy('availability_id');
+        $variantsBySpecial = $product->variants->groupBy('special_schedule_id');
+        $genericVariants = $product->variants
             ->whereNull('availability_id')
             ->whereNull('special_schedule_id');
 
@@ -284,37 +286,37 @@ class ProductSeoService
         ?ProductPriceVariation $variation,
     ): array {
         [$h, $m] = array_pad(explode(':', $slot['time']), 2, 0);
-        $start   = $date->setTime((int) $h, (int) $m);
+        $start = $date->setTime((int) $h, (int) $m);
         $endDate = $this->computeEndDate($product, $start);
 
         $availabilityUri = is_null($slot['availability']) || $slot['availability'] > 0
             ? 'https://schema.org/InStock'
             : 'https://schema.org/SoldOut';
 
-        $offers = $variants->map(fn(ProductVariant $v) => array_filter([
-            '@type'         => 'Offer',
-            'name'          => $v->label,
-            'price'         => number_format($this->variantCommissionedPrice($product, $v, $variation), 2, '.', ''),
+        $offers = $variants->map(fn (ProductVariant $v) => array_filter([
+            '@type' => 'Offer',
+            'name' => $v->label,
+            'price' => number_format($this->variantCommissionedPrice($product, $v, $variation), 2, '.', ''),
             'priceCurrency' => 'EUR',
-            'availability'  => $availabilityUri,
-            'url'           => $product->route,
-            'validFrom'     => $start->toIso8601String(),
+            'availability' => $availabilityUri,
+            'url' => $product->route,
+            'validFrom' => $start->toIso8601String(),
         ]))->values()->all();
 
         return array_filter([
-            '@type'               => 'Event',
-            'name'                => sprintf('%s - %s %s', $product->meta_title ?: $product->label, $date->toDateString(), $slot['time']),
-            'startDate'           => $start->toIso8601String(),
-            'endDate'             => $endDate?->toIso8601String(),
-            'eventStatus'         => 'https://schema.org/EventScheduled',
+            '@type' => 'Event',
+            'name' => sprintf('%s - %s %s', $product->meta_title ?: $product->label, $date->toDateString(), $slot['time']),
+            'startDate' => $start->toIso8601String(),
+            'endDate' => $endDate?->toIso8601String(),
+            'eventStatus' => 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
-            'location'            => [
+            'location' => [
                 '@type' => 'Place',
-                'name'  => $product->partner?->partner_name ?? '',
+                'name' => $product->partner?->partner_name ?? '',
             ],
-            'image'               => $this->productImage($product),
-            'url'                 => $product->route,
-            'offers'              => $offers,
+            'image' => $this->productImage($product),
+            'url' => $product->route,
+            'offers' => $offers,
         ]);
     }
 
@@ -334,27 +336,33 @@ class ProductSeoService
     private function variantCommissionedPrice(Product $product, ProductVariant $variant, ?ProductPriceVariation $variation): float
     {
         $price = $this->availabilityService->applyPriceVariation((float) $variant->full_price, $variation);
+
         return $price + ($product->partner?->resolvePresaleCommission($price) ?? 0);
     }
 
     private function productImage(Product $product): ?string
     {
         $media = $product->cover->first() ?? $product->gallery->first();
-        return $media?->file_path ? asset('storage/' . $media->file_path) : null;
+
+        return $media?->file_path ? asset('storage/'.$media->file_path) : null;
     }
 
     private function partnerImage(Partner $partner): ?string
     {
         $media = $partner->logo ?? $partner->cover;
-        return $media?->file_path ? asset('storage/' . $media->file_path) : null;
+
+        return $media?->file_path ? asset('storage/'.$media->file_path) : null;
     }
 
     private function firstProductImage(Collection $products): ?string
     {
         foreach ($products as $p) {
             $url = $this->productImage($p);
-            if ($url) return $url;
+            if ($url) {
+                return $url;
+            }
         }
+
         return null;
     }
 
@@ -365,6 +373,6 @@ class ProductSeoService
             $products->pluck('label')->filter()->take(10)->all(),
         ));
 
-        return implode(', ', array_unique(array_map(fn($t) => trim($t), $terms)));
+        return implode(', ', array_unique(array_map(fn ($t) => trim($t), $terms)));
     }
 }

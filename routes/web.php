@@ -3,7 +3,6 @@
 use App\Http\Controllers\Backoffice\CalendarController;
 use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
-use App\Http\Controllers\Backoffice\CustomerController;
 use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\EditorMediaController;
 use App\Http\Controllers\Backoffice\LoginController;
@@ -220,7 +219,6 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
         Route::put('companies/{company}/products', [CompanyController::class, 'syncProducts'])->name('companies.products.sync');
         Route::resource('users', UserController::class);
-        Route::resource('customers', CustomerController::class);
         Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
     });
 });

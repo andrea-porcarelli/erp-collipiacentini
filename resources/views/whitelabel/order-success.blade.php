@@ -88,16 +88,16 @@
 
                         <div class="customer-info">
                             <h4>Dati acquirente</h4>
-                            <p><strong>{{ $order->customer->full_name }}</strong></p>
-                            <p>{{ $order->customer->email }}</p>
-                            @if($order->customer->phone)
-                                <p>{{ $order->customer->phone }}</p>
+                            <p><strong>{{ $order->full_name }}</strong></p>
+                            <p>{{ $order->email }}</p>
+                            @if($order->phone)
+                                <p>{{ $order->phone }}</p>
                             @endif
                         </div>
 
                         <div class="confirmation-message">
                             <i class="fa-regular fa-envelope"></i>
-                            <p>Ti abbiamo inviato una email di conferma all'indirizzo <strong>{{ $order->customer->email }}</strong> con tutti i dettagli del tuo ordine.</p>
+                            <p>Ti abbiamo inviato una email di conferma all'indirizzo <strong>{{ $order->email }}</strong> con tutti i dettagli del tuo ordine.</p>
                         </div>
                     </div>
                 </x-card>

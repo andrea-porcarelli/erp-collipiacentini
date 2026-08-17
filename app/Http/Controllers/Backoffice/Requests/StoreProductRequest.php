@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Auth;
 
 class StoreProductRequest extends FormRequest
 {
-    public function authorize() : bool {
+    public function authorize(): bool
+    {
         return Auth::check();
     }
 
-    public function rules() : array {
+    public function rules(): array
+    {
         $rules['label'] = ['required', 'unique:products,label'];
 
         if (in_array(Auth::user()->role, ['god', 'admin', 'company'])) {
@@ -21,7 +23,7 @@ class StoreProductRequest extends FormRequest
         return $rules;
     }
 
-    public function messages() : array
+    public function messages(): array
     {
         return [
             'label.required' => 'Il nome del prodotto è obbligatorio',

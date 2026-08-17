@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        $now  = now();
+        $now = now();
         $rows = [];
         $seed = [
             'accessibility' => [
@@ -31,7 +31,7 @@ return new class extends Migration
             ],
             'pets' => [
                 ['pets_allowed',      'Animali ammessi',                      'fa-paw'],
-                ['small_pets_allowed','Animali di piccola taglia ammessi',    'fa-cat'],
+                ['small_pets_allowed', 'Animali di piccola taglia ammessi',    'fa-cat'],
                 ['pets_outdoor_only', 'Animali ammessi solo in aree esterne', 'fa-tree'],
                 ['pets_not_allowed',  'Animali non ammessi',                  'fa-ban'],
                 ['dog_sitter',        'Dog sitter',                           'fa-dog'],
@@ -58,10 +58,10 @@ return new class extends Migration
         foreach ($seed as $category => $items) {
             foreach ($items as $i => [$code, $label, $icon]) {
                 $rows[] = [
-                    'category'   => $category,
-                    'code'       => $code,
-                    'label'      => $label,
-                    'icon'       => $icon,
+                    'category' => $category,
+                    'code' => $code,
+                    'label' => $label,
+                    'icon' => $icon,
                     'sort_order' => $i + 1,
                     'created_at' => $now,
                     'updated_at' => $now,

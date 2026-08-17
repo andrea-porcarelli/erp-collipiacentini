@@ -23,15 +23,15 @@ return new class extends Migration
                     $missing = max(0, ((int) $row->quantity) - $existing);
                     for ($i = 0; $i < $missing; $i++) {
                         $rowsToInsert[] = [
-                            'order_id'              => $row->order_id,
+                            'order_id' => $row->order_id,
                             'order_product_item_id' => $row->opi_id,
-                            'status'                => 'booked',
-                            'created_at'            => $now,
-                            'updated_at'            => $now,
+                            'status' => 'booked',
+                            'created_at' => $now,
+                            'updated_at' => $now,
                         ];
                     }
                 }
-                if (!empty($rowsToInsert)) {
+                if (! empty($rowsToInsert)) {
                     DB::table('order_participants')->insert($rowsToInsert);
                 }
             }, 'opi.id', 'opi_id');

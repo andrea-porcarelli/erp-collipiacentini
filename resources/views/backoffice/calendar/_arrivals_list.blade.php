@@ -10,7 +10,6 @@
                 $order = $entry['order'];
                 $checkin = $entry['checkin'];
                 $status = $order->order_status;
-                $customer = $order->customer;
                 $expected = (int) ($checkin['expected'] ?? 0);
                 $checkedIn = (int) ($checkin['checked_in'] ?? 0);
                 $checkinLabel = null;
@@ -25,7 +24,7 @@
             @endphp
             <li class="calendar-arrival-item js-arrival-item" data-order-id="{{ $order->id }}">
                 <div class="calendar-arrival-main">
-                    <div class="calendar-arrival-name">{{ trim(($customer->name ?? '').' '.($customer->surname ?? '')) ?: 'Cliente' }}</div>
+                    <div class="calendar-arrival-name">{{ $order->full_name ?: 'Cliente' }}</div>
                     <div class="calendar-arrival-number">MTK-{{ $order->order_number }}</div>
                     <div class="calendar-arrival-badges">
                         <span class="calendar-badge status-{{ $status?->status() ? strtolower($status->status()) : 'default' }}">

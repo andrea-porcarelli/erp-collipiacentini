@@ -45,7 +45,7 @@ class OrderConfirmationMail extends Mailable
     public function attachments(): array
     {
         $this->order->loadMissing([
-            'customer.country',
+            'country',
             'partner.logo',
             'orderProducts.product.category',
             'orderProducts.items.variant',

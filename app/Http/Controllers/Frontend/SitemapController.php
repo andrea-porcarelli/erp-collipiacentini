@@ -57,22 +57,22 @@ class SitemapController extends Controller
 
     private function buildIndex(Partner $partner): string
     {
-        $products    = $partner->active_products()->select('id', 'updated_at')->get();
+        $products = $partner->active_products()->select('id', 'updated_at')->get();
         $productsMod = $this->maxUpdated($products) ?? $partner->updated_at ?? Carbon::now();
-        $pagesMod    = $partner->updated_at ?? Carbon::now();
+        $pagesMod = $partner->updated_at ?? Carbon::now();
 
         $entries = [
             ['loc' => URL::to('/sitemap-pages.xml'),    'lastmod' => $this->iso($pagesMod)],
             ['loc' => URL::to('/sitemap-products.xml'), 'lastmod' => $this->iso($productsMod)],
         ];
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         foreach ($entries as $entry) {
             $xml .= "  <sitemap>\n";
-            $xml .= '    <loc>' . htmlspecialchars($entry['loc'], ENT_XML1) . "</loc>\n";
-            $xml .= '    <lastmod>' . $entry['lastmod'] . "</lastmod>\n";
+            $xml .= '    <loc>'.htmlspecialchars($entry['loc'], ENT_XML1)."</loc>\n";
+            $xml .= '    <lastmod>'.$entry['lastmod']."</lastmod>\n";
             $xml .= "  </sitemap>\n";
         }
 
@@ -87,9 +87,9 @@ class SitemapController extends Controller
             ->with(['cover', 'gallery'])
             ->get();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
-              . 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+              .'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'."\n";
 
         foreach ($products as $product) {
             $loc = $product->route;
@@ -98,14 +98,14 @@ class SitemapController extends Controller
             }
 
             $xml .= "  <url>\n";
-            $xml .= '    <loc>' . htmlspecialchars($loc, ENT_XML1) . "</loc>\n";
-            $xml .= '    <lastmod>' . $this->iso($product->updated_at) . "</lastmod>\n";
+            $xml .= '    <loc>'.htmlspecialchars($loc, ENT_XML1)."</loc>\n";
+            $xml .= '    <lastmod>'.$this->iso($product->updated_at)."</lastmod>\n";
             $xml .= "    <changefreq>weekly</changefreq>\n";
             $xml .= "    <priority>0.8</priority>\n";
 
             foreach ($this->productImages($product) as $imageUrl) {
                 $xml .= "    <image:image>\n";
-                $xml .= '      <image:loc>' . htmlspecialchars($imageUrl, ENT_XML1) . "</image:loc>\n";
+                $xml .= '      <image:loc>'.htmlspecialchars($imageUrl, ENT_XML1)."</image:loc>\n";
                 $xml .= "    </image:image>\n";
             }
 
@@ -121,12 +121,12 @@ class SitemapController extends Controller
     {
         $lastmod = $this->iso($partner->updated_at ?? Carbon::now());
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         $xml .= "  <url>\n";
-        $xml .= '    <loc>' . htmlspecialchars($this->homeUrl($partner), ENT_XML1) . "</loc>\n";
-        $xml .= '    <lastmod>' . $lastmod . "</lastmod>\n";
+        $xml .= '    <loc>'.htmlspecialchars($this->homeUrl($partner), ENT_XML1)."</loc>\n";
+        $xml .= '    <lastmod>'.$lastmod."</lastmod>\n";
         $xml .= "    <changefreq>daily</changefreq>\n";
         $xml .= "    <priority>1.0</priority>\n";
         $xml .= "  </url>\n";
@@ -138,8 +138,8 @@ class SitemapController extends Controller
             }
 
             $xml .= "  <url>\n";
-            $xml .= '    <loc>' . htmlspecialchars($url, ENT_XML1) . "</loc>\n";
-            $xml .= '    <lastmod>' . $lastmod . "</lastmod>\n";
+            $xml .= '    <loc>'.htmlspecialchars($url, ENT_XML1)."</loc>\n";
+            $xml .= '    <lastmod>'.$lastmod."</lastmod>\n";
             $xml .= "    <changefreq>monthly</changefreq>\n";
             $xml .= "    <priority>0.5</priority>\n";
             $xml .= "  </url>\n";
@@ -168,7 +168,7 @@ class SitemapController extends Controller
         }
 
         return $partner->slug_name
-            ? URL::to('/' . $partner->slug_name)
+            ? URL::to('/'.$partner->slug_name)
             : URL::to('/');
     }
 
@@ -195,12 +195,12 @@ class SitemapController extends Controller
 
         $cover = $product->cover->first();
         if ($cover?->file_path) {
-            $images[] = asset('storage/' . $cover->file_path);
+            $images[] = asset('storage/'.$cover->file_path);
         }
 
         foreach ($product->gallery as $media) {
             if ($media->file_path) {
-                $images[] = asset('storage/' . $media->file_path);
+                $images[] = asset('storage/'.$media->file_path);
             }
         }
 
@@ -231,7 +231,7 @@ class SitemapController extends Controller
     private function xmlResponse(string $xml): Response
     {
         return response($xml, 200, [
-            'Content-Type'  => 'application/xml; charset=utf-8',
+            'Content-Type' => 'application/xml; charset=utf-8',
             'Cache-Control' => 'public, max-age=3600',
         ]);
     }

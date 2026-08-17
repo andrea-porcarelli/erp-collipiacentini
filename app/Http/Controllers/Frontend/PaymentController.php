@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,14 +25,14 @@ class PaymentController extends Controller
     {
         $cart = Cart::getBySession();
 
-        if (!$cart) {
+        if (! $cart) {
             return response()->json([
                 'success' => false,
                 'error' => 'Carrello non trovato',
             ], 404);
         }
 
-        if (!$cart->customer_id) {
+        if (! $cart->customer_id) {
             return response()->json([
                 'success' => false,
                 'error' => 'Dati cliente mancanti',
@@ -54,7 +53,7 @@ class PaymentController extends Controller
 
             return response()->json([
                 'success' => false,
-                'error' => 'Errore nella creazione del pagamento: ' . $e->getMessage(),
+                'error' => 'Errore nella creazione del pagamento: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -70,7 +69,7 @@ class PaymentController extends Controller
 
         $cart = Cart::getBySession();
 
-        if (!$cart) {
+        if (! $cart) {
             return response()->json([
                 'success' => false,
                 'error' => 'Carrello non trovato',
@@ -131,7 +130,7 @@ class PaymentController extends Controller
 
             return response()->json([
                 'success' => false,
-                'error' => 'Errore nella conferma del pagamento: ' . $e->getMessage(),
+                'error' => 'Errore nella conferma del pagamento: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -144,14 +143,14 @@ class PaymentController extends Controller
     {
         $cart = Cart::getBySession();
 
-        if (!$cart) {
+        if (! $cart) {
             return response()->json([
                 'success' => false,
                 'error' => 'Carrello non trovato',
             ], 404);
         }
 
-        if (!$cart->customer_id) {
+        if (! $cart->customer_id) {
             return response()->json([
                 'success' => false,
                 'error' => 'Dati cliente mancanti',
@@ -182,7 +181,7 @@ class PaymentController extends Controller
 
             return response()->json([
                 'success' => false,
-                'error' => 'Errore nella creazione della prenotazione: ' . $e->getMessage(),
+                'error' => 'Errore nella creazione della prenotazione: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -195,7 +194,7 @@ class PaymentController extends Controller
     {
         $allowed = array_map('strval', (array) session('completed_orders', []));
 
-        if (!in_array($orderNumber, $allowed, true)) {
+        if (! in_array($orderNumber, $allowed, true)) {
             return redirect('/shop');
         }
 
@@ -218,7 +217,7 @@ class PaymentController extends Controller
     {
         $completed = array_map('strval', (array) session('completed_orders', []));
 
-        if (!in_array($orderNumber, $completed, true)) {
+        if (! in_array($orderNumber, $completed, true)) {
             $completed[] = $orderNumber;
             session(['completed_orders' => $completed]);
         }

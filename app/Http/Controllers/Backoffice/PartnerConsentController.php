@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 class PartnerConsentController extends CrudController
 {
     public PartnerConsentInterface $interface;
+
     public PartnerInterface $partnerInterface;
+
     public string $path = 'partner-consents';
 
     public function __construct(PartnerConsentInterface $interface, PartnerInterface $partnerInterface)
@@ -25,9 +27,10 @@ class PartnerConsentController extends CrudController
     {
         try {
             $items = PartnerConsent::where('partner_id', $partnerId)
+                ->current()
                 ->orderBy('position')
                 ->get()
-                ->map(fn($c) => $this->serialize($c));
+                ->map(fn ($c) => $this->serialize($c));
 
             return $this->success(['data' => $items]);
         } catch (\Exception $e) {
@@ -44,12 +47,12 @@ class PartnerConsentController extends CrudController
             $consent = PartnerConsent::firstOrCreate(
                 ['partner_id' => $partner->id, 'code' => PartnerConsent::CODE_TERMS],
                 [
-                    'is_required'   => true,
-                    'is_locked'     => true,
-                    'expiry_days'   => 0,
+                    'is_required' => true,
+                    'is_locked' => true,
+                    'expiry_days' => 0,
                     'expiry_months' => 0,
-                    'expiry_years'  => 10,
-                    'position'      => 0,
+                    'expiry_years' => 10,
+                    'position' => 0,
                 ]
             );
 
@@ -74,13 +77,13 @@ class PartnerConsentController extends CrudController
             $position = (int) (PartnerConsent::where('partner_id', $partner->id)->max('position') ?? -1) + 1;
 
             $consent = $this->interface->store([
-                'partner_id'    => $partner->id,
-                'is_required'   => $data['is_required'],
-                'is_locked'     => false,
-                'expiry_days'   => $data['expiry_days'],
+                'partner_id' => $partner->id,
+                'is_required' => $data['is_required'],
+                'is_locked' => false,
+                'expiry_days' => $data['expiry_days'],
                 'expiry_months' => $data['expiry_months'],
-                'expiry_years'  => $data['expiry_years'],
-                'position'      => $position,
+                'expiry_years' => $data['expiry_years'],
+                'position' => $position,
             ]);
 
             $this->applyTranslations($consent, $data['content_translations']);
@@ -94,19 +97,52 @@ class PartnerConsentController extends CrudController
     public function update(Request $request, int $partnerId, int $consentId): JsonResponse
     {
         try {
-            $consent = PartnerConsent::where('partner_id', $partnerId)->findOrFail($consentId);
+            $consent = PartnerConsent::where('partner_id', $partnerId)
+                ->current()
+                ->findOrFail($consentId);
             $data = $this->validatedPayload($request);
 
             $update = [];
-            // Su un consenso bloccato la scadenza e is_required non sono modificabili
             if (! $consent->is_locked) {
-                $update['is_required']   = $data['is_required'];
-                $update['expiry_days']   = $data['expiry_days'];
+                $update['is_required'] = $data['is_required'];
+                $update['expiry_days'] = $data['expiry_days'];
                 $update['expiry_months'] = $data['expiry_months'];
-                $update['expiry_years']  = $data['expiry_years'];
+                $update['expiry_years'] = $data['expiry_years'];
             }
-            if (!empty($update)) {
+            if (! empty($update)) {
                 $this->interface->edit($consent, $update);
+            }
+
+            $textChanged = $this->contentChanged($consent, $data['content_translations']);
+
+            if ($textChanged && $consent->orderConsents()->exists()) {
+                // Copy-on-write: creiamo una nuova versione, quella vecchia resta
+                // puntata dagli ordini storici come snapshot immutabile.
+                $newConsent = \Illuminate\Support\Facades\DB::transaction(function () use ($consent, $data) {
+                    $new = PartnerConsent::create([
+                        'partner_id' => $consent->partner_id,
+                        'code' => $consent->code,
+                        'version' => (int) $consent->version + 1,
+                        'is_required' => $consent->is_required,
+                        'is_locked' => $consent->is_locked,
+                        'is_active' => $consent->is_active,
+                        'expiry_days' => $consent->expiry_days,
+                        'expiry_months' => $consent->expiry_months,
+                        'expiry_years' => $consent->expiry_years,
+                        'position' => $consent->position,
+                    ]);
+
+                    $this->applyTranslations($new, $data['content_translations']);
+
+                    $consent->update([
+                        'superseded_at' => now(),
+                        'superseded_by_id' => $new->id,
+                    ]);
+
+                    return $new;
+                });
+
+                return $this->success(['consent' => $this->serialize($newConsent->fresh())]);
             }
 
             $this->applyTranslations($consent, $data['content_translations']);
@@ -115,6 +151,24 @@ class PartnerConsentController extends CrudController
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }
+    }
+
+    /**
+     * True se almeno una traduzione contenuto differisce da quella salvata attuale.
+     */
+    private function contentChanged(PartnerConsent $consent, array $translations): bool
+    {
+        foreach ($translations as $isoCode => $html) {
+            if (! is_string($isoCode) || $isoCode === '') {
+                continue;
+            }
+            $current = (string) ($consent->contentField('content', $isoCode) ?? '');
+            if ((string) $html !== $current) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function toggleActive(Request $request, int $partnerId, int $consentId): JsonResponse
@@ -152,8 +206,12 @@ class PartnerConsentController extends CrudController
             if ($consent->is_locked) {
                 return $this->exception(new \Exception('Questo consenso non può essere eliminato.'));
             }
-            if ($consent->customerConsents()->exists()) {
-                return $this->exception(new \Exception('Questo consenso è già stato sottoscritto da uno o più utenti e non può essere eliminato.'));
+            if ($consent->orderConsents()->exists()) {
+                // Soft-delete via superseded_at: gli ordini storici continuano
+                // a puntare a questo record e ne conservano il testo integrale.
+                $consent->update(['superseded_at' => now()]);
+
+                return $this->success();
             }
             $consent->delete();
 
@@ -169,11 +227,11 @@ class PartnerConsentController extends CrudController
             $consent = PartnerConsent::where('partner_id', $partnerId)->findOrFail($consentId);
             $languages = Language::where('is_active', 1)->get();
 
-            $data = $languages->map(fn($lang) => [
+            $data = $languages->map(fn ($lang) => [
                 'language_id' => $lang->id,
-                'language'    => $lang->label,
-                'iso_code'    => $lang->iso_code,
-                'content'     => $consent->contentField('content', $lang->iso_code) ?? '',
+                'language' => $lang->label,
+                'iso_code' => $lang->iso_code,
+                'content' => $consent->contentField('content', $lang->iso_code) ?? '',
             ]);
 
             return $this->success(['data' => $data]);
@@ -189,7 +247,9 @@ class PartnerConsentController extends CrudController
 
             foreach ($request->input('translations', []) as $t) {
                 $lang = Language::find($t['language_id'] ?? null);
-                if (!$lang) continue;
+                if (! $lang) {
+                    continue;
+                }
                 $consent->setContentFields(['content' => $t['content'] ?? ''], $lang->iso_code);
             }
 
@@ -202,18 +262,18 @@ class PartnerConsentController extends CrudController
     private function validatedPayload(Request $request): array
     {
         $request->validate([
-            'is_required'           => 'required|boolean',
-            'expiry_days'           => 'required|integer|min:0',
-            'expiry_months'         => 'required|integer|min:0',
-            'expiry_years'          => 'required|integer|min:0',
-            'content_translations'  => 'nullable|array',
+            'is_required' => 'required|boolean',
+            'expiry_days' => 'required|integer|min:0',
+            'expiry_months' => 'required|integer|min:0',
+            'expiry_years' => 'required|integer|min:0',
+            'content_translations' => 'nullable|array',
         ]);
 
         return [
-            'is_required'          => (bool) $request->input('is_required'),
-            'expiry_days'          => (int) $request->input('expiry_days'),
-            'expiry_months'        => (int) $request->input('expiry_months'),
-            'expiry_years'         => (int) $request->input('expiry_years'),
+            'is_required' => (bool) $request->input('is_required'),
+            'expiry_days' => (int) $request->input('expiry_days'),
+            'expiry_months' => (int) $request->input('expiry_months'),
+            'expiry_years' => (int) $request->input('expiry_years'),
             'content_translations' => (array) $request->input('content_translations', []),
         ];
     }
@@ -224,7 +284,9 @@ class PartnerConsentController extends CrudController
             return;
         }
         foreach ($translations as $isoCode => $html) {
-            if (!is_string($isoCode) || $isoCode === '') continue;
+            if (! is_string($isoCode) || $isoCode === '') {
+                continue;
+            }
             $consent->setContentFields(['content' => (string) $html], $isoCode);
         }
     }
@@ -232,17 +294,18 @@ class PartnerConsentController extends CrudController
     private function serialize(PartnerConsent $c): array
     {
         return [
-            'id'            => $c->id,
-            'code'          => $c->code,
-            'is_required'   => (bool) $c->is_required,
-            'is_locked'     => (bool) $c->is_locked,
-            'is_active'     => (bool) $c->is_active,
-            'has_customers' => $c->customerConsents()->exists(),
-            'expiry_days'   => (int) $c->expiry_days,
+            'id' => $c->id,
+            'code' => $c->code,
+            'version' => (int) $c->version,
+            'is_required' => (bool) $c->is_required,
+            'is_locked' => (bool) $c->is_locked,
+            'is_active' => (bool) $c->is_active,
+            'has_customers' => $c->orderConsents()->exists(),
+            'expiry_days' => (int) $c->expiry_days,
             'expiry_months' => (int) $c->expiry_months,
-            'expiry_years'  => (int) $c->expiry_years,
-            'position'      => (int) $c->position,
-            'content_it'    => $c->contentField('content', 'it') ?? '',
+            'expiry_years' => (int) $c->expiry_years,
+            'position' => (int) $c->position,
+            'content_it' => $c->contentField('content', 'it') ?? '',
         ];
     }
 }

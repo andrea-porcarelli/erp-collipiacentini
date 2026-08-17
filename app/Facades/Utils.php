@@ -5,26 +5,29 @@ namespace App\Facades;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class Utils
 {
-    public static  function site_title() : string
+    public static function site_title(): string
     {
         return 'Miticko';
     }
-    public static  function company_id() : string
+
+    public static function company_id(): string
     {
         return 1;
     }
-    public static function upload_path() : string {
-        return storage_path() . '/app/public';
+
+    public static function upload_path(): string
+    {
+        return storage_path().'/app/public';
     }
 
-    public static function queryLog($models, $print = false, $return  = false) {
+    public static function queryLog($models, $print = false, $return = false)
+    {
         Log::info($models->toSql());
         if (preg_match('/\?/', $models->toSql())) {
-            $query = str_replace(array('?'), array('\'%s\''), $models->toSql());
+            $query = str_replace(['?'], ['\'%s\''], $models->toSql());
             $query = vsprintf($query, $models->getBindings());
         } else {
             $query = $models->toSql();
@@ -32,43 +35,51 @@ class Utils
         if ($return) {
             return $query;
         }
-        if (!$print) {
+        if (! $print) {
             Log::info($query);
         } else {
             echo $query;
         }
     }
 
-    public static function price(float $price = null) : string
+    public static function price(?float $price = null): string
     {
-        return isset($price) ? number_format($price, '2', ',', '.') . ' €' : '0,00 €';
+        return isset($price) ? number_format($price, '2', ',', '.').' €' : '0,00 €';
     }
 
-    public static function data(string $data = null) : string {
+    public static function data(?string $data = null): string
+    {
         return isset($data) ? Carbon::parse($data)->format('d/m/Y') : '';
     }
 
-    public static function data_long(string $data = null) : string {
+    public static function data_long(?string $data = null): string
+    {
         return isset($data) ? Carbon::parse($data)->format('d/m/Y H:i') : '';
     }
 
-    public static function data_extra_long(string $data = null) : string {
+    public static function data_extra_long(?string $data = null): string
+    {
         return isset($data) ? Carbon::parse($data)->format('d/m/Y H:i:s') : '';
     }
 
-    public static function data_from_ita(string $data = null) : Carbon {
+    public static function data_from_ita(?string $data = null): Carbon
+    {
         return Carbon::createFromFormat('d/m/Y', $data);
     }
 
-    public static function place_holders(string $text, array $fields = []) : string {
+    public static function place_holders(string $text, array $fields = []): string
+    {
         if (count($fields) > 0) {
             foreach ($fields as $key => $field) {
-                $text = preg_replace('/{'. $key . '}/', $field, $text);
+                $text = preg_replace('/{'.$key.'}/', $field, $text);
             }
         }
+
         return $text;
     }
-    public static function map_collection($items) : array {
+
+    public static function map_collection($items): array
+    {
         return $items->get()->map(function ($item) {
             return ['id' => $item->id, 'label' => $item->custom_label ?? $item->label];
         })->values()->toArray();
@@ -79,6 +90,7 @@ class Utils
         if (count($elements) == 0) {
             return [];
         }
+
         return collect($elements)->map(function ($item, $key) {
             return ['id' => $key, 'label' => $item];
         })->toArray();
@@ -89,32 +101,37 @@ class Utils
         if (count($elements) == 0) {
             return [];
         }
+
         return collect($elements)->map(function ($item) {
             return ['id' => $item, 'label' => $item];
         })->toArray();
     }
 
-    public static function partner_path(): string {
+    public static function partner_path(): string
+    {
         $partner = Session::get('partner');
         if ($partner && $partner->logo) {
             return $partner->logo->file_path;
         }
+
         return '';
     }
 
-    public static function hours() : array {
-        return array_map(function($h) {
+    public static function hours(): array
+    {
+        return array_map(function ($h) {
             return [
-                'id'    => $h,
-                'label' => str_pad($h, 2, '0', STR_PAD_LEFT)
+                'id' => $h,
+                'label' => str_pad($h, 2, '0', STR_PAD_LEFT),
             ];
         }, range(0, 23));
     }
 
-    public static function minutes() : array {
-        return array_map(fn($m) => [
-            'id'    => str_pad($m, 2, '0', STR_PAD_LEFT),
-            'label' => str_pad($m, 2, '0', STR_PAD_LEFT)
+    public static function minutes(): array
+    {
+        return array_map(fn ($m) => [
+            'id' => str_pad($m, 2, '0', STR_PAD_LEFT),
+            'label' => str_pad($m, 2, '0', STR_PAD_LEFT),
         ], range(0, 59, 1));
     }
 }

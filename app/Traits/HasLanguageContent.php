@@ -24,9 +24,9 @@ trait HasLanguageContent
     {
         $locale = $locale ?? app()->getLocale();
 
-        if (!isset($this->contentCache[$locale])) {
+        if (! isset($this->contentCache[$locale])) {
             $this->contentCache[$locale] = $this->contents()
-                ->whereHas('language', fn($q) => $q->where('iso_code', $locale))
+                ->whereHas('language', fn ($q) => $q->where('iso_code', $locale))
                 ->pluck('value', 'field');
         }
 
@@ -60,7 +60,7 @@ trait HasLanguageContent
     /**
      * Salva più campi tradotti in una sola chiamata.
      *
-     * @param array<string, string> $fields  [ 'field' => 'value', ... ]
+     * @param  array<string, string>  $fields  [ 'field' => 'value', ... ]
      */
     public function setContentFields(array $fields, ?string $locale = null): void
     {

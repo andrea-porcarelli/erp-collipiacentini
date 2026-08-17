@@ -2,6 +2,4 @@
 
 namespace App\Interfaces;
 
-interface CategoryInterface extends CrudInterface
-{
-}
+interface CategoryInterface extends CrudInterface {}

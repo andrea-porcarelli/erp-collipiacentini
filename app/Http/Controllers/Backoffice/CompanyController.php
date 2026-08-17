@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Backoffice\Requests\StoreCompanyRequest;
-use App\Http\Controllers\Controller;
 use App\Interfaces\CompanyInterface;
 use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -18,6 +17,7 @@ class CompanyController extends CrudController
     use AuthorizesRequests, ValidatesRequests;
 
     public CompanyInterface $interface;
+
     public string $path;
 
     public function __construct(CompanyInterface $interface)
@@ -28,7 +28,7 @@ class CompanyController extends CrudController
 
     public function index(): View
     {
-        return view('backoffice.' . $this->path . '.index')
+        return view('backoffice.'.$this->path.'.index')
             ->with('path', $this->path);
     }
 
@@ -45,7 +45,7 @@ class CompanyController extends CrudController
             ->orderBy('partner_name')
             ->get();
 
-        return view('backoffice.' . $this->path . '.show', compact('model', 'partners', 'selectedProductIds'))
+        return view('backoffice.'.$this->path.'.show', compact('model', 'partners', 'selectedProductIds'))
             ->with('path', $this->path);
     }
 
@@ -71,7 +71,7 @@ class CompanyController extends CrudController
             'is_active' => 0,
         ]);
 
-        return $this->success(['redirect' => route($this->path . '.show', $company->id)]);
+        return $this->success(['redirect' => route($this->path.'.show', $company->id)]);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -80,7 +80,7 @@ class CompanyController extends CrudController
             $company = $this->interface->find($id);
             $this->interface->edit($company, $request->only([
                 'company_name', 'company_code', 'vat_number', 'phone', 'email', 'email_notify',
-                'has_whitelabel', 'has_woocommerce', 'endpoint_woocommerce'
+                'has_whitelabel', 'has_woocommerce', 'endpoint_woocommerce',
             ]));
 
             return $this->success();
@@ -102,11 +102,13 @@ class CompanyController extends CrudController
         }
     }
 
-    public function data(Request $request) : JsonResponse {
+    public function data(Request $request): JsonResponse
+    {
         try {
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters);
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
                 ->addColumn('has_whitelabel', function ($item) {
                     return view('backoffice.components.label', [

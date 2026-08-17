@@ -43,7 +43,7 @@ class CatalogController extends Controller
         $checksumData = Product::query()
             ->orderBy('id')
             ->get(['id', 'updated_at'])
-            ->map(fn($p) => $p->id . ':' . $p->updated_at)
+            ->map(fn ($p) => $p->id.':'.$p->updated_at)
             ->implode('|');
 
         return response()->json([

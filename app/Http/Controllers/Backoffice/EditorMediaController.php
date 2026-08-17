@@ -22,13 +22,13 @@ class EditorMediaController extends Controller
             ], 422);
         }
 
-        $file   = $request->file('upload');
+        $file = $request->file('upload');
         $userId = Auth::id() ?? 'anon';
-        $name   = Str::random(16) . '.' . $file->getClientOriginalExtension();
-        $path   = $file->storeAs("editor/{$userId}", $name, 'public');
+        $name = Str::random(16).'.'.$file->getClientOriginalExtension();
+        $path = $file->storeAs("editor/{$userId}", $name, 'public');
 
         return response()->json([
-            'url'      => asset('storage/' . $path),
+            'url' => asset('storage/'.$path),
             'uploaded' => 1,
             'fileName' => $file->getClientOriginalName(),
         ]);

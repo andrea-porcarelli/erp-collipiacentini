@@ -10,9 +10,15 @@ return new class extends Migration
     {
         Schema::table('product_faqs', function (Blueprint $table) {
             $columns = [];
-            if (Schema::hasColumn('product_faqs', 'question')) $columns[] = 'question';
-            if (Schema::hasColumn('product_faqs', 'answer'))   $columns[] = 'answer';
-            if (!empty($columns)) $table->dropColumn($columns);
+            if (Schema::hasColumn('product_faqs', 'question')) {
+                $columns[] = 'question';
+            }
+            if (Schema::hasColumn('product_faqs', 'answer')) {
+                $columns[] = 'answer';
+            }
+            if (! empty($columns)) {
+                $table->dropColumn($columns);
+            }
         });
     }
 

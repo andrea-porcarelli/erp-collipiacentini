@@ -15,8 +15,8 @@
 
 return [
     'meta' => [
-        'source'    => 'public/backoffice/css/Miticko.css',
-        'mode'      => 'Light',
+        'source' => 'public/backoffice/css/Miticko.css',
+        'mode' => 'Light',
         'synced_at' => '2026-06-10 10:49:28',
     ],
 
@@ -24,11 +24,11 @@ return [
 
     'brands' => [
         'miticko' => [
-            'meta' => array (
-  'brand' => 'Miticko',
-  'mode' => 'Light',
-  'tokens_count' => 1113,
-),
+            'meta' => [
+                'brand' => 'Miticko',
+                'mode' => 'Light',
+                'tokens_count' => 1113,
+            ],
             'tokens' => [
                 'accordion-background' => '#fafafa',
                 'accordion-bordercoloractive' => '#808080',
@@ -1146,11 +1146,11 @@ return [
             ],
         ],
         'veleia' => [
-            'meta' => array (
-  'brand' => 'Veleia',
-  'mode' => 'Light',
-  'tokens_count' => 1113,
-),
+            'meta' => [
+                'brand' => 'Veleia',
+                'mode' => 'Light',
+                'tokens_count' => 1113,
+            ],
             'tokens' => [
                 'accordion-background' => '#fafafa',
                 'accordion-bordercoloractive' => '#808080',

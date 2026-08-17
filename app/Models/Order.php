@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Enums\CustomerStatus;
@@ -33,14 +34,29 @@ class Order extends LogsModel
         'referrer',
         'gclid',
         'fbclid',
+        'name',
+        'surname',
+        'email',
+        'prefix_phone',
+        'phone',
+        'address',
+        'city',
+        'zip_code',
+        'country_id',
+        'fiscal_code',
+        'birth_date',
+        'privacy_accepted',
+        'newsletter',
     ];
-
 
     protected $casts = [
         'order_status' => OrderStatus::class,
         'customer_status' => CustomerStatus::class,
         'paid_at' => 'datetime',
         'amount' => 'decimal:2',
+        'birth_date' => 'date',
+        'privacy_accepted' => 'boolean',
+        'newsletter' => 'boolean',
     ];
 
     public function partner(): BelongsTo
@@ -48,9 +64,9 @@ class Order extends LogsModel
         return $this->belongsTo(Partner::class);
     }
 
-    public function customer(): BelongsTo
+    public function country(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Country::class);
     }
 
     public function orderProducts(): HasMany
@@ -63,22 +79,37 @@ class Order extends LogsModel
         return $this->hasMany(OrderParticipant::class);
     }
 
+    public function consents(): HasMany
+    {
+        return $this->hasMany(OrderConsent::class);
+    }
+
     public function logs(): HasMany
     {
         return $this->hasMany(OrderLog::class);
     }
 
-    public function getProductTimeAttribute() : string
+    public function getFullNameAttribute(): string
     {
-        return isset($this->orderProducts()->first()->booking_time) ? substr($this->orderProducts()->first()->booking_time, 0 , 5) : '';
+        return trim(sprintf('%s %s', $this->name ?? '', $this->surname ?? ''));
     }
 
-    public function getProductDataAttribute() : string
+    public function getFullAddressAttribute(): string
+    {
+        return trim(sprintf('%s, %s %s', $this->address ?? '', $this->zip_code ?? '', $this->city ?? ''), ' ,');
+    }
+
+    public function getProductTimeAttribute(): string
+    {
+        return isset($this->orderProducts()->first()->booking_time) ? substr($this->orderProducts()->first()->booking_time, 0, 5) : '';
+    }
+
+    public function getProductDataAttribute(): string
     {
         return $this->orderProducts()->first()->booking_date ?? '';
     }
 
-    public function getProductLabelAttribute() : string
+    public function getProductLabelAttribute(): string
     {
         return $this->orderProducts()->first()->product->label ?? '';
     }

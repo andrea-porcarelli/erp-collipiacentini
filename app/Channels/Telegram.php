@@ -19,7 +19,7 @@ class Telegram
                 'parse_mode' => $message['parse_mode'] ?? 'HTML',
             ];
 
-            if (!empty($message['url'])) {
+            if (! empty($message['url'])) {
                 $buttonText = $message['button_text'] ?? 'Apri';
                 $payload['reply_markup'] = json_encode([
                     'inline_keyboard' => [
@@ -30,8 +30,8 @@ class Telegram
                 ]);
             }
 
-            $response = Http::post('https://api.telegram.org/bot' . config('services.telegram.bot_token') . '/sendMessage', $payload);
-            if (!$response->successful()) {
+            $response = Http::post('https://api.telegram.org/bot'.config('services.telegram.bot_token').'/sendMessage', $payload);
+            if (! $response->successful()) {
                 logger()->error('Telegram API error', [
                     'status' => $response->status(),
                     'body' => $response->body(),

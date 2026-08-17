@@ -9,5 +9,5 @@ return [
     'types' => [
         'guided' => 'Guidata',
         'free' => 'Libera',
-    ]
+    ],
 ];

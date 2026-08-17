@@ -1,4 +1,4 @@
-@php($customer = $order->customer)
+@php($customer = $order)
 @php($countries = \App\Models\Country::orderBy('position')->orderBy('name')->get(['id', 'name'])->map(fn($c) => ['id' => $c->id, 'label' => $c->name])->all())
 <x-modal id="modal-edit-customer" title="Modifica cliente" primary="Salva" secondary="Annulla" width="640px">
     <form id="form-edit-customer">

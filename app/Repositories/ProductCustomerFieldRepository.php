@@ -16,6 +16,6 @@ class ProductCustomerFieldRepository extends CrudRepository implements ProductCu
     public function filters(array $filters): Builder
     {
         return $this->builder()
-            ->when(isset($filters['product_id']), fn($q) => $q->where('product_id', $filters['product_id']));
+            ->when(isset($filters['product_id']), fn ($q) => $q->where('product_id', $filters['product_id']));
     }
 }

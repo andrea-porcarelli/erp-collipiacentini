@@ -21,6 +21,7 @@ class UserController extends CrudController
     use AuthorizesRequests, ValidatesRequests;
 
     public UserInterface $interface;
+
     public string $path;
 
     public function __construct(UserInterface $interface)
@@ -47,7 +48,7 @@ class UserController extends CrudController
             ['id' => 'partner', 'label' => 'Collaboratore Partner'],
         ];
 
-        return view('backoffice.' . $this->path . '.index', compact('companies', 'partners', 'roles'))
+        return view('backoffice.'.$this->path.'.index', compact('companies', 'partners', 'roles'))
             ->with('path', $this->path);
     }
 
@@ -70,12 +71,12 @@ class UserController extends CrudController
 
         $user = $this->interface->store($data);
 
-        return $this->success(['redirect' => route($this->path . '.show', $user->id)]);
+        return $this->success(['redirect' => route($this->path.'.show', $user->id)]);
     }
 
     public function show(int $id): View|RedirectResponse
     {
-        $model       = $this->interface->find($id);
+        $model = $this->interface->find($id);
         $currentUser = Auth::user();
 
         if ($currentUser->role === 'god') {
@@ -95,17 +96,17 @@ class UserController extends CrudController
             ];
         }
 
-        return view('backoffice.' . $this->path . '.show', compact('model', 'partners', 'roles'))
+        return view('backoffice.'.$this->path.'.show', compact('model', 'partners', 'roles'))
             ->with('path', $this->path);
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try {
-            $user    = $this->interface->find($id);
+            $user = $this->interface->find($id);
             $current = Auth::user();
-            $isGod          = $current->role === 'god';
-            $isAdminPartner = $current->role === 'admin' && !is_null($current->partner_id);
+            $isGod = $current->role === 'god';
+            $isAdminPartner = $current->role === 'admin' && ! is_null($current->partner_id);
 
             match ($request->input('section')) {
                 'info' => $this->updateInfo($user, $request),
@@ -123,19 +124,19 @@ class UserController extends CrudController
     private function updateInfo($user, Request $request): void
     {
         $this->validate($request, [
-            'name'  => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email', 'unique:users,email,'.$user->id],
         ]);
 
         $this->interface->edit($user, [
-            'name'  => $request->input('name'),
+            'name' => $request->input('name'),
             'email' => $request->input('email'),
         ]);
     }
 
     private function updatePartnerRole($user, Request $request, bool $isGod, bool $isAdminPartner, $current): void
     {
-        if (!$isGod && !$isAdminPartner) {
+        if (! $isGod && ! $isAdminPartner) {
             abort(403);
         }
 
@@ -144,7 +145,7 @@ class UserController extends CrudController
             : ['admin', 'partner'];
 
         $role = $request->input('role');
-        if (!in_array($role, $allowedRoles, true)) {
+        if (! in_array($role, $allowedRoles, true)) {
             abort(403, 'Ruolo non permesso');
         }
 
@@ -153,14 +154,14 @@ class UserController extends CrudController
             : $current->partner_id;
 
         $this->interface->edit($user, [
-            'role'       => $role,
+            'role' => $role,
             'partner_id' => $partnerId,
         ]);
     }
 
     private function updatePassword($user, Request $request, bool $allowed): void
     {
-        if (!$allowed) {
+        if (! $allowed) {
             abort(403);
         }
 
@@ -173,25 +174,28 @@ class UserController extends CrudController
         ]);
     }
 
-    public function data(Request $request) : JsonResponse {
+    public function data(Request $request): JsonResponse
+    {
         try {
             $filters = $request->get('filters') ?? [];
 
             $elements = $this->interface->filters($filters)
-            ->when(!in_array(Auth::user()->role, ['god']), function($q) {
-                if (Auth::user()->role == 'admin') {
-                    $q->whereIn('role', ['admin','partner'])
-                        ->where('partner_id', Auth::user()->partner_id);
-                }
-            });
+                ->when(! in_array(Auth::user()->role, ['god']), function ($q) {
+                    if (Auth::user()->role == 'admin') {
+                        $q->whereIn('role', ['admin', 'partner'])
+                            ->where('partner_id', Auth::user()->partner_id);
+                    }
+                });
+
             return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['impersonate', 'edit', 'status'])
                 ->addColumn('role', function ($item) {
                     if ($item->role === 'partner') {
-                        return "Collaboratore";
+                        return 'Collaboratore';
                     }
                     if ($item->role === 'admin') {
-                        return "Proprietario";
+                        return 'Proprietario';
                     }
+
                     return ucfirst($item->role);
                 })
                 ->addColumn('association', function ($item) {
@@ -201,6 +205,7 @@ class UserController extends CrudController
                     if ($item->role === 'company' && $item->company) {
                         return $item->company->company_name;
                     }
+
                     return ' - ';
                 })
                 ->rawColumns(['status'])

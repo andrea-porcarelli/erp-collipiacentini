@@ -2,12 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Facades\Utils;
 use App\Models\Company;
 use App\Models\Partner;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class Token
@@ -16,7 +14,7 @@ class Token
     {
         $token = $request->input('token') ?? $request->header('token') ?? $request->bearerToken();
 
-        if (!$token) {
+        if (! $token) {
             $host = $request->getHost();
             $partner = Partner::where('domain_name', $host)->first()
                 ?? Partner::where('slug_name', $host)->first();
@@ -24,21 +22,22 @@ class Token
             if ($partner) {
                 Session::put('partner', $partner);
                 $request->merge(['partner' => $partner]);
+
                 return $next($request);
             }
 
             return response()->json([
                 'error' => 'Token mancante',
-                'message' => 'Il parametro token è richiesto'
+                'message' => 'Il parametro token è richiesto',
             ], 401);
         }
 
         $company = Company::where('token', $token)->first();
 
-        if (!$company) {
+        if (! $company) {
             return response()->json([
                 'error' => 'Token non valido',
-                'message' => 'Nessuna azienda trovata con questo token'
+                'message' => 'Nessuna azienda trovata con questo token',
             ], 401);
         }
 

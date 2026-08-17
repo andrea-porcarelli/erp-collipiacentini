@@ -25,8 +25,8 @@ class MediaFactory extends Factory
             'mediable_type' => Product::class,
             'mediable_id' => 5,
             'media_type' => 'image',
-            'file_name' => fake()->word() . '.jpg',
-            'file_path' => 'images/products/' . fake()->uuid() . '.jpg',
+            'file_name' => fake()->word().'.jpg',
+            'file_path' => 'images/products/'.fake()->uuid().'.jpg',
             'file_type' => 'image/jpeg',
             'file_size' => fake()->numberBetween(50000, 500000),
             'description' => fake()->sentence(),
@@ -41,7 +41,7 @@ class MediaFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'mediable_type' => Partner::class,
             'mediable_id' => 2,
-            'file_path' => 'images/partners/' . fake()->uuid() . '.jpg',
+            'file_path' => 'images/partners/'.fake()->uuid().'.jpg',
             'description' => 'Immagine default per il partner',
         ]);
     }
@@ -54,7 +54,7 @@ class MediaFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'mediable_type' => Product::class,
             'mediable_id' => 5,
-            'file_path' => 'images/products/' . fake()->uuid() . '.jpg',
+            'file_path' => 'images/products/'.fake()->uuid().'.jpg',
             'description' => 'Immagine default per il prodotto',
         ]);
     }

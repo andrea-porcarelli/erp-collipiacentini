@@ -2,7 +2,7 @@
 
 @php
     $languages = \App\Models\Language::where('is_active', 1)->orderBy('iso_code')->get();
-    $consents  = $model->consents()->withCount('customerConsents')->orderBy('position')->get();
+    $consents  = $model->consents()->current()->withCount('orderConsents')->orderBy('position')->get();
     $isEnabled = (bool) $model->consents_enabled;
 
     $dayOpts   = collect(range(0, 31))->map(fn($n) => ['id' => $n, 'label' => (string) $n])->all();

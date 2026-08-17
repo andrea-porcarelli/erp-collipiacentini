@@ -11,7 +11,8 @@ class CrudController extends Controller
     {
         try {
             $model = $this->interface->find($id);
-            $this->interface->edit($model, ["is_active" => !$model->is_active]);
+            $this->interface->edit($model, ['is_active' => ! $model->is_active]);
+
             return $this->success();
         } catch (\Exception $e) {
             return $this->exception($e, null);
@@ -21,7 +22,8 @@ class CrudController extends Controller
     public function show(int $id)
     {
         $model = $this->interface->find($id);
-        return view('backoffice.' . $this->path . '.show', compact('model'))
+
+        return view('backoffice.'.$this->path.'.show', compact('model'))
             ->with('path', $this->path);
     }
 }

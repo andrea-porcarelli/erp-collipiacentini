@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\V1\AvailabilityController;
 use App\Http\Controllers\Api\V1\CatalogController;
-use App\Http\Controllers\Api\V1\CustomerController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +17,4 @@ Route::prefix('v1')->middleware('api.token')->group(function () {
 
     Route::get('/products/{id}/availability', [AvailabilityController::class, 'index']);
     Route::post('/products/{id}/availability/check', [AvailabilityController::class, 'check']);
-
-    Route::get('/customers', [CustomerController::class, 'index']);
-    Route::get('/customers/{id}', [CustomerController::class, 'show']);
 });

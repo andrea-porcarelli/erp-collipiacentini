@@ -53,9 +53,37 @@ class StatisticsController extends Controller
         $presale = 0.0;
 
         $orders = (clone $ordersQuery)
-            ->with(['customer', 'orderProducts.product', 'orderProducts.items.variant'])
+            ->with(['country', 'orderProducts.product', 'orderProducts.items.variant'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
+            ->get();
+
+        // Statistiche Ordini: aggregazione per email = cliente unico.
+        // Statistiche Clienti: aggregazione geografica per singolo ordine.
+        $uniqueCustomers = (int) (clone $ordersQuery)->whereNotNull('email')->distinct('email')->count('email');
+        $ordersCount = (int) (clone $ordersQuery)->count();
+        $recurringCustomers = (int) (clone $ordersQuery)
+            ->whereNotNull('email')
+            ->selectRaw('email, COUNT(*) as c')
+            ->groupBy('email')
+            ->havingRaw('COUNT(*) > 1')
+            ->get()
+            ->count();
+
+        $ordersPerCity = (clone $ordersQuery)
+            ->whereNotNull('city')
+            ->selectRaw('city, COUNT(*) as c')
+            ->groupBy('city')
+            ->orderByDesc('c')
+            ->limit(20)
+            ->get();
+
+        $ordersPerCountry = (clone $ordersQuery)
+            ->whereNotNull('country_id')
+            ->selectRaw('country_id, COUNT(*) as c')
+            ->groupBy('country_id')
+            ->orderByDesc('c')
+            ->limit(20)
             ->get();
 
         return view('backoffice.statistics.index', [
@@ -69,8 +97,13 @@ class StatisticsController extends Controller
                 'commissions' => $commissions,
                 'payment_fees' => $paymentFees,
                 'presale' => $presale,
+                'unique_customers' => $uniqueCustomers,
+                'orders_count' => $ordersCount,
+                'recurring_customers' => $recurringCustomers,
             ],
             'orders' => $orders,
+            'orders_per_city' => $ordersPerCity,
+            'orders_per_country' => $ordersPerCountry,
         ]);
     }
 }

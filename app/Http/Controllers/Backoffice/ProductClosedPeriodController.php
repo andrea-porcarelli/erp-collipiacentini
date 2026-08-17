@@ -25,11 +25,11 @@ class ProductClosedPeriodController extends Controller
     private function serialize(ProductClosedPeriod $p): array
     {
         return [
-            'id'           => $p->id,
-            'date_from'    => $p->date_from->locale('it')->isoFormat('D MMMM YYYY'),
-            'date_to'      => $p->date_to->locale('it')->isoFormat('D MMMM YYYY'),
+            'id' => $p->id,
+            'date_from' => $p->date_from->locale('it')->isoFormat('D MMMM YYYY'),
+            'date_to' => $p->date_to->locale('it')->isoFormat('D MMMM YYYY'),
             'date_from_iso' => $p->date_from->format('Y-m-d'),
-            'date_to_iso'   => $p->date_to->format('Y-m-d'),
+            'date_to_iso' => $p->date_to->format('Y-m-d'),
         ];
     }
 
@@ -39,7 +39,7 @@ class ProductClosedPeriodController extends Controller
 
         $data = $request->validate([
             'date_from' => 'required|date',
-            'date_to'   => 'required|date|after_or_equal:date_from',
+            'date_to' => 'required|date|after_or_equal:date_from',
         ]);
 
         $period = $product->closedPeriods()->create($data);

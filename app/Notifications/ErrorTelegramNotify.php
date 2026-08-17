@@ -9,6 +9,7 @@ use Throwable;
 class ErrorTelegramNotify extends Notification
 {
     protected Throwable $exception;
+
     protected array $context;
 
     public function __construct(Throwable $exception, array $context = [])
@@ -29,22 +30,22 @@ class ErrorTelegramNotify extends Notification
         $message = $this->exception->getMessage() !== ''
             ? $this->exception->getMessage()
             : '(no message)';
-        $file = $this->exception->getFile() . ':' . $this->exception->getLine();
+        $file = $this->exception->getFile().':'.$this->exception->getLine();
 
         $url = $this->context['url'] ?? null;
         $method = $this->context['method'] ?? null;
         $userId = $this->context['user_id'] ?? null;
 
         $text = "🚨 <b>Errore {$env}</b>\n"
-            . '<b>' . $this->escape($class) . "</b>\n"
-            . '<code>' . $this->escape($this->truncate($message, 500)) . "</code>\n"
-            . '📄 ' . $this->escape($file);
+            .'<b>'.$this->escape($class)."</b>\n"
+            .'<code>'.$this->escape($this->truncate($message, 500))."</code>\n"
+            .'📄 '.$this->escape($file);
 
         if ($url) {
-            $text .= "\n🔗 " . $this->escape(($method ? $method . ' ' : '') . $url);
+            $text .= "\n🔗 ".$this->escape(($method ? $method.' ' : '').$url);
         }
         if ($userId) {
-            $text .= "\n👤 user #" . (int) $userId;
+            $text .= "\n👤 user #".(int) $userId;
         }
 
         return [
@@ -54,7 +55,7 @@ class ErrorTelegramNotify extends Notification
 
     private function truncate(string $text, int $max): string
     {
-        return mb_strlen($text) > $max ? mb_substr($text, 0, $max - 1) . '…' : $text;
+        return mb_strlen($text) > $max ? mb_substr($text, 0, $max - 1).'…' : $text;
     }
 
     private function escape(string $text): string

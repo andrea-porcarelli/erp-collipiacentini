@@ -12,7 +12,8 @@ class DashboardController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function index() : View {
+    public function index(): View
+    {
 
         return view('backoffice.dashboard.index');
     }
@@ -23,7 +24,7 @@ class DashboardController extends Controller
         Session::put('company-to-be-select', false);
     }
 
-    public function select_company() : View
+    public function select_company(): View
     {
         return view('backoffice.pages.dashboard.select-company');
     }
