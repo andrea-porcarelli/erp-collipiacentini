@@ -32,7 +32,7 @@ class PaymentController extends Controller
             ], 404);
         }
 
-        if (! $cart->customer_id) {
+        if (! $cart->email) {
             return response()->json([
                 'success' => false,
                 'error' => 'Dati cliente mancanti',
@@ -40,8 +40,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $customer = $cart->customer;
-            $paymentIntent = $this->stripeService->createPaymentIntent($cart, $customer);
+            $paymentIntent = $this->stripeService->createPaymentIntent($cart);
 
             return response()->json([
                 'success' => true,
@@ -108,7 +107,6 @@ class PaymentController extends Controller
             // Crea l'ordine
             $order = $this->orderService->createOrderFromCart(
                 $cart,
-                $cart->customer,
                 $paymentIntentId,
                 $paymentIntent->payment_method
             );
@@ -150,7 +148,7 @@ class PaymentController extends Controller
             ], 404);
         }
 
-        if (! $cart->customer_id) {
+        if (! $cart->email) {
             return response()->json([
                 'success' => false,
                 'error' => 'Dati cliente mancanti',
@@ -165,7 +163,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $order = $this->orderService->createOrderFromCart($cart, $cart->customer);
+            $order = $this->orderService->createOrderFromCart($cart);
             $this->orderService->completeOrder($order);
 
             $cart->delete();
