@@ -220,7 +220,7 @@ class OrderController extends Controller
         $commissionPaymentAmount = round($amount * $commissionPaymentRate / 100, 2);
         $commissionServiceAmount = round($amount * $commissionServiceRate / 100, 2);
 
-        $customerConsents = OrderConsent::with('partnerConsent')
+        $orderConsents = OrderConsent::with('partnerConsent')
             ->where('order_id', $order->id)
             ->get()
             ->filter(fn ($oc) => $oc->partnerConsent !== null)
@@ -239,6 +239,29 @@ class OrderController extends Controller
                     'expires_at' => $oc->expires_at,
                 ];
             });
+
+        // Se il partner non ha configurato consensi personalizzati, mostriamo
+        // comunque i due flag standard (privacy + newsletter) accettati in checkout.
+        $baseConsents = collect([
+            [
+                'label' => 'Ha accettato la Privacy Policy',
+                'accepted' => (bool) $order->privacy_accepted,
+                'is_expired' => false,
+                'subscribed_at' => $order->created_at,
+                'expires_at' => null,
+            ],
+            [
+                'label' => 'Desidera ricevere comunicazioni commerciali',
+                'accepted' => (bool) $order->newsletter,
+                'is_expired' => false,
+                'subscribed_at' => $order->created_at,
+                'expires_at' => null,
+            ],
+        ]);
+
+        $customerConsents = $orderConsents->isNotEmpty()
+            ? $orderConsents
+            : $baseConsents;
 
         $orderLogs = collect();
         if (in_array(Auth::user()->role, ['god', 'admin'])) {
