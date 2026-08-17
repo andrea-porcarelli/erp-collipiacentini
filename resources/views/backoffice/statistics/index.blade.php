@@ -66,9 +66,21 @@
                 </div>
             </x-card>
 
-            {{-- Riepilogo KPI --}}
+            {{-- Sezione: Statistiche → Ordini --}}
             <div class="mt-spacing-xl">
-                <h3 class="mb-spacing-m">Riepilogo</h3>
+                <div class="d-flex justify-content-between align-items-end mb-spacing-m">
+                    <div>
+                        <small class="text-uppercase text-muted">Statistiche</small>
+                        <h3 class="mb-0">Ordini</h3>
+                    </div>
+                    <small class="text-muted"
+                           title="I clienti unici sono aggregati per email: ordini con la stessa email contano come un solo cliente.">
+                        <i class="fa-regular fa-circle-info"></i>
+                        Clienti unici e ricorrenti sono calcolati per email
+                    </small>
+                </div>
+
+                {{-- KPI economici --}}
                 <div class="row g-3">
                     @php
                         $kpiCards = [
@@ -88,6 +100,42 @@
                                 </div>
                                 <h2 class="mt-spacing-s mb-0">
                                     {{ number_format($card['value'], 2, ',', '.') }} €
+                                </h2>
+                            </x-card>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- KPI clienti (aggregazione per email) --}}
+                <div class="row g-3 mt-spacing-s">
+                    @php
+                        $customerKpi = [
+                            [
+                                'label' => 'N. ordini',
+                                'value' => $kpi['orders_count'],
+                                'hint'  => 'Numero totale di ordini nel periodo.',
+                            ],
+                            [
+                                'label' => 'Clienti unici',
+                                'value' => $kpi['unique_customers'],
+                                'hint'  => 'Numero di email distinte tra gli ordini del periodo.',
+                            ],
+                            [
+                                'label' => 'Clienti ricorrenti',
+                                'value' => $kpi['recurring_customers'],
+                                'hint'  => 'Email che hanno effettuato più di un ordine nel periodo.',
+                            ],
+                        ];
+                    @endphp
+                    @foreach($customerKpi as $card)
+                        <div class="col-12 col-md-4">
+                            <x-card size="Small">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <small class="text-uppercase text-muted">{{ $card['label'] }}</small>
+                                    <i class="fa-regular fa-circle-info text-muted" title="{{ $card['hint'] }}"></i>
+                                </div>
+                                <h2 class="mt-spacing-s mb-0">
+                                    {{ number_format($card['value'], 0, ',', '.') }}
                                 </h2>
                             </x-card>
                         </div>
@@ -207,6 +255,118 @@
                     </select>
                 </div>
             </x-card>
+
+            {{-- Sezione: Statistiche → Clienti --}}
+            <div class="mt-spacing-xl">
+                <div class="d-flex justify-content-between align-items-end mb-spacing-m">
+                    <div>
+                        <small class="text-uppercase text-muted">Statistiche</small>
+                        <h3 class="mb-0">Clienti</h3>
+                    </div>
+                    <small class="text-muted"
+                           title="Le distribuzioni geografiche e anagrafiche sono calcolate sui dati dichiarati in ogni singolo ordine. Se la stessa email indica città diverse in ordini diversi, ciascun ordine viene contato nella città che ha dichiarato in quel momento.">
+                        <i class="fa-regular fa-circle-info"></i>
+                        Dati calcolati per singolo ordine, non per cliente
+                    </small>
+                </div>
+
+                <div class="row g-3">
+                    {{-- Città --}}
+                    <div class="col-12 col-lg-4">
+                        <x-card title="Città" sub_title="Top 20 per numero di ordini">
+                            @if($orders_per_city->isEmpty())
+                                <p class="text-muted mb-0 small">Nessun dato disponibile nel periodo.</p>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table-miticko">
+                                        <thead>
+                                            <tr>
+                                                <th>Città</th>
+                                                <th class="text-end">Ordini</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($orders_per_city as $row)
+                                                <tr>
+                                                    <td>{{ $row->city }}</td>
+                                                    <td class="text-end">{{ $row->c }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </x-card>
+                    </div>
+
+                    {{-- Nazione --}}
+                    <div class="col-12 col-lg-4">
+                        <x-card title="Nazione" sub_title="Top 20 per numero di ordini">
+                            @if($orders_per_country->isEmpty())
+                                <p class="text-muted mb-0 small">Nessun dato disponibile nel periodo.</p>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table-miticko">
+                                        <thead>
+                                            <tr>
+                                                <th>Nazione</th>
+                                                <th class="text-end">Ordini</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($orders_per_country as $row)
+                                                <tr>
+                                                    <td>{{ $countries_by_id[$row->country_id] ?? '—' }}</td>
+                                                    <td class="text-end">{{ $row->c }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </x-card>
+                    </div>
+
+                    {{-- Fasce d'età --}}
+                    <div class="col-12 col-lg-4">
+                        <x-card title="Fasce d'età" sub_title="Calcolate dalla data di nascita dichiarata">
+                            @if($orders_per_age->isEmpty() && $orders_without_age === 0)
+                                <p class="text-muted mb-0 small">Nessun dato disponibile nel periodo.</p>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table-miticko">
+                                        <thead>
+                                            <tr>
+                                                <th>Fascia</th>
+                                                <th class="text-end">Ordini</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($orders_per_age as $row)
+                                                <tr>
+                                                    <td>{{ $row['bucket'] }}</td>
+                                                    <td class="text-end">{{ $row['count'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                            @if($orders_without_age > 0)
+                                                <tr>
+                                                    <td class="text-muted">Non dichiarata</td>
+                                                    <td class="text-end text-muted">{{ $orders_without_age }}</td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </x-card>
+                    </div>
+                </div>
+
+                <p class="text-muted small mt-spacing-m mb-0">
+                    <i class="fa-regular fa-circle-info me-1"></i>
+                    Provincia e genere non sono attualmente raccolti nel form d'ordine e non compaiono in queste statistiche.
+                </p>
+            </div>
 
         </div>
     @endif

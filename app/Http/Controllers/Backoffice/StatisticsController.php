@@ -58,8 +58,7 @@ class StatisticsController extends Controller
             ->limit(10)
             ->get();
 
-        // Statistiche Ordini: aggregazione per email = cliente unico.
-        // Statistiche Clienti: aggregazione geografica per singolo ordine.
+        // Statistiche → Ordini: aggregazione per email (identificativo cliente ai fini statistici).
         $uniqueCustomers = (int) (clone $ordersQuery)->whereNotNull('email')->distinct('email')->count('email');
         $ordersCount = (int) (clone $ordersQuery)->count();
         $recurringCustomers = (int) (clone $ordersQuery)
@@ -70,6 +69,7 @@ class StatisticsController extends Controller
             ->get()
             ->count();
 
+        // Statistiche → Clienti: anagrafica per singolo ordine (non aggregata per identità).
         $ordersPerCity = (clone $ordersQuery)
             ->whereNotNull('city')
             ->selectRaw('city, COUNT(*) as c')
@@ -85,6 +85,35 @@ class StatisticsController extends Controller
             ->orderByDesc('c')
             ->limit(20)
             ->get();
+
+        $countriesById = \App\Models\Country::whereIn('id', $ordersPerCountry->pluck('country_id'))
+            ->pluck('name', 'id');
+
+        $ordersPerAgeBucket = (clone $ordersQuery)
+            ->whereNotNull('birth_date')
+            ->selectRaw("
+                CASE
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) < 18 THEN '<18'
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 18 AND 24 THEN '18-24'
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 25 AND 34 THEN '25-34'
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 35 AND 44 THEN '35-44'
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 45 AND 54 THEN '45-54'
+                    WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 55 AND 64 THEN '55-64'
+                    ELSE '65+'
+                END AS bucket,
+                COUNT(*) as c
+            ")
+            ->groupBy('bucket')
+            ->get()
+            ->pluck('c', 'bucket');
+
+        $ageBucketOrder = ['<18', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+        $ordersPerAge = collect($ageBucketOrder)
+            ->map(fn ($b) => ['bucket' => $b, 'count' => (int) ($ordersPerAgeBucket[$b] ?? 0)])
+            ->filter(fn ($row) => $row['count'] > 0)
+            ->values();
+
+        $ordersWithoutAge = (int) (clone $ordersQuery)->whereNull('birth_date')->count();
 
         return view('backoffice.statistics.index', [
             'isGod' => false,
@@ -104,6 +133,9 @@ class StatisticsController extends Controller
             'orders' => $orders,
             'orders_per_city' => $ordersPerCity,
             'orders_per_country' => $ordersPerCountry,
+            'countries_by_id' => $countriesById,
+            'orders_per_age' => $ordersPerAge,
+            'orders_without_age' => $ordersWithoutAge,
         ]);
     }
 }

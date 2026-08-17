@@ -386,12 +386,6 @@ class OrderLogger
             return $full !== '' ? $full : ($causer->email ?? null);
         }
 
-        if ($causer instanceof Customer) {
-            $full = trim(($causer->name ?? '').' '.($causer->surname ?? ''));
-
-            return $full !== '' ? $full : ($causer->email ?? null);
-        }
-
         return method_exists($causer, '__toString') ? (string) $causer : null;
     }
 
