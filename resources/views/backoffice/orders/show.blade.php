@@ -20,6 +20,27 @@
         #modal-cancel-order {
             --bs-modal-width: 520px !important;
         }
+        #modal-emit-invoice {
+            --bs-modal-width: 780px !important;
+        }
+        #modal-emit-invoice .card-miticko {
+            padding: 16px;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            background: #fff;
+        }
+        #modal-emit-invoice .invoice-flags label {
+            cursor: pointer;
+        }
+        #modal-emit-invoice .invoice-flags .invoice-flag {
+            width: 16px;
+            height: 16px;
+        }
+        #modal-emit-invoice .invoice-lines th,
+        #modal-emit-invoice .invoice-lines td {
+            font-size: 13px;
+            padding: 6px 8px;
+        }
         .flatpickr-day {
             font-weight:var(--weight,700);
         }

@@ -6,7 +6,7 @@
             <x-card title="Voci di fatturazione" sub_title="Seleziona quali voci includere automaticamente nella fattura degli ordini di questo prodotto. Gli importi vengono presi dalla configurazione partner." class="position-relative">
                 <form id="form-info-billing">
                     <div class="row switch-container">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12">
                             <x-switch
                                 name="bill_ticket_base"
                                 class="switch-bill-ticket-base"
@@ -15,7 +15,7 @@
                                 message="Se attivo, le commissioni Miticko e bancarie risultano già comprese nel biglietto e vengono forzate."
                             />
                         </div>
-                        <div class="col-12 col-md-6 mt-3 mt-md-0">
+                        <div class="col-12 mt-4">
                             <x-switch
                                 name="bill_presale"
                                 class="switch-bill-presale"
@@ -24,7 +24,7 @@
                                 message="Importo derivato dalla soglia e dalle fasce commissione presale del partner."
                             />
                         </div>
-                        <div class="col-12 col-md-6 mt-4">
+                        <div class="col-12 mt-4">
                             <x-switch
                                 name="bill_miticko_commission"
                                 class="switch-bill-miticko-commission"
@@ -33,7 +33,7 @@
                                 message="Componente fissa + variabile dalla configurazione partner."
                             />
                         </div>
-                        <div class="col-12 col-md-6 mt-4">
+                        <div class="col-12 mt-4">
                             <x-switch
                                 name="bill_bank_commission"
                                 class="switch-bill-bank-commission"

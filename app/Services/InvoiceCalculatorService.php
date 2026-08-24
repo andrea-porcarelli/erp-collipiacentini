@@ -25,7 +25,7 @@ class InvoiceCalculatorService
      */
     public function computeForOrder(Order $order, ?array $overrideFlags = null): array
     {
-        $order->loadMissing(['orderProducts.items.variant', 'partner.billing']);
+        $order->loadMissing(['orderProducts.product', 'orderProducts.items.variant', 'partner.billing']);
 
         $partnerLines = [];
         $customerLines = [];
@@ -89,11 +89,24 @@ class InvoiceCalculatorService
      */
     private function resolveFlags(OrderProductItem $item, ?array $overrideFlags): array
     {
+        // Fallback ai flag correnti del prodotto per ordini pre-snapshot (bill_* NULL su OPI).
+        $product = $item->orderProduct?->product;
+        $defaults = $product?->defaultBillingFlags() ?? [
+            'bill_ticket_base' => true,
+            'bill_presale' => false,
+            'bill_miticko_commission' => true,
+            'bill_bank_commission' => true,
+        ];
+
+        $pick = fn (string $rawKey, string $defaultKey) => is_null($item->getRawOriginal($rawKey))
+            ? (bool) $defaults[$defaultKey]
+            : (bool) $item->{$rawKey};
+
         $snapshot = [
-            self::LINE_TICKET_BASE => (bool) $item->bill_ticket_base,
-            self::LINE_PRESALE => (bool) $item->bill_presale,
-            self::LINE_MITICKO => (bool) $item->bill_miticko_commission,
-            self::LINE_BANK => (bool) $item->bill_bank_commission,
+            self::LINE_TICKET_BASE => $pick('bill_ticket_base', 'bill_ticket_base'),
+            self::LINE_PRESALE => $pick('bill_presale', 'bill_presale'),
+            self::LINE_MITICKO => $pick('bill_miticko_commission', 'bill_miticko_commission'),
+            self::LINE_BANK => $pick('bill_bank_commission', 'bill_bank_commission'),
         ];
 
         if ($overrideFlags === null) {
@@ -160,12 +173,7 @@ class InvoiceCalculatorService
 
         foreach ($order->orderProducts as $orderProduct) {
             foreach ($orderProduct->items as $item) {
-                $itemFlags = [
-                    self::LINE_TICKET_BASE => (bool) $item->bill_ticket_base,
-                    self::LINE_PRESALE => (bool) $item->bill_presale,
-                    self::LINE_MITICKO => (bool) $item->bill_miticko_commission,
-                    self::LINE_BANK => (bool) $item->bill_bank_commission,
-                ];
+                $itemFlags = $this->resolveFlags($item, null);
                 foreach ($keys as $key) {
                     if (! empty($itemFlags[$key])) {
                         $result[$key] = true;
