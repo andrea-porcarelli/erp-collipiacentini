@@ -397,7 +397,7 @@ const renderRecipient = (recipient, bucket, providerConfigured) => {
 
     const $tbody = $section.find('tbody').empty();
     if (!bucket.lines?.length) {
-        $tbody.append('<tr><td colspan="4" class="text-secondary small">Nessuna voce da fatturare per i flag correnti.</td></tr>');
+        $tbody.append('<tr class="empty-row"><td colspan="4">Nessuna voce da fatturare per i flag correnti.</td></tr>');
     } else {
         bucket.lines.forEach(line => {
             $tbody.append(`

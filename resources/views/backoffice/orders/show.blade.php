@@ -23,23 +23,96 @@
         #modal-emit-invoice {
             --bs-modal-width: 780px !important;
         }
-        #modal-emit-invoice .card-miticko {
-            padding: 16px;
-            border: 1px solid #e6e6e6;
-            border-radius: 8px;
-            background: #fff;
+        #modal-emit-invoice .modal-body {
+            text-align: left;
         }
-        #modal-emit-invoice .invoice-flags label {
-            cursor: pointer;
-        }
-        #modal-emit-invoice .invoice-flags .invoice-flag {
-            width: 16px;
-            height: 16px;
-        }
-        #modal-emit-invoice .invoice-lines th,
-        #modal-emit-invoice .invoice-lines td {
+        #modal-emit-invoice .invoice-order-summary {
             font-size: 13px;
+            color: var(--text-secondary, #666);
+        }
+        #modal-emit-invoice .invoice-section {
+            display: block;
+            width: 100%;
+            padding: var(--spacing-l, 16px);
+            border: 1px solid var(--card-border-color, #E6E6E6);
+            border-radius: var(--border-radius-m, 12px);
+            background: var(--background-global-paper1, #fff);
+            margin-bottom: var(--spacing-m, 12px);
+            text-align: left;
+        }
+        #modal-emit-invoice .invoice-section-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--spacing-m, 12px);
+            margin-bottom: var(--spacing-m, 12px);
+        }
+        #modal-emit-invoice .invoice-section-title {
+            font-family: var(--title-font-type, "DM Sans"), sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main, #0D0D0D);
+        }
+        #modal-emit-invoice .invoice-recipient-name {
+            font-size: 13px;
+            color: var(--text-secondary, #666);
+            margin-top: 2px;
+        }
+        #modal-emit-invoice .invoice-emit-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            margin: 0;
+            white-space: nowrap;
+        }
+        #modal-emit-invoice .invoice-emit-toggle input {
+            margin: 0;
+        }
+        #modal-emit-invoice .invoice-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-l, 16px);
+            padding-bottom: var(--spacing-m, 12px);
+            border-bottom: 1px solid var(--card-border-color, #E6E6E6);
+            margin-bottom: var(--spacing-m, 12px);
+        }
+        #modal-emit-invoice .invoice-flag-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            margin: 0;
+        }
+        #modal-emit-invoice .invoice-flag-item input {
+            margin: 0;
+        }
+        #modal-emit-invoice .invoice-lines {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        #modal-emit-invoice .invoice-lines th {
+            font-weight: 600;
+            color: var(--text-secondary, #666);
             padding: 6px 8px;
+            border-bottom: 1px solid var(--card-border-color, #E6E6E6);
+        }
+        #modal-emit-invoice .invoice-lines td {
+            padding: 8px;
+            border-bottom: 1px solid var(--card-border-color, #F0F0F0);
+        }
+        #modal-emit-invoice .invoice-lines tfoot td {
+            border-bottom: none;
+            font-weight: 700;
+            padding-top: 10px;
+        }
+        #modal-emit-invoice .invoice-lines .empty-row td {
+            color: var(--text-secondary, #999);
+            font-style: italic;
         }
         .flatpickr-day {
             font-weight:var(--weight,700);
