@@ -25,7 +25,7 @@ class InvoiceController extends Controller
     public function index(): View
     {
         $this->ensureAdmin();
-        $partners = Utils::map_collection(Partner::active());
+        $partners = Partner::active()->orderBy('partner_name')->pluck('partner_name', 'id')->all();
         $statuses = [
             Invoice::STATUS_DRAFT => 'Bozza',
             Invoice::STATUS_QUEUED => 'In coda',
