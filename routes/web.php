@@ -123,6 +123,7 @@ Route::domain('admin.miticko.com')->group(function () {
         // Sezione Fatturazione (solo god + admin, controllato nel controller).
         Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::any('invoices/data', [InvoiceController::class, 'data'])->name('invoices.data');
+        Route::get('invoices/pending', [InvoiceController::class, 'pending'])->name('invoices.pending');
         Route::any('invoices/pending/data', [InvoiceController::class, 'pendingData'])->name('invoices.pending.data');
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');

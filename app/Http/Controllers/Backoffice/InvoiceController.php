@@ -39,6 +39,15 @@ class InvoiceController extends Controller
             ->with('path', $this->path);
     }
 
+    public function pending(): View
+    {
+        $this->ensureAdmin();
+        $partners = Partner::active()->orderBy('partner_name')->pluck('partner_name', 'id')->all();
+
+        return view('backoffice.'.$this->path.'.pending', compact('partners'))
+            ->with('path', $this->path);
+    }
+
     public function data(Request $request): JsonResponse
     {
         try {
