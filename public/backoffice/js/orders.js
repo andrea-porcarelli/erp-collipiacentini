@@ -385,15 +385,18 @@ const collectFlags = (recipient) => {
     return flags;
 };
 
-const renderRecipient = (recipient, bucket, providerConfigured) => {
+// applyDefaults=true solo al primo caricamento: sovrascrive lo stato dei checkbox flag con quello del server.
+// Sui refresh successivi (change utente) NON tocchiamo le checkbox, altrimenti resettiamo la selezione.
+const renderRecipient = (recipient, bucket, providerConfigured, applyDefaults = false) => {
     const $section = $(`#modal-emit-invoice [data-recipient="${recipient}"]`);
     $section.find('.invoice-recipient-name').text(bucket.recipient?.name || '—');
 
-    const $flags = $section.find('.invoice-flag');
-    $flags.each(function () {
-        const flag = $(this).data('flag');
-        $(this).prop('checked', !!bucket.default_flags?.[flag]);
-    });
+    if (applyDefaults) {
+        $section.find('.invoice-flag').each(function () {
+            const flag = $(this).data('flag');
+            $(this).prop('checked', !!bucket.default_flags?.[flag]);
+        });
+    }
 
     const $tbody = $section.find('tbody').empty();
     if (!bucket.lines?.length) {
@@ -413,11 +416,14 @@ const renderRecipient = (recipient, bucket, providerConfigured) => {
     $section.find('.invoice-total').text(fmtEuro(bucket.total));
 
     // Se non ci sono righe, disattivo il checkbox "Emetti" per evitare submit vuoto.
-    const $toggle = $section.find('.invoice-recipient-toggle');
-    if (!bucket.lines?.length) {
-        $toggle.prop('checked', false).prop('disabled', true);
-    } else {
-        $toggle.prop('disabled', false);
+    // Solo al primo caricamento — dopo lascio libera la scelta dell'utente.
+    if (applyDefaults) {
+        const $toggle = $section.find('.invoice-recipient-toggle');
+        if (!bucket.lines?.length) {
+            $toggle.prop('checked', false).prop('disabled', true);
+        } else {
+            $toggle.prop('disabled', false);
+        }
     }
 };
 
@@ -444,9 +450,10 @@ const initInvoiceModal = (routes) => {
         $('#invoice-content').addClass('d-none');
 
         // Prima chiamata senza override → il backend usa lo snapshot dell'item come default.
+        // applyDefaults=true: le checkbox si posizionano sui default lato server.
         App.ajax({ path: routes.invoicePreview, method: 'GET' }).then(res => {
-            renderRecipient('partner', res.partner, res.provider?.configured);
-            renderRecipient('customer', res.customer, res.provider?.configured);
+            renderRecipient('partner', res.partner, res.provider?.configured, true);
+            renderRecipient('customer', res.customer, res.provider?.configured, true);
             $('#invoice-provider-warning').toggleClass('d-none', !!res.provider?.configured);
             $('#invoice-loading').addClass('d-none');
             $('#invoice-content').removeClass('d-none');
