@@ -17,18 +17,14 @@ class InvoiceController extends Controller
 {
     public string $path = 'invoices';
 
-    public function __construct()
+    private function ensureAdmin(): void
     {
-        // La sezione è riservata a god + admin (come da spec).
-        $this->middleware(function ($request, $next) {
-            abort_unless(in_array(Auth::user()?->role, ['god', 'admin'], true), 403);
-
-            return $next($request);
-        });
+        abort_unless(in_array(Auth::user()?->role, ['god', 'admin'], true), 403);
     }
 
     public function index(): View
     {
+        $this->ensureAdmin();
         $partners = Utils::map_collection(Partner::active());
         $statuses = [
             Invoice::STATUS_DRAFT => 'Bozza',
@@ -46,6 +42,7 @@ class InvoiceController extends Controller
     public function data(Request $request): JsonResponse
     {
         try {
+            $this->ensureAdmin();
             $filters = $request->get('filters') ?? [];
 
             $query = Invoice::query()->with(['order', 'partner'])->orderBy('emitted_at', 'desc');
@@ -109,6 +106,7 @@ class InvoiceController extends Controller
     public function pendingData(Request $request): JsonResponse
     {
         try {
+            $this->ensureAdmin();
             $filters = $request->get('filters') ?? [];
 
             // Ordini pagati senza alcuna fattura collegata.
