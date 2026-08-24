@@ -370,4 +370,135 @@ $(function () {
             showError(errors);
         });
     });
+
+    // ─── Emetti fattura ────────────────────────────────────────────────────
+    if (routes.invoicePreview) initInvoiceModal(routes);
 });
+
+const fmtEuro = (v) => `€ ${Number(v || 0).toFixed(2).replace('.', ',')}`;
+
+const collectFlags = (recipient) => {
+    const flags = {};
+    $(`#modal-emit-invoice [data-recipient="${recipient}"] .invoice-flag`).each(function () {
+        flags[$(this).data('flag')] = $(this).is(':checked') ? 1 : 0;
+    });
+    return flags;
+};
+
+const renderRecipient = (recipient, bucket, providerConfigured) => {
+    const $section = $(`#modal-emit-invoice [data-recipient="${recipient}"]`);
+    $section.find('.invoice-recipient-name').text(bucket.recipient?.name || '—');
+
+    const $flags = $section.find('.invoice-flag');
+    $flags.each(function () {
+        const flag = $(this).data('flag');
+        $(this).prop('checked', !!bucket.default_flags?.[flag]);
+    });
+
+    const $tbody = $section.find('tbody').empty();
+    if (!bucket.lines?.length) {
+        $tbody.append('<tr><td colspan="4" class="text-secondary small">Nessuna voce da fatturare per i flag correnti.</td></tr>');
+    } else {
+        bucket.lines.forEach(line => {
+            $tbody.append(`
+                <tr>
+                    <td>${line.label}</td>
+                    <td class="text-end">${line.quantity}</td>
+                    <td class="text-end">${fmtEuro(line.unit_amount)}</td>
+                    <td class="text-end">${fmtEuro(line.total)}</td>
+                </tr>
+            `);
+        });
+    }
+    $section.find('.invoice-total').text(fmtEuro(bucket.total));
+
+    // Se non ci sono righe, disattivo il checkbox "Emetti" per evitare submit vuoto.
+    const $toggle = $section.find('.invoice-recipient-toggle');
+    if (!bucket.lines?.length) {
+        $toggle.prop('checked', false).prop('disabled', true);
+    } else {
+        $toggle.prop('disabled', false);
+    }
+};
+
+const refreshInvoicePreview = (routes) => {
+    const data = {
+        flags: {
+            partner: collectFlags('partner'),
+            customer: collectFlags('customer'),
+        },
+    };
+    return App.ajax({ path: routes.invoicePreview, method: 'GET', data }).then(res => {
+        renderRecipient('partner', res.partner, res.provider?.configured);
+        renderRecipient('customer', res.customer, res.provider?.configured);
+        $('#invoice-provider-warning').toggleClass('d-none', !!res.provider?.configured);
+    });
+};
+
+const initInvoiceModal = (routes) => {
+    const modalEl = document.getElementById('modal-emit-invoice');
+    if (!modalEl) return;
+
+    modalEl.addEventListener('show.bs.modal', () => {
+        $('#invoice-loading').removeClass('d-none');
+        $('#invoice-content').addClass('d-none');
+
+        // Prima chiamata senza override → il backend usa lo snapshot dell'item come default.
+        App.ajax({ path: routes.invoicePreview, method: 'GET' }).then(res => {
+            renderRecipient('partner', res.partner, res.provider?.configured);
+            renderRecipient('customer', res.customer, res.provider?.configured);
+            $('#invoice-provider-warning').toggleClass('d-none', !!res.provider?.configured);
+            $('#invoice-loading').addClass('d-none');
+            $('#invoice-content').removeClass('d-none');
+        }).catch(showError);
+    });
+
+    // Ogni change sui flag → ricalcolo totali via preview.
+    $(document).on('change', '#modal-emit-invoice .invoice-flag', function () {
+        refreshInvoicePreview(routes).catch(showError);
+    });
+
+    // Submit
+    $(document).on('click', '#modal-emit-invoice .btn-success', function () {
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+
+        const recipients = $('#modal-emit-invoice .invoice-recipient-toggle:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (!recipients.length) {
+            toastr.error('Seleziona almeno un destinatario');
+            return;
+        }
+
+        $btn.prop('disabled', true);
+        App.ajax({
+            path: routes.invoiceStore,
+            method: 'POST',
+            data: {
+                recipients,
+                flags: {
+                    partner: collectFlags('partner'),
+                    customer: collectFlags('customer'),
+                },
+            },
+        }).then((res) => {
+            const anyError = (res.invoices || []).some(i => i.status === 'error');
+            if (anyError) {
+                toastr.warning('Fatture salvate ma alcune sono in errore. Controlla i dettagli.');
+            } else {
+                const anyDraft = (res.invoices || []).some(i => i.status === 'draft');
+                toastr.success(anyDraft
+                    ? 'Fatture salvate come bozza (provider non configurato).'
+                    : 'Fatture emesse con successo');
+            }
+            const closeBtn = document.querySelector('#modal-emit-invoice [data-bs-dismiss="modal"]');
+            if (closeBtn) closeBtn.click();
+            setTimeout(() => location.reload(), 1200);
+        }).catch((errors) => {
+            $btn.prop('disabled', false);
+            showError(errors);
+        });
+    });
+};

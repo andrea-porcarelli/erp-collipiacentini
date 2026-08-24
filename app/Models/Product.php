@@ -36,9 +36,30 @@ class Product extends LogsModel
         'max_tickets_per_session',
         'booking_deadline_minutes',
         'support_email',
+        'bill_ticket_base',
+        'bill_presale',
+        'bill_miticko_commission',
+        'bill_bank_commission',
     ];
 
-    protected $casts = [];
+    protected $casts = [
+        'bill_ticket_base' => 'boolean',
+        'bill_presale' => 'boolean',
+        'bill_miticko_commission' => 'boolean',
+        'bill_bank_commission' => 'boolean',
+    ];
+
+    public function defaultBillingFlags(): array
+    {
+        $ticketBase = (bool) $this->bill_ticket_base;
+
+        return [
+            'bill_ticket_base' => $ticketBase,
+            'bill_presale' => (bool) $this->bill_presale,
+            'bill_miticko_commission' => $ticketBase ? true : (bool) $this->bill_miticko_commission,
+            'bill_bank_commission' => $ticketBase ? true : (bool) $this->bill_bank_commission,
+        ];
+    }
 
     public function status(): ProductStatus
     {

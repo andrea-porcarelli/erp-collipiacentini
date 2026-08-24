@@ -69,6 +69,9 @@
             ])
             <x-button id="btn-send-email" label="Invia email ordine" status="Primary" emphasis="MediumLow" />
             <x-button id="btn-download-receipt" label="Scarica ricevuta" status="Primary" emphasis="Medium"  />
+            @if(in_array(auth()->user()->role, ['god', 'admin']))
+                <x-button id="btn-emit-invoice" label="Emetti fattura" status="Primary" emphasis="High" leading="fa-file-invoice" :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-emit-invoice']" />
+            @endif
         </div>
     </div>
 
@@ -465,6 +468,9 @@
     @include('backoffice.orders._modal-edit-notes', ['order' => $order])
     @include('backoffice.orders._modal-edit-customer', ['order' => $order])
     @include('backoffice.orders._modal-cancel-order', ['order' => $order])
+    @if(in_array(auth()->user()->role, ['god', 'admin']))
+        @include('backoffice.orders._modal-emit-invoice', ['order' => $order])
+    @endif
 @endsection
 
 @push('scripts')
@@ -480,6 +486,8 @@
             ticketsBatchStatus:   @json(route('tickets.batchStatus')),
             availabilityDays:     @json(route('orders.availabilityDays', $model)),
             availabilitySlots:    @json(route('orders.availabilitySlots', $model)),
+            invoicePreview:       @json(route('orders.invoice.preview', $model)),
+            invoiceStore:         @json(route('orders.invoice.store', $model)),
         };
         window.orderBooking = {
             currentDate: @json($firstOp?->booking_date ? \Carbon\Carbon::parse($firstOp->booking_date)->format('Y-m-d') : null),

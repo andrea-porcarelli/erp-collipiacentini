@@ -7,6 +7,7 @@ use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\EditorMediaController;
 use App\Http\Controllers\Backoffice\LoginController;
 use App\Http\Controllers\Backoffice\OrderController;
+use App\Http\Controllers\Backoffice\OrderInvoiceController;
 use App\Http\Controllers\Backoffice\PartnerConsentController;
 use App\Http\Controllers\Backoffice\PartnerController;
 use App\Http\Controllers\Backoffice\PartnerUserController;
@@ -115,6 +116,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('orders/create/customers', [OrderController::class, 'createCustomers'])->name('orders.create.customers');
 
         Route::post('orders/{order}/payment-link', [OrderController::class, 'paymentLink'])->name('orders.paymentLink');
+        Route::get('orders/{order}/invoice/preview', [OrderInvoiceController::class, 'preview'])->name('orders.invoice.preview');
+        Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
         Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');

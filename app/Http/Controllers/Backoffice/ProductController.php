@@ -170,6 +170,7 @@ class ProductController extends CrudController
                 'long_description' => $this->updateLongDescription($product, $request),
                 'features' => $this->updateFeatures($product, $request),
                 'visit' => $this->updateVisit($product, $request),
+                'billing' => $this->updateBilling($product, $request),
                 default => throw new \Exception('Sezione non valida'),
             };
 
@@ -280,6 +281,19 @@ class ProductController extends CrudController
 
         $product->setContentFields([
             'visit_info' => $request->input('visit_info') ?? '',
+        ]);
+    }
+
+    private function updateBilling(Product $product, UpdateProductRequest $request): void
+    {
+        $ticketBase = (bool) $request->input('bill_ticket_base');
+
+        $this->interface->edit($product, [
+            'bill_ticket_base' => $ticketBase,
+            'bill_presale' => (bool) $request->input('bill_presale'),
+            // Se il biglietto base è on, le commissioni sono comprese e forzate on lato server (invariante).
+            'bill_miticko_commission' => $ticketBase ? true : (bool) $request->input('bill_miticko_commission'),
+            'bill_bank_commission' => $ticketBase ? true : (bool) $request->input('bill_bank_commission'),
         ]);
     }
 

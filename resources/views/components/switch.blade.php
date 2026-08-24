@@ -12,6 +12,7 @@
     'icon' => null,
     'model' => null,
     'maxlength' => null,
+    'checked' => false,
 ])
 <div class="text-field">
     @isset($label)
@@ -30,6 +31,9 @@
         @endif
         @if($disabled)
             disabled
+        @endif
+        @if($checked)
+            checked
         @endif
     />
     <x-supporting-text :message="$message" :icon="$icon"/>

@@ -91,6 +91,8 @@ class OrderService
                 'partner_commission_payment' => $partner->commission_payment,
             ] : [];
 
+            $billingFlagsSnapshot = ($cart->product ?? Product::find($cart->product_id))?->defaultBillingFlags() ?? [];
+
             foreach ($cart->items as $item) {
                 $opi = OrderProductItem::create([
                     'order_product_id' => $orderProduct->id,
@@ -98,6 +100,7 @@ class OrderService
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
                     ...$commissionSnapshot,
+                    ...$billingFlagsSnapshot,
                 ]);
 
                 // Una riga participant per ogni biglietto, stato di default "Prenotato".
@@ -382,6 +385,8 @@ class OrderService
                 'partner_commission_payment' => $partner->commission_payment,
             ] : [];
 
+            $billingFlagsSnapshot = $product->defaultBillingFlags();
+
             foreach ($itemsResolved as $item) {
                 $opi = OrderProductItem::create([
                     'order_product_id' => $orderProduct->id,
@@ -389,6 +394,7 @@ class OrderService
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     ...$commissionSnapshot,
+                    ...$billingFlagsSnapshot,
                 ]);
 
                 for ($i = 0; $i < $item['quantity']; $i++) {

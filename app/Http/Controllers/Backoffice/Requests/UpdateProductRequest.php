@@ -52,6 +52,12 @@ class UpdateProductRequest extends FormRequest
                 'visit_info' => ['nullable', 'string', 'max:600'],
                 'support_email' => ['nullable', 'email', 'max:255'],
             ],
+            'billing' => [
+                'bill_ticket_base' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
+                'bill_presale' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
+                'bill_miticko_commission' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
+                'bill_bank_commission' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
+            ],
             default => [],
         };
     }

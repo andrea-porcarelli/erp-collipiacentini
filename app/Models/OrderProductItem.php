@@ -18,6 +18,10 @@ class OrderProductItem extends LogsModel
         'partner_commission_miticko_fixed',
         'partner_commission_miticko_variable',
         'partner_commission_payment',
+        'bill_ticket_base',
+        'bill_presale',
+        'bill_miticko_commission',
+        'bill_bank_commission',
     ];
 
     protected $casts = [
@@ -28,6 +32,10 @@ class OrderProductItem extends LogsModel
         'partner_commission_miticko_fixed' => 'decimal:2',
         'partner_commission_miticko_variable' => 'decimal:2',
         'partner_commission_payment' => 'decimal:2',
+        'bill_ticket_base' => 'boolean',
+        'bill_presale' => 'boolean',
+        'bill_miticko_commission' => 'boolean',
+        'bill_bank_commission' => 'boolean',
     ];
 
     public function orderProduct(): BelongsTo

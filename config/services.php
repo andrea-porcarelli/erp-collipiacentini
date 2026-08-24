@@ -47,4 +47,10 @@ return [
         'error_chat_id' => env('TELEGRAM_ERROR_CHAT_ID'),
     ],
 
+    'fatture_in_cloud' => [
+        'access_token' => env('FIC_ACCESS_TOKEN'),
+        'company_id' => env('FIC_COMPANY_ID'),
+        'api_base' => env('FIC_API_BASE', 'https://api-v2.fattureincloud.it'),
+    ],
+
 ];
