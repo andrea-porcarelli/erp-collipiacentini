@@ -30,10 +30,12 @@ class InvoiceCalculatorService
         $partnerLines = [];
         $customerLines = [];
 
+        $partner = $order->partner;
+
         foreach ($order->orderProducts as $orderProduct) {
             foreach ($orderProduct->items as $item) {
                 $flags = $this->resolveFlags($item, $overrideFlags);
-                $amounts = $this->computeAmountsForItem($item);
+                $amounts = $this->computeAmountsForItem($item, $partner);
 
                 if ($flags[self::LINE_MITICKO] && $amounts[self::LINE_MITICKO] > 0) {
                     $partnerLines[] = [
@@ -125,29 +127,31 @@ class InvoiceCalculatorService
     /**
      * @return array<string,float>
      */
-    private function computeAmountsForItem(OrderProductItem $item): array
+    private function computeAmountsForItem(OrderProductItem $item, ?\App\Models\Partner $partner): array
     {
         $unitPrice = (float) $item->unit_price;
         $qty = max((int) $item->quantity, 1);
         $subtotal = round($unitPrice * $qty, 2);
 
+        // Snapshot NULL → fallback ai valori correnti del partner (per ordini pre-migrazione snapshot).
+        $presaleThreshold = $item->partner_commission_presale_threshold ?? $partner?->commission_presale_threshold;
+        $presaleLow = (float) ($item->partner_commission_presale_low ?? $partner?->commission_presale_low ?? 0);
+        $presaleHigh = (float) ($item->partner_commission_presale_high ?? $partner?->commission_presale_high ?? 0);
+        $mitickoFixed = (float) ($item->partner_commission_miticko_fixed ?? $partner?->commission_miticko_fixed ?? 0);
+        $mitickoVarPct = (float) ($item->partner_commission_miticko_variable ?? $partner?->commission_miticko_variable ?? 0);
+        $bankPct = (float) ($item->partner_commission_payment ?? $partner?->commission_payment ?? 0);
+
         // Prevendita: importo per partecipante, dipende dalla soglia sul unit_price.
-        $presaleThreshold = $item->partner_commission_presale_threshold;
         $presaleUnit = is_null($presaleThreshold)
             ? 0.0
-            : ($unitPrice < (float) $presaleThreshold
-                ? (float) $item->partner_commission_presale_low
-                : (float) $item->partner_commission_presale_high);
+            : ($unitPrice < (float) $presaleThreshold ? $presaleLow : $presaleHigh);
         $presaleTotal = round($presaleUnit * $qty, 2);
 
         // Miticko = fisso per biglietto + variabile % sul subtotal.
-        $mitickoFixed = (float) $item->partner_commission_miticko_fixed;
-        $mitickoVarPct = (float) $item->partner_commission_miticko_variable;
         $mitickoTotal = round(($mitickoFixed * $qty) + ($subtotal * $mitickoVarPct / 100), 2);
         $mitickoUnit = $qty > 0 ? round($mitickoTotal / $qty, 2) : 0.0;
 
         // Bancarie: % gateway sul subtotal.
-        $bankPct = (float) $item->partner_commission_payment;
         $bankTotal = round($subtotal * $bankPct / 100, 2);
         $bankUnit = $qty > 0 ? round($bankTotal / $qty, 2) : 0.0;
 
