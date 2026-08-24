@@ -406,9 +406,14 @@ const selectChoice = (parameters) => {
 }
 
 const datatable = (parameters) => {
+    // `filtersScope` limita la raccolta dei filtri a una card/tab specifica.
+    // Utile quando in pagina ci sono più datatable con filtri distinti (es. sezione Fatturazione con 2 tab).
+    const filtersSelector = parameters.filtersScope
+        ? `${parameters.filtersScope} .filters-miticko input, ${parameters.filtersScope} .filters-miticko select`
+        : '.filters-miticko input, .filters-miticko select';
     const filters = function(d) {
         const filterData = {};
-        $('.filters-miticko input, .filters-miticko select').each(function() {
+        $(filtersSelector).each(function() {
             if ($(this).attr('name')) {
                 filterData[$(this).attr('name')] = $(this).val();
             }
@@ -417,7 +422,7 @@ const datatable = (parameters) => {
         return d;
     };
     $.fn.dataTable.ext.errMode = 'none';
-    let table = new DataTable('.datatable', {
+    let table = new DataTable(parameters.selector || '.datatable', {
         responsive: true,
         searching: false,
         ordering:  false,
@@ -689,7 +694,7 @@ const init = () => {
                 }
             });
         }
-        if (filter_type === 'status' || filter_type === 'partner') {
+        if (filter_type === 'status' || filter_type === 'partner' || filter_type === 'recipient' || filter_type === 'invoicestatus') {
             modal.modal('show');
             const btn_success = modal.find(`.btn-success`);
             const btn_cancel = modal.find(`.btn-cancel`);

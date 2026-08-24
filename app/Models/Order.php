@@ -84,6 +84,11 @@ class Order extends LogsModel
         return $this->hasMany(OrderConsent::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function logs(): HasMany
     {
         return $this->hasMany(OrderLog::class);

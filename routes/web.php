@@ -5,6 +5,7 @@ use App\Http\Controllers\Backoffice\CategoryController;
 use App\Http\Controllers\Backoffice\CompanyController;
 use App\Http\Controllers\Backoffice\DashboardController;
 use App\Http\Controllers\Backoffice\EditorMediaController;
+use App\Http\Controllers\Backoffice\InvoiceController;
 use App\Http\Controllers\Backoffice\LoginController;
 use App\Http\Controllers\Backoffice\OrderController;
 use App\Http\Controllers\Backoffice\OrderInvoiceController;
@@ -118,6 +119,11 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::post('orders/{order}/payment-link', [OrderController::class, 'paymentLink'])->name('orders.paymentLink');
         Route::get('orders/{order}/invoice/preview', [OrderInvoiceController::class, 'preview'])->name('orders.invoice.preview');
         Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
+
+        // Sezione Fatturazione (solo god + admin, controllato nel controller).
+        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::any('invoices/data', [InvoiceController::class, 'data'])->name('invoices.data');
+        Route::any('invoices/pending/data', [InvoiceController::class, 'pendingData'])->name('invoices.pending.data');
         Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
         Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
         Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');

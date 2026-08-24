@@ -14,6 +14,7 @@
         @endif
         @if(in_array(Auth::user()->role, ['god', 'admin']))
             <x-navigation-item label="Gestione utenti" icon="fa fa-user-group" route="users.index" :is_active="$active === 'users'" />
+            <x-navigation-item label="Fatturazione" icon="fa fa-file-invoice" route="invoices.index" :is_active="$active === 'invoices'" />
         @endif
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
