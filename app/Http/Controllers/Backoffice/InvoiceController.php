@@ -118,10 +118,12 @@ class InvoiceController extends Controller
             $this->ensureAdmin();
             $filters = $request->get('filters') ?? [];
 
-            // Ordini pagati senza alcuna fattura collegata.
+            // Ordini pagati con biglietto > 0 e senza alcuna fattura collegata.
+            // Gli ordini gratuiti (amount = 0) non vengono mai fatturati.
             $query = Order::query()
                 ->with(['partner', 'orderProducts.product'])
                 ->where('order_status', OrderStatus::PAID->value)
+                ->where('amount', '>', 0)
                 ->whereDoesntHave('invoices')
                 ->orderBy('paid_at', 'desc');
 
