@@ -9,6 +9,11 @@
             <x-icon-button label="" size="Small" icon="fa-pen" />
         </a>
     @endif
+    @if (in_array('report', $options))
+        <a href="{{ route( $route . '.report', $item->id) }}" title="Report commissioni">
+            <x-icon-button label="" size="Small" icon="fa-chart-line" />
+        </a>
+    @endif
     @if (in_array('status', $options))
             <x-button
                 label="{{ ($item->is_active) ? 'Attivo' : 'Disattivo' }}"

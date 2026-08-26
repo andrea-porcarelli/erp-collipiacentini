@@ -11,6 +11,7 @@ use App\Http\Controllers\Backoffice\OrderController;
 use App\Http\Controllers\Backoffice\OrderInvoiceController;
 use App\Http\Controllers\Backoffice\PartnerConsentController;
 use App\Http\Controllers\Backoffice\PartnerController;
+use App\Http\Controllers\Backoffice\PartnerReportController;
 use App\Http\Controllers\Backoffice\PartnerUserController;
 use App\Http\Controllers\Backoffice\ProductAvailabilityController;
 use App\Http\Controllers\Backoffice\ProductClosedPeriodController;
@@ -205,6 +206,8 @@ Route::domain('admin.miticko.com')->group(function () {
         Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
         Route::resource('categories', CategoryController::class);
         Route::resource('partners', PartnerController::class);
+        Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
+        Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
         Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
         Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
         Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])

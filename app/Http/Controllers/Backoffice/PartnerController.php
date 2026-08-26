@@ -309,7 +309,7 @@ class PartnerController extends CrudController
                 ->with('billing')
                 ->orderByDesc('id');
 
-            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'status'])
+            return $this->editColumns(datatables()->of($elements), $this->route_name(__CLASS__), ['edit', 'report', 'status'])
                 ->addColumn('partner_code', function ($item) {
                     return (string) $item->partner_code;
                 })
