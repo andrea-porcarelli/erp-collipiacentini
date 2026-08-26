@@ -12,6 +12,9 @@
     $currentYear = (int) now()->year;
     $years = range($currentYear + 1, $currentYear - 5);
 
+    $monthOptions = collect($months)->map(fn ($label, $id) => ['id' => $id, 'label' => $label])->values()->all();
+    $yearOptions = collect($years)->map(fn ($y) => ['id' => $y, 'label' => (string) $y])->all();
+
     $fmtEuro = fn ($v) => number_format((float) $v, 2, ',', '.') . ' €';
 
     $totals = $report['totals'];
@@ -39,20 +42,10 @@
                 <x-card title="Periodo di riferimento" sub_title="Seleziona mese e anno per aggregare le commissioni maturate">
                     <form method="GET" action="{{ route('partners.report', $partner->id) }}" class="row g-3 align-items-end">
                         <div class="col-md-3">
-                            <label class="d-block mb-1">Mese</label>
-                            <select name="month" class="input-miticko w-100">
-                                @foreach($months as $m => $label)
-                                    <option value="{{ $m }}" @selected($selectedMonth === $m)>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            <x-select name="month" label="Mese" :value="$selectedMonth" :options="$monthOptions" />
                         </div>
                         <div class="col-md-3">
-                            <label class="d-block mb-1">Anno</label>
-                            <select name="year" class="input-miticko w-100">
-                                @foreach($years as $y)
-                                    <option value="{{ $y }}" @selected($selectedYear === $y)>{{ $y }}</option>
-                                @endforeach
-                            </select>
+                            <x-select name="year" label="Anno" :value="$selectedYear" :options="$yearOptions" />
                         </div>
                         <div class="col-md-6 d-flex gap-2 justify-content-end">
                             <x-button type="submit" label="Aggiorna" leading="fa-arrows-rotate" status="Primary" emphasis="Medium" />
