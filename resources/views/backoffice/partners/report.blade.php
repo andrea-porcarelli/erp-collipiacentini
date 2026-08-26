@@ -26,7 +26,7 @@
                 <x-button :href="route('partners.index')" class="btn-success" emphasis="outlined" leading="fa-arrow-left" />
             </div>
             <div>
-                <x-breadcrumb :first="['Partner', 'partners.index']" :second="[$partner->partner_name, 'Report commissioni']" />
+                <x-breadcrumb :first="['Partner', 'partners.index']" :second="['Report commissioni · ' . $partner->partner_name]" />
                 <x-header-page :title="'Report commissioni · ' . $partner->partner_name" />
             </div>
         </div>
