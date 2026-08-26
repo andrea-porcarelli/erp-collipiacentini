@@ -34,9 +34,26 @@
         $partnerLogoSrc = 'data:' . $logoMime . ';base64,' . base64_encode(file_get_contents($logoPath));
     }
 
-    $footerLogoPath = public_path('assets/images/logo-miticko.png');
-    $footerLogoSrc = file_exists($footerLogoPath)
-        ? 'data:image/png;base64,' . base64_encode(file_get_contents($footerLogoPath))
+    $mitickoLogoPath = public_path('assets/images/logo-miticko.png');
+    $mitickoLogoSrc = file_exists($mitickoLogoPath)
+        ? 'data:image/png;base64,' . base64_encode(file_get_contents($mitickoLogoPath))
+        : null;
+    $footerLogoSrc = $mitickoLogoSrc;
+
+    $partnerAddress = trim(implode(' · ', array_filter([
+        $partner->structure_address,
+        $partner->phone_number,
+        $partner->email_notify,
+        $partner->domain_name,
+    ])));
+
+    $billingAddressLine = $billing
+        ? trim(implode(' ', array_filter([
+            $billing->street_address,
+            $billing->postal_code,
+            $billing->city,
+            $billing->province ? '('.$billing->province.')' : null,
+        ])))
         : null;
 @endphp
 <!DOCTYPE html>
@@ -80,16 +97,13 @@
             width: 100%;
             margin-bottom: 10px;
         }
-        .doc-header td { vertical-align: top; }
-        .doc-header .partner-name {
-            font-size: 13px;
-            font-weight: 700;
-            line-height: 1.15;
-        }
-        .doc-header .partner-meta {
-            font-size: 8.5px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            margin-top: 2px;
+        .doc-header td { vertical-align: middle; }
+        .doc-header .logo img { height: 22px; display: block; }
+        .doc-header .logo .fallback {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: {{ $t['text-main'] ?? '#111' }};
         }
         .doc-header .right { text-align: right; }
         .doc-header .doc-title {
@@ -104,23 +118,48 @@
             font-weight: 700;
             margin-top: 2px;
         }
+        .doc-header .doc-range {
+            font-size: 8px;
+            color: {{ $t['text-secondary'] ?? '#666' }};
+            margin-top: 1px;
+        }
 
-        .billing-box {
+        .anagrafica {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px 0;
+            margin-bottom: 12px;
+        }
+        .anagrafica td {
+            vertical-align: top;
+            width: 50%;
             border: 1px solid {{ $t['border-default'] ?? '#e0e0e0' }};
             border-radius: 4px;
             padding: 6px 8px;
-            margin-bottom: 10px;
             font-size: 8.5px;
-            line-height: 1.3;
+            line-height: 1.35;
         }
-        .billing-box .label {
+        .anagrafica .label {
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.4px;
             color: {{ $t['text-secondary'] ?? '#666' }};
             font-size: 7.5px;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
+        .anagrafica .name {
+            font-weight: 700;
+            font-size: 10.5px;
+            margin-bottom: 1px;
+            color: {{ $t['text-main'] ?? '#111' }};
+        }
+        .anagrafica .row {
+            margin-top: 2px;
+        }
+        .anagrafica .muted {
+            color: {{ $t['text-secondary'] ?? '#666' }};
+        }
+        .anagrafica.single td { width: 100%; }
 
         .kpi-grid {
             width: 100%;
@@ -245,35 +284,66 @@
 
 <table class="doc-header">
     <tr>
-        <td style="width: 55%;">
-            <div class="partner-name">{{ $partner->partner_name }}</div>
-            <div class="partner-meta">
-                Codice partner: <strong>{{ $partner->partner_code ?? '—' }}</strong>
-                @if($partner->domain_name) · {{ $partner->domain_name }} @endif
-            </div>
+        <td class="logo" style="width: 55%;">
+            @if($mitickoLogoSrc)
+                <img src="{{ $mitickoLogoSrc }}" alt="Miticko">
+            @else
+                <span class="fallback">miticko</span>
+            @endif
         </td>
         <td class="right" style="width: 45%;">
             <div class="doc-title">Report commissioni</div>
             <div class="doc-period">{{ $period['label'] }}</div>
-            <div class="partner-meta">
-                Periodo dal {{ $period['from']->format('d/m/Y') }} al {{ $period['to']->format('d/m/Y') }}
+            <div class="doc-range">
+                dal {{ $period['from']->format('d/m/Y') }} al {{ $period['to']->format('d/m/Y') }}
             </div>
         </td>
     </tr>
 </table>
 
-@if($billing)
-    <div class="billing-box">
-        <div class="label">Dati di fatturazione</div>
-        <strong>{{ $billing->legal_name ?: $partner->partner_name }}</strong>
-        @if($billing->vat_number) · P.IVA {{ $billing->vat_number }} @endif
-        @if($billing->tax_code) · CF {{ $billing->tax_code }} @endif
-        <br>
-        {{ trim(($billing->street_address ?? '') . ' — ' . ($billing->postal_code ?? '') . ' ' . ($billing->city ?? '') . ' ' . ($billing->province ? '(' . $billing->province . ')' : ''), ' —') }}
-        @if($billing->pec_email) <br>PEC: {{ $billing->pec_email }} @endif
-        @if($billing->sdi_code) · SDI: {{ $billing->sdi_code }} @endif
-    </div>
-@endif
+<table class="anagrafica {{ $billing ? '' : 'single' }}">
+    <tr>
+        <td>
+            <div class="label">Partner</div>
+            <div class="name">{{ $partner->partner_name }}</div>
+            <div class="muted">Codice: <strong>{{ $partner->partner_code ?? '—' }}</strong></div>
+            @if($partner->structure_address)
+                <div class="row">{{ $partner->structure_address }}</div>
+            @endif
+            @if($partner->phone_number || $partner->email_notify)
+                <div class="row">
+                    @if($partner->phone_number)Tel. {{ $partner->phone_number }}@endif
+                    @if($partner->phone_number && $partner->email_notify) · @endif
+                    @if($partner->email_notify){{ $partner->email_notify }}@endif
+                </div>
+            @endif
+            @if($partner->domain_name)
+                <div class="row muted">{{ $partner->domain_name }}</div>
+            @endif
+        </td>
+        @if($billing)
+            <td>
+                <div class="label">Dati di fatturazione</div>
+                <div class="name">{{ $billing->legal_name ?: $partner->partner_name }}</div>
+                <div class="muted">
+                    @if($billing->vat_number)P.IVA {{ $billing->vat_number }}@endif
+                    @if($billing->vat_number && $billing->tax_code) · @endif
+                    @if($billing->tax_code)CF {{ $billing->tax_code }}@endif
+                </div>
+                @if($billingAddressLine)
+                    <div class="row">{{ $billingAddressLine }}</div>
+                @endif
+                @if($billing->pec_email || $billing->sdi_code)
+                    <div class="row muted">
+                        @if($billing->pec_email)PEC: {{ $billing->pec_email }}@endif
+                        @if($billing->pec_email && $billing->sdi_code) · @endif
+                        @if($billing->sdi_code)SDI: {{ $billing->sdi_code }}@endif
+                    </div>
+                @endif
+            </td>
+        @endif
+    </tr>
+</table>
 
 <h2>Riepilogo · {{ $period['label'] }}</h2>
 
