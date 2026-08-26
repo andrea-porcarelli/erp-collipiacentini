@@ -45,7 +45,7 @@
     <meta charset="UTF-8">
     <title>Report commissioni {{ $partner->partner_name }} — {{ $period['label'] }}</title>
     <style>
-        @page { margin: 20mm 15mm 25mm 15mm; }
+        @page { margin: 14mm 12mm 18mm 12mm; }
 
         @foreach($fontFaces as $face)
         @font-face {
@@ -61,107 +61,106 @@
         body {
             font-family: "{{ $fontFamily }}", DejaVu Sans, sans-serif;
             color: {{ $t['text-main'] ?? '#111' }};
-            font-size: 10.5px;
-            line-height: 1.5;
+            font-size: 9px;
+            line-height: 1.35;
             margin: 0;
             padding: 0;
         }
 
         .header-band {
             position: fixed;
-            top: -15mm;
-            left: -15mm;
-            right: -15mm;
-            height: 10mm;
+            top: -14mm;
+            left: -12mm;
+            right: -12mm;
+            height: 6mm;
             background: {{ $t['brand-primary-brand'] ?? '#2F6BFF' }};
         }
 
         .doc-header {
             width: 100%;
-            margin-bottom: 22px;
+            margin-bottom: 10px;
         }
         .doc-header td { vertical-align: top; }
         .doc-header .partner-name {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .doc-header .partner-meta {
-            font-size: 10px;
+            font-size: 8.5px;
             color: {{ $t['text-secondary'] ?? '#666' }};
-            margin-top: 3px;
+            margin-top: 2px;
         }
-        .doc-header .right {
-            text-align: right;
-        }
+        .doc-header .right { text-align: right; }
         .doc-header .doc-title {
-            font-size: 11px;
+            font-size: 8.5px;
             color: {{ $t['text-secondary'] ?? '#666' }};
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 700;
         }
         .doc-header .doc-period {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
-            margin-top: 4px;
+            margin-top: 2px;
         }
-        .doc-header .logo img { height: 22px; }
 
         .billing-box {
             border: 1px solid {{ $t['border-default'] ?? '#e0e0e0' }};
-            border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 18px;
-            font-size: 10px;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-bottom: 10px;
+            font-size: 8.5px;
+            line-height: 1.3;
         }
         .billing-box .label {
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.4px;
             color: {{ $t['text-secondary'] ?? '#666' }};
-            font-size: 9px;
-            margin-bottom: 4px;
+            font-size: 7.5px;
+            margin-bottom: 2px;
         }
 
         .kpi-grid {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 6px 6px;
-            margin-bottom: 18px;
+            border-spacing: 3px 0;
+            margin-bottom: 12px;
         }
         .kpi-grid td {
-            width: 25%;
-            padding: 10px 12px;
+            width: 16.66%;
+            padding: 6px 7px;
             background: #f6f6f7;
-            border-radius: 6px;
+            border-radius: 4px;
             vertical-align: top;
         }
         .kpi-grid .kpi-label {
-            font-size: 9px;
+            font-size: 7.5px;
             color: {{ $t['text-secondary'] ?? '#666' }};
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
             font-weight: 700;
+            white-space: nowrap;
         }
         .kpi-grid .kpi-value {
-            font-size: 15px;
+            font-size: 12px;
             font-weight: 700;
-            margin-top: 3px;
+            margin-top: 2px;
         }
         .kpi-grid .kpi-note {
-            font-size: 9px;
+            font-size: 7.5px;
             color: {{ $t['text-secondary'] ?? '#666' }};
-            margin-top: 3px;
+            margin-top: 1px;
         }
         .kpi-grid .kpi-warn { background: #fff3e0; }
         .kpi-grid .kpi-net { background: #e8f5e9; }
         .kpi-grid .kpi-info { background: #e3f2fd; }
 
         h2 {
-            font-size: 12px;
+            font-size: 9.5px;
             font-weight: 700;
-            margin: 20px 0 8px;
+            margin: 10px 0 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: {{ $t['text-main'] ?? '#111' }};
@@ -170,57 +169,57 @@
         table.orders {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9.5px;
+            font-size: 8.5px;
         }
         table.orders thead th {
             background: {{ $t['brand-primary-brand'] ?? '#2F6BFF' }};
             color: #fff;
-            padding: 6px 5px;
+            padding: 4px 4px;
             text-align: left;
             font-weight: 700;
-            font-size: 9px;
+            font-size: 8px;
         }
         table.orders thead th.text-end,
         table.orders tbody td.text-end,
         table.orders tfoot td.text-end {
             text-align: right;
         }
+        table.orders tbody tr:nth-child(even) td { background: #fafafa; }
         table.orders tbody td {
             border-bottom: 1px solid #eee;
-            padding: 5px 5px;
-            vertical-align: top;
+            padding: 3px 4px;
+            vertical-align: middle;
         }
         table.orders tfoot td {
-            border-top: 2px solid {{ $t['text-main'] ?? '#111' }};
-            padding: 7px 5px;
+            border-top: 1.5px solid {{ $t['text-main'] ?? '#111' }};
+            padding: 5px 4px;
             font-weight: 700;
-            font-size: 10px;
+            font-size: 9px;
+            background: #f6f6f7;
         }
-        table.orders .muted {
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            font-size: 8.5px;
-        }
+        table.orders .order-code { font-weight: 700; }
 
         .empty {
             text-align: center;
-            padding: 40px 10px;
+            padding: 24px 10px;
             color: {{ $t['text-secondary'] ?? '#666' }};
             border: 1px dashed {{ $t['border-default'] ?? '#e0e0e0' }};
-            border-radius: 8px;
+            border-radius: 6px;
+            font-size: 9px;
         }
 
         .footer {
             position: fixed;
-            bottom: -20mm;
-            left: -15mm;
-            right: -15mm;
-            padding: 8px 15mm;
+            bottom: -14mm;
+            left: -12mm;
+            right: -12mm;
+            padding: 4px 12mm;
             background: #f6f6f7;
-            font-size: 8.5px;
+            font-size: 7.5px;
             color: {{ $t['text-secondary'] ?? '#666' }};
         }
-        .footer td { vertical-align: middle; padding: 6px 0; }
-        .footer .logo img { height: 16px; }
+        .footer td { vertical-align: middle; padding: 4px 0; }
+        .footer .logo img { height: 12px; }
     </style>
 </head>
 <body>
@@ -276,48 +275,34 @@
     </div>
 @endif
 
-<h2>Riepilogo</h2>
+<h2>Riepilogo · {{ $period['label'] }}</h2>
 
 <table class="kpi-grid">
     <tr>
         <td>
-            <div class="kpi-label">Ordini pagati</div>
-            <div class="kpi-value">{{ number_format($report['orders_count'], 0, ',', '.') }}</div>
-            <div class="kpi-note">{{ $report['items_count'] }} biglietti</div>
+            <div class="kpi-label">Ordini · Bigl.</div>
+            <div class="kpi-value">{{ number_format($report['orders_count'], 0, ',', '.') }} · {{ $report['items_count'] }}</div>
         </td>
         <td>
             <div class="kpi-label">Lordo biglietti</div>
             <div class="kpi-value">{{ $fmtEuro($totals['gross']) }}</div>
-            <div class="kpi-note">Prima delle commissioni</div>
         </td>
         <td class="kpi-warn">
             <div class="kpi-label">Commissioni Miticko</div>
             <div class="kpi-value">{{ $fmtEuro($totals['miticko_total']) }}</div>
-            <div class="kpi-note">Fissa {{ $fmtEuro($totals['miticko_fixed']) }} · Var. {{ $fmtEuro($totals['miticko_variable']) }}</div>
+            <div class="kpi-note">F. {{ $fmtEuro($totals['miticko_fixed']) }} · V. {{ $fmtEuro($totals['miticko_variable']) }}</div>
         </td>
         <td class="kpi-warn">
-            <div class="kpi-label">Commissioni bancarie</div>
+            <div class="kpi-label">Bancarie</div>
             <div class="kpi-value">{{ $fmtEuro($totals['bank']) }}</div>
-            <div class="kpi-note">A carico del partner</div>
         </td>
-    </tr>
-    <tr>
+        <td class="kpi-info">
+            <div class="kpi-label">Prevendita</div>
+            <div class="kpi-value">{{ $fmtEuro($totals['presale']) }}</div>
+        </td>
         <td class="kpi-net">
             <div class="kpi-label">Netto partner</div>
             <div class="kpi-value">{{ $fmtEuro($totals['partner_net']) }}</div>
-            <div class="kpi-note">Lordo − commissioni Miticko/banca</div>
-        </td>
-        <td class="kpi-info">
-            <div class="kpi-label">Prevendita (Miticko)</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['presale']) }}</div>
-            <div class="kpi-note">Incassata dal cliente</div>
-        </td>
-        <td colspan="2">
-            <div class="kpi-label">Note</div>
-            <div class="kpi-note" style="margin-top: 4px; font-size: 9.5px;">
-                Il netto partner è calcolato come lordo biglietti diminuito delle commissioni Miticko e bancarie.
-                La prevendita è a carico del cliente ed è ricavo Miticko.
-            </div>
         </td>
     </tr>
 </table>
@@ -330,14 +315,14 @@
     <table class="orders">
         <thead>
         <tr>
-            <th style="width: 11%;">Ordine</th>
+            <th style="width: 12%;">Ordine</th>
             <th style="width: 13%;">Pagato il</th>
             <th>Cliente</th>
-            <th class="text-end" style="width: 6%;">Bigl.</th>
+            <th class="text-end" style="width: 5%;">Bigl.</th>
             <th class="text-end" style="width: 11%;">Lordo</th>
             <th class="text-end" style="width: 11%;">Miticko</th>
-            <th class="text-end" style="width: 10%;">Bancarie</th>
-            <th class="text-end" style="width: 10%;">Prevendita</th>
+            <th class="text-end" style="width: 10%;">Banca</th>
+            <th class="text-end" style="width: 10%;">Prev.</th>
             <th class="text-end" style="width: 11%;">Netto</th>
         </tr>
         </thead>
@@ -345,18 +330,15 @@
         @foreach($rows as $row)
             @php($o = $row['order'])
             <tr>
-                <td>MTK-{{ $o->order_number }}</td>
+                <td class="order-code">MTK-{{ $o->order_number }}</td>
                 <td>{{ $o->paid_at?->format('d/m/Y H:i') ?? '—' }}</td>
-                <td>
-                    {{ $o->full_name ?: '—' }}
-                    @if($o->email)<br><span class="muted">{{ $o->email }}</span>@endif
-                </td>
+                <td>{{ \Illuminate\Support\Str::limit($o->full_name ?: '—', 32, '…') }}</td>
                 <td class="text-end">{{ $row['items_count'] }}</td>
                 <td class="text-end">{{ $fmtEuro($row['gross']) }}</td>
                 <td class="text-end">{{ $fmtEuro($row['miticko']) }}</td>
                 <td class="text-end">{{ $fmtEuro($row['bank']) }}</td>
                 <td class="text-end">{{ $fmtEuro($row['presale']) }}</td>
-                <td class="text-end"><strong>{{ $fmtEuro($row['net']) }}</strong></td>
+                <td class="text-end">{{ $fmtEuro($row['net']) }}</td>
             </tr>
         @endforeach
         </tbody>

@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="w-100 mt-spacing-2xl">
+    <div class="w-100 mt-spacing-2xl" style="padding-bottom: 50px;">
         <div class="row g-3">
             {{-- Selettore periodo --}}
             <div class="col-12">
