@@ -353,7 +353,7 @@
     gap: 8px;
     width: 100%;
     padding: 10px 16px;
-    color: var(--ts-success);
+    color: var(--button-resting-foreground, #29670E);
     border-radius: var(--button-corner-radius, 12px);
     border: var(--button-resting-border-width, 0) solid var(--button-resting-border-color, rgba(255, 255, 255, 0.00));
     background: var(--button-resting-background, #F2F5F2);
