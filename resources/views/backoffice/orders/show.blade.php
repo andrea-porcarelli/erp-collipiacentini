@@ -234,7 +234,7 @@
                         </div>
 
                         <button type="button" class="ts-btn-all-arrived order-checkin-all-arrived" data-role="card-all-arrived">
-                            <i class="fa-solid fa-check"></i> Arrivati tutti
+                            Segna tutti come arrivati
                         </button>
 
                         <ul class="ts-tickets-list order-checkin-tickets">

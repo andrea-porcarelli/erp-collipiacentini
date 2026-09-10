@@ -89,7 +89,7 @@
         </div>
 
         <button type="button" class="ts-btn-all-arrived" data-role="all-arrived">
-            <i class="fa-solid fa-check"></i> Segna tutti come arrivati
+               Segna tutti come arrivati
         </button>
 
         <ul class="ts-tickets-list">
