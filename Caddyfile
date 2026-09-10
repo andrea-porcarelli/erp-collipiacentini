@@ -3,6 +3,11 @@ admin.miticko.com {
     reverse_proxy erp_panel:8000
 }
 
+dev.miticko.com {
+    tls internal
+    reverse_proxy erp_panel:8000
+}
+
 grazzano-visconti.miticko.com {
     tls internal
     reverse_proxy erp_panel:8000

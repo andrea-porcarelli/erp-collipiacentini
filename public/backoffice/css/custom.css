@@ -1385,9 +1385,6 @@ table.order-detail-tickets tbody tr:last-child td {
 }
 
 /* --- Check-in visitatori card --- */
-.order-checkin-card .card-body {
-    padding-top: var(--spacing-l, 16px);
-}
 .order-checkin-content {
     display: flex;
     flex-direction: column;
@@ -1405,9 +1402,12 @@ table.order-detail-tickets tbody tr:last-child td {
     text-align: center;
 }
 .order-checkin-content .ts-checkin-counter-main {
-    font-size: 18px;
-    font-weight: 700;
+    font-family: var(--typography-web-title-font, "DM Sans");
+    font-size: var(--size, 18px);
     color: var(--text-main, #0D0D0D);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px);
 }
 .order-checkin-content .ts-checkin-counter-sub {
     font-size: 13px;

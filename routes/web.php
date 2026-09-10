@@ -73,170 +73,179 @@ Route::get('/{page}', [BookingController::class, 'page'])
 Route::get('/{slug}/{page}', [BookingController::class, 'page'])
     ->whereIn('page', $partnerPages)
     ->name('partner.page.slug');
-Route::domain('admin.miticko.com')->group(function () {
 
-    Route::get('/', function () {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        } else {
-            return redirect()->route('login');
-        }
-    });
-    Route::get('/login', [LoginController::class, 'index'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+$adminDomains = [
+    'admin.miticko.com',
+    'dev.miticko.com',
+];
+foreach ($adminDomains as $domain) {
+    Route::domain($domain)
+        ->group(function () {
 
-    Route::group(['middleware' => ['auth']], function () {
-        Route::impersonate();
-        Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
-        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+            Route::get('/', function () {
+                if (Auth::check()) {
+                    return redirect()->route('dashboard');
+                } else {
+                    return redirect()->route('login');
+                }
+            });
+            Route::get('/login', [LoginController::class, 'index'])->name('login');
+            Route::post('/login', [LoginController::class, 'login']);
 
-        // Impostazioni partner (utente con ruolo "partner"): rende la show del proprio partner.
-        Route::get('/settings', [PartnerController::class, 'settings'])->name('settings');
+            Route::group(['middleware' => ['auth']], function () {
+                Route::impersonate();
+                Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
+                Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-        // Ticket scanner (FAB)
-        Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');
-        Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
-        Route::patch('tickets/{participant}/status', [TicketScannerController::class, 'updateStatus'])->name('tickets.updateStatus');
+                // Impostazioni partner (utente con ruolo "partner"): rende la show del proprio partner.
+                Route::get('/settings', [PartnerController::class, 'settings'])->name('settings');
 
-        // Calendario prenotazioni (settimana → giorno → slot → ordini).
-        Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
-        Route::get('calendar/week', [CalendarController::class, 'week'])->name('calendar.week');
-        Route::get('calendar/day', [CalendarController::class, 'day'])->name('calendar.day');
-        Route::get('calendar/slot/orders', [CalendarController::class, 'slotOrders'])->name('calendar.slot.orders');
-        Route::get('calendar/orders/{order}', [CalendarController::class, 'orderDetail'])->name('calendar.order.detail');
-        Route::put('calendar/participants/batch-status', [CalendarController::class, 'batchStatus'])->name('calendar.participants.batchStatus');
+                // Ticket scanner (FAB)
+                Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');
+                Route::put('tickets/batch-status', [TicketScannerController::class, 'batchStatus'])->name('tickets.batchStatus');
+                Route::patch('tickets/{participant}/status', [TicketScannerController::class, 'updateStatus'])->name('tickets.updateStatus');
 
-        // Endpoint AJAX per il form "Registra ordine".
-        // IMPORTANTE: devono precedere le route parametriche orders/{order}/*
-        // per non venire intercettate dal binding {order}.
-        Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
-        Route::get('orders/create/partners', [OrderController::class, 'createPartners'])->name('orders.create.partners');
-        Route::get('orders/create/products', [OrderController::class, 'createProducts'])->name('orders.create.products');
-        Route::get('orders/create/availability/days', [OrderController::class, 'createAvailabilityDays'])->name('orders.create.availabilityDays');
-        Route::get('orders/create/availability/slots', [OrderController::class, 'createAvailabilitySlots'])->name('orders.create.availabilitySlots');
-        Route::get('orders/create/variants', [OrderController::class, 'createVariants'])->name('orders.create.variants');
-        Route::get('orders/create/customers', [OrderController::class, 'createCustomers'])->name('orders.create.customers');
+                // Calendario prenotazioni (settimana → giorno → slot → ordini).
+                Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+                Route::get('calendar/week', [CalendarController::class, 'week'])->name('calendar.week');
+                Route::get('calendar/day', [CalendarController::class, 'day'])->name('calendar.day');
+                Route::get('calendar/slot/orders', [CalendarController::class, 'slotOrders'])->name('calendar.slot.orders');
+                Route::get('calendar/orders/{order}', [CalendarController::class, 'orderDetail'])->name('calendar.order.detail');
+                Route::put('calendar/participants/batch-status', [CalendarController::class, 'batchStatus'])->name('calendar.participants.batchStatus');
 
-        Route::post('orders/{order}/payment-link', [OrderController::class, 'paymentLink'])->name('orders.paymentLink');
-        Route::get('orders/{order}/invoice/preview', [OrderInvoiceController::class, 'preview'])->name('orders.invoice.preview');
-        Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
+                // Endpoint AJAX per il form "Registra ordine".
+                // IMPORTANTE: devono precedere le route parametriche orders/{order}/*
+                // per non venire intercettate dal binding {order}.
+                Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
+                Route::get('orders/create/partners', [OrderController::class, 'createPartners'])->name('orders.create.partners');
+                Route::get('orders/create/products', [OrderController::class, 'createProducts'])->name('orders.create.products');
+                Route::get('orders/create/availability/days', [OrderController::class, 'createAvailabilityDays'])->name('orders.create.availabilityDays');
+                Route::get('orders/create/availability/slots', [OrderController::class, 'createAvailabilitySlots'])->name('orders.create.availabilitySlots');
+                Route::get('orders/create/variants', [OrderController::class, 'createVariants'])->name('orders.create.variants');
+                Route::get('orders/create/customers', [OrderController::class, 'createCustomers'])->name('orders.create.customers');
 
-        // Sezione Fatturazione (solo god + admin, controllato nel controller).
-        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
-        Route::any('invoices/data', [InvoiceController::class, 'data'])->name('invoices.data');
-        Route::get('invoices/pending', [InvoiceController::class, 'pending'])->name('invoices.pending');
-        Route::any('invoices/pending/data', [InvoiceController::class, 'pendingData'])->name('invoices.pending.data');
-        Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
-        Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
-        Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');
-        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-        Route::put('orders/{order}/customer-status', [OrderController::class, 'updateCustomerStatus'])->name('orders.updateCustomerStatus');
-        Route::put('orders/{order}/notes', [OrderController::class, 'updateNotes'])->name('orders.updateNotes');
-        Route::put('orders/{order}/customer', [OrderController::class, 'updateCustomer'])->name('orders.updateCustomer');
-        Route::put('orders/{order}/booking', [OrderController::class, 'updateBooking'])->name('orders.updateBooking');
-        Route::get('orders/{order}/availability/days', [OrderController::class, 'availabilityDays'])->name('orders.availabilityDays');
-        Route::get('orders/{order}/availability/slots', [OrderController::class, 'availabilitySlots'])->name('orders.availabilitySlots');
-        Route::resource('orders', OrderController::class)->except(['create']);
-        Route::resource('products', ProductController::class);
-        Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');
-        Route::post('products/{product}/price-variations', [ProductPriceVariationController::class, 'store'])->name('products.price-variations.store');
-        Route::put('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'update'])->name('products.price-variations.update');
-        Route::delete('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'destroy'])->name('products.price-variations.destroy');
-        Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
-        Route::get('products/{product}/visit-info/translations', [ProductController::class, 'getVisitInfoTranslations'])->name('products.visit-info.translations.get');
-        Route::put('products/{product}/visit-info/translations', [ProductController::class, 'saveVisitInfoTranslations'])->name('products.visit-info.translations.save');
-        Route::get('products/{product}/public-meta/translations', [ProductController::class, 'getPublicMetaTranslations'])->name('products.public-meta.translations.get');
-        Route::put('products/{product}/public-meta/translations', [ProductController::class, 'savePublicMetaTranslations'])->name('products.public-meta.translations.save');
-        Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
-        Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
-        Route::put('products/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('products.variants.update');
-        Route::delete('products/{product}/variants/{variant}', [ProductController::class, 'destroyVariant'])->name('products.variants.destroy');
-        Route::get('products/{product}/variants/{variant}/translations', [ProductController::class, 'getVariantTranslations'])->name('products.variants.translations.get');
-        Route::put('products/{product}/variants/{variant}/translations', [ProductController::class, 'saveVariantTranslations'])->name('products.variants.translations.save');
-        Route::get('products/{product}/links', [ProductLinkController::class, 'index'])->name('products.links.index');
-        Route::post('products/{product}/links', [ProductLinkController::class, 'store'])->name('products.links.store');
-        Route::put('products/{product}/links/{link}', [ProductLinkController::class, 'update'])->name('products.links.update');
-        Route::delete('products/{product}/links/{link}', [ProductLinkController::class, 'destroy'])->name('products.links.destroy');
-        Route::get('products/{product}/links/{link}/translations', [ProductLinkController::class, 'getTranslations'])->name('products.links.translations.get');
-        Route::put('products/{product}/links/{link}/translations', [ProductLinkController::class, 'saveTranslations'])->name('products.links.translations.save');
-        Route::get('products/{product}/faqs', [ProductFaqController::class, 'index'])->name('products.faqs.index');
-        Route::post('products/{product}/faqs', [ProductFaqController::class, 'store'])->name('products.faqs.store');
-        Route::put('products/{product}/faqs/{faq}', [ProductFaqController::class, 'update'])->name('products.faqs.update');
-        Route::delete('products/{product}/faqs/{faq}', [ProductFaqController::class, 'destroy'])->name('products.faqs.destroy');
-        Route::get('products/{product}/faqs/{faq}/translations', [ProductFaqController::class, 'getTranslations'])->name('products.faqs.translations.get');
-        Route::put('products/{product}/faqs/{faq}/translations', [ProductFaqController::class, 'saveTranslations'])->name('products.faqs.translations.save');
-        Route::get('products/{product}/related/search', [ProductRelatedController::class, 'find'])->name('products.related.search');
-        Route::get('products/{product}/related', [ProductRelatedController::class, 'index'])->name('products.related.index');
-        Route::post('products/{product}/related', [ProductRelatedController::class, 'store'])->name('products.related.store');
-        Route::put('products/{product}/related', [ProductRelatedController::class, 'sync'])->name('products.related.sync');
-        Route::delete('products/{product}/related/{related}', [ProductRelatedController::class, 'destroy'])->name('products.related.destroy');
-        Route::post('products/{product}/customer-fields/sync', [ProductCustomerFieldController::class, 'sync'])->name('products.customer-fields.sync');
-        Route::get('products/{product}/schedule/{dayIndex}', [ProductAvailabilityController::class, 'index'])->name('products.schedule.index');
-        Route::post('products/{product}/schedule', [ProductAvailabilityController::class, 'store'])->name('products.schedule.store');
-        Route::put('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'update'])->name('products.schedule.update');
-        Route::delete('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'destroy'])->name('products.schedule.destroy');
+                Route::post('orders/{order}/payment-link', [OrderController::class, 'paymentLink'])->name('orders.paymentLink');
+                Route::get('orders/{order}/invoice/preview', [OrderInvoiceController::class, 'preview'])->name('orders.invoice.preview');
+                Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
 
-        // Special schedule
-        Route::get('products/{product}/special-schedule/dates', [ProductSpecialScheduleController::class, 'dates'])->name('products.special-schedule.dates');
-        Route::get('products/{product}/special-schedule/preview/{availability}/variants', [ProductSpecialScheduleController::class, 'previewVariants'])->name('products.special-schedule.preview-variants');
-        Route::post('products/{product}/special-schedule/{date}/materialize', [ProductSpecialScheduleController::class, 'materialize'])->name('products.special-schedule.materialize')->where('date', '\d{4}-\d{2}-\d{2}');
-        Route::get('products/{product}/special-schedule/{date}', [ProductSpecialScheduleController::class, 'index'])->name('products.special-schedule.index')->where('date', '\d{4}-\d{2}-\d{2}');
-        Route::post('products/{product}/special-schedule', [ProductSpecialScheduleController::class, 'store'])->name('products.special-schedule.store');
-        Route::post('products/{product}/special-schedule/toggle-disable', [ProductSpecialScheduleController::class, 'toggleDisable'])->name('products.special-schedule.toggle-disable');
-        Route::delete('products/{product}/special-schedule/{date}/reset', [ProductSpecialScheduleController::class, 'reset'])->name('products.special-schedule.reset')->where('date', '\d{4}-\d{2}-\d{2}');
-        Route::put('products/{product}/special-schedule/{slot}/availability', [ProductSpecialScheduleController::class, 'updateAvailability'])->name('products.special-schedule.availability');
-        Route::delete('products/{product}/special-schedule/{slot}', [ProductSpecialScheduleController::class, 'destroy'])->name('products.special-schedule.destroy');
-        Route::get('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'getVariants'])->name('products.special-schedule.variants.index');
-        Route::post('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'storeVariant'])->name('products.special-schedule.variants.store');
-        Route::post('products/{product}/special-schedule/{slot}/variants/reorder', [ProductSpecialScheduleController::class, 'reorderVariants'])->name('products.special-schedule.variants.reorder');
-        Route::put('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'updateVariant'])->name('products.special-schedule.variants.update');
-        Route::delete('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'destroyVariant'])->name('products.special-schedule.variants.destroy');
+                // Sezione Fatturazione (solo god + admin, controllato nel controller).
+                Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+                Route::any('invoices/data', [InvoiceController::class, 'data'])->name('invoices.data');
+                Route::get('invoices/pending', [InvoiceController::class, 'pending'])->name('invoices.pending');
+                Route::any('invoices/pending/data', [InvoiceController::class, 'pendingData'])->name('invoices.pending.data');
+                Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
+                Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
+                Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');
+                Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+                Route::put('orders/{order}/customer-status', [OrderController::class, 'updateCustomerStatus'])->name('orders.updateCustomerStatus');
+                Route::put('orders/{order}/notes', [OrderController::class, 'updateNotes'])->name('orders.updateNotes');
+                Route::put('orders/{order}/customer', [OrderController::class, 'updateCustomer'])->name('orders.updateCustomer');
+                Route::put('orders/{order}/booking', [OrderController::class, 'updateBooking'])->name('orders.updateBooking');
+                Route::get('orders/{order}/availability/days', [OrderController::class, 'availabilityDays'])->name('orders.availabilityDays');
+                Route::get('orders/{order}/availability/slots', [OrderController::class, 'availabilitySlots'])->name('orders.availabilitySlots');
+                Route::resource('orders', OrderController::class)->except(['create']);
+                Route::resource('products', ProductController::class);
+                Route::get('products/{product}/price-variations', [ProductPriceVariationController::class, 'index'])->name('products.price-variations.index');
+                Route::post('products/{product}/price-variations', [ProductPriceVariationController::class, 'store'])->name('products.price-variations.store');
+                Route::put('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'update'])->name('products.price-variations.update');
+                Route::delete('products/{product}/price-variations/{variation}', [ProductPriceVariationController::class, 'destroy'])->name('products.price-variations.destroy');
+                Route::post('products/{product}/sync-woocommerce', [ProductController::class, 'syncWooCommerce'])->name('products.sync-woocommerce');
+                Route::get('products/{product}/visit-info/translations', [ProductController::class, 'getVisitInfoTranslations'])->name('products.visit-info.translations.get');
+                Route::put('products/{product}/visit-info/translations', [ProductController::class, 'saveVisitInfoTranslations'])->name('products.visit-info.translations.save');
+                Route::get('products/{product}/public-meta/translations', [ProductController::class, 'getPublicMetaTranslations'])->name('products.public-meta.translations.get');
+                Route::put('products/{product}/public-meta/translations', [ProductController::class, 'savePublicMetaTranslations'])->name('products.public-meta.translations.save');
+                Route::post('products/{product}/variants/reorder', [ProductController::class, 'reorderVariants'])->name('products.variants.reorder');
+                Route::post('products/{product}/variants', [ProductController::class, 'storeVariant'])->name('products.variants.store');
+                Route::put('products/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('products.variants.update');
+                Route::delete('products/{product}/variants/{variant}', [ProductController::class, 'destroyVariant'])->name('products.variants.destroy');
+                Route::get('products/{product}/variants/{variant}/translations', [ProductController::class, 'getVariantTranslations'])->name('products.variants.translations.get');
+                Route::put('products/{product}/variants/{variant}/translations', [ProductController::class, 'saveVariantTranslations'])->name('products.variants.translations.save');
+                Route::get('products/{product}/links', [ProductLinkController::class, 'index'])->name('products.links.index');
+                Route::post('products/{product}/links', [ProductLinkController::class, 'store'])->name('products.links.store');
+                Route::put('products/{product}/links/{link}', [ProductLinkController::class, 'update'])->name('products.links.update');
+                Route::delete('products/{product}/links/{link}', [ProductLinkController::class, 'destroy'])->name('products.links.destroy');
+                Route::get('products/{product}/links/{link}/translations', [ProductLinkController::class, 'getTranslations'])->name('products.links.translations.get');
+                Route::put('products/{product}/links/{link}/translations', [ProductLinkController::class, 'saveTranslations'])->name('products.links.translations.save');
+                Route::get('products/{product}/faqs', [ProductFaqController::class, 'index'])->name('products.faqs.index');
+                Route::post('products/{product}/faqs', [ProductFaqController::class, 'store'])->name('products.faqs.store');
+                Route::put('products/{product}/faqs/{faq}', [ProductFaqController::class, 'update'])->name('products.faqs.update');
+                Route::delete('products/{product}/faqs/{faq}', [ProductFaqController::class, 'destroy'])->name('products.faqs.destroy');
+                Route::get('products/{product}/faqs/{faq}/translations', [ProductFaqController::class, 'getTranslations'])->name('products.faqs.translations.get');
+                Route::put('products/{product}/faqs/{faq}/translations', [ProductFaqController::class, 'saveTranslations'])->name('products.faqs.translations.save');
+                Route::get('products/{product}/related/search', [ProductRelatedController::class, 'find'])->name('products.related.search');
+                Route::get('products/{product}/related', [ProductRelatedController::class, 'index'])->name('products.related.index');
+                Route::post('products/{product}/related', [ProductRelatedController::class, 'store'])->name('products.related.store');
+                Route::put('products/{product}/related', [ProductRelatedController::class, 'sync'])->name('products.related.sync');
+                Route::delete('products/{product}/related/{related}', [ProductRelatedController::class, 'destroy'])->name('products.related.destroy');
+                Route::post('products/{product}/customer-fields/sync', [ProductCustomerFieldController::class, 'sync'])->name('products.customer-fields.sync');
+                Route::get('products/{product}/schedule/{dayIndex}', [ProductAvailabilityController::class, 'index'])->name('products.schedule.index');
+                Route::post('products/{product}/schedule', [ProductAvailabilityController::class, 'store'])->name('products.schedule.store');
+                Route::put('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'update'])->name('products.schedule.update');
+                Route::delete('products/{product}/schedule/{slot}', [ProductAvailabilityController::class, 'destroy'])->name('products.schedule.destroy');
 
-        // Closed periods
-        Route::post('products/{product}/closed-periods', [ProductClosedPeriodController::class, 'store'])->name('products.closed-periods.store');
-        Route::delete('products/{product}/closed-periods/{period}', [ProductClosedPeriodController::class, 'destroy'])->name('products.closed-periods.destroy');
+                // Special schedule
+                Route::get('products/{product}/special-schedule/dates', [ProductSpecialScheduleController::class, 'dates'])->name('products.special-schedule.dates');
+                Route::get('products/{product}/special-schedule/preview/{availability}/variants', [ProductSpecialScheduleController::class, 'previewVariants'])->name('products.special-schedule.preview-variants');
+                Route::post('products/{product}/special-schedule/{date}/materialize', [ProductSpecialScheduleController::class, 'materialize'])->name('products.special-schedule.materialize')->where('date', '\d{4}-\d{2}-\d{2}');
+                Route::get('products/{product}/special-schedule/{date}', [ProductSpecialScheduleController::class, 'index'])->name('products.special-schedule.index')->where('date', '\d{4}-\d{2}-\d{2}');
+                Route::post('products/{product}/special-schedule', [ProductSpecialScheduleController::class, 'store'])->name('products.special-schedule.store');
+                Route::post('products/{product}/special-schedule/toggle-disable', [ProductSpecialScheduleController::class, 'toggleDisable'])->name('products.special-schedule.toggle-disable');
+                Route::delete('products/{product}/special-schedule/{date}/reset', [ProductSpecialScheduleController::class, 'reset'])->name('products.special-schedule.reset')->where('date', '\d{4}-\d{2}-\d{2}');
+                Route::put('products/{product}/special-schedule/{slot}/availability', [ProductSpecialScheduleController::class, 'updateAvailability'])->name('products.special-schedule.availability');
+                Route::delete('products/{product}/special-schedule/{slot}', [ProductSpecialScheduleController::class, 'destroy'])->name('products.special-schedule.destroy');
+                Route::get('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'getVariants'])->name('products.special-schedule.variants.index');
+                Route::post('products/{product}/special-schedule/{slot}/variants', [ProductSpecialScheduleController::class, 'storeVariant'])->name('products.special-schedule.variants.store');
+                Route::post('products/{product}/special-schedule/{slot}/variants/reorder', [ProductSpecialScheduleController::class, 'reorderVariants'])->name('products.special-schedule.variants.reorder');
+                Route::put('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'updateVariant'])->name('products.special-schedule.variants.update');
+                Route::delete('products/{product}/special-schedule/{slot}/variants/{variant}', [ProductSpecialScheduleController::class, 'destroyVariant'])->name('products.special-schedule.variants.destroy');
 
-        // Upload immagini per editor WYSIWYG (CKEditor)
-        Route::post('editor/upload-image', [EditorMediaController::class, 'uploadImage'])->name('editor.upload-image');
+                // Closed periods
+                Route::post('products/{product}/closed-periods', [ProductClosedPeriodController::class, 'store'])->name('products.closed-periods.store');
+                Route::delete('products/{product}/closed-periods/{period}', [ProductClosedPeriodController::class, 'destroy'])->name('products.closed-periods.destroy');
 
-        // Media gallery
-        Route::post('products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');
-        Route::post('products/{product}/media/reorder', [ProductMediaController::class, 'reorder'])->name('products.media.reorder');
-        Route::delete('products/{product}/media/{media}', [ProductMediaController::class, 'destroy'])->name('products.media.destroy');
-        Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
-        Route::resource('categories', CategoryController::class);
-        Route::resource('partners', PartnerController::class);
-        Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
-        Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
-        Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
-        Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
-        Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
-            ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
-            ->name('partners.translations.get');
-        Route::put('partners/{partner}/translations/{field}', [PartnerController::class, 'saveFieldTranslations'])
-            ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
-            ->name('partners.translations.save');
-        Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
-        Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
-        Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');
-        Route::post('partners/{partner}/consents/enable', [PartnerConsentController::class, 'enable'])->name('partners.consents.enable');
-        Route::post('partners/{partner}/consents/reorder', [PartnerConsentController::class, 'reorder'])->name('partners.consents.reorder');
-        Route::put('partners/{partner}/consents/{consent}/toggle-active', [PartnerConsentController::class, 'toggleActive'])->name('partners.consents.toggleActive');
-        Route::get('partners/{partner}/consents', [PartnerConsentController::class, 'index'])->name('partners.consents.index');
-        Route::post('partners/{partner}/consents', [PartnerConsentController::class, 'store'])->name('partners.consents.store');
-        Route::put('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'update'])->name('partners.consents.update');
-        Route::delete('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'destroy'])->name('partners.consents.destroy');
-        Route::get('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'getTranslations'])->name('partners.consents.translations.get');
-        Route::put('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'saveTranslations'])->name('partners.consents.translations.save');
-        Route::resource('companies', CompanyController::class);
-        Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
-        Route::put('companies/{company}/products', [CompanyController::class, 'syncProducts'])->name('companies.products.sync');
-        Route::resource('users', UserController::class);
-        Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
-    });
-});
+                // Upload immagini per editor WYSIWYG (CKEditor)
+                Route::post('editor/upload-image', [EditorMediaController::class, 'uploadImage'])->name('editor.upload-image');
+
+                // Media gallery
+                Route::post('products/{product}/media', [ProductMediaController::class, 'store'])->name('products.media.store');
+                Route::post('products/{product}/media/reorder', [ProductMediaController::class, 'reorder'])->name('products.media.reorder');
+                Route::delete('products/{product}/media/{media}', [ProductMediaController::class, 'destroy'])->name('products.media.destroy');
+                Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
+                Route::resource('categories', CategoryController::class);
+                Route::resource('partners', PartnerController::class);
+                Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
+                Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
+                Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
+                Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
+                Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
+                    ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+                    ->name('partners.translations.get');
+                Route::put('partners/{partner}/translations/{field}', [PartnerController::class, 'saveFieldTranslations'])
+                    ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+                    ->name('partners.translations.save');
+                Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
+                Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');
+                Route::delete('partners/{partner}/users/{user}', [PartnerUserController::class, 'destroy'])->name('partners.users.destroy');
+                Route::post('partners/{partner}/consents/enable', [PartnerConsentController::class, 'enable'])->name('partners.consents.enable');
+                Route::post('partners/{partner}/consents/reorder', [PartnerConsentController::class, 'reorder'])->name('partners.consents.reorder');
+                Route::put('partners/{partner}/consents/{consent}/toggle-active', [PartnerConsentController::class, 'toggleActive'])->name('partners.consents.toggleActive');
+                Route::get('partners/{partner}/consents', [PartnerConsentController::class, 'index'])->name('partners.consents.index');
+                Route::post('partners/{partner}/consents', [PartnerConsentController::class, 'store'])->name('partners.consents.store');
+                Route::put('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'update'])->name('partners.consents.update');
+                Route::delete('partners/{partner}/consents/{consent}', [PartnerConsentController::class, 'destroy'])->name('partners.consents.destroy');
+                Route::get('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'getTranslations'])->name('partners.consents.translations.get');
+                Route::put('partners/{partner}/consents/{consent}/translations', [PartnerConsentController::class, 'saveTranslations'])->name('partners.consents.translations.save');
+                Route::resource('companies', CompanyController::class);
+                Route::post('companies/{company}/generate-token', [CompanyController::class, 'generateToken'])->name('companies.generate-token');
+                Route::put('companies/{company}/products', [CompanyController::class, 'syncProducts'])->name('companies.products.sync');
+                Route::resource('users', UserController::class);
+                Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+            });
+        });
+}
 Route::fallback(function () {
-    if (request()->getHost() !== 'admin.miticko.com') {
+    $req = request()->getHost();
+    if (!in_array($req, ['dev.miticko.com', 'admin.miticko.com'])) {
         return redirect('/');
     }
     abort(404);
