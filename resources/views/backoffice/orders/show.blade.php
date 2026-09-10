@@ -233,7 +233,7 @@
                             <div class="ts-checkin-counter-sub">{{ $checkinTotal }} {{ $checkinTotal === 1 ? 'visitatore atteso' : 'visitatori attesi' }}</div>
                         </div>
 
-                        <button type="button" class="ts-btn-all-arrived order-checkin-all-arrived" data-role="card-all-arrived">
+                        <button type="button" class="ts-btn-all-arrived order-checkin-all-arrived " data-mode="buttonSize-Large buttonEmphasis-Medium buttonAppearance-Success" data-role="card-all-arrived">
                             Segna tutti come arrivati
                         </button>
 
