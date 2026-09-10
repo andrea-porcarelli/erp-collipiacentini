@@ -363,7 +363,7 @@
     transition: background 120ms ease;
 }
 .ticket-scanner-content .ts-btn-all-arrived:hover {
-    background: rgba(16, 185, 129, 0.12);
+    color: var(--button-hover-foreground, #29670E);
 }
 /* Tickets list */
 .ticket-scanner-content .ts-tickets-list {
