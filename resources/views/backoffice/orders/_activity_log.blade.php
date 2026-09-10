@@ -10,7 +10,7 @@
     $grouped = $logs->groupBy(fn ($l) => $l->event_group);
 @endphp
 
-<x-card title="Storico attività">
+<x-card title="Storico attività" size="Small">
     @if($logs->isEmpty())
         <div class="text-secondary">Nessuna attività registrata per questo ordine.</div>
     @else

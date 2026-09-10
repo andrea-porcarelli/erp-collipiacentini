@@ -172,7 +172,7 @@
     {{-- STAT STRIP --}}
     <div class="row g-3 mb-spacing-2xl order-stat-strip">
         <div class="col-12 col-md-6 col-xl">
-            <x-card>
+            <x-card size="Small">
                 <div class="stat-label">DATA VISITA</div>
                 @if($firstOp)
                     <div class="stat-value">{{ \Carbon\Carbon::parse($firstOp->booking_date)->translatedFormat('j M Y') }}</div>
@@ -188,7 +188,7 @@
             </x-card>
         </div>
         <div class="col-12 col-md-6 col-xl">
-            <x-card>
+            <x-card size="Small">
                 <div class="stat-label">CLIENTE</div>
                 <div class="stat-value">{{ $order->name }} {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($order->surname ?? '', 0, 1)) }}.</div>
                 @if($order->phone)
@@ -197,7 +197,7 @@
             </x-card>
         </div>
         <div class="col-12 col-md-6 col-xl">
-            <x-card>
+            <x-card size="Small">
                 <div class="stat-label">BIGLIETTI</div>
                 <div class="stat-value">{{ $ticketsTotal }} biglietti</div>
                 @if($product)
@@ -206,7 +206,7 @@
             </x-card>
         </div>
         <div class="col-12 col-md-6 col-xl">
-            <x-card>
+            <x-card size="Small">
                 <div class="stat-label">TOTALE</div>
                 <div class="stat-value">{{ number_format($order->amount, 2, ',', '.') }} €</div>
             </x-card>
@@ -221,7 +221,7 @@
             @php($checkinTotal = $participants->count())
             @php($checkinDone = $participants->where('status', 'checked_in')->count())
             @php($statusOptions = ['booked' => 'Prenotato', 'checked_in' => 'Arrivato', 'no_show' => 'No show', 'refunded' => 'Rimborsato', 'cancelled' => 'Annullato'])
-            <x-card class="position-relative mb-spacing-xl order-checkin-card" title="Check-in visitatori">
+            <x-card class="position-relative mb-spacing-xl order-checkin-card" title="Check-in visitatori" size="Small">
                 @if($participants->isEmpty())
                     <div class="text-secondary">Nessun partecipante per questo ordine.</div>
                 @else
@@ -272,7 +272,7 @@
                 @endif
             </x-card>
 
-            <x-card :title="'Dettaglio ordine #' . $order->order_number">
+            <x-card :title="'Dettaglio ordine #' . $order->order_number" size="Small">
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
                         <x-input
