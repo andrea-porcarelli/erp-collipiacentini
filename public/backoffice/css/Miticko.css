@@ -1,11 +1,11 @@
 /* Figma Variables Export */
-/* Generated on 2026-06-03T09:29:47.306Z */
+/* Generated on 2026-09-08T14:39:38.410Z */
 /* All Modes */
 
 /* Mode: Dark */
 [data-mode*="Dark"] {
   --accordion-background: var(--background-global-paper2);
-  --accordion-bordercoloractive: var(--border-active);
+  --accordion-bordercoloractive: var(--colors-primitives-grey-scale-black-40);
   --accordion-bordercolorresting: var(--border-light);
   --accordion-fontcolor: var(--text-main);
   --background-be-default: var(--background-dark-be-background);
@@ -513,6 +513,18 @@
   --label-warning-background: var(--colors-primitives-grey-scale-transparent);
   --label-warning-border-color: var(--colors-brand-warning-dark-mode-brand);
   --label-warning-foreground: var(--colors-brand-warning-dark-mode-brand);
+  --search-appearance-active-background: var(--background-dark-global-paper1);
+  --search-appearance-active-bordercolor: var(--border-active);
+  --search-appearance-active-foregroundicon: var(--text-main);
+  --search-appearance-active-foregroundtext: var(--text-main);
+  --search-appearance-default-background: var(--background-dark-global-paper1);
+  --search-appearance-default-bordercolor: var(--border-default);
+  --search-appearance-default-foregroundicon: var(--text-secondary);
+  --search-appearance-default-foregroundtext: var(--text-disabled);
+  --search-appearance-disabled-background: var(--background-dark-global-paper1);
+  --search-appearance-disabled-bordercolor: var(--border-disabled);
+  --search-appearance-disabled-foregroundicon: var(--text-disabled);
+  --search-appearance-disabled-foregroundtext: var(--text-disabled);
   --tag-primary-default-default-background: var(--colors-brand-primary-dark-mode-brand);
   --tag-primary-default-default-foreground: var(--colors-brand-primary-dark-mode-onbrand);
   --tag-primary-light-default-background: var(--colors-brand-primary-dark-mode-brandlight);
@@ -687,6 +699,9 @@
   --label-error-border-width: 1px;
   --label-success-border-width: 1px;
   --label-warning-border-width: 1px;
+  --search-appearance-active-borderwidth: 1px;
+  --search-appearance-default-borderwidth: 1px;
+  --search-appearance-disabled-borderwidth: 1px;
   --mode: "Dark";
 }
 
@@ -800,6 +815,11 @@
   --menu-label-paddingright: var(--spacing-s---desktop);
   --menu-label-paddingvertical: var(--spacing-s---desktop);
   --menu-label-spacing: var(--spacing-xs---desktop);
+  --search-appearance-default-cornerradius: var(--corner-radius-m);
+  --search-appearance-default-iconsize: 20px;
+  --search-appearance-default-paddinghorizontal: var(--spacing-m---desktop);
+  --search-appearance-default-paddingvertical: var(--spacing-m---desktop);
+  --search-appearance-default-spacing: var(--spacing-s---desktop);
   --spacing-0: var(--spacing-0---desktop);
   --spacing-2xl: var(--spacing-2xl---desktop);
   --spacing-3xl: var(--spacing-3xl---desktop);
@@ -917,7 +937,7 @@
 /* Mode: Light */
 [data-mode*="Light"] {
   --accordion-background: var(--background-global-paper2);
-  --accordion-bordercoloractive: var(--border-active);
+  --accordion-bordercoloractive: var(--colors-primitives-grey-scale-black-30);
   --accordion-bordercolorresting: var(--border-light);
   --accordion-fontcolor: var(--text-main);
   --background-be-default: var(--background-light-be-background);
@@ -1425,6 +1445,18 @@
   --label-warning-background: var(--colors-brand-warning-light-mode-brandlight);
   --label-warning-border-color: var(--colors-primitives-grey-scale-transparent);
   --label-warning-foreground: var(--colors-brand-warning-light-mode-onbrandlight);
+  --search-appearance-active-background: var(--background-light-global-paper1);
+  --search-appearance-active-bordercolor: var(--border-active);
+  --search-appearance-active-foregroundicon: var(--text-main);
+  --search-appearance-active-foregroundtext: var(--text-main);
+  --search-appearance-default-background: var(--background-light-global-paper1);
+  --search-appearance-default-bordercolor: var(--border-default);
+  --search-appearance-default-foregroundicon: var(--text-secondary);
+  --search-appearance-default-foregroundtext: var(--text-disabled);
+  --search-appearance-disabled-background: var(--background-light-global-paper1);
+  --search-appearance-disabled-bordercolor: var(--border-disabled);
+  --search-appearance-disabled-foregroundicon: var(--text-disabled);
+  --search-appearance-disabled-foregroundtext: var(--text-disabled);
   --tag-primary-default-default-background: var(--colors-brand-primary-light-mode-brand);
   --tag-primary-default-default-foreground: var(--colors-brand-primary-light-mode-onbrand);
   --tag-primary-light-default-background: var(--colors-brand-primary-light-mode-brandlight);
@@ -1599,6 +1631,9 @@
   --label-error-border-width: ;
   --label-success-border-width: ;
   --label-warning-border-width: ;
+  --search-appearance-active-borderwidth: 1px;
+  --search-appearance-default-borderwidth: 1px;
+  --search-appearance-disabled-borderwidth: 1px;
   --mode: "Light";
 }
 
@@ -2145,6 +2180,11 @@
   --menu-label-paddingright: var(--corner-radius-s);
   --menu-label-paddingvertical: var(--spacing-m---mobile);
   --menu-label-spacing: var(--spacing-s----mobile);
+  --search-appearance-default-cornerradius: var(--corner-radius-m);
+  --search-appearance-default-iconsize: 18px;
+  --search-appearance-default-paddinghorizontal: var(--spacing-l---mobile);
+  --search-appearance-default-paddingvertical: var(--spacing-m---mobile);
+  --search-appearance-default-spacing: var(--spacing-s----mobile);
   --spacing-0: var(--spacing-0---mobile);
   --spacing-2xl: var(--spacing-2xl---mobile);
   --spacing-3xl: var(--spacing-3xl---mobile);
@@ -2257,6 +2297,48 @@
   --menu-label-foregroundactive: var(--brand-primary-brand);
   --menu-label-foregroundhover: var(--brand-primary-brand);
   --wl---page-overlay: var(--background-global-overlay);
+}
+
+/* Mode: SearchAppaerance-Active */
+[data-mode*="SearchAppaerance-Active"] {
+  --background: var(--search-appearance-active-background);
+  --bordercolor: var(--search-appearance-active-bordercolor);
+  --foregroundicon: var(--search-appearance-active-foregroundicon);
+  --foregroundtext: var(--search-appearance-active-foregroundtext);
+  --borderwidth: var(--search-appearance-default-borderwidth);
+  --cornerradius: var(--search-appearance-default-cornerradius);
+  --iconsize: var(--search-appearance-default-iconsize);
+  --paddinghorizontal: var(--search-appearance-default-paddinghorizontal);
+  --paddingvertical: var(--search-appearance-default-paddingvertical);
+  --spacing: var(--search-appearance-default-spacing);
+}
+
+/* Mode: SearchAppaerance-Disabled */
+[data-mode*="SearchAppaerance-Disabled"] {
+  --background: var(--search-appearance-disabled-background);
+  --bordercolor: var(--search-appearance-disabled-bordercolor);
+  --foregroundicon: var(--search-appearance-disabled-foregroundicon);
+  --foregroundtext: var(--search-appearance-disabled-foregroundtext);
+  --borderwidth: var(--search-appearance-default-borderwidth);
+  --cornerradius: var(--search-appearance-default-cornerradius);
+  --iconsize: var(--search-appearance-default-iconsize);
+  --paddinghorizontal: var(--search-appearance-default-paddinghorizontal);
+  --paddingvertical: var(--search-appearance-default-paddingvertical);
+  --spacing: var(--search-appearance-default-spacing);
+}
+
+/* Mode: SearchAppaerance-Resting */
+[data-mode*="SearchAppaerance-Resting"] {
+  --background: var(--search-appearance-default-background);
+  --bordercolor: var(--search-appearance-default-bordercolor);
+  --foregroundicon: var(--search-appearance-default-foregroundicon);
+  --foregroundtext: var(--search-appearance-default-foregroundtext);
+  --borderwidth: var(--search-appearance-default-borderwidth);
+  --cornerradius: var(--search-appearance-default-cornerradius);
+  --iconsize: var(--search-appearance-default-iconsize);
+  --paddinghorizontal: var(--search-appearance-default-paddinghorizontal);
+  --paddingvertical: var(--search-appearance-default-paddingvertical);
+  --spacing: var(--search-appearance-default-spacing);
 }
 
 /* Mode: SupptextAppearance-Default */
