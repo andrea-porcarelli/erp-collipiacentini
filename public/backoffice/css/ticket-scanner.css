@@ -353,10 +353,10 @@
     gap: 8px;
     width: 100%;
     padding: 10px 16px;
-    border: 1px solid var(--ts-success);
-    background: rgba(16, 185, 129, 0.06);
     color: var(--ts-success);
-    border-radius: 10px;
+    border-radius: var(--button-corner-radius, 12px);
+    border: var(--button-resting-border-width, 0) solid var(--button-resting-border-color, rgba(255, 255, 255, 0.00));
+    background: var(--button-resting-background, #F2F5F2);
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 16px;
