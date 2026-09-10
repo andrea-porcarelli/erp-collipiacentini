@@ -362,9 +362,6 @@
     margin-bottom: 16px;
     transition: background 120ms ease;
 }
-.ticket-scanner-content .ts-btn-all-arrived:hover {
-    color: var(--button-hover-foreground, #29670E);
-}
 /* Tickets list */
 .ticket-scanner-content .ts-tickets-list {
     list-style: none;
