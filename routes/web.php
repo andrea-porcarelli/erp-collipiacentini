@@ -74,12 +74,12 @@ Route::get('/{slug}/{page}', [BookingController::class, 'page'])
     ->whereIn('page', $partnerPages)
     ->name('partner.page.slug');
 
-$adminDomains = [
-    'admin.miticko.com',
-    'dev.miticko.com',
-];
-foreach ($adminDomains as $domain) {
-    Route::domain($domain)
+//$adminDomains = [
+//    'admin.miticko.com',
+//    'dev.miticko.com',
+//];
+//foreach ($adminDomains as $domain) {
+    Route::domain("admin.miticko.com")
         ->group(function () {
 
             Route::get('/', function () {
@@ -242,7 +242,7 @@ foreach ($adminDomains as $domain) {
                 Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
             });
         });
-}
+//}
 Route::fallback(function () {
     $req = request()->getHost();
     if (!in_array($req, ['dev.miticko.com', 'admin.miticko.com'])) {
