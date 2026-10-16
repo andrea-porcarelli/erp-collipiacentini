@@ -197,6 +197,10 @@
                     this.setAttribute('data-mode', 'chipAppearance-Active');
                 });
             });
+
+            setTimeout(() => {
+                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: '#E87722'}}]);
+            }, 250);
         });
     </script>
     <script src="{{ asset('backoffice/js/partners.js') }}?v=1.1" type="module"></script>

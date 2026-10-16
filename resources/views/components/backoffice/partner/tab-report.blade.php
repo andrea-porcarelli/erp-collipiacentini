@@ -45,7 +45,7 @@
     $monthsIt = [1 => 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
 @endphp
 
-<div class="tab-pane fade" id="partner-report-panel" role="tabpanel" data-partner-id="{{ $model->id }}">
+<div class="tab-pane fade switch-container" id="partner-report-panel" role="tabpanel" data-partner-id="{{ $model->id }}">
 
     {{-- CARD 1: Impostazioni di invio (solo god) --}}
     @if($isGod)
