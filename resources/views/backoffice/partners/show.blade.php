@@ -132,15 +132,19 @@
         }
 
         /* Footer DataTables: riga full-width con sfondo grigio + length menu allineato a destra */
-        #partner-report-panel .dt-layout-row.dt-layout-end {
-            background: var(--Footer-Background-color, #FAFAFA);
+        #partner-report-panel .dt-container > .dt-layout-row:last-child,
+        #partner-report-panel div.dt-container div.dt-layout-row:last-child {
+            background: var(--Footer-Background-color, #FAFAFA) !important;
             padding: 14px 20px;
-            margin: 0;
+            margin: 0 !important;
+            border-top: 1px solid #F0F0F0;
+        }
+        #partner-report-panel .dt-container > .dt-layout-row:last-child .dt-layout-cell {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            gap: 10px;
-            border-top: 1px solid #F0F0F0;
+            gap: 16px;
+            background: transparent !important;
         }
         #partner-report-panel .dt-length {
             display: inline-flex;
