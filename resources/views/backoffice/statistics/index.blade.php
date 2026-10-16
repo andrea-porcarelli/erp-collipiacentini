@@ -417,11 +417,16 @@
             }
 
             function updateActionButtons() {
-                const canAct = Boolean($partner.val() && $month.val() && $year.val());
-                [$btnDownload, $btnSend].forEach(function ($b) {
-                    $b.prop('disabled', !canAct);
-                    setButtonAppearance($b, canAct ? 'Primary' : 'Disabled');
-                });
+                const periodOk = Boolean($partner.val() && $month.val() && $year.val());
+                const sendToggleOn = $modal.find('input[name="report_send_master_toggle"]').is(':checked');
+                const canDownload = periodOk;
+                const canSend = periodOk && sendToggleOn;
+
+                $btnDownload.prop('disabled', !canDownload);
+                setButtonAppearance($btnDownload, canDownload ? 'Primary' : 'Disabled');
+
+                $btnSend.prop('disabled', !canSend);
+                setButtonAppearance($btnSend, canSend ? 'Primary' : 'Disabled');
             }
 
             function initSwitchery(container) {
@@ -474,6 +479,7 @@
             $partner.on('change', function () { loadSubscribers($(this).val()); updateActionButtons(); });
             $month.on('change', updateActionButtons);
             $year.on('change', updateActionButtons);
+            $modal.on('change', 'input[name="report_send_master_toggle"]', updateActionButtons);
 
             $btnDownload.on('click', function (e) {
                 e.preventDefault();
