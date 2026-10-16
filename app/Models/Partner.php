@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasLanguageContent;
 use App\Traits\InvalidatesProductSeoCache;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -39,10 +40,12 @@ class Partner extends LogsModel
         'commission_miticko_variable',
         'commission_payment',
         'consents_enabled',
+        'report_auto_send_enabled',
     ];
 
     protected $casts = [
         'consents_enabled' => 'boolean',
+        'report_auto_send_enabled' => 'boolean',
     ];
 
     public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno'];
@@ -95,6 +98,18 @@ class Partner extends LogsModel
     public function consents(): HasMany
     {
         return $this->hasMany(PartnerConsent::class)->orderBy('position');
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(PartnerReport::class);
+    }
+
+    public function reportSubscribers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'partner_report_subscriptions')
+            ->withPivot('auto_send')
+            ->withTimestamps();
     }
 
     public static function active(): Builder

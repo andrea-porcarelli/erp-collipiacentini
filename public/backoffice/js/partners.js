@@ -47,6 +47,28 @@ const formConfigs = {
         successMessage: 'Dati di fatturazione aggiornati con successo',
         validate: () => ({}),
     },
+    'form-partner-report-settings': {
+        endpoint: () => `/partners/${window.PARTNER_ID}/report/settings`,
+        method: 'put',
+        successMessage: 'Impostazioni di invio salvate',
+        collect: () => ({
+            report_auto_send_enabled: $('.switch-report-auto-send').is(':checked') ? 1 : 0,
+        }),
+        validate: () => ({}),
+    },
+    'form-partner-report-subscriptions': {
+        endpoint: () => `/partners/${window.PARTNER_ID}/report/subscriptions`,
+        method: 'put',
+        successMessage: 'Preferenze destinatari salvate',
+        collect: () => ({
+            subscriptions: $('.switch-report-subscription').map(function () {
+                const match = /^subscription\[(\d+)\]$/.exec($(this).attr('name') || '');
+                if (!match) return null;
+                return { user_id: parseInt(match[1], 10), auto_send: $(this).is(':checked') ? 1 : 0 };
+            }).get().filter(Boolean),
+        }),
+        validate: () => ({}),
+    },
     'form-partner-description': {
         endpoint: () => `/partners/${window.PARTNER_ID}`,
         method: 'put',

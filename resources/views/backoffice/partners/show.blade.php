@@ -27,6 +27,7 @@
                 <x-chip label="Termini e Condizioni"  appearance="Resting" :dataset="['tab-target' => '#partner-terms-panel']" />
                 <x-chip label="Consensi utente"           appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
             @endif
+            <x-chip label="Report" appearance="Resting" :dataset="['tab-target' => '#partner-report-panel']" />
         </div>
 
         {{-- Tabs Content --}}
@@ -40,6 +41,7 @@
                 <x-backoffice.partner.tab-policy :model="$model" type="termini-condizioni" field="terms_conditions" label="Termini e Condizioni"  slug="termini-condizioni" panelId="partner-terms-panel" />
                 <x-backoffice.partner.tab-consents :model="$model" />
             @endif
+            <x-backoffice.partner.tab-report :model="$model" />
         </div>
     </div>
 

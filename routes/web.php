@@ -215,6 +215,9 @@ Route::get('/{slug}/{page}', [BookingController::class, 'page'])
                 Route::resource('partners', PartnerController::class);
                 Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
                 Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
+                Route::put('partners/{partner}/report/settings', [PartnerReportController::class, 'updateSettings'])->name('partners.report.settings.update');
+                Route::put('partners/{partner}/report/subscriptions', [PartnerReportController::class, 'updateSubscriptions'])->name('partners.report.subscriptions.update');
+                Route::get('partners/{partner}/report/archived/{partnerReport}', [PartnerReportController::class, 'downloadArchived'])->name('partners.report.download-archived');
                 Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
                 Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
                 Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
