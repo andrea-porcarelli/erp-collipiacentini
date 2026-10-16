@@ -47,33 +47,32 @@
 
 <div class="tab-pane fade switch-container" id="partner-report-panel" role="tabpanel" data-partner-id="{{ $model->id }}">
 
-    {{-- CARD 1: Impostazioni di invio (solo god) --}}
-    @if($isGod)
-        <x-card title="Impostazioni di invio" class="position-relative">
-            <form id="form-partner-report-settings">
-                <div class="row align-items-center">
-                    <div class="col-12 col-md-9">
-                        <div class="fw-semibold mb-1">Invio automatico</div>
-                        <p class="text-secondary mb-0 small">Report del mese precedente, inviato il 5 del mese successivo</p>
-                    </div>
-                    <div class="col-12 col-md-3 text-md-end mt-3 mt-md-0">
-                        <div class="switch-cell switch-cell-settings">
-                            <x-switch
-                                name="report_auto_send_enabled"
-                                class="switch-report-auto-send"
-                                :checked="(bool) $model->report_auto_send_enabled" />
-                        </div>
+    {{-- CARD 1: Impostazioni di invio (sempre visibile; Partner solo in lettura) --}}
+    <x-card title="Impostazioni di invio" class="position-relative">
+        <form id="form-partner-report-settings">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-9">
+                    <div class="fw-semibold mb-1">Invio automatico</div>
+                    <p class="text-secondary mb-0 small">Report del mese precedente, inviato il 5 del mese successivo</p>
+                </div>
+                <div class="col-12 col-md-3 text-md-end mt-3 mt-md-0">
+                    <div class="switch-cell switch-cell-settings">
+                        <x-switch
+                            name="report_auto_send_enabled"
+                            class="switch-report-auto-send"
+                            :checked="(bool) $model->report_auto_send_enabled"
+                            :disabled="! $isGod" />
                     </div>
                 </div>
-            </form>
-            <div class="button-card-absolute">
-                <x-button class="btn-save-card btn-save-report-settings" label="Salva modifiche" leading="fa-save" status="Disabled" />
             </div>
-        </x-card>
-    @endif
+        </form>
+        <div class="button-card-absolute">
+            <x-button class="btn-save-card btn-save-report-settings" label="Salva modifiche" leading="fa-save" status="Disabled" />
+        </div>
+    </x-card>
 
     {{-- CARD 2: Registro di invio dei Report --}}
-    <x-card title="Registro di invio dei Report" sub_title="Verifica lo storico di invio dei report sia automatico che manuale. Puoi inoltre scaricare i file originali che ti sono stati inviati via email" class="{{ $isGod ? 'mt-4' : '' }} position-relative">
+    <x-card title="Registro di invio dei Report" sub_title="Verifica lo storico di invio dei report sia automatico che manuale. Puoi inoltre scaricare i file originali che ti sono stati inviati via email" class="mt-4 position-relative">
         <div class="table-responsive">
             <table class="table table-miticko align-middle">
                 <thead>

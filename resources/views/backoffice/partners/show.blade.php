@@ -70,7 +70,7 @@
 @endsection
 
 @section('custom-css')
-    <link rel="stylesheet" href="{{ asset('backoffice/vendor/switchery/switchery.min.css') }}" />
+    <link rel="stylesheet" href="/backoffice/vendor/switchery/switchery.min.css" />
     <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css" />
     <script type="importmap">
     {
@@ -172,7 +172,7 @@
 @endsection
 
 @section('custom-script')
-    <script src="{{ asset('backoffice/vendor/switchery/switchery.min.js') }}"></script>
+    <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
     <script>
         window.PARTNER_ID = {{ $model->id }};
 
