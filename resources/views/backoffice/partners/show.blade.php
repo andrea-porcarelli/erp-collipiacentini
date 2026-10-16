@@ -112,6 +112,17 @@
         #partnerTabsContent .tab-pane { display: none; }
         #partnerTabsContent .tab-pane.show.active { display: block; }
 
+        /* Toggle Switchery nel tab Report: wrapper con position:relative e dimensioni fisse */
+        #partner-report-panel .switch-cell {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+            vertical-align: middle;
+        }
+        #partner-report-panel .switch-cell .text-field { margin: 0; padding: 0; }
+        #partner-report-panel .switch-cell .supporting-text { display: none; }
+
         /* Consensi: check "Obbligatorio" arancio (fill solid + check bianco) */
         .consent-required-wrap { cursor: pointer; user-select: none; }
         .consent-required-wrap.disabled { cursor: default; opacity: 0.75; }
@@ -187,7 +198,11 @@
                     pane.classList.remove('show', 'active');
                 });
                 const active = document.querySelector(target);
-                if (active) active.classList.add('show', 'active');
+                if (active) {
+                    active.classList.add('show', 'active');
+                    // Lazy init Switchery per switches diventati visibili ora
+                    $(document).trigger('loadSwitchTrigger', [{ container: target, options: {secondaryColor: '#cccccc', color: '#E87722'}}]);
+                }
             }
 
             chips.forEach((chip) => {

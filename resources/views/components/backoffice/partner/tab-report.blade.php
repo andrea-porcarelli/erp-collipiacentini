@@ -57,10 +57,12 @@
                         <p class="text-secondary mb-0 small">Report del mese precedente, inviato il 5 del mese successivo</p>
                     </div>
                     <div class="col-12 col-md-3 text-md-end mt-3 mt-md-0">
-                        <x-switch
-                            name="report_auto_send_enabled"
-                            class="switch-report-auto-send"
-                            :checked="(bool) $model->report_auto_send_enabled" />
+                        <div class="switch-cell switch-cell-settings">
+                            <x-switch
+                                name="report_auto_send_enabled"
+                                class="switch-report-auto-send"
+                                :checked="(bool) $model->report_auto_send_enabled" />
+                        </div>
                     </div>
                 </div>
             </form>
@@ -149,10 +151,12 @@
                                     <td>{{ $u->email }}</td>
                                     <td>{{ $roleLabels[$u->role] ?? $u->role }}</td>
                                     <td class="text-end">
-                                        <x-switch
-                                            name="subscription[{{ $u->id }}]"
-                                            class="switch-report-subscription"
-                                            :checked="(bool) ($subscriptions[$u->id] ?? false)" />
+                                        <div class="switch-cell">
+                                            <x-switch
+                                                name="subscription[{{ $u->id }}]"
+                                                class="switch-report-subscription"
+                                                :checked="(bool) ($subscriptions[$u->id] ?? false)" />
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
