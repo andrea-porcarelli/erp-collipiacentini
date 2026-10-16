@@ -209,8 +209,8 @@ class PartnerReportController extends Controller
         $this->authorizeGod();
 
         $query = User::query()
-            ->whereIn('role', ['god', 'admin'])
-            ->whereNull('partner_id')
+            ->whereIn('users.role', ['god', 'admin'])
+            ->whereNull('users.partner_id')
             ->leftJoin('partner_report_subscriptions', function ($join) use ($partner) {
                 $join->on('partner_report_subscriptions.user_id', '=', 'users.id')
                     ->where('partner_report_subscriptions.partner_id', '=', $partner->id);
