@@ -409,11 +409,23 @@
             const $tbody   = $('#generate-report-subscribers-tbody');
             const $btnDownload = $modal.find('.btn-generate-report-download');
             const $btnSend     = $modal.find('.btn-generate-report-send');
+            const switcheryOpts = { secondaryColor: '#cccccc', color: '#3B82F6' };
+
+            function setButtonAppearance($btn, appearance) {
+                const mode = ($btn.attr('data-mode') || '').replace(/buttonAppearance-\w+/, 'buttonAppearance-' + appearance);
+                $btn.attr('data-mode', mode);
+            }
 
             function updateActionButtons() {
-                const canAct = $partner.val() && $month.val() && $year.val();
-                $btnDownload.prop('disabled', !canAct);
-                $btnSend.prop('disabled', !canAct);
+                const canAct = Boolean($partner.val() && $month.val() && $year.val());
+                [$btnDownload, $btnSend].forEach(function ($b) {
+                    $b.prop('disabled', !canAct);
+                    setButtonAppearance($b, canAct ? 'Primary' : 'Disabled');
+                });
+            }
+
+            function initSwitchery(container) {
+                $(document).trigger('loadSwitchTrigger', [{ container: container, options: switcheryOpts }]);
             }
 
             function loadSubscribers(partnerId) {
@@ -427,7 +439,7 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    data: { _token: '{{ csrf_token() }}', length: 10, start: 0 },
+                    data: { _token: '{{ csrf_token() }}', length: 10, start: 0, draw: 1 },
                 }).done(function (res) {
                     const rows = (res && res.data) || [];
                     if (!rows.length) {
@@ -442,7 +454,7 @@
                             + '</tr>';
                     }).join('');
                     $tbody.html(html);
-                    $(document).trigger('loadSwitchTrigger', [{ container: '#generate-report-subscribers-tbody', options: { secondaryColor: '#cccccc', color: '#3B82F6' } }]);
+                    initSwitchery('#generate-report-subscribers-tbody');
                 }).fail(function () {
                     $tbody.html('<tr><td colspan="3" class="text-center text-danger py-4">Errore nel caricamento dei destinatari.</td></tr>');
                 });
@@ -453,6 +465,8 @@
             });
 
             $modal.on('shown.bs.modal', function () {
+                // Inizializza Switchery sul toggle master della modale.
+                initSwitchery('#modal-generate-report #form-generate-report');
                 loadSubscribers($partner.val());
                 updateActionButtons();
             });
