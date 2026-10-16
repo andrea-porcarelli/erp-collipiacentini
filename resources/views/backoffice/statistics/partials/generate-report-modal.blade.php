@@ -75,28 +75,30 @@
                         </div>
                     </div>
 
-                    <table class="table table-miticko align-middle w-100 mt-spacing-m mb-0">
-                        <thead>
-                            <tr>
-                                <th>Utente</th>
-                                <th>Ruolo</th>
-                                <th class="text-end" style="width: 140px;">Invia report</th>
-                            </tr>
-                        </thead>
-                        <tbody id="generate-report-subscribers-tbody">
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-4">
-                                    Seleziona un partner per vedere i destinatari configurati.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div id="generate-report-subscribers-section" class="subscribers-section locked mt-spacing-m">
+                        <table class="table table-miticko align-middle w-100 mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Utente</th>
+                                    <th>Ruolo</th>
+                                    <th class="text-end" style="width: 140px;">Invia report</th>
+                                </tr>
+                            </thead>
+                            <tbody id="generate-report-subscribers-tbody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        Seleziona un partner per vedere i destinatari configurati.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                    <div class="d-flex justify-content-end align-items-center gap-2 mt-spacing-s text-muted small">
-                        <span>utenti per pagina</span>
-                        <select class="input-miticko" style="width:70px;" disabled>
-                            <option>10</option>
-                        </select>
+                        <div class="d-flex justify-content-end align-items-center gap-2 mt-spacing-s text-muted small">
+                            <span>utenti per pagina</span>
+                            <select class="input-miticko" style="width:70px;" disabled>
+                                <option>10</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -142,4 +144,20 @@
         border-bottom: none;
     }
     #modal-generate-report .modal-body { overflow-x: hidden; }
+    #modal-generate-report .subscribers-section {
+        position: relative;
+        transition: opacity .2s ease;
+    }
+    #modal-generate-report .subscribers-section.locked {
+        opacity: .5;
+        pointer-events: none;
+        user-select: none;
+    }
+    #modal-generate-report .subscribers-section.locked::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, .25);
+        z-index: 2;
+    }
 </style>

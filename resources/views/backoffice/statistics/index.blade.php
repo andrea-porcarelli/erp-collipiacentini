@@ -433,6 +433,8 @@
 
                 $btnSend.prop('disabled', !canSend);
                 setButtonAppearance($btnSend, canSend ? 'Primary' : 'Disabled');
+
+                $('#generate-report-subscribers-section').toggleClass('locked', !sendToggleOn);
             }
 
             function initSwitchery(container) {
