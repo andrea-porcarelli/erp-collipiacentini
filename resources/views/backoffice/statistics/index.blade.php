@@ -471,7 +471,9 @@
 
             $modal.on('shown.bs.modal', function () {
                 // Inizializza Switchery sul toggle master della modale.
-                initSwitchery('#modal-generate-report #form-generate-report');
+                setTimeout(function () {
+                    initSwitchery('#modal-generate-report #form-generate-report');
+                }, 50);
                 loadSubscribers($partner.val());
                 updateActionButtons();
             });

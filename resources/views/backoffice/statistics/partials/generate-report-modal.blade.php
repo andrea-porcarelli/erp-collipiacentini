@@ -71,7 +71,7 @@
                             <div class="text-muted small">seleziona chi riceverà la copia in formato PDF via email</div>
                         </div>
                         <div class="switch-cell">
-                            <x-switch name="report_send_master_toggle" />
+                            <input type="checkbox" class="js-switch" name="report_send_master_toggle" id="report_send_master_toggle" />
                         </div>
                     </div>
 
