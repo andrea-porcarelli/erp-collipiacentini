@@ -430,7 +430,12 @@
             }
 
             function initSwitchery(container) {
-                $(document).trigger('loadSwitchTrigger', [{ container: container, options: switcheryOpts }]);
+                const SwitcheryLib = window.Switchery;
+                if (typeof SwitcheryLib !== 'function') return;
+                document.querySelectorAll(container + ' .js-switch').forEach(function (el) {
+                    if (el.getAttribute('data-switchery') === 'true') return;
+                    new SwitcheryLib(el, switcheryOpts);
+                });
             }
 
             function loadSubscribers(partnerId) {
