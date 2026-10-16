@@ -123,22 +123,36 @@
         #partner-report-panel .switch-cell .text-field { margin: 0; padding: 0; }
         #partner-report-panel .switch-cell .supporting-text { display: none; }
 
-        /* DataTables length menu: pill box come da design */
+        /* Tabella Report: header con sfondo grigio chiaro come da design */
+        #partner-report-panel table.table-miticko thead th {
+            background: var(--Footer-Background-color, #FAFAFA);
+            font-weight: 600;
+            color: #666;
+            border-bottom: none;
+        }
+
+        /* Footer DataTables: riga full-width con sfondo grigio + length menu allineato a destra */
+        #partner-report-panel .dt-layout-row.dt-layout-end {
+            background: var(--Footer-Background-color, #FAFAFA);
+            padding: 14px 20px;
+            margin: 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid #F0F0F0;
+        }
         #partner-report-panel .dt-length {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 10px 6px 14px;
-            background: #fff;
-            border: 1px solid #E6E6E6;
-            border-radius: 10px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         #partner-report-panel .dt-length label {
             margin: 0;
             color: #666;
             font-size: 13px;
             font-weight: 500;
+            white-space: nowrap;
         }
         #partner-report-panel .dt-length select {
             border: 1px solid #E6E6E6;
@@ -148,9 +162,6 @@
             background-color: #fff;
             cursor: pointer;
             min-width: 56px;
-        }
-        #partner-report-panel .dt-layout-row.dt-layout-table + .dt-layout-row {
-            margin-top: 12px;
         }
 
         /* Consensi: check "Obbligatorio" arancio (fill solid + check bianco) */
@@ -232,7 +243,7 @@
                 if (active) {
                     active.classList.add('show', 'active');
                     // Lazy init Switchery per switches diventati visibili ora
-                    $(document).trigger('loadSwitchTrigger', [{ container: target, options: {secondaryColor: '#cccccc', color: '#E87722'}}]);
+                    $(document).trigger('loadSwitchTrigger', [{ container: target, options: {secondaryColor: '#cccccc', color: '#3B82F6'}}]);
                 }
             }
 
@@ -247,7 +258,7 @@
             });
 
             setTimeout(() => {
-                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: '#E87722'}}]);
+                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: '#3B82F6'}}]);
             }, 250);
         });
     </script>

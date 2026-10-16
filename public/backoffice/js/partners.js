@@ -1008,7 +1008,7 @@ const initReportTables = () => {
             // Reinit Switchery sui nuovi toggle
             $(document).trigger('loadSwitchTrigger', [{
                 container: '#partner-report-panel',
-                options: { secondaryColor: '#cccccc', color: '#E87722' },
+                options: { secondaryColor: '#cccccc', color: '#3B82F6' },
             }]);
         },
     });
