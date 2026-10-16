@@ -8,8 +8,8 @@
 <div class="tab-pane fade switch-container" id="partner-report-panel" role="tabpanel" data-partner-id="{{ $model->id }}">
 
     {{-- CARD 1: Impostazioni di invio (sempre visibile; Partner solo in lettura) --}}
-    <x-card title="Impostazioni di invio" class="position-relative">
-        <form id="form-partner-report-settings">
+    <x-card title="Impostazioni di invio" class="position-relative card-report-settings">
+        <form id="form-partner-report-settings" class="py-3">
             <div class="row align-items-center">
                 <div class="col-12 col-md-9">
                     <div class="fw-semibold mb-1">Invio automatico</div>
