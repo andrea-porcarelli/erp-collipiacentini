@@ -173,6 +173,7 @@
 
 @section('custom-script')
     <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
+    <script src="/backoffice/vendor/datatables/dataTables.js"></script>
     <script>
         window.PARTNER_ID = {{ $model->id }};
 

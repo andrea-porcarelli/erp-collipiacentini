@@ -61,11 +61,8 @@ const formConfigs = {
         method: 'put',
         successMessage: 'Preferenze destinatari salvate',
         collect: () => ({
-            subscriptions: $('.switch-report-subscription').map(function () {
-                const match = /^subscription\[(\d+)\]$/.exec($(this).attr('name') || '');
-                if (!match) return null;
-                return { user_id: parseInt(match[1], 10), auto_send: $(this).is(':checked') ? 1 : 0 };
-            }).get().filter(Boolean),
+            subscriptions: Array.from(reportPendingSubscriptions.entries())
+                .map(([userId, autoSend]) => ({ user_id: userId, auto_send: autoSend ? 1 : 0 })),
         }),
         validate: () => ({}),
     },
@@ -962,6 +959,127 @@ const initConsents = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Report tab (DataTables + stato toggle cross-page)
+// ---------------------------------------------------------------------------
+const reportPendingSubscriptions = new Map(); // userId → boolean (auto_send)
+let reportTablesInitialized = false;
+
+const initReportTables = () => {
+    if (reportTablesInitialized) return;
+    if (typeof DataTable === 'undefined') return;
+    reportTablesInitialized = true;
+
+    const commonConfig = (ajaxUrl) => ({
+        responsive: true,
+        searching: false,
+        ordering: false,
+        processing: true,
+        serverSide: true,
+        pagingType: 'simple',
+        lengthMenu: [[10, 25, 50], [10, 25, 50]],
+        pageLength: 10,
+        layout: {
+            topStart: '',
+            topEnd: '',
+            bottomStart: 'info',
+            bottomEnd: ['pageLength', 'paging'],
+        },
+        language: {
+            lengthMenu: '_MENU_ per pagina',
+            paginate: { previous: '<', next: '>' },
+            info: '_START_-_END_ di _TOTAL_',
+            infoEmpty: '0-0 di 0',
+            emptyTable: 'Nessun dato disponibile',
+            processing: 'Caricamento...',
+        },
+        ajax: {
+            url: ajaxUrl,
+            type: 'POST',
+            beforeSend: (xhr) => xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content')),
+        },
+        drawCallback: function () {
+            // Pre-popola la Map con lo stato corrente dei toggle appena renderizzati
+            $(this.api().table().node()).find('.switch-report-subscription').each(function () {
+                const userId = parseInt($(this).data('user-id'), 10);
+                if (!Number.isNaN(userId) && !reportPendingSubscriptions.has(userId)) {
+                    reportPendingSubscriptions.set(userId, this.checked);
+                }
+            });
+            // Reinit Switchery sui nuovi toggle
+            $(document).trigger('loadSwitchTrigger', [{
+                container: '#partner-report-panel',
+                options: { secondaryColor: '#cccccc', color: '#E87722' },
+            }]);
+        },
+    });
+
+    const logsTable = $('#dt-report-logs');
+    if (logsTable.length) {
+        new DataTable('#dt-report-logs', {
+            ...commonConfig(logsTable.data('url')),
+            columns: [
+                { data: 'pr_year' },
+                { data: 'email' },
+                { data: 'sent_at' },
+                { data: 'pr_mode' },
+                { data: 'status' },
+                { data: 'download', className: 'text-end' },
+            ],
+        });
+    }
+
+    const miticcoTable = $('#dt-report-subscribers-miticko');
+    if (miticcoTable.length) {
+        new DataTable('#dt-report-subscribers-miticko', {
+            ...commonConfig(miticcoTable.data('url')),
+            columns: [
+                { data: 'email' },
+                { data: 'role' },
+                { data: 'toggle', className: 'text-end' },
+            ],
+        });
+    }
+
+    const partnerTable = $('#dt-report-subscribers-partner');
+    if (partnerTable.length) {
+        new DataTable('#dt-report-subscribers-partner', {
+            ...commonConfig(partnerTable.data('url')),
+            columns: [
+                { data: 'email' },
+                { data: 'role' },
+                { data: 'toggle', className: 'text-end' },
+            ],
+        });
+    }
+};
+
+const initReportTab = () => {
+    // Lazy init alla prima apertura del tab Report
+    $(document).on('click', '[data-tab-target="#partner-report-panel"]', function () {
+        setTimeout(initReportTables, 100);
+    });
+
+    // Change toggle → aggiorna Map
+    $(document).on('change', '.switch-report-subscription', function () {
+        const userId = parseInt($(this).data('user-id'), 10);
+        if (Number.isNaN(userId)) return;
+        reportPendingSubscriptions.set(userId, this.checked);
+        // Enable save button della card subscriptions
+        $('.btn-save-report-subscriptions').attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
+    });
+
+    // Save buttons specifici (card subscriptions non ha <form>, il generic handler non trova il form)
+    $(document).on('click', '.btn-save-report-settings', function (e) {
+        e.stopImmediatePropagation();
+        saveForm('form-partner-report-settings', $(this));
+    });
+    $(document).on('click', '.btn-save-report-subscriptions', function (e) {
+        e.stopImmediatePropagation();
+        saveForm('form-partner-report-subscriptions', $(this));
+    });
+};
+
+// ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
 const init = () => {
@@ -984,6 +1102,7 @@ const init = () => {
     initCopyUrl();
     initConsents();
     initRichEditors();
+    initReportTab();
 };
 
 $(function () {

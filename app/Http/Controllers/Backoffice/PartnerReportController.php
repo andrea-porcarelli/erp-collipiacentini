@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use App\Models\PartnerReport;
+use App\Models\PartnerReportRecipient;
 use App\Models\User;
 use App\Services\PartnerCommissionReportService;
 use App\Services\PartnerReportArchiveService;
@@ -19,6 +20,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PartnerReportController extends Controller
 {
+    private const MITICKO_ROLE_LABELS = [
+        'god' => 'Admin miticko',
+        'admin' => 'Collaboratore miticko',
+    ];
+
+    private const PARTNER_ROLE_LABELS = [
+        'admin' => 'Partner admin',
+        'partner' => 'Partner collaboratore',
+    ];
+
+    private const MONTHS_IT = [
+        1 => 'Gennaio', 2 => 'Febbraio', 3 => 'Marzo', 4 => 'Aprile',
+        5 => 'Maggio', 6 => 'Giugno', 7 => 'Luglio', 8 => 'Agosto',
+        9 => 'Settembre', 10 => 'Ottobre', 11 => 'Novembre', 12 => 'Dicembre',
+    ];
+
     public function __construct(
         private readonly PartnerCommissionReportService $service,
         private readonly PartnerReportArchiveService $archive,
@@ -84,8 +101,8 @@ class PartnerReportController extends Controller
 
         $authUser = Auth::user();
         $isGod = $authUser->role === 'god';
+        $existingUserIds = $partner->reportSubscribers()->pluck('users.id')->all();
 
-        $sync = [];
         foreach ($data['subscriptions'] as $row) {
             $user = User::find($row['user_id']);
             if (! $user) {
@@ -103,10 +120,13 @@ class PartnerReportController extends Controller
                 continue;
             }
 
-            $sync[$user->id] = ['auto_send' => (bool) $row['auto_send']];
+            $pivotAttrs = ['auto_send' => (bool) $row['auto_send']];
+            if (in_array($user->id, $existingUserIds, true)) {
+                $partner->reportSubscribers()->updateExistingPivot($user->id, $pivotAttrs);
+            } else {
+                $partner->reportSubscribers()->attach($user->id, $pivotAttrs);
+            }
         }
-
-        $partner->reportSubscribers()->sync($sync);
 
         return response()->json(['message' => 'Preferenze destinatari salvate']);
     }
@@ -128,6 +148,109 @@ class PartnerReportController extends Controller
         );
 
         return response()->download($disk->path($partnerReport->pdf_path), $filename);
+    }
+
+    public function logsData(Request $request, Partner $partner): JsonResponse
+    {
+        $this->authorizePartnerAccess($partner);
+
+        $query = PartnerReportRecipient::query()
+            ->join('partner_reports', 'partner_reports.id', '=', 'partner_report_recipients.partner_report_id')
+            ->where('partner_reports.partner_id', $partner->id)
+            ->select(
+                'partner_report_recipients.id',
+                'partner_report_recipients.email',
+                'partner_report_recipients.status',
+                'partner_report_recipients.sent_at',
+                'partner_report_recipients.partner_report_id',
+                'partner_reports.year as pr_year',
+                'partner_reports.month as pr_month',
+                'partner_reports.mode as pr_mode',
+                'partner_reports.pdf_path as pr_pdf_path',
+                'partner_reports.created_at as pr_created_at',
+            )
+            ->orderByDesc('partner_report_recipients.created_at');
+
+        return datatables()->of($query)
+            ->editColumn('pr_year', fn ($r) => $r->pr_year.' - '.(self::MONTHS_IT[$r->pr_month] ?? $r->pr_month))
+            ->editColumn('sent_at', function ($r) {
+                if (! $r->sent_at) {
+                    return '<span class="text-secondary">—</span>';
+                }
+                $dt = Carbon::parse($r->sent_at);
+
+                return $dt->format('d M Y').'<br><small class="text-secondary">'.$dt->format('H:i').'</small>';
+            })
+            ->editColumn('pr_mode', fn ($r) => $r->pr_mode === 'auto' ? 'Automatica' : 'Manuale')
+            ->editColumn('status', function ($r) {
+                return match ($r->status) {
+                    'sent' => '<span class="badge bg-success-subtle text-success text-uppercase">Completato</span>',
+                    'failed' => '<span class="badge bg-danger-subtle text-danger text-uppercase">Errore</span>',
+                    default => '<span class="badge bg-secondary-subtle text-secondary text-uppercase">In coda</span>',
+                };
+            })
+            ->addColumn('download', function ($r) use ($partner) {
+                if (! $r->pr_pdf_path) {
+                    return '<span class="text-secondary">—</span>';
+                }
+                $url = route('partners.report.download-archived', [
+                    'partner' => $partner->id,
+                    'partnerReport' => $r->partner_report_id,
+                ]);
+
+                return '<a href="'.$url.'" class="link-primary"><i class="fa-regular fa-download me-1"></i>Scarica file</a>';
+            })
+            ->rawColumns(['sent_at', 'status', 'download'])
+            ->toJson();
+    }
+
+    public function subscribersMitickoData(Request $request, Partner $partner): JsonResponse
+    {
+        $this->authorizeGod();
+
+        $query = User::query()
+            ->whereIn('role', ['god', 'admin'])
+            ->whereNull('partner_id')
+            ->leftJoin('partner_report_subscriptions', function ($join) use ($partner) {
+                $join->on('partner_report_subscriptions.user_id', '=', 'users.id')
+                    ->where('partner_report_subscriptions.partner_id', '=', $partner->id);
+            })
+            ->select('users.id', 'users.email', 'users.role', 'partner_report_subscriptions.auto_send')
+            ->orderBy('users.email');
+
+        return $this->buildSubscribersResponse($query, self::MITICKO_ROLE_LABELS);
+    }
+
+    public function subscribersPartnerData(Request $request, Partner $partner): JsonResponse
+    {
+        $this->authorizePartnerAccess($partner);
+
+        $query = User::query()
+            ->where('users.partner_id', $partner->id)
+            ->leftJoin('partner_report_subscriptions', function ($join) use ($partner) {
+                $join->on('partner_report_subscriptions.user_id', '=', 'users.id')
+                    ->where('partner_report_subscriptions.partner_id', '=', $partner->id);
+            })
+            ->select('users.id', 'users.email', 'users.role', 'partner_report_subscriptions.auto_send')
+            ->orderBy('users.email');
+
+        return $this->buildSubscribersResponse($query, self::PARTNER_ROLE_LABELS);
+    }
+
+    private function buildSubscribersResponse($query, array $roleLabels): JsonResponse
+    {
+        return datatables()->of($query)
+            ->editColumn('role', fn ($u) => $roleLabels[$u->role] ?? $u->role)
+            ->addColumn('toggle', function ($u) {
+                $checked = $u->auto_send ? 'checked' : '';
+
+                return '<div class="switch-cell">'
+                    .'<input type="checkbox" class="js-switch switch-report-subscription" '
+                    .'data-user-id="'.$u->id.'" name="subscription['.$u->id.']" '.$checked.' />'
+                    .'</div>';
+            })
+            ->rawColumns(['toggle'])
+            ->toJson();
     }
 
     /**

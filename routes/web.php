@@ -218,6 +218,9 @@ Route::get('/{slug}/{page}', [BookingController::class, 'page'])
                 Route::put('partners/{partner}/report/settings', [PartnerReportController::class, 'updateSettings'])->name('partners.report.settings.update');
                 Route::put('partners/{partner}/report/subscriptions', [PartnerReportController::class, 'updateSubscriptions'])->name('partners.report.subscriptions.update');
                 Route::get('partners/{partner}/report/archived/{partnerReport}', [PartnerReportController::class, 'downloadArchived'])->name('partners.report.download-archived');
+                Route::match(['get', 'post'], 'partners/{partner}/report/data/logs', [PartnerReportController::class, 'logsData'])->name('partners.report.data.logs');
+                Route::match(['get', 'post'], 'partners/{partner}/report/data/subscribers-miticko', [PartnerReportController::class, 'subscribersMitickoData'])->name('partners.report.data.subscribers-miticko');
+                Route::match(['get', 'post'], 'partners/{partner}/report/data/subscribers-partner', [PartnerReportController::class, 'subscribersPartnerData'])->name('partners.report.data.subscribers-partner');
                 Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
                 Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
                 Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
