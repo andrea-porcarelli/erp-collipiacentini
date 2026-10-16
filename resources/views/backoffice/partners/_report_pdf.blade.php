@@ -1,9 +1,16 @@
 @php
     use Illuminate\Support\Facades\Storage;
+    use App\Support\QuickChart;
 
     $brand = $partner?->brand ?? config('design.default_brand', 'miticko');
     $t = config("design.brands.{$brand}.tokens")
         ?? config('design.brands.miticko.tokens', []);
+
+    $accent   = $t['brand-primary-brand'] ?? '#ab9038';
+    $textMain = $t['text-main'] ?? '#111';
+    $textMuted = $t['text-secondary'] ?? '#7a7a7a';
+    $cardBg   = '#f6f1e3';
+    $tableHeaderBg = '#f4efe4';
 
     $fontFamily = 'DM Sans';
     $fontFaces = [];
@@ -20,12 +27,17 @@
     }
 
     $fmtEuro = fn ($v) => number_format((float) $v, 2, ',', '.') . ' €';
+    $fmtInt  = fn ($v) => number_format((int) $v, 0, ',', '.');
 
-    $totals = $report['totals'];
     $period = $report['period'];
-    $rows = $report['rows'];
-    $billing = $partner->billing;
+    $previousPeriodLabel = $report['previous_period_label'] ?? null;
+    $kpis = $report['kpis'];
+    $productRows = $report['product_rows'] ?? [];
+    $trend = $report['monthly_trend'] ?? [];
+    $distribution = $report['product_distribution'] ?? [];
+    $totals = $report['totals'];
 
+    // Carica logo partner inline (base64) per PDF self-contained
     $partnerLogoMedia = $partner->logo ?? null;
     $partnerLogoSrc = null;
     if ($partnerLogoMedia && Storage::disk('public')->exists($partnerLogoMedia->file_path)) {
@@ -34,35 +46,39 @@
         $partnerLogoSrc = 'data:' . $logoMime . ';base64,' . base64_encode(file_get_contents($logoPath));
     }
 
+    // Logo Miticko (header + footer)
     $mitickoLogoPath = public_path('assets/images/logo-miticko.png');
     $mitickoLogoSrc = file_exists($mitickoLogoPath)
         ? 'data:image/png;base64,' . base64_encode(file_get_contents($mitickoLogoPath))
         : null;
-    $footerLogoSrc = $mitickoLogoSrc;
 
-    $partnerAddress = trim(implode(' · ', array_filter([
-        $partner->structure_address,
-        $partner->phone_number,
-        $partner->email_notify,
-        $partner->domain_name,
-    ])));
+    // Grafici: scarico come data URI per PDF self-contained
+    $trendLabels = array_map(fn ($r) => $r['label'], $trend);
+    $trendValues = array_map(fn ($r) => $r['units'], $trend);
+    $barChartUrl = $trend ? QuickChart::fetchDataUri(QuickChart::bar($trendLabels, $trendValues, $accent)) : null;
 
-    $billingAddressLine = $billing
-        ? trim(implode(' ', array_filter([
-            $billing->street_address,
-            $billing->postal_code,
-            $billing->city,
-            $billing->province ? '('.$billing->province.')' : null,
-        ])))
-        : null;
+    $distLabels = array_map(fn ($r) => $r['label'], $distribution);
+    $distValues = array_map(fn ($r) => $r['units'], $distribution);
+    $distColors = QuickChart::defaultPalette(count($distLabels), [$accent, $accent.'cc', $accent.'99', $accent.'66', '#5d4e22', '#c1a85a']);
+    $donutChartUrl = $distribution ? QuickChart::fetchDataUri(QuickChart::doughnut($distLabels, $distValues, $distColors)) : null;
+
+    // KPI helpers
+    $kpiLabels = [
+        'orders'     => 'Ordini',
+        'items'      => 'Esperienze vendute',
+        'revenue'    => 'Fatturato',
+        'net_margin' => 'Margine netto',
+    ];
+    $isEuro = ['revenue' => true, 'net_margin' => true, 'orders' => false, 'items' => false];
+    $formatKpi = fn ($key, $v) => $isEuro[$key] ? $fmtEuro($v) : $fmtInt($v);
 @endphp
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Report commissioni {{ $partner->partner_name }} — {{ $period['label'] }}</title>
+    <title>Report mensile — {{ $partner->partner_name }} — {{ $period['label'] }}</title>
     <style>
-        @page { margin: 14mm 12mm 18mm 12mm; }
+        @page { margin: 14mm 10mm 20mm 10mm; }
 
         @foreach($fontFaces as $face)
         @font-face {
@@ -77,354 +93,332 @@
 
         body {
             font-family: "{{ $fontFamily }}", DejaVu Sans, sans-serif;
-            color: {{ $t['text-main'] ?? '#111' }};
+            color: {{ $textMain }};
             font-size: 9px;
-            line-height: 1.35;
+            line-height: 1.4;
             margin: 0;
             padding: 0;
         }
 
-        .header-band {
-            position: fixed;
-            top: -14mm;
-            left: -12mm;
-            right: -12mm;
-            height: 6mm;
-            background: {{ $t['brand-primary-brand'] ?? '#2F6BFF' }};
+        .header-logo {
+            text-align: center;
+            margin-bottom: 14px;
         }
+        .header-logo img { height: 22px; }
+        .header-logo .fallback { font-weight: 700; font-size: 14px; }
 
-        .doc-header {
+        .doc-head {
             width: 100%;
             margin-bottom: 10px;
         }
-        .doc-header td { vertical-align: middle; }
-        .doc-header .logo img { height: 22px; display: block; }
-        .doc-header .logo .fallback {
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: {{ $t['text-main'] ?? '#111' }};
+        .doc-head td { vertical-align: top; }
+        .doc-head .partner-eyebrow {
+            font-size: 10px;
+            color: {{ $textMain }};
+            font-weight: 500;
+            margin-bottom: 2px;
         }
-        .doc-header .right { text-align: right; }
-        .doc-header .doc-title {
-            font-size: 8.5px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .doc-head .doc-title {
+            font-size: 20px;
             font-weight: 700;
+            color: {{ $textMain }};
+            margin: 0;
+            line-height: 1.15;
         }
-        .doc-header .doc-period {
-            font-size: 14px;
-            font-weight: 700;
+        .doc-head .doc-sub {
+            font-size: 9px;
+            color: {{ $textMuted }};
             margin-top: 2px;
         }
-        .doc-header .doc-range {
-            font-size: 8px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            margin-top: 1px;
+        .doc-head .partner-logo {
+            text-align: right;
         }
-
-        .anagrafica {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 6px 0;
-            margin-bottom: 12px;
-        }
-        .anagrafica td {
-            vertical-align: top;
-            width: 50%;
-            border: 1px solid {{ $t['border-default'] ?? '#e0e0e0' }};
-            border-radius: 4px;
-            padding: 6px 8px;
-            font-size: 8.5px;
-            line-height: 1.35;
-        }
-        .anagrafica .label {
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            font-size: 7.5px;
-            margin-bottom: 3px;
-        }
-        .anagrafica .name {
-            font-weight: 700;
-            font-size: 10.5px;
-            margin-bottom: 1px;
-            color: {{ $t['text-main'] ?? '#111' }};
-        }
-        .anagrafica .row {
-            margin-top: 2px;
-        }
-        .anagrafica .muted {
-            color: {{ $t['text-secondary'] ?? '#666' }};
-        }
-        .anagrafica.single td { width: 100%; }
+        .doc-head .partner-logo img { max-height: 46px; max-width: 150px; }
 
         .kpi-grid {
             width: 100%;
+            margin-top: 10px;
             border-collapse: separate;
-            border-spacing: 3px 0;
-            margin-bottom: 12px;
+            border-spacing: 6px 0;
         }
-        .kpi-grid td {
-            width: 16.66%;
-            padding: 6px 7px;
-            background: #f6f6f7;
-            border-radius: 4px;
+        .kpi-cell {
+            background: {{ $cardBg }};
+            padding: 10px 12px;
+            border-radius: 10px;
             vertical-align: top;
+            width: 25%;
         }
-        .kpi-grid .kpi-label {
-            font-size: 7.5px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+        .kpi-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            background: #ffffff;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
             font-weight: 700;
-            white-space: nowrap;
+            color: {{ $accent }};
+            margin-bottom: 6px;
+            font-size: 10px;
         }
-        .kpi-grid .kpi-value {
+        .kpi-label {
+            font-size: 8px;
+            color: {{ $textMuted }};
+            text-transform: none;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .kpi-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: {{ $textMain }};
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+        .kpi-delta {
+            font-size: 7.5px;
+            color: {{ $textMuted }};
+        }
+        .kpi-delta .delta-up    { color: #2a9d4a; font-weight: 600; }
+        .kpi-delta .delta-down  { color: #d14343; font-weight: 600; }
+        .kpi-delta .delta-flat  { color: {{ $textMuted }}; }
+
+        .section-title {
             font-size: 12px;
             font-weight: 700;
-            margin-top: 2px;
-        }
-        .kpi-grid .kpi-note {
-            font-size: 7.5px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            margin-top: 1px;
-        }
-        .kpi-grid .kpi-warn { background: #fff3e0; }
-        .kpi-grid .kpi-net { background: #e8f5e9; }
-        .kpi-grid .kpi-info { background: #e3f2fd; }
-
-        h2 {
-            font-size: 9.5px;
-            font-weight: 700;
-            margin: 10px 0 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: {{ $t['text-main'] ?? '#111' }};
+            margin: 18px 0 8px;
+            color: {{ $textMain }};
         }
 
-        table.orders {
+        .table-wrap { background: #fff; border-radius: 10px; overflow: hidden; }
+        table.data {
             width: 100%;
             border-collapse: collapse;
             font-size: 8.5px;
         }
-        table.orders thead th {
-            background: {{ $t['brand-primary-brand'] ?? '#2F6BFF' }};
-            color: #fff;
-            padding: 4px 4px;
+        table.data thead th {
+            background: {{ $tableHeaderBg }};
+            color: {{ $textMain }};
+            font-weight: 500;
             text-align: left;
-            font-weight: 700;
+            padding: 8px 10px;
+            border-bottom: none;
             font-size: 8px;
         }
-        table.orders thead th.text-end,
-        table.orders tbody td.text-end,
-        table.orders tfoot td.text-end {
-            text-align: right;
+        table.data tbody td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ececec;
+            color: {{ $textMain }};
         }
-        table.orders tbody tr:nth-child(even) td { background: #fafafa; }
-        table.orders tbody td {
-            border-bottom: 1px solid #eee;
-            padding: 3px 4px;
+        table.data tbody tr:last-child td { border-bottom: none; }
+        table.data tfoot td {
+            padding: 10px;
+            font-weight: 700;
+            border-top: 1px solid #d9d9d9;
+            background: #ffffff;
+        }
+        .num { text-align: right; white-space: nowrap; }
+
+        .charts {
+            width: 100%;
+            margin-top: 18px;
+        }
+        .charts td { vertical-align: top; padding-right: 10px; }
+        .chart-title {
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: {{ $textMain }};
+        }
+        .chart-box { background: transparent; }
+        .chart-box img { width: 100%; max-width: 100%; height: auto; }
+
+        .donut-legend {
+            font-size: 8px;
+            color: {{ $textMain }};
+            margin-top: 6px;
+        }
+        .donut-legend .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 5px;
             vertical-align: middle;
         }
-        table.orders tfoot td {
-            border-top: 1.5px solid {{ $t['text-main'] ?? '#111' }};
-            padding: 5px 4px;
-            font-weight: 700;
-            font-size: 9px;
-            background: #f6f6f7;
-        }
-        table.orders .order-code { font-weight: 700; }
-
-        .empty {
-            text-align: center;
-            padding: 24px 10px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
-            border: 1px dashed {{ $t['border-default'] ?? '#e0e0e0' }};
-            border-radius: 6px;
-            font-size: 9px;
-        }
+        .donut-legend .legend-row { margin-bottom: 3px; }
 
         .footer {
             position: fixed;
-            bottom: -14mm;
-            left: -12mm;
-            right: -12mm;
-            padding: 4px 12mm;
-            background: #f6f6f7;
-            font-size: 7.5px;
-            color: {{ $t['text-secondary'] ?? '#666' }};
+            bottom: -16mm;
+            left: -10mm;
+            right: -10mm;
+            padding: 8px 10mm;
+            background: #ffffff;
+            border-top: 1px solid #ececec;
+            font-size: 7px;
+            color: {{ $textMuted }};
         }
-        .footer td { vertical-align: middle; padding: 4px 0; }
+        .footer table { width: 100%; border-collapse: collapse; }
+        .footer td { vertical-align: middle; padding: 2px 0; }
         .footer .logo img { height: 12px; }
+        .footer .logo .fallback { font-weight: 700; font-size: 10px; color: {{ $textMain }}; }
     </style>
 </head>
 <body>
 
-<div class="header-band">&nbsp;</div>
-
 <div class="footer">
-    <table style="width: 100%; border-collapse: collapse;">
+    <table>
         <tr>
-            <td style="width: 130px;" class="logo">
-                @if($footerLogoSrc)
-                    <img src="{{ $footerLogoSrc }}" alt="Miticko">
+            <td style="width: 90px;" class="logo">
+                @if($mitickoLogoSrc)
+                    <img src="{{ $mitickoLogoSrc }}" alt="Miticko">
                 @else
-                    <span style="font-weight: 800; font-size: 12px;">miticko</span>
+                    <span class="fallback">miticko</span>
                 @endif
             </td>
             <td>
-                Report generato il {{ now()->translatedFormat('d/m/Y H:i') }} · Documento non fiscale, riepilogo interno delle commissioni maturate.
+                Servizio offerto da Miticko (miticko.com) · Miticko.com è un brand di Colli Italiani S.N.C.<br>
+                P.IVA 12341080983 · San Giuliano Milanese (MI) Via Fratelli Rizzi 8 · CAP 20098 · Italia
             </td>
         </tr>
     </table>
 </div>
 
-<table class="doc-header">
+<div class="header-logo">
+    @if($mitickoLogoSrc)
+        <img src="{{ $mitickoLogoSrc }}" alt="Miticko">
+    @else
+        <span class="fallback">miticko</span>
+    @endif
+</div>
+
+<table class="doc-head">
     <tr>
-        <td class="logo" style="width: 55%;">
-            @if($mitickoLogoSrc)
-                <img src="{{ $mitickoLogoSrc }}" alt="Miticko">
-            @else
-                <span class="fallback">miticko</span>
-            @endif
+        <td style="width: 70%;">
+            <div class="partner-eyebrow">{{ $partner->partner_name }}</div>
+            <h1 class="doc-title">Report mensile · {{ ucfirst($period['label']) }}</h1>
+            <div class="doc-sub">vendite e rendicontazione mensile</div>
         </td>
-        <td class="right" style="width: 45%;">
-            <div class="doc-title">Report commissioni</div>
-            <div class="doc-period">{{ $period['label'] }}</div>
-            <div class="doc-range">
-                dal {{ $period['from']->format('d/m/Y') }} al {{ $period['to']->format('d/m/Y') }}
-            </div>
+        <td style="width: 30%;" class="partner-logo">
+            @if($partnerLogoSrc)
+                <img src="{{ $partnerLogoSrc }}" alt="{{ $partner->partner_name }}">
+            @endif
         </td>
     </tr>
 </table>
-
-<table class="anagrafica {{ $billing ? '' : 'single' }}">
-    <tr>
-        <td>
-            <div class="label">Partner</div>
-            <div class="name">{{ $partner->partner_name }}</div>
-            <div class="muted">Codice: <strong>{{ $partner->partner_code ?? '—' }}</strong></div>
-            @if($partner->structure_address)
-                <div class="row">{{ $partner->structure_address }}</div>
-            @endif
-            @if($partner->phone_number || $partner->email_notify)
-                <div class="row">
-                    @if($partner->phone_number)Tel. {{ $partner->phone_number }}@endif
-                    @if($partner->phone_number && $partner->email_notify) · @endif
-                    @if($partner->email_notify){{ $partner->email_notify }}@endif
-                </div>
-            @endif
-            @if($partner->domain_name)
-                <div class="row muted">{{ $partner->domain_name }}</div>
-            @endif
-        </td>
-        @if($billing)
-            <td>
-                <div class="label">Dati di fatturazione</div>
-                <div class="name">{{ $billing->legal_name ?: $partner->partner_name }}</div>
-                <div class="muted">
-                    @if($billing->vat_number)P.IVA {{ $billing->vat_number }}@endif
-                    @if($billing->vat_number && $billing->tax_code) · @endif
-                    @if($billing->tax_code)CF {{ $billing->tax_code }}@endif
-                </div>
-                @if($billingAddressLine)
-                    <div class="row">{{ $billingAddressLine }}</div>
-                @endif
-                @if($billing->pec_email || $billing->sdi_code)
-                    <div class="row muted">
-                        @if($billing->pec_email)PEC: {{ $billing->pec_email }}@endif
-                        @if($billing->pec_email && $billing->sdi_code) · @endif
-                        @if($billing->sdi_code)SDI: {{ $billing->sdi_code }}@endif
-                    </div>
-                @endif
-            </td>
-        @endif
-    </tr>
-</table>
-
-<h2>Riepilogo · {{ $period['label'] }}</h2>
 
 <table class="kpi-grid">
     <tr>
-        <td>
-            <div class="kpi-label">Ordini · Bigl.</div>
-            <div class="kpi-value">{{ number_format($report['orders_count'], 0, ',', '.') }} · {{ $report['items_count'] }}</div>
-        </td>
-        <td>
-            <div class="kpi-label">Lordo biglietti</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['gross']) }}</div>
-        </td>
-        <td class="kpi-warn">
-            <div class="kpi-label">Commissioni Miticko</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['miticko_total']) }}</div>
-            <div class="kpi-note">F. {{ $fmtEuro($totals['miticko_fixed']) }} · V. {{ $fmtEuro($totals['miticko_variable']) }}</div>
-        </td>
-        <td class="kpi-warn">
-            <div class="kpi-label">Bancarie</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['bank']) }}</div>
-        </td>
-        <td class="kpi-info">
-            <div class="kpi-label">Prevendita</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['presale']) }}</div>
-        </td>
-        <td class="kpi-net">
-            <div class="kpi-label">Netto partner</div>
-            <div class="kpi-value">{{ $fmtEuro($totals['partner_net']) }}</div>
-        </td>
+        @foreach(['orders', 'items', 'revenue', 'net_margin'] as $key)
+            @php
+                $kpi = $kpis[$key];
+                $direction = $kpi['direction'];
+                $deltaPct = $kpi['delta_pct'];
+                $arrow = $direction === 'up' ? '↑' : ($direction === 'down' ? '↓' : '→');
+                $deltaClass = 'delta-' . $direction;
+            @endphp
+            <td class="kpi-cell">
+                <div class="kpi-icon">⬡</div>
+                <div class="kpi-label">{{ $kpiLabels[$key] }}</div>
+                <div class="kpi-value">{{ $formatKpi($key, $kpi['current']) }}</div>
+                <div class="kpi-delta">
+                    @if($deltaPct !== null)
+                        <span class="{{ $deltaClass }}">{{ $arrow }} {{ ($deltaPct > 0 ? '+' : '') . number_format($deltaPct, 0, ',', '.') }}%</span>
+                        rispetto {{ ucfirst($previousPeriodLabel) }}
+                    @else
+                        — nessun dato {{ ucfirst($previousPeriodLabel) }}
+                    @endif
+                </div>
+            </td>
+        @endforeach
     </tr>
 </table>
 
-<h2>Prenotazioni del periodo</h2>
+<div class="section-title">Dettaglio vendite per prodotto</div>
 
-@if(empty($rows))
-    <div class="empty">Nessun ordine pagato in {{ $period['label'] }}.</div>
-@else
-    <table class="orders">
+<div class="table-wrap">
+    <table class="data">
         <thead>
-        <tr>
-            <th style="width: 12%;">Ordine</th>
-            <th style="width: 13%;">Pagato il</th>
-            <th>Cliente</th>
-            <th class="text-end" style="width: 5%;">Bigl.</th>
-            <th class="text-end" style="width: 11%;">Lordo</th>
-            <th class="text-end" style="width: 11%;">Miticko</th>
-            <th class="text-end" style="width: 10%;">Banca</th>
-            <th class="text-end" style="width: 10%;">Prev.</th>
-            <th class="text-end" style="width: 11%;">Netto</th>
-        </tr>
+            <tr>
+                <th>Prodotto</th>
+                <th>Variante</th>
+                <th class="num">Prezzo<br>singolo<br>prodotto</th>
+                <th class="num">Commissione<br>singolo<br>prodotto</th>
+                <th class="num">Margine<br>singolo<br>prodotto</th>
+                <th class="num">Unità<br>vendute</th>
+                <th class="num">Totale<br>vendite</th>
+                <th class="num">Totale<br>commissioni</th>
+                <th class="num">Totale incassato<br>dal partner</th>
+            </tr>
         </thead>
         <tbody>
-        @foreach($rows as $row)
-            @php($o = $row['order'])
-            <tr>
-                <td class="order-code">MTK-{{ $o->order_number }}</td>
-                <td>{{ $o->paid_at?->format('d/m/Y H:i') ?? '—' }}</td>
-                <td>{{ \Illuminate\Support\Str::limit($o->full_name ?: '—', 32, '…') }}</td>
-                <td class="text-end">{{ $row['items_count'] }}</td>
-                <td class="text-end">{{ $fmtEuro($row['gross']) }}</td>
-                <td class="text-end">{{ $fmtEuro($row['miticko']) }}</td>
-                <td class="text-end">{{ $fmtEuro($row['bank']) }}</td>
-                <td class="text-end">{{ $fmtEuro($row['presale']) }}</td>
-                <td class="text-end">{{ $fmtEuro($row['net']) }}</td>
-            </tr>
-        @endforeach
+            @forelse($productRows as $row)
+                <tr>
+                    <td>{{ $row['product'] }}</td>
+                    <td>{{ $row['variant'] }}</td>
+                    <td class="num">{{ $fmtEuro($row['unit_price']) }}</td>
+                    <td class="num">{{ $fmtEuro($row['commission_unit']) }}</td>
+                    <td class="num">{{ $fmtEuro($row['margin_unit']) }}</td>
+                    <td class="num">{{ $fmtInt($row['units']) }}</td>
+                    <td class="num">{{ $fmtEuro($row['total_gross']) }}</td>
+                    <td class="num">{{ $fmtEuro($row['total_commissions']) }}</td>
+                    <td class="num">{{ $fmtEuro($row['total_partner']) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 24px; color: {{ $textMuted }};">
+                        Nessuna vendita registrata nel periodo.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="3" class="text-end">Totali</td>
-            <td class="text-end">{{ $report['items_count'] }}</td>
-            <td class="text-end">{{ $fmtEuro($totals['gross']) }}</td>
-            <td class="text-end">{{ $fmtEuro($totals['miticko_total']) }}</td>
-            <td class="text-end">{{ $fmtEuro($totals['bank']) }}</td>
-            <td class="text-end">{{ $fmtEuro($totals['presale']) }}</td>
-            <td class="text-end">{{ $fmtEuro($totals['partner_net']) }}</td>
-        </tr>
-        </tfoot>
+        @if(!empty($productRows))
+            <tfoot>
+                <tr>
+                    <td colspan="5">Totale periodo</td>
+                    <td class="num">{{ $fmtInt($report['items_count']) }}</td>
+                    <td class="num">{{ $fmtEuro($totals['gross']) }}</td>
+                    <td class="num">{{ $fmtEuro($totals['miticko_total']) }}</td>
+                    <td class="num">{{ $fmtEuro($totals['partner_net']) }}</td>
+                </tr>
+            </tfoot>
+        @endif
     </table>
-@endif
+</div>
+
+<table class="charts">
+    <tr>
+        <td style="width: 50%;">
+            <div class="chart-title">Andamento vendite</div>
+            @if($barChartUrl)
+                <div class="chart-box"><img src="{{ $barChartUrl }}" alt="Andamento vendite"></div>
+            @else
+                <div class="chart-box" style="padding:40px; text-align:center; color:{{ $textMuted }};">Nessun dato</div>
+            @endif
+        </td>
+        <td style="width: 50%;">
+            <div class="chart-title">Distribuzione vendite</div>
+            @if($donutChartUrl)
+                <table style="width:100%;">
+                    <tr>
+                        <td style="width:55%;"><img src="{{ $donutChartUrl }}" alt="Distribuzione vendite" style="width:100%;"></td>
+                        <td class="donut-legend">
+                            @foreach($distribution as $i => $d)
+                                <div class="legend-row">
+                                    <span class="dot" style="background: {{ $distColors[$i] ?? $accent }};"></span>
+                                    {{ $d['label'] }}
+                                </div>
+                            @endforeach
+                        </td>
+                    </tr>
+                </table>
+            @else
+                <div class="chart-box" style="padding:40px; text-align:center; color:{{ $textMuted }};">Nessun dato</div>
+            @endif
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

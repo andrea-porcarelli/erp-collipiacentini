@@ -20,7 +20,7 @@ class PartnerReportArchiveService
     public function renderPdf(Partner $partner, int $year, int $month): DomPdfInstance
     {
         $partner->loadMissing('billing', 'logo');
-        $report = $this->commissionService->buildReport($partner, $year, $month);
+        $report = $this->commissionService->buildMonthlyReport($partner, $year, $month);
 
         return Pdf::loadView('backoffice.partners._report_pdf', [
             'partner' => $partner,
