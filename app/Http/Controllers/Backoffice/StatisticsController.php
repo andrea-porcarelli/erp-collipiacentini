@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Carbon;
@@ -115,11 +116,20 @@ class StatisticsController extends Controller
 
         $ordersWithoutAge = (int) (clone $ordersQuery)->whereNull('birth_date')->count();
 
+        // Opzioni per la modale "Genera report"
+        $reportPartners = match ($user->role) {
+            'company' => Partner::where('company_id', $user->company_id)->orderBy('partner_name')->get(['id', 'partner_name']),
+            default   => $user->partner ? collect([$user->partner])->map(fn ($p) => (object) ['id' => $p->id, 'partner_name' => $p->partner_name]) : collect(),
+        };
+        $reportCurrentPartnerId = $user->partner_id;
+
         return view('backoffice.statistics.index', [
             'isGod' => false,
             'active' => 'statistics',
             'from' => $from,
             'to' => $to,
+            'reportPartners' => $reportPartners,
+            'reportCurrentPartnerId' => $reportCurrentPartnerId,
             'kpi' => [
                 'revenue' => (float) $revenue,
                 'net_margin' => $netMargin,

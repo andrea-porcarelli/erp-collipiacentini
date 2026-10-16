@@ -16,9 +16,19 @@
         <div class="w-100 statistics-page">
 
             {{-- Intestazione --}}
-            <div class="content-header">
-                <small>Statistiche</small>
-                <h1 class="mb-0">Fatturato</h1>
+            <div class="content-header d-flex justify-content-between align-items-start">
+                <div>
+                    <small>Statistiche</small>
+                    <h1 class="mb-0">Fatturato</h1>
+                </div>
+                <x-button
+                    id="btn-open-generate-report"
+                    label="Genera report"
+                    trailing="fa-file"
+                    status="Primary"
+                    emphasis="Low"
+                    size="Medium"
+                />
             </div>
 
             {{-- Pannello filtri --}}
@@ -368,11 +378,19 @@
                 </p>
             </div>
 
+            @include('backoffice.statistics.partials.generate-report-modal', [
+                'reportPartners' => $reportPartners,
+                'reportCurrentPartnerId' => $reportCurrentPartnerId,
+            ])
+
         </div>
     @endif
 @endsection
 
 @section('custom-script')
+    @unless($isGod)
+        <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
+    @endunless
     <script>
         $(document).ready(function () {
             $(document).on('click', '[data-toggle-group] .chip-miticko', function () {
@@ -381,6 +399,85 @@
                     .attr('data-mode', 'chipAppearance-Inactive');
                 $(this).attr('data-mode', 'chipAppearance-Active');
             });
+
+            @unless($isGod)
+            // --- Modale "Genera report"
+            const $modal = $('#modal-generate-report');
+            const $partner = $modal.find('select[name="report_partner_id"]');
+            const $month   = $modal.find('select[name="report_month"]');
+            const $year    = $modal.find('select[name="report_year"]');
+            const $tbody   = $('#generate-report-subscribers-tbody');
+            const $btnDownload = $modal.find('.btn-generate-report-download');
+            const $btnSend     = $modal.find('.btn-generate-report-send');
+
+            function updateActionButtons() {
+                const canAct = $partner.val() && $month.val() && $year.val();
+                $btnDownload.prop('disabled', !canAct);
+                $btnSend.prop('disabled', !canAct);
+            }
+
+            function loadSubscribers(partnerId) {
+                if (!partnerId) {
+                    $tbody.html('<tr><td colspan="3" class="text-center text-muted py-4">Seleziona un partner per vedere i destinatari configurati.</td></tr>');
+                    return;
+                }
+                $tbody.html('<tr><td colspan="3" class="text-center text-muted py-4">Caricamento in corso…</td></tr>');
+
+                const url = '{{ url('partners') }}/' + partnerId + '/report/data/subscribers-partner';
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: { _token: '{{ csrf_token() }}', length: 10, start: 0 },
+                }).done(function (res) {
+                    const rows = (res && res.data) || [];
+                    if (!rows.length) {
+                        $tbody.html('<tr><td colspan="3" class="text-center text-muted py-4">Nessun destinatario configurato per questo partner.</td></tr>');
+                        return;
+                    }
+                    const html = rows.map(function (r) {
+                        return '<tr>'
+                            + '<td>' + (r.email || '—') + '</td>'
+                            + '<td>' + (r.role  || '—') + '</td>'
+                            + '<td class="text-end">' + (r.toggle || '') + '</td>'
+                            + '</tr>';
+                    }).join('');
+                    $tbody.html(html);
+                    $(document).trigger('loadSwitchTrigger', [{ container: '#generate-report-subscribers-tbody', options: { secondaryColor: '#cccccc', color: '#3B82F6' } }]);
+                }).fail(function () {
+                    $tbody.html('<tr><td colspan="3" class="text-center text-danger py-4">Errore nel caricamento dei destinatari.</td></tr>');
+                });
+            }
+
+            $(document).on('click', '#btn-open-generate-report', function () {
+                $modal.modal('show');
+            });
+
+            $modal.on('shown.bs.modal', function () {
+                loadSubscribers($partner.val());
+                updateActionButtons();
+            });
+
+            $partner.on('change', function () { loadSubscribers($(this).val()); updateActionButtons(); });
+            $month.on('change', updateActionButtons);
+            $year.on('change', updateActionButtons);
+
+            $btnDownload.on('click', function (e) {
+                e.preventDefault();
+                if ($(this).prop('disabled')) return;
+                const url = '{{ url('partners') }}/' + $partner.val() + '/report/pdf?year=' + $year.val() + '&month=' + $month.val();
+                window.open(url, '_blank');
+            });
+
+            $btnSend.on('click', function (e) {
+                e.preventDefault();
+                if ($(this).prop('disabled')) return;
+                if (typeof toastr !== 'undefined') {
+                    toastr.info('Invio report via email non ancora disponibile.');
+                } else {
+                    alert('Invio report via email non ancora disponibile.');
+                }
+            });
+            @endunless
         });
     </script>
 @endsection
