@@ -969,7 +969,7 @@ const initReportTables = () => {
     if (typeof DataTable === 'undefined') return;
     reportTablesInitialized = true;
 
-    const commonConfig = (ajaxUrl) => ({
+    const commonConfig = (ajaxUrl, lengthLabel = 'elementi per pagina') => ({
         responsive: true,
         searching: false,
         ordering: false,
@@ -981,14 +981,14 @@ const initReportTables = () => {
         layout: {
             topStart: '',
             topEnd: '',
-            bottomStart: 'info',
+            bottomStart: '',
             bottomEnd: ['pageLength', 'paging'],
         },
         language: {
-            lengthMenu: '_MENU_ per pagina',
+            lengthMenu: `${lengthLabel} _MENU_`,
             paginate: { previous: '<', next: '>' },
-            info: '_START_-_END_ di _TOTAL_',
-            infoEmpty: '0-0 di 0',
+            info: '',
+            infoEmpty: '',
             emptyTable: 'Nessun dato disponibile',
             processing: 'Caricamento...',
         },
@@ -1016,7 +1016,7 @@ const initReportTables = () => {
     const logsTable = $('#dt-report-logs');
     if (logsTable.length) {
         new DataTable('#dt-report-logs', {
-            ...commonConfig(logsTable.data('url')),
+            ...commonConfig(logsTable.data('url'), 'Report per pagina'),
             columns: [
                 { data: 'pr_year' },
                 { data: 'email' },
@@ -1031,7 +1031,7 @@ const initReportTables = () => {
     const miticcoTable = $('#dt-report-subscribers-miticko');
     if (miticcoTable.length) {
         new DataTable('#dt-report-subscribers-miticko', {
-            ...commonConfig(miticcoTable.data('url')),
+            ...commonConfig(miticcoTable.data('url'), 'utenti per pagina'),
             columns: [
                 { data: 'email' },
                 { data: 'role' },
@@ -1043,7 +1043,7 @@ const initReportTables = () => {
     const partnerTable = $('#dt-report-subscribers-partner');
     if (partnerTable.length) {
         new DataTable('#dt-report-subscribers-partner', {
-            ...commonConfig(partnerTable.data('url')),
+            ...commonConfig(partnerTable.data('url'), 'utenti per pagina'),
             columns: [
                 { data: 'email' },
                 { data: 'role' },

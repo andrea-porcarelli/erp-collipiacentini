@@ -123,6 +123,36 @@
         #partner-report-panel .switch-cell .text-field { margin: 0; padding: 0; }
         #partner-report-panel .switch-cell .supporting-text { display: none; }
 
+        /* DataTables length menu: pill box come da design */
+        #partner-report-panel .dt-length {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 6px 14px;
+            background: #fff;
+            border: 1px solid #E6E6E6;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        #partner-report-panel .dt-length label {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        #partner-report-panel .dt-length select {
+            border: 1px solid #E6E6E6;
+            border-radius: 6px;
+            padding: 4px 24px 4px 10px;
+            font-size: 13px;
+            background-color: #fff;
+            cursor: pointer;
+            min-width: 56px;
+        }
+        #partner-report-panel .dt-layout-row.dt-layout-table + .dt-layout-row {
+            margin-top: 12px;
+        }
+
         /* Consensi: check "Obbligatorio" arancio (fill solid + check bianco) */
         .consent-required-wrap { cursor: pointer; user-select: none; }
         .consent-required-wrap.disabled { cursor: default; opacity: 0.75; }
