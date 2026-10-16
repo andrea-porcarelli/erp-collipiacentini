@@ -387,6 +387,12 @@
     @endif
 @endsection
 
+@unless($isGod)
+    @section('custom-css')
+        <link rel="stylesheet" href="/backoffice/vendor/switchery/switchery.min.css" />
+    @endsection
+@endunless
+
 @section('custom-script')
     @unless($isGod)
         <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
