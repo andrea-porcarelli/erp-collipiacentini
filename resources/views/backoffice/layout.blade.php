@@ -32,8 +32,17 @@
                     document.body.classList.toggle('sidebar-open');
                 });
                 if (backdrop) backdrop.addEventListener('click', close);
-                document.querySelectorAll('.sidebar .nav-item').forEach(function (el) {
+                document.querySelectorAll('.sidebar .nav-item:not(.nav-group-toggle)').forEach(function (el) {
                     el.addEventListener('click', close);
+                });
+                document.querySelectorAll('.sidebar .nav-group-toggle').forEach(function (btn) {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        var group = btn.closest('.nav-group');
+                        if (!group) return;
+                        var open = group.classList.toggle('is-open');
+                        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    });
                 });
             })();
         </script>

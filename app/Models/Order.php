@@ -145,11 +145,19 @@ class Order extends LogsModel
             return self::INVOICE_STATUS_NOT_REQUIRED;
         }
 
-        $sentInvoice = $this->invoices->contains(
-            fn (Invoice $i) => in_array($i->status, [Invoice::STATUS_SENT, Invoice::STATUS_ACCEPTED], true)
+        // Fattura considerata "emessa" se esiste almeno un invoice collegato in uno degli stati
+        // non ri-emittibili (draft/queued compresi: la pratica è già stata avviata, non va rifatta).
+        // Solo error/rejected lasciano il bottone "Imposta fattura" attivo.
+        $emittedInvoice = $this->invoices->contains(
+            fn (Invoice $i) => in_array($i->status, [
+                Invoice::STATUS_DRAFT,
+                Invoice::STATUS_QUEUED,
+                Invoice::STATUS_SENT,
+                Invoice::STATUS_ACCEPTED,
+            ], true)
         );
 
-        return $sentInvoice ? self::INVOICE_STATUS_SENT : self::INVOICE_STATUS_TO_EMIT;
+        return $emittedInvoice ? self::INVOICE_STATUS_SENT : self::INVOICE_STATUS_TO_EMIT;
     }
 
     public function invoiceStatusLabel(): string

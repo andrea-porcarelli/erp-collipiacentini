@@ -66,6 +66,18 @@ class InvoiceCalculatorService
                         'total' => $amounts[self::LINE_PRESALE],
                     ];
                 }
+
+                // Biglietto base: emesso come riga nella fattura al cliente a prezzo pieno dell'item.
+                if ($flags[self::LINE_TICKET_BASE] && $amounts[self::LINE_TICKET_BASE] > 0) {
+                    $variantLabel = $item->variant?->label ?? 'Biglietto';
+                    $customerLines[] = [
+                        'code' => self::LINE_TICKET_BASE,
+                        'label' => $variantLabel,
+                        'quantity' => (int) $item->quantity,
+                        'unit_amount' => $amounts[self::LINE_TICKET_BASE.'_unit'],
+                        'total' => $amounts[self::LINE_TICKET_BASE],
+                    ];
+                }
             }
         }
 
@@ -78,7 +90,7 @@ class InvoiceCalculatorService
             ],
             Invoice::RECIPIENT_CUSTOMER => [
                 'recipient' => $this->customerRecipient($order),
-                'default_flags' => $this->aggregateFlags($order, [self::LINE_PRESALE]),
+                'default_flags' => $this->aggregateFlags($order, [self::LINE_PRESALE, self::LINE_TICKET_BASE]),
                 'lines' => $customerLines,
                 'total' => round(array_sum(array_column($customerLines, 'total')), 2),
             ],

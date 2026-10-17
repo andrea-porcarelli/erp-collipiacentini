@@ -131,7 +131,14 @@ class InvoiceController extends Controller
 
     private function applyStatusFilter($query, string $status): void
     {
-        $sent = fn ($q) => $q->whereIn('status', [Invoice::STATUS_SENT, Invoice::STATUS_ACCEPTED]);
+        // Coerente con Order::invoiceStatus(): "emessa" = draft/queued/sent/accepted
+        // (error/rejected restano riproducibili → stato "da emettere").
+        $sent = fn ($q) => $q->whereIn('status', [
+            Invoice::STATUS_DRAFT,
+            Invoice::STATUS_QUEUED,
+            Invoice::STATUS_SENT,
+            Invoice::STATUS_ACCEPTED,
+        ]);
 
         match ($status) {
             Order::INVOICE_STATUS_REFUNDED => $query->where('order_status', OrderStatus::REFUNDED->value),

@@ -34,20 +34,50 @@ class OrderInvoiceController extends Controller
                 ? $partnerData
                 : $this->calculator->computeForOrder($order, $overrideCustomer);
 
-            $order->loadMissing('orderProducts.product', 'orderProducts.items.variant');
-            $productLabels = $order->orderProducts
-                ->map(fn ($op) => $op->product?->label)
-                ->filter()->unique()->values()->all();
+            $order->loadMissing('orderProducts.product', 'orderProducts.items.variant.prices');
+            $products = $order->orderProducts
+                ->map(fn ($op) => $op->product ? ['id' => $op->product->id, 'label' => $op->product->label] : null)
+                ->filter()->unique('id')->values()->all();
+            $productLabels = array_column($products, 'label');
             $variants = $order->orderProducts
                 ->flatMap(fn ($op) => $op->items->map(fn ($it) => $it->variant?->label))
                 ->filter()->values()->all();
+
+            // Dettaglio righe ordine: una riga per OrderProductItem (variante acquistata)
+            // con qty, unit_price, vat_rate (dal ProductVariantPrice matchato per prezzo), subtotal.
+            $orderItems = $order->orderProducts->flatMap(function ($op) {
+                $productLabel = $op->product?->label ?? '—';
+
+                return $op->items->map(function ($it) use ($productLabel) {
+                    $vat = $it->variant?->prices
+                        ?->firstWhere(fn ($p) => abs((float) $p->price - (float) $it->unit_price) < 0.01)
+                        ?->vat_rate;
+
+                    return [
+                        'label' => $productLabel,
+                        'quantity' => (int) $it->quantity,
+                        'unit_price' => (float) $it->unit_price,
+                        'vat_rate' => is_null($vat) ? null : (float) $vat,
+                        'subtotal' => round((float) $it->unit_price * (int) $it->quantity, 2),
+                    ];
+                });
+            })->values()->all();
 
             return response()->json([
                 'partner' => $partnerData[Invoice::RECIPIENT_PARTNER],
                 'customer' => $customerData[Invoice::RECIPIENT_CUSTOMER],
                 'order_meta' => [
                     'product_labels' => $productLabels,
+                    'products' => $products,
                     'variants' => $variants,
+                    'items' => $orderItems,
+                    'order_total' => (float) $order->amount,
+                    // Rate commissioni e importi "DI CUI" calcolati come nel dettaglio ordine
+                    // (OrderController@show): rate presa dal partner corrente, amount = rate * order->amount.
+                    'commission_payment_rate' => (float) ($order->partner?->commission_payment ?? 0),
+                    'commission_payment_amount' => round((float) $order->amount * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
+                    'commission_miticko_rate' => (float) ($order->partner?->commission_miticko_variable ?? 0),
+                    'commission_miticko_amount' => round((float) $order->amount * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
                     'payment_method' => $order->card_brand
                         ? sprintf('%s **** %s', ucfirst($order->card_brand), $order->card_last4 ?: '')
                         : ($order->stripe_payment_method ?: '—'),

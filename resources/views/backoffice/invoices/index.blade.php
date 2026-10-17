@@ -29,6 +29,8 @@
                 <x-card title="Ordini" sub_title="" brelative="true">
                     <x-table-header>
                         <div class="filters-miticko">
+                            {{-- Filtro `status` controllato dalle chip-tab sopra (default: all) --}}
+                            <input type="hidden" name="status" id="invoice-status-filter" value="all">
                             <x-filter label="data pagamento" type="daterange" name="dates" />
                             <x-filter label="prodotto" type="text" name="products" />
                             @if(count($partners) > 1)
@@ -127,16 +129,15 @@
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
     <script>
         $(function () {
-            // Chip-tab stato: setta il filtro `status` come hidden input condiviso in .filters-miticko
-            // (il payload DataTables lo legge come filters[status]).
-            const $hiddenStatus = $('<input>', { type: 'hidden', name: 'status', val: 'all' });
-            $('.filters-miticko').append($hiddenStatus);
-
+            // Chip-tab stato: aggiorna il valore di #invoice-status-filter (dentro .filters-miticko)
+            // → DataTable lo include nel payload come filters[status] alla successiva reload.
             $(document).on('click', '.invoice-chip-tab', function () {
                 $('.invoice-chip-tab').attr('data-mode', 'chipAppearance-Resting');
                 $(this).attr('data-mode', 'chipAppearance-Active');
-                $hiddenStatus.val($(this).data('status') || 'all');
-                App.reloadTable();
+                $('#invoice-status-filter').val($(this).data('status') || 'all');
+                const dt = $('.datatable').DataTable();
+                dt.clear();
+                dt.ajax.reload();
             });
 
             setTimeout(() => {

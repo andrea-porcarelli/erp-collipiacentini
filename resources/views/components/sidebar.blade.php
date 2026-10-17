@@ -6,7 +6,17 @@
         <x-navigation-item label="Calendario" icon="fa fa-calendar-days" route="calendar.index" :is_active="$active === 'calendar'" />
         <x-navigation-item label="Ordini" icon="fa fa-receipt" route="orders.index" :is_active="$active === 'orders'"  />
         <x-navigation-item label="Prodotti" icon="fa fa-border-all" route="products.index" :is_active="$active === 'products'"  />
-        <x-navigation-item label="Statistiche" icon="fa fa-chart-line" route="statistics.index" :is_active="$active === 'statistics'" />
+        @php
+            $isStatsSection = is_string($active ?? null) && str_starts_with($active, 'statistics');
+        @endphp
+        <x-navigation-group label="Statistiche" icon="fa fa-chart-line" :is_open="$isStatsSection">
+            <x-navigation-sub-item label="Fatturato" route="statistics.revenue"   :is_active="$active === 'statistics.revenue'" />
+            <x-navigation-sub-item label="Ordini"    route="statistics.orders"    :is_active="$active === 'statistics.orders'" />
+            <x-navigation-sub-item label="Prodotto"  route="statistics.product"   :is_active="$active === 'statistics.product'" />
+            <x-navigation-sub-item label="Categoria" route="statistics.category"  :is_active="$active === 'statistics.category'" />
+            <x-navigation-sub-item label="Partner"   route="statistics.partner"   :is_active="$active === 'statistics.partner'" />
+            <x-navigation-sub-item label="Clienti"   route="statistics.customers" :is_active="$active === 'statistics.customers'" />
+        </x-navigation-group>
         @if(Auth::user()->role == 'god')
             <x-navigation-item label="Categorie" icon="fa fa-border-all" route="categories.index" :is_active="$active === 'categories'"  />
             <x-navigation-item label="Gestione Aziende" icon="fa fa-buildings" route="companies.index" :is_active="$active === 'companies'" />

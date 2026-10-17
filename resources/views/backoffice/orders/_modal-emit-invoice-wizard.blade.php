@@ -1,10 +1,17 @@
-{{-- Wizard "Imposta fattura" (2 step), largo come la modale register-order per ospitare le 2 colonne. --}}
+{{-- Wizard "Imposta fattura" (2 step).
+     Larghezza: fullscreen responsive (modal-fullscreen-xxl-down nativo di Bootstrap)
+     → 100vw/100vh fino a 1399px, poi max 1320px centrata su schermi ≥1400px. --}}
 <style>
-    #modal-set-invoice .modal-dialog { max-width: 1100px; width: 95%; }
-    #modal-set-invoice .modal-body { max-height: calc(100vh - 200px); overflow-y: auto; }
+    /* Compensare il padding 0 globale di .modal-miticko .modal-body:
+       le .row Bootstrap con gutter hanno margin negativi laterali che altrimenti sfondano.  */
+    #modal-set-invoice .modal-body { overflow-x: hidden; overflow-y: auto; padding: 16px 24px; }
+    @media (min-width: 1400px) {
+        #modal-set-invoice .modal-dialog { max-width: 1320px; }
+        #modal-set-invoice .modal-body { max-height: calc(100vh - 200px); }
+    }
 
     .invoice-wizard-tabs { display: flex; gap: 8px; }
-    .invoice-wizard-tabs .chip-miticko { flex: 1; justify-content: center; cursor: pointer; }
+    .invoice-wizard-tabs .bt-miticko { flex: 1; justify-content: center; cursor: pointer; }
 
     .invoice-wizard-settings-box {
         background: #FAFAFA;
@@ -19,6 +26,21 @@
     .invoice-flag-list { display: flex; flex-direction: column; gap: 10px; }
     .invoice-flag-item { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
     .invoice-flag-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+    /* Modalità "Impostazioni di default": campi readonly, visuale greyed-out. */
+    .invoice-settings-fields.is-locked {
+        opacity: 0.55;
+        pointer-events: none;
+        user-select: none;
+    }
+    .invoice-settings-fields.is-locked .text-field,
+    .invoice-settings-fields.is-locked .text-field-container,
+    .invoice-settings-fields.is-locked select {
+        background: #F0F1F5 !important;
+        color: #999 !important;
+    }
+    .invoice-settings-fields.is-locked label span,
+    .invoice-settings-fields.is-locked .small { color: #999 !important; }
 
     .invoice-summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .invoice-summary-table th, .invoice-summary-table td { padding: 8px 10px; border-bottom: 1px solid #F0F1F5; }
@@ -37,10 +59,23 @@
 
     .invoice-open-order-link { color: #FF8A50; font-weight: 600; }
     .invoice-open-order-link:hover { color: #ff7b36; }
+    .invoice-wizard-pane h3 { color: var(--card-title, #0D0D0D); font-family: var(--typography-web-title-font, "DM Sans"), sans-serif; font-size: var(--size, 18px);
+        font-style: normal;
+        font-weight: var(--weight, 700);
+        line-height: var(--line-height, 24px); /* 133.333% */
+    }
+    #modal-set-invoice h1 {
+        color: var(--text-main, #0D0D0D);
+        font-family: var(--typography-web-title-font, "DM Sans");
+        font-size: var(--size, 18px);
+        font-style: normal;
+        font-weight: var(--weight, 700);
+        line-height: var(--line-height, 24px); /* 133.333% */
+    }
 </style>
 
 <div class="modal fade" tabindex="-1" id="modal-set-invoice">
-    <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-xxl-down">
         <div class="modal-content modal-miticko">
             <div class="modal-header">
                 <h1 class="modal-title">Imposta fattura</h1>
@@ -57,8 +92,8 @@
                 <div id="invoice-wizard-content" class="d-none w-100">
                     {{-- Progress-bar step come chip Active/Resting --}}
                     <div class="invoice-wizard-tabs mb-spacing-xl">
-                        <x-button label="Imposta fattura" status="Primary"  emphasis="MediumLow" class="invoice-wizard-tab" :dataset="['step' => '1']" />
-                        <x-chip label="Riepilogo" appearance="Resting" class="invoice-wizard-tab" :dataset="['step' => '2']" />
+                        <x-button label="Imposta fattura" size="Small" emphasis="MediumLow" status="Primary" class="invoice-wizard-tab" :dataset="['step' => '1']" />
+                        <x-button label="Riepilogo" status="Disabled" emphasis="High" size="Small" class="invoice-wizard-tab" :dataset="['step' => '2']" />
                     </div>
 
                     {{-- STEP 1 --}}
@@ -99,41 +134,42 @@
                                     <h3 class="mb-3" style="font-size:16px">Impostazioni fatturazione</h3>
 
                                     <div class="invoice-mode-switch">
-                                        <x-button label="Impostazioni di default" status="Primary" emphasis="Medium" leading="fa-lock" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'default']" />
-                                        <x-button label="Personalizza" status="Neutral" emphasis="Low" leading="fa-lock-open" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'custom']" />
+                                        <x-button label="Impostazioni di default" size="Small" leading="fa-lock" emphasis="MediumLow" status="Secondary" class="invoice-mode-btn" :dataset="['invoice-mode' => 'default']" />
+                                        <x-button label="Personalizza" status="Neutral" emphasis="Low" leading="fa-lock-open" size="Small" class="invoice-mode-btn" :dataset="['invoice-mode' => 'custom']" />
                                     </div>
 
-                                    <div class="mb-3">
-                                        <x-select
-                                            id="invoice-required-select"
-                                            name="invoice_required"
-                                            label="Fattura"
-                                            :value="'1'"
-                                            :options="[
-                                                ['id' => '1', 'label' => 'Necessaria'],
-                                                ['id' => '0', 'label' => 'Non necessaria'],
-                                            ]"
-                                        />
-                                    </div>
+                                    <div class="invoice-settings-fields">
+                                        <div class="mb-3">
+                                            <x-select
+                                                name="invoice_required"
+                                                label="Fattura"
+                                                :value="'1'"
+                                                :options="[
+                                                    ['id' => '1', 'label' => 'Necessaria'],
+                                                    ['id' => '0', 'label' => 'Non necessaria'],
+                                                ]"
+                                            />
+                                        </div>
 
-                                    <div class="small fw-semibold mb-2">Campi da inserire in fattura</div>
-                                    <div class="invoice-flag-list">
-                                        <label class="invoice-flag-item">
-                                            <input type="checkbox" class="form-check-input invoice-flag" data-flag="ticket_base">
-                                            <span class="small">Biglietto base (non include le eventuali commissioni miticko)</span>
-                                        </label>
-                                        <label class="invoice-flag-item">
-                                            <input type="checkbox" class="form-check-input invoice-flag" data-flag="miticko_commission">
-                                            <span class="small">Commissioni Miticko</span>
-                                        </label>
-                                        <label class="invoice-flag-item">
-                                            <input type="checkbox" class="form-check-input invoice-flag" data-flag="presale">
-                                            <span class="small">Prevendita Miticko</span>
-                                        </label>
-                                        <label class="invoice-flag-item">
-                                            <input type="checkbox" class="form-check-input invoice-flag" data-flag="bank_commission">
-                                            <span class="small">Commissioni gateway di pagamento</span>
-                                        </label>
+                                        <div class="small fw-semibold mb-2">Campi da inserire in fattura</div>
+                                        <div class="invoice-flag-list">
+                                            <label class="invoice-flag-item">
+                                                <input type="checkbox" class="form-check-input invoice-flag" data-flag="ticket_base">
+                                                <span class="small">Biglietto base (non include le eventuali commissioni miticko)</span>
+                                            </label>
+                                            <label class="invoice-flag-item">
+                                                <input type="checkbox" class="form-check-input invoice-flag" data-flag="miticko_commission">
+                                                <span class="small">Commissioni Miticko</span>
+                                            </label>
+                                            <label class="invoice-flag-item">
+                                                <input type="checkbox" class="form-check-input invoice-flag" data-flag="presale">
+                                                <span class="small">Prevendita Miticko</span>
+                                            </label>
+                                            <label class="invoice-flag-item">
+                                                <input type="checkbox" class="form-check-input invoice-flag" data-flag="bank_commission">
+                                                <span class="small">Commissioni gateway di pagamento</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -144,23 +180,24 @@
                     <section class="invoice-wizard-pane d-none" data-step="2">
                         <div class="row g-4">
                             <div class="col-12 col-lg-7">
-                                <h3 class="mb-3" style="font-size:16px">Descrizione</h3>
+                                <h3 class="mb-3" style="font-size:16px">Biglietti</h3>
                                 <table class="invoice-summary-table">
                                     <thead>
                                         <tr>
-                                            <th>Prodotto</th>
+                                            <th>Tipo</th>
                                             <th class="text-end">Q.tà</th>
                                             <th class="text-end">Prezzo</th>
-                                            <th class="text-end">Sconto</th>
-                                            <th class="text-end">IVA</th>
                                             <th class="text-end">Subtotale</th>
                                         </tr>
                                     </thead>
                                     <tbody data-slot="invoice-items"></tbody>
                                     <tfoot>
-                                        <tr class="sub"><td colspan="5" class="text-end">Subtotale</td><td class="text-end" data-slot="invoice-subtotal">—</td></tr>
-                                        <tr class="sub"><td colspan="5" class="text-end">IVA</td><td class="text-end" data-slot="invoice-vat">—</td></tr>
-                                        <tr class="total"><td colspan="5" class="text-end">Totale fattura</td><td class="text-end" data-slot="invoice-total">—</td></tr>
+                                        <tr class="sub"><td colspan="3" class="text-end">Subtotale</td><td class="text-end" data-slot="invoice-subtotal">—</td></tr>
+                                        <tr class="di-cui-label"><td colspan="4" class="text-start" style="color:#999;font-size:11px;letter-spacing:.5px">DI CUI</td></tr>
+                                        <tr class="sub di-cui" data-slot="row-commission-payment" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di pagamento (<span data-slot="rate-payment">—</span>%)</td><td class="text-end" data-slot="amount-payment">—</td></tr>
+                                        <tr class="sub di-cui" data-slot="row-commission-miticko" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di servizio (<span data-slot="rate-miticko">—</span>%)</td><td class="text-end" data-slot="amount-miticko">—</td></tr>
+                                        <tr class="sub di-cui" data-slot="row-presale" style="display:none"><td colspan="3" class="text-start text-secondary">Prevendita</td><td class="text-end" data-slot="amount-presale">—</td></tr>
+                                        <tr class="total"><td colspan="3" class="text-end">Totale ordine</td><td class="text-end" data-slot="invoice-total">—</td></tr>
                                     </tfoot>
                                 </table>
                             </div>
@@ -194,9 +231,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <x-button label="annulla" class="btn-cancel" status="Neutral" emphasis="Low" :dataset="['bs-dismiss' => 'modal']" />
-                <x-button label="Salva e vai al riepilogo" trailing="fa-arrow-right" status="Primary" emphasis="High" class="btn-wizard-next" />
-                <x-button label="Conferma ed invia" status="Primary" emphasis="High" class="btn-wizard-submit d-none" />
+                <x-button label="annulla" class="btn-cancel" status="Neutral" emphasis="Low" size="Medium" :dataset="['bs-dismiss' => 'modal']" />
+                <x-button label="Salva e vai al riepilogo" trailing="fa-arrow-right" status="Primary" emphasis="High" size="Medium" class="btn-wizard-next" />
+                <x-button label="Conferma ed invia" status="Primary" emphasis="High" size="Medium" class="btn-wizard-submit d-none" />
             </div>
         </div>
     </div>

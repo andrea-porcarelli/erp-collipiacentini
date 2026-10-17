@@ -44,7 +44,7 @@
     <button
         data-mode="buttonSize-{{ $size }} buttonEmphasis-{{ $emphasis }}  buttonAppearance-{{ $status }}"
         type="{{ $type }}"
-        class="bt-miticko {{ $class }} btn-miticko-{{ $emphasis }}"
+        class="bt-miticko {{ $class }} {{ $disabled ? 'disabled' : '' }}"
         @isset($id) id="{{ $id }}" @endisset
         @isset($style) style="{{ $style }}" @endisset
         @isset($role) role="{{ $role }}" @endisset

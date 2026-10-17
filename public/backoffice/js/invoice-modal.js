@@ -48,28 +48,39 @@
 
         $modal().find('[data-field="partner_name"]').text(recipient.name || '—');
         $modal().find('[data-field="customer_name"]').text(customer.recipient?.name || '—');
-        $modal().find('[data-field="product_label"]').text((preview.order_meta?.product_labels || []).join(', ') || '—');
+        const products = preview.order_meta?.products || [];
+        const productHtml = products.length === 0 ? '—' : products
+            .map((p) => `<a href="/products/${p.id}" target="_blank" rel="noopener" class="invoice-open-order-link">${escapeHtml(p.label)}</a>`)
+            .join(', ');
+        $modal().find('[data-field="product_label"]').html(productHtml);
         $modal().find('[data-field="order_number"]').text('#' + (currentOrderNumber || ''));
         $modal().find('[data-field="payment_method"]').text(preview.order_meta?.payment_method || '—');
 
+        // Step 1 mostra le VARIANTI acquistate dell'ordine (OrderProductItem), non le voci fatturabili.
+        const orderItems = preview.order_meta?.items || [];
         const $items = $modal().find('[data-slot="order-items"]').empty();
-        allLines.forEach((l) => {
+        orderItems.forEach((it) => {
+            const vat = (it.vat_rate === null || it.vat_rate === undefined)
+                ? '—'
+                : (parseFloat(it.vat_rate) === 0 ? 'Esente' : `${parseFloat(it.vat_rate)}%`);
             $items.append(`<tr>
-                <td>${escapeHtml(l.label)}</td>
-                <td class="text-end">${l.quantity}</td>
-                <td class="text-end">${fmt(l.unit_amount)}</td>
-                <td class="text-end">—</td>
-                <td class="text-end">${fmt(l.total)}</td>
+                <td>${escapeHtml(it.label)}</td>
+                <td class="text-end">${it.quantity}</td>
+                <td class="text-end">${fmt(it.unit_price)}</td>
+                <td class="text-end">${vat}</td>
+                <td class="text-end">${fmt(it.subtotal)}</td>
             </tr>`);
         });
 
-        const subtotal = allLines.reduce((s, l) => s + (parseFloat(l.total) || 0), 0);
+        const subtotal = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
+        const orderTotal = parseFloat(preview.order_meta?.order_total ?? subtotal);
         $modal().find('[data-slot="order-subtotal"]').text(fmt(subtotal));
-        $modal().find('[data-slot="order-total"]').text(fmt(subtotal));
+        $modal().find('[data-slot="order-total"]').text(fmt(orderTotal));
 
-        // Default: imposta checkbox come da default_flags di partner+customer
+        // Default: imposta checkbox come da default_flags.
+        // ticket_base è un flag del CUSTOMER (biglietto emesso nella fattura cliente).
         const defaults = {
-            ticket_base: !!(partner.default_flags?.ticket_base || customer.default_flags?.ticket_base),
+            ticket_base: !!customer.default_flags?.ticket_base,
             miticko_commission: !!partner.default_flags?.miticko_commission,
             bank_commission: !!partner.default_flags?.bank_commission,
             presale: !!customer.default_flags?.presale,
@@ -80,37 +91,56 @@
 
         // Se nessun flag → forzatura Personalizza; "Fattura" = Non necessaria
         const anyFlag = Object.values(defaults).some(Boolean);
-        $modal().find('#invoice-required-select').val(anyFlag ? '1' : '0');
+        $modal().find('select[name="invoice_required"]').val(anyFlag ? '1' : '0');
     };
 
     const renderStep2 = () => {
         if (!preview) return;
-        const partner = preview.partner || {};
         const customer = preview.customer || {};
-        const partnerName = partner.recipient?.name || '';
-        const productLabels = (preview.order_meta?.product_labels || []);
-        const variants = (preview.order_meta?.variants || []);
+        const partner = preview.partner || {};
+        const meta = preview.order_meta || {};
 
-        const allLines = [...(partner.lines || []), ...(customer.lines || [])];
+        // Tabella principale: le varianti dell'ordine (come dettaglio ordine).
+        const orderItems = meta.items || [];
         const $items = $modal().find('[data-slot="invoice-items"]').empty();
-        allLines.forEach((l, i) => {
-            const variant = variants[i] || '';
-            const prodLabel = productLabels[0] || '';
-            const name = [partnerName, prodLabel, variant].filter(Boolean).join(' - ') || l.label;
+        orderItems.forEach((it) => {
             $items.append(`<tr>
-                <td class="fw-semibold">${escapeHtml(name)}</td>
-                <td class="text-end">${l.quantity}</td>
-                <td class="text-end">${fmt(l.unit_amount)}</td>
-                <td class="text-end">0</td>
-                <td class="text-end">—</td>
-                <td class="text-end">${fmt(l.total)}</td>
+                <td class="fw-semibold">${escapeHtml(it.label)}</td>
+                <td class="text-end">${it.quantity}</td>
+                <td class="text-end">${fmt(it.unit_price)}</td>
+                <td class="text-end">${fmt(it.subtotal)}</td>
             </tr>`);
         });
 
-        const subtotal = allLines.reduce((s, l) => s + (parseFloat(l.total) || 0), 0);
-        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(subtotal));
-        $modal().find('[data-slot="invoice-vat"]').text('—');
-        $modal().find('[data-slot="invoice-total"]').text(fmt(subtotal));
+        // Subtotale e totale = order amount (come dettaglio ordine: le commissioni non si sommano).
+        const orderTotal = parseFloat(meta.order_total ?? 0);
+        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(orderTotal));
+        $modal().find('[data-slot="invoice-total"]').text(fmt(orderTotal));
+
+        // DI CUI: righe condizionali in base ai flag selezionati nello Step 1.
+        const flagChecked = (f) => $modal().find(`.invoice-flag[data-flag="${f}"]`).is(':checked');
+
+        const showPayment = flagChecked('bank_commission');
+        $modal().find('[data-slot="row-commission-payment"]').toggle(showPayment);
+        if (showPayment) {
+            $modal().find('[data-slot="rate-payment"]').text(String(meta.commission_payment_rate ?? 0).replace('.', ','));
+            $modal().find('[data-slot="amount-payment"]').text(fmt(meta.commission_payment_amount));
+        }
+
+        const showMiticko = flagChecked('miticko_commission');
+        $modal().find('[data-slot="row-commission-miticko"]').toggle(showMiticko);
+        if (showMiticko) {
+            $modal().find('[data-slot="rate-miticko"]').text(String(meta.commission_miticko_rate ?? 0).replace('.', ','));
+            $modal().find('[data-slot="amount-miticko"]').text(fmt(meta.commission_miticko_amount));
+        }
+
+        const presaleTotal = (customer.lines || []).filter((l) => l.code === 'presale')
+            .reduce((s, l) => s + (parseFloat(l.total) || 0), 0);
+        const showPresale = flagChecked('presale') && presaleTotal > 0;
+        $modal().find('[data-slot="row-presale"]').toggle(showPresale);
+        if (showPresale) {
+            $modal().find('[data-slot="amount-presale"]').text(fmt(presaleTotal));
+        }
 
         const cust = customer.recipient || {};
         const custHtml = [
@@ -129,17 +159,21 @@
         $modal().find('#invoice_description').val(desc).trigger('input');
     };
 
+    // Preset data-mode per bottone attivo/inattivo coerente col design system.
+    const MODE_ACTIVE = 'buttonSize-Small buttonEmphasis-MediumLow buttonAppearance-Secondary';
+    const MODE_INACTIVE = 'buttonSize-Small buttonEmphasis-Low  buttonAppearance-Neutral';
+
     const applyMode = (mode) => {
-        // Toggle visuale: Primary/High per attivo, Neutral/Low per inattivo (coerente col design system).
         $modal().find('.invoice-mode-btn').each(function () {
-            const isActive = $(this).data('mode') === mode;
-            $(this).attr('data-mode', isActive
-                ? 'buttonSize-Small buttonEmphasis-Medium buttonAppearance-Primary'
-                : 'buttonSize-Small buttonEmphasis-Low buttonAppearance-Neutral');
+            const isActive = $(this).data('invoice-mode') === mode;
+            $(this).attr('data-mode', isActive ? MODE_ACTIVE : MODE_INACTIVE);
         });
+
+        // In modalità "default" l'intera sezione campi è readonly con visuale greyed-out.
         const isDefault = mode === 'default';
+        $modal().find('.invoice-settings-fields').toggleClass('is-locked', isDefault);
         $modal().find('.invoice-flag').prop('disabled', isDefault);
-        $modal().find('#invoice-required-select').prop('disabled', isDefault);
+        $modal().find('select[name="invoice_required"]').prop('disabled', isDefault);
     };
 
     const applyTicketBaseRule = () => {
@@ -153,16 +187,22 @@
     };
 
     const isDefaultMode = () => {
-        const mode = $modal().find('.invoice-mode-btn[data-mode="default"]').attr('data-mode') || '';
-        return mode.includes('buttonAppearance-Primary');
+        const mode = $modal().find('.invoice-mode-btn[data-invoice-mode="default"]').attr('data-mode') || '';
+        return mode.includes('buttonAppearance-Secondary');
     };
+
+    // Preset data-mode per tab wizard.
+    //  - "Imposta fattura" alterna MediumLow (attivo) / Medium (inattivo), sempre Primary.
+    //  - "Riepilogo" resta Disabled all'apertura modale; diventa MediumLow Primary solo quando lo step è il 2.
+    const TAB1_ACTIVE = 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary';
+    const TAB1_INACTIVE = 'buttonSize-Small buttonEmphasis-Medium  buttonAppearance-Primary';
+    const TAB2_ACTIVE = 'buttonSize-Small buttonEmphasis-MediumLow  buttonAppearance-Primary';
+    const TAB2_DISABLED = 'buttonSize-Small buttonEmphasis-High  buttonAppearance-Disabled';
 
     const setStep = (n) => {
         currentStep = n;
-        $modal().find('.invoice-wizard-tab').each(function () {
-            const active = parseInt($(this).data('step'), 10) === n;
-            $(this).attr('data-mode', active ? 'chipAppearance-Active' : 'chipAppearance-Resting');
-        });
+        $modal().find('.invoice-wizard-tab[data-step="1"]').attr('data-mode', n === 1 ? TAB1_ACTIVE : TAB1_INACTIVE);
+        $modal().find('.invoice-wizard-tab[data-step="2"]').attr('data-mode', n === 2 ? TAB2_ACTIVE : TAB2_DISABLED);
         $modal().find('.invoice-wizard-pane').addClass('d-none');
         $modal().find(`.invoice-wizard-pane[data-step="${n}"]`).removeClass('d-none');
         $modal().find('.btn-wizard-next').toggleClass('d-none', n !== 1);
@@ -173,10 +213,10 @@
         const flagsPartner = {
             miticko_commission: $modal().find('.invoice-flag[data-flag="miticko_commission"]').is(':checked') ? 1 : 0,
             bank_commission: $modal().find('.invoice-flag[data-flag="bank_commission"]').is(':checked') ? 1 : 0,
-            ticket_base: $modal().find('.invoice-flag[data-flag="ticket_base"]').is(':checked') ? 1 : 0,
         };
         const flagsCustomer = {
             presale: $modal().find('.invoice-flag[data-flag="presale"]').is(':checked') ? 1 : 0,
+            ticket_base: $modal().find('.invoice-flag[data-flag="ticket_base"]').is(':checked') ? 1 : 0,
         };
         const recipients = [];
         if (Object.values(flagsPartner).some(Boolean)) recipients.push('partner');
@@ -238,11 +278,11 @@
         });
 
         $(document).on('click', '.invoice-mode-btn', function () {
-            applyMode($(this).data('mode'));
+            applyMode($(this).data('invoice-mode'));
             applyTicketBaseRule();
         });
 
-        $(document).on('change', '#invoice-required-select', function () {
+        $(document).on('change', '#modal-set-invoice select[name="invoice_required"]', function () {
             const val = $(this).val();
             $modal().find('.invoice-flag').prop('disabled', val === '0' || isDefaultMode());
             if (val === '0') $modal().find('.invoice-flag').prop('checked', false);
@@ -251,8 +291,22 @@
         $(document).on('change', '.invoice-flag[data-flag="ticket_base"]', applyTicketBaseRule);
 
         $(document).on('click', '.btn-wizard-next', function () {
-            renderStep2();
-            setStep(2);
+            // Ricarica il preview coi flag correnti (Step 2 deve mostrare le righe effettive da fatturare).
+            const payload = buildPayload();
+            const $btn = $(this);
+            $btn.prop('disabled', true);
+            $.ajax({
+                url: `/orders/${currentOrderId}/invoice/preview`,
+                method: 'GET',
+                data: { flags: payload.flags },
+                dataType: 'json',
+            }).done((res) => {
+                preview = res;
+                renderStep2();
+                setStep(2);
+            }).fail(() => {
+                if (typeof toastr !== 'undefined') toastr.error('Errore nel ricalcolo delle voci fattura');
+            }).always(() => $btn.prop('disabled', false));
         });
 
         $(document).on('click', '.invoice-wizard-tab', function () {
