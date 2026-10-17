@@ -623,19 +623,6 @@
         }
         .invoice-feedback-banner[data-type="success"] { background: #1F7D4D; color: #fff; }
         .invoice-feedback-banner[data-type="error"]   { background: #D93025; color: #fff; }
-
-        .invoice-wizard-step {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 10px 14px; border-radius: 999px; background: #F5F5F5;
-            color: #999; font-weight: 600; font-size: 13px; border: 1px solid transparent;
-        }
-        .invoice-wizard-step.active { background: #FFEBE0; color: #FF8A50; border-color: #FFCDB2; }
-        .invoice-wizard-settings { background: #FAFAFA; border: 1px solid #EEE; border-radius: 10px; padding: 14px; }
-        .invoice-wizard-table { border-collapse: collapse; }
-        .invoice-wizard-table th, .invoice-wizard-table td { padding: 6px 8px; border-bottom: 1px solid #F0F0F0; }
-        .invoice-wizard-table tfoot .totals td { border-bottom: none; }
-        .invoice-mode-btn { font-weight: 600; }
-        .invoice-mode-btn.active { background: #E7F0FF; border-color: #B6D1FF; color: #0D6EFD; }
     </style>
     <script type="module" src="{{ asset('backoffice/js/orders.js') }}?v={{ filemtime(public_path('backoffice/js/orders.js')) }}"></script>
     <script src="{{ asset('backoffice/js/invoice-modal.js') }}?v={{ filemtime(public_path('backoffice/js/invoice-modal.js')) }}"></script>

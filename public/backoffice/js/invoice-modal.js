@@ -124,14 +124,19 @@
         $modal().find('[data-slot="payment-method"]').text(preview.order_meta?.payment_method || '—');
         $modal().find('[data-slot="order-link"]').attr('href', `/orders/${currentOrderId}`);
 
-        // Descrizione precompilata con #order_number
+        // Descrizione precompilata con #order_number (x-textarea usa id=name)
         const desc = '#' + (currentOrderNumber || '');
-        $modal().find('#invoice-description').val(desc).trigger('input');
+        $modal().find('#invoice_description').val(desc).trigger('input');
     };
 
     const applyMode = (mode) => {
-        $modal().find('.invoice-mode-btn').removeClass('active');
-        $modal().find(`.invoice-mode-btn[data-mode="${mode}"]`).addClass('active');
+        // Toggle visuale: Primary/High per attivo, Neutral/Low per inattivo (coerente col design system).
+        $modal().find('.invoice-mode-btn').each(function () {
+            const isActive = $(this).data('mode') === mode;
+            $(this).attr('data-mode', isActive
+                ? 'buttonSize-Small buttonEmphasis-Medium buttonAppearance-Primary'
+                : 'buttonSize-Small buttonEmphasis-Low buttonAppearance-Neutral');
+        });
         const isDefault = mode === 'default';
         $modal().find('.invoice-flag').prop('disabled', isDefault);
         $modal().find('#invoice-required-select').prop('disabled', isDefault);
@@ -147,12 +152,17 @@
             });
     };
 
-    const isDefaultMode = () => $modal().find('.invoice-mode-btn.active').data('mode') === 'default';
+    const isDefaultMode = () => {
+        const mode = $modal().find('.invoice-mode-btn[data-mode="default"]').attr('data-mode') || '';
+        return mode.includes('buttonAppearance-Primary');
+    };
 
     const setStep = (n) => {
         currentStep = n;
-        $modal().find('.invoice-wizard-step').removeClass('active');
-        $modal().find(`.invoice-wizard-step[data-step="${n}"]`).addClass('active');
+        $modal().find('.invoice-wizard-tab').each(function () {
+            const active = parseInt($(this).data('step'), 10) === n;
+            $(this).attr('data-mode', active ? 'chipAppearance-Active' : 'chipAppearance-Resting');
+        });
         $modal().find('.invoice-wizard-pane').addClass('d-none');
         $modal().find(`.invoice-wizard-pane[data-step="${n}"]`).removeClass('d-none');
         $modal().find('.btn-wizard-next').toggleClass('d-none', n !== 1);
@@ -175,7 +185,7 @@
             recipients,
             flags: { partner: flagsPartner, customer: flagsCustomer },
             mode: isDefaultMode() ? 'default' : 'custom',
-            description: $modal().find('#invoice-description').val() || '',
+            description: $modal().find('#invoice_description').val() || '',
         };
     };
 
@@ -245,7 +255,7 @@
             setStep(2);
         });
 
-        $(document).on('click', '.invoice-wizard-step', function () {
+        $(document).on('click', '.invoice-wizard-tab', function () {
             const target = parseInt($(this).data('step'), 10);
             if (target === 2) {
                 renderStep2();
@@ -254,11 +264,7 @@
         });
 
         $(document).on('click', '.btn-wizard-submit', submit);
-
-        $(document).on('input', '#invoice-description', function () {
-            const left = 400 - ($(this).val() || '').length;
-            $('#invoice-description-count').text(Math.max(0, left));
-        });
+        // x-textarea gestisce già il contatore caratteri via oninput inline.
     });
 
     // Esposto per orders/show (bottone Imposta fattura nel dettaglio ordine)

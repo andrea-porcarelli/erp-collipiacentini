@@ -59,11 +59,6 @@
                 appearance="Resting"
                 :dataset="['tab-target' => '#media-panel']"
             />
-            <x-chip
-                label="Fatturazione"
-                appearance="Resting"
-                :dataset="['tab-target' => '#billing-panel']"
-            />
         </div>
         {{-- Tabs Content --}}
         <div class="tab-content mt-spacing-xl" id="productTabsContent">
@@ -73,7 +68,6 @@
             <x-backoffice.product.tab-special-schedule :model="$model" />
             <x-backoffice.product.tab-closed-period :model="$model" />
             <x-backoffice.product.tab-media :model="$model" :languages="$languages" />
-            <x-backoffice.product.tab-billing :model="$model" />
         </div>
     </div>
 
