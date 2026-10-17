@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Partner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -16,23 +17,37 @@ class StatisticsController extends Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $user = Auth::user();
 
-        if ($user->role === 'god') {
-            return view('backoffice.statistics.index', [
-                'isGod' => true,
-                'active' => 'statistics',
-            ]);
+        // Admin Miticko = god o admin senza partner assegnato: devono selezionare un Partner.
+        $isMitickoAdmin = in_array($user->role, ['god', 'admin'], true) && $user->partner_id === null;
+
+        $allPartners = $isMitickoAdmin
+            ? Partner::orderBy('partner_name')->get(['id', 'partner_name'])
+            : collect();
+
+        $selectedPartnerId = $isMitickoAdmin
+            ? ($request->integer('partner_id') ?: null)
+            : $user->partner_id;
+
+        // Verifica che il partner_id dalla query appartenga davvero alla lista disponibile.
+        if ($isMitickoAdmin && $selectedPartnerId && ! $allPartners->contains('id', $selectedPartnerId)) {
+            $selectedPartnerId = null;
         }
 
         $from = Carbon::now()->subDays(30)->startOfDay();
         $to = Carbon::now()->endOfDay();
 
+        // Senza partner selezionato (admin Miticko in attesa di scelta) → dati vuoti, UI bloccata.
+        $noPartnerContext = $isMitickoAdmin && ! $selectedPartnerId;
+
         $ordersQuery = Order::query()->whereBetween('created_at', [$from, $to]);
 
-        if ($user->role === 'company') {
+        if ($isMitickoAdmin) {
+            $ordersQuery->where('partner_id', $selectedPartnerId ?? 0);
+        } elseif ($user->role === 'company') {
             $ordersQuery->whereHas('partner', fn ($q) => $q->where('company_id', $user->company_id));
         } elseif (in_array($user->role, ['partner', 'admin'], true)) {
             $ordersQuery->where('partner_id', $user->partner_id);
@@ -44,7 +59,9 @@ class StatisticsController extends Controller
             ->whereIn('order_status', array_map(fn ($s) => $s->value, $paidStatuses))
             ->sum('amount');
 
-        $partner = $user->partner;
+        $partner = $isMitickoAdmin
+            ? ($selectedPartnerId ? Partner::find($selectedPartnerId) : null)
+            : $user->partner;
         $commissionPaymentRate = (float) ($partner?->commission_payment ?? 0);
         $commissionServiceRate = (float) ($partner?->commission_miticko_variable ?? 0);
 
@@ -59,7 +76,6 @@ class StatisticsController extends Controller
             ->limit(10)
             ->get();
 
-        // Statistiche → Ordini: aggregazione per email (identificativo cliente ai fini statistici).
         $uniqueCustomers = (int) (clone $ordersQuery)->whereNotNull('email')->distinct('email')->count('email');
         $ordersCount = (int) (clone $ordersQuery)->count();
         $recurringCustomers = (int) (clone $ordersQuery)
@@ -70,7 +86,6 @@ class StatisticsController extends Controller
             ->get()
             ->count();
 
-        // Statistiche → Clienti: anagrafica per singolo ordine (non aggregata per identità).
         $ordersPerCity = (clone $ordersQuery)
             ->whereNotNull('city')
             ->selectRaw('city, COUNT(*) as c')
@@ -117,15 +132,19 @@ class StatisticsController extends Controller
         $ordersWithoutAge = (int) (clone $ordersQuery)->whereNull('birth_date')->count();
 
         // Opzioni per la modale "Genera report"
-        $reportPartners = match ($user->role) {
-            'company' => Partner::where('company_id', $user->company_id)->orderBy('partner_name')->get(['id', 'partner_name']),
-            default   => $user->partner ? collect([$user->partner])->map(fn ($p) => (object) ['id' => $p->id, 'partner_name' => $p->partner_name]) : collect(),
+        $reportPartners = match (true) {
+            $isMitickoAdmin               => $allPartners,
+            $user->role === 'company'     => Partner::where('company_id', $user->company_id)->orderBy('partner_name')->get(['id', 'partner_name']),
+            default                       => $user->partner ? collect([$user->partner])->map(fn ($p) => (object) ['id' => $p->id, 'partner_name' => $p->partner_name]) : collect(),
         };
-        $reportCurrentPartnerId = $user->partner_id;
+        $reportCurrentPartnerId = $selectedPartnerId;
 
         return view('backoffice.statistics.index', [
-            'isGod' => false,
             'active' => 'statistics',
+            'isMitickoAdmin' => $isMitickoAdmin,
+            'allPartners' => $allPartners,
+            'selectedPartnerId' => $selectedPartnerId,
+            'noPartnerContext' => $noPartnerContext,
             'from' => $from,
             'to' => $to,
             'reportPartners' => $reportPartners,

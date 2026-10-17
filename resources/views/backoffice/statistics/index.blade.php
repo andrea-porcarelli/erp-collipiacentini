@@ -1,18 +1,6 @@
 @extends('backoffice.layout', ['title' => 'Statistiche', 'active' => $active])
 
 @section('main-content')
-    @if($isGod)
-        <x-header-page title="Statistiche" />
-        <div class="w-100">
-            <div class="row">
-                <div class="col-12">
-                    <x-card title="In costruzione" sub_title="Questa sezione sarà disponibile presto.">
-                        <p class="text-muted mb-0">La dashboard statistiche per i ruoli god sarà definita successivamente.</p>
-                    </x-card>
-                </div>
-            </div>
-        </div>
-    @else
         <div class="w-100 statistics-page">
 
             {{-- Intestazione --}}
@@ -28,8 +16,34 @@
                     status="Primary"
                     emphasis="Low"
                     size="Medium"
+                    :disabled="$noPartnerContext ?? false"
                 />
             </div>
+
+            @if($isMitickoAdmin)
+                {{-- Selettore Partner (admin Miticko) --}}
+                <x-card class="mt-spacing-l">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-uppercase text-muted mb-2">Partner</label>
+                            <select id="statistics-partner-switcher" class="input-miticko" style="width: 100%;">
+                                <option value="">Seleziona un partner per visualizzare le statistiche</option>
+                                @foreach($allPartners as $p)
+                                    <option value="{{ $p->id }}" @selected($selectedPartnerId == $p->id)>{{ $p->partner_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($noPartnerContext)
+                            <div class="col-12 col-md-6 text-muted small">
+                                <i class="fa-regular fa-circle-info me-1"></i>
+                                Scegli un partner dall'elenco per sbloccare filtri, dati e report.
+                            </div>
+                        @endif
+                    </div>
+                </x-card>
+            @endif
+
+            <div class="statistics-content-wrap @if($noPartnerContext) locked @endif">
 
             {{-- Pannello filtri --}}
             <x-card class="mt-spacing-l" brelative="true">
@@ -378,25 +392,37 @@
                 </p>
             </div>
 
+            </div>{{-- /.statistics-content-wrap --}}
+
             @include('backoffice.statistics.partials.generate-report-modal', [
                 'reportPartners' => $reportPartners,
                 'reportCurrentPartnerId' => $reportCurrentPartnerId,
             ])
 
         </div>
-    @endif
 @endsection
 
-@unless($isGod)
-    @section('custom-css')
-        <link rel="stylesheet" href="/backoffice/vendor/switchery/switchery.min.css" />
-    @endsection
-@endunless
+@section('custom-css')
+    <link rel="stylesheet" href="/backoffice/vendor/switchery/switchery.min.css" />
+    <style>
+        .statistics-content-wrap { position: relative; transition: opacity .2s ease; }
+        .statistics-content-wrap.locked {
+            opacity: .45;
+            pointer-events: none;
+            user-select: none;
+        }
+        .statistics-content-wrap.locked::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, .35);
+            z-index: 2;
+        }
+    </style>
+@endsection
 
 @section('custom-script')
-    @unless($isGod)
-        <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
-    @endunless
+    <script src="/backoffice/vendor/switchery/switchery.min.js"></script>
     <script>
         $(document).ready(function () {
             $(document).on('click', '[data-toggle-group] .chip-miticko', function () {
@@ -406,7 +432,6 @@
                 $(this).attr('data-mode', 'chipAppearance-Active');
             });
 
-            @unless($isGod)
             // --- Modale "Genera report"
             const $modal = $('#modal-generate-report');
             const $partner = $modal.find('select[name="report_partner_id"]');
@@ -512,7 +537,20 @@
                     alert('Invio report via email non ancora disponibile.');
                 }
             });
-            @endunless
+
+            @if($isMitickoAdmin)
+            // --- Selettore Partner (admin Miticko): submit al cambio
+            $(document).on('change', '#statistics-partner-switcher', function () {
+                const pid = $(this).val();
+                const url = new URL(window.location.href);
+                if (pid) {
+                    url.searchParams.set('partner_id', pid);
+                } else {
+                    url.searchParams.delete('partner_id');
+                }
+                window.location.href = url.toString();
+            });
+            @endif
         });
     </script>
 @endsection
