@@ -57,7 +57,7 @@
                 <div id="invoice-wizard-content" class="d-none w-100">
                     {{-- Progress-bar step come chip Active/Resting --}}
                     <div class="invoice-wizard-tabs mb-spacing-xl">
-                        <x-button label="Imposta fattura" appearance="Primary"  emphasis="MediumLow" class="invoice-wizard-tab" :dataset="['step' => '1']" />
+                        <x-button label="Imposta fattura" status="Primary"  emphasis="MediumLow" class="invoice-wizard-tab" :dataset="['step' => '1']" />
                         <x-chip label="Riepilogo" appearance="Resting" class="invoice-wizard-tab" :dataset="['step' => '2']" />
                     </div>
 
