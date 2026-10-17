@@ -19,7 +19,7 @@
         {{-- Tabs Navigation --}}
         <div class="d-flex gap-2 product-tabs-scroll" id="partnerTabs" role="tablist">
             <x-chip label="Informazioni" :dataset="['tab-target' => '#partner-info-panel']" />
-            <x-chip label="Dati aziendali" appearance="Resting" :dataset="['tab-target' => '#partner-business-panel']" />
+            <x-chip label="Fatturazione" appearance="Resting" :dataset="['tab-target' => '#partner-business-panel']" />
             <x-chip label="Contatti" appearance="Resting" :dataset="['tab-target' => '#partner-contacts-panel']" />
             @if($isGod)
                 <x-chip label="Privacy Policy"        appearance="Resting" :dataset="['tab-target' => '#partner-privacy-panel']" />

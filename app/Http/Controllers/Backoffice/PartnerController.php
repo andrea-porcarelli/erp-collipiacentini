@@ -144,15 +144,7 @@ class PartnerController extends CrudController
                     'commission_miticko_variable' => $request->input('commission_miticko_variable'),
                     'commission_payment' => $request->input('commission_payment'),
                 ]),
-                'billing' => PartnerBilling::updateOrCreate(
-                    ['partner_id' => $partner->id],
-                    $request->only([
-                        'legal_name', 'vat_number', 'tax_code',
-                        'street_address', 'postal_code', 'city', 'province', 'country',
-                        'pec_email', 'sdi_code',
-                        'iban', 'tax_regime',
-                    ]),
-                ),
+                'billing' => $this->updateBilling($partner, $request),
                 'translatable' => $this->updateTranslatable($partner, $request),
                 default => throw new \Exception('Sezione non valida'),
             };
@@ -192,6 +184,33 @@ class PartnerController extends CrudController
         ]);
 
         $this->updateTranslatable($partner, $request);
+    }
+
+    /**
+     * Sezione Fatturazione: scelta "chi gestisce" + anagrafica fiscale/contatti del Partner.
+     * I campi email_notify e phone_number vivono su Partner; il resto su PartnerBilling.
+     */
+    private function updateBilling(Partner $partner, Request $request): void
+    {
+        $managedBy = in_array($request->input('billing_managed_by'), [
+            Partner::BILLING_MANAGED_BY_MITICKO,
+            Partner::BILLING_MANAGED_BY_PARTNER,
+        ], true) ? $request->input('billing_managed_by') : Partner::BILLING_MANAGED_BY_PARTNER;
+
+        $this->interface->edit($partner, [
+            'billing_managed_by' => $managedBy,
+            'email_notify' => $request->input('email_notify'),
+            'phone_number' => $request->input('phone_number'),
+        ]);
+
+        PartnerBilling::updateOrCreate(
+            ['partner_id' => $partner->id],
+            $request->only([
+                'legal_name', 'vat_number', 'tax_code',
+                'street_address', 'postal_code', 'city', 'province', 'country',
+                'pec_email', 'sdi_code',
+            ]),
+        );
     }
 
     private function updateSale(Partner $partner, Request $request): void

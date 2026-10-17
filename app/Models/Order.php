@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends LogsModel
 {
+    public const INVOICE_STATUS_TO_EMIT = 'to_emit';
+
+    public const INVOICE_STATUS_NOT_REQUIRED = 'not_required';
+
+    public const INVOICE_STATUS_SENT = 'sent';
+
+    public const INVOICE_STATUS_REFUNDED = 'refunded';
+
     public $fillable = [
         'customer_id',
         'partner_id',
@@ -117,5 +125,41 @@ class Order extends LogsModel
     public function getProductLabelAttribute(): string
     {
         return $this->orderProducts()->first()->product->label ?? '';
+    }
+
+    /**
+     * Stato fattura derivato on-the-fly. Nessuna persistenza.
+     */
+    public function invoiceStatus(): string
+    {
+        if ($this->order_status === OrderStatus::REFUNDED) {
+            return self::INVOICE_STATUS_REFUNDED;
+        }
+
+        $this->loadMissing('orderProducts.product', 'invoices');
+
+        $hasInvoiceRequiredProduct = $this->orderProducts
+            ->contains(fn ($op) => (bool) ($op->product->invoice_required ?? false));
+
+        if (! $hasInvoiceRequiredProduct) {
+            return self::INVOICE_STATUS_NOT_REQUIRED;
+        }
+
+        $sentInvoice = $this->invoices->contains(
+            fn (Invoice $i) => in_array($i->status, [Invoice::STATUS_SENT, Invoice::STATUS_ACCEPTED], true)
+        );
+
+        return $sentInvoice ? self::INVOICE_STATUS_SENT : self::INVOICE_STATUS_TO_EMIT;
+    }
+
+    public function invoiceStatusLabel(): string
+    {
+        return match ($this->invoiceStatus()) {
+            self::INVOICE_STATUS_TO_EMIT => 'Da emettere',
+            self::INVOICE_STATUS_NOT_REQUIRED => 'Non necessaria',
+            self::INVOICE_STATUS_SENT => 'Inviata',
+            self::INVOICE_STATUS_REFUNDED => 'Rimborsato',
+            default => '—',
+        };
     }
 }

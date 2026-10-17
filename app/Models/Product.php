@@ -40,6 +40,7 @@ class Product extends LogsModel
         'bill_presale',
         'bill_miticko_commission',
         'bill_bank_commission',
+        'invoice_required',
     ];
 
     protected $casts = [
@@ -47,10 +48,20 @@ class Product extends LogsModel
         'bill_presale' => 'boolean',
         'bill_miticko_commission' => 'boolean',
         'bill_bank_commission' => 'boolean',
+        'invoice_required' => 'boolean',
     ];
 
     public function defaultBillingFlags(): array
     {
+        if (! $this->invoice_required) {
+            return [
+                'bill_ticket_base' => false,
+                'bill_presale' => false,
+                'bill_miticko_commission' => false,
+                'bill_bank_commission' => false,
+            ];
+        }
+
         $ticketBase = (bool) $this->bill_ticket_base;
 
         return [

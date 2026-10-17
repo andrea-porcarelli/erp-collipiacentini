@@ -130,14 +130,18 @@ const formConfigs = {
         endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',
         section: 'billing',
-        successMessage: 'Voci di fatturazione aggiornate con successo',
+        successMessage: 'Impostazioni di fatturazione aggiornate con successo',
         validate: () => ({}),
-        collect: () => ({
-            bill_ticket_base: $('#form-info-billing input[name="bill_ticket_base"]').is(':checked') ? 1 : 0,
-            bill_presale: $('#form-info-billing input[name="bill_presale"]').is(':checked') ? 1 : 0,
-            bill_miticko_commission: $('#form-info-billing input[name="bill_miticko_commission"]').is(':checked') ? 1 : 0,
-            bill_bank_commission: $('#form-info-billing input[name="bill_bank_commission"]').is(':checked') ? 1 : 0,
-        }),
+        collect: () => {
+            const required = $('#form-info-billing [name="invoice_required"]').val() === '1' ? 1 : 0;
+            return {
+                invoice_required: required,
+                bill_ticket_base: required && $('#bill_ticket_base').is(':checked') ? 1 : 0,
+                bill_presale: required && $('#bill_presale').is(':checked') ? 1 : 0,
+                bill_miticko_commission: required && $('#bill_miticko_commission').is(':checked') ? 1 : 0,
+                bill_bank_commission: required && $('#bill_bank_commission').is(':checked') ? 1 : 0,
+            };
+        },
     },
 };
 
@@ -1359,32 +1363,38 @@ const init = () => {
     initBillingFlags();
 };
 
-// Regola: se "Biglietto base" è on, forza on + blocca "Miticko" e "Bancarie".
-// Le commissioni sono comprese nel biglietto e non possono essere emesse come voci separate.
+// Fattura "Non necessaria" → nasconde i checkbox dei flag.
+// "Biglietto base" ON ⇒ forza+blocca "Commissioni Miticko" e "Commissioni gateway di pagamento"
+// (le commissioni sono comprese nel biglietto, non possono essere emesse come voci separate).
 const initBillingFlags = () => {
     const $form = $('#form-info-billing');
     if (!$form.length) return;
 
-    const $ticket = $form.find('input[name="bill_ticket_base"]');
-    const $dependents = $form.find('input[name="bill_miticko_commission"], input[name="bill_bank_commission"]');
+    const $required = $form.find('[name="invoice_required"]');
+    const $wrapper = $('#billing-flags-wrapper');
+    const $ticket = $('#bill_ticket_base');
+    const $dependents = $('#bill_miticko_commission, #bill_bank_commission');
 
-    const apply = () => {
+    const applyRequired = () => {
+        $wrapper.toggleClass('d-none', $required.val() !== '1');
+    };
+
+    const applyTicketRule = () => {
         const locked = $ticket.is(':checked');
         $dependents.each(function () {
-            const $input = $(this);
-            const $overlay = $input.next('.switchery');
-            if (locked && !$input.is(':checked')) {
-                // Switchery intercetta i click sull'input reale, quindi togliamo prima il disabled per lasciar propagare il toggle.
-                $overlay.trigger('click');
+            if (locked) {
+                $(this).prop('checked', true);
             }
-            $input.prop('disabled', locked);
-            $overlay.css({ 'pointer-events': locked ? 'none' : '', 'opacity': locked ? '0.6' : '' });
+            $(this).prop('disabled', locked);
+            $(this).closest('label').css('opacity', locked ? 0.6 : 1);
         });
     };
 
-    // Switchery inizializza gli overlay ~250ms dopo il ready (vedi show.blade.php).
-    setTimeout(apply, 400);
-    $(document).on('change', '#form-info-billing input[name="bill_ticket_base"]', apply);
+    applyRequired();
+    applyTicketRule();
+
+    $(document).on('change', '#form-info-billing [name="invoice_required"]', applyRequired);
+    $(document).on('change', '#bill_ticket_base', applyTicketRule);
 };
 
 $(function () {

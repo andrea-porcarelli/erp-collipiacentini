@@ -286,9 +286,24 @@ class ProductController extends CrudController
 
     private function updateBilling(Product $product, UpdateProductRequest $request): void
     {
+        $required = (bool) $request->input('invoice_required');
+
+        if (! $required) {
+            $this->interface->edit($product, [
+                'invoice_required' => false,
+                'bill_ticket_base' => false,
+                'bill_presale' => false,
+                'bill_miticko_commission' => false,
+                'bill_bank_commission' => false,
+            ]);
+
+            return;
+        }
+
         $ticketBase = (bool) $request->input('bill_ticket_base');
 
         $this->interface->edit($product, [
+            'invoice_required' => true,
             'bill_ticket_base' => $ticketBase,
             'bill_presale' => (bool) $request->input('bill_presale'),
             // Se il biglietto base è on, le commissioni sono comprese e forzate on lato server (invariante).

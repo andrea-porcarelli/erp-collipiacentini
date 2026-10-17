@@ -1103,6 +1103,19 @@ const init = () => {
     initConsents();
     initRichEditors();
     initReportTab();
+    initBillingSection();
+};
+
+// ---------------------------------------------------------------------------
+// Card Fatturazione — abilita/disabilita anagrafica in base alla scelta "chi gestisce"
+// ---------------------------------------------------------------------------
+const initBillingSection = () => {
+    const apply = () => {
+        const value = $('input.billing-managed-by:checked').val();
+        $('#partner-billing-data').toggleClass('opacity-50 pe-none', value === 'miticko');
+    };
+    apply();
+    $(document).on('change', 'input.billing-managed-by', apply);
 };
 
 $(function () {

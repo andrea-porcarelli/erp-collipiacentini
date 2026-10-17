@@ -3,34 +3,54 @@
 @section('main-content')
     <x-header-page title="Fatturazione" />
 
-    @include('backoffice.invoices._tabs', ['active' => 'issued'])
+    {{-- Banner feedback (success/error) --}}
+    <div id="invoice-feedback" class="d-none">
+        <div class="invoice-feedback-banner" data-type="success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span class="invoice-feedback-text"></span>
+        </div>
+    </div>
+
+    {{-- Chip-tab stato (quick filters) --}}
+    <div class="d-flex gap-2 mb-spacing-xl invoice-chip-tabs">
+        @foreach($chipStatuses as $value => $label)
+            <x-chip
+                :label="$label"
+                :appearance="$value === 'all' ? 'Active' : 'Resting'"
+                class="invoice-chip-tab"
+                :dataset="['status' => $value]"
+            />
+        @endforeach
+    </div>
 
     <div class="w-100">
         <div class="row">
             <div class="col-12">
-                <x-card title="Fatture emesse" sub_title="Storico dei documenti generati dal sistema" brelative="true">
+                <x-card title="Ordini" sub_title="" brelative="true">
                     <x-table-header>
                         <div class="filters-miticko">
-                            <x-filter label="Data emissione" type="daterange" name="dates" />
-                            <x-filter label="Partner" name="partners" type="partner" />
-                            <x-filter label="Destinatario" name="recipient_type" type="recipient" />
-                            <x-filter label="Stato" name="status" type="invoicestatus" />
+                            <x-filter label="data pagamento" type="daterange" name="dates" />
+                            <x-filter label="prodotto" type="text" name="products" />
+                            @if(count($partners) > 1)
+                                <x-filter label="partner" name="partners" type="partner" />
+                            @endif
+                            <x-filter label="cliente (cerca)" type="text" name="customer" />
                         </div>
                         <span class="table-header-total"> - </span>
                     </x-table-header>
                     <div class="table-responsive">
                         <table class="table-miticko datatable">
                             <thead>
-                                <tr>
-                                    <th>Numero</th>
-                                    <th>Data emissione</th>
-                                    <th>Ordine</th>
-                                    <th>Destinatario</th>
-                                    <th>Nominativo</th>
-                                    <th class="text-end">Totale</th>
-                                    <th>Stato</th>
-                                    <th></th>
-                                </tr>
+                            <tr>
+                                <th>#ordine</th>
+                                <th>Data acquisto</th>
+                                <th>Stato pag.</th>
+                                <th>Cliente</th>
+                                <th>Partner</th>
+                                <th>Prodotto</th>
+                                <th class="text-end">Totale</th>
+                                <th class="text-end">Stato fattura</th>
+                            </tr>
                             </thead>
                         </table>
                     </div>
@@ -39,32 +59,85 @@
         </div>
     </div>
 
-    {{-- Modali dei filtri (stesso pattern di orders/index.blade.php) --}}
+    {{-- Modali dei filtri --}}
+    <x-modal id="filter-text" title="Filtra" primary="Salva" secondary="annulla" width="400px">
+        <x-input name="filter_text_value" label="Cerca" placeholder="Inserisci testo" />
+    </x-modal>
     <x-modal id="filter-daterange" title="Seleziona periodo" primary="Salva" secondary="annulla" width="350px">
         <div class="d-flex align-items-center justify-content-center">
             <div id="calendar-container" data-filter="dates"></div>
         </div>
     </x-modal>
-    <x-modal id="filter-partner" title="Filtra per partner" primary="Salva" secondary="annulla" width="400px">
-        <ul class="order-statuses">
-            @foreach($partners as $id => $name)
-                <li><x-checkbox :label="$name" :name="(string) $id" /></li>
-            @endforeach
-        </ul>
-    </x-modal>
-    <x-modal id="filter-recipient" title="Filtra per destinatario" primary="Salva" secondary="annulla" width="400px">
-        <ul class="order-statuses">
-            <li><x-checkbox label="Partner" name="partner" /></li>
-            <li><x-checkbox label="Cliente finale" name="customer" /></li>
-        </ul>
-    </x-modal>
-    <x-modal id="filter-invoicestatus" title="Filtra per stato fattura" primary="Salva" secondary="annulla" width="400px">
-        <ul class="order-statuses">
-            @foreach($statuses as $value => $label)
-                <li><x-checkbox :label="$label" :name="$value" /></li>
-            @endforeach
-        </ul>
-    </x-modal>
+    @if(count($partners) > 1)
+        <x-modal id="filter-partner" title="Filtra per partner" primary="Salva" secondary="annulla" width="400px">
+            <ul class="order-statuses">
+                @foreach($partners as $id => $name)
+                    <li><x-checkbox :label="$name" :name="(string) $id" /></li>
+                @endforeach
+            </ul>
+        </x-modal>
+    @endif
+
+    {{-- Modale Imposta fattura (2 step) --}}
+    @include('backoffice.orders._modal-emit-invoice-wizard')
+@endsection
+
+@section('custom-css')
+    <style>
+        .invoice-chip-tabs .chip-miticko { cursor: pointer; }
+        .invoice-feedback-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .invoice-feedback-banner[data-type="success"] {
+            background: #1F7D4D;
+            color: #fff;
+        }
+        .invoice-feedback-banner[data-type="error"] {
+            background: #D93025;
+            color: #fff;
+        }
+        #invoice-feedback.visible { display: block; }
+        .label-InvoiceAction {
+            background: #FF8A50;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .label-InvoiceAction:hover { background: #ff7b36; color: #fff; }
+
+        /* Wizard "Imposta fattura" */
+        .invoice-wizard-steps { }
+        .invoice-wizard-step {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 14px; border-radius: 999px; background: #F5F5F5;
+            color: #999; font-weight: 600; font-size: 13px; border: 1px solid transparent;
+        }
+        .invoice-wizard-step.active {
+            background: #FFEBE0; color: #FF8A50; border-color: #FFCDB2;
+        }
+        .invoice-wizard-settings {
+            background: #FAFAFA; border: 1px solid #EEE; border-radius: 10px; padding: 14px;
+        }
+        .invoice-wizard-table { border-collapse: collapse; }
+        .invoice-wizard-table th, .invoice-wizard-table td { padding: 6px 8px; border-bottom: 1px solid #F0F0F0; }
+        .invoice-wizard-table tfoot .totals td { border-bottom: none; }
+        .invoice-mode-btn { font-weight: 600; }
+        .invoice-mode-btn.active { background: #E7F0FF; border-color: #B6D1FF; color: #0D6EFD; }
+    </style>
 @endsection
 
 @section('custom-script')
@@ -72,26 +145,49 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
     <script>
-        $(document).ready(function () {
+        $(function () {
+            // Chip-tab stato: setta il filtro `status` come hidden input condiviso in .filters-miticko
+            // (il payload DataTables lo legge come filters[status]).
+            const $hiddenStatus = $('<input>', { type: 'hidden', name: 'status', val: 'all' });
+            $('.filters-miticko').append($hiddenStatus);
+
+            $(document).on('click', '.invoice-chip-tab', function () {
+                $('.invoice-chip-tab').attr('data-mode', 'chipAppearance-Resting');
+                $(this).attr('data-mode', 'chipAppearance-Active');
+                $hiddenStatus.val($(this).data('status') || 'all');
+                App.reloadTable();
+            });
+
             setTimeout(() => {
                 $(document).trigger('datatable', [{
                     columns: [
-                        { data: 'number' },
-                        { data: 'emitted_at' },
-                        { data: 'order' },
-                        { data: 'recipient_type_label' },
-                        { data: 'recipient_name' },
+                        { data: 'order_number' },
+                        { data: 'paid_at' },
+                        { data: 'payment_status' },
+                        { data: 'customer' },
+                        { data: 'partner' },
+                        { data: 'product' },
                         { data: 'total_formatted', class: 'text-end' },
-                        { data: 'status_label' },
-                        { data: 'action', class: 'text-end' },
+                        { data: 'invoice_status', class: 'text-end' },
                     ],
                     path: '{{ route('invoices.data') }}',
                     drawCallback: function (api) {
                         const info = api.api.page.info();
-                        $('.table-header-total').html(`${info.recordsDisplay} fattur${info.recordsDisplay === 1 ? 'a' : 'e'}`);
+                        $('.table-header-total').html(`${info.recordsDisplay} ordin${info.recordsDisplay === 1 ? 'e' : 'i'}`);
                     }
                 }]);
             });
         });
+
+        window.APP_BANNER = (type, message) => {
+            const $box = $('#invoice-feedback');
+            $box.find('.invoice-feedback-banner').attr('data-type', type);
+            $box.find('.invoice-feedback-text').text(message);
+            $box.addClass('visible').removeClass('d-none');
+            if (type === 'success') {
+                setTimeout(() => $box.removeClass('visible').addClass('d-none'), 4000);
+            }
+        };
     </script>
+    <script src="{{ asset('backoffice/js/invoice-modal.js') }}?v={{ filemtime(public_path('backoffice/js/invoice-modal.js')) }}"></script>
 @endsection

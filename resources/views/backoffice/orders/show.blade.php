@@ -164,7 +164,16 @@
             <x-button id="btn-send-email" label="Invia email ordine" status="Primary" emphasis="MediumLow" />
             <x-button id="btn-download-receipt" label="Scarica ricevuta" status="Primary" emphasis="Medium"  />
             @if(in_array(auth()->user()->role, ['god', 'admin']))
-                <x-button id="btn-emit-invoice" label="Emetti fattura" status="Primary" emphasis="High" leading="fa-file-invoice" :dataset="['bs-toggle' => 'modal', 'bs-target' => '#modal-emit-invoice']" />
+                @php($invoiceStatus = $order->invoiceStatus())
+                @if($invoiceStatus === \App\Models\Order::INVOICE_STATUS_SENT)
+                    <span class="label-miticko label-Success">INVIATA</span>
+                @elseif($invoiceStatus === \App\Models\Order::INVOICE_STATUS_REFUNDED)
+                    <span class="label-miticko label-Error">RIMBORSATO</span>
+                @elseif($invoiceStatus === \App\Models\Order::INVOICE_STATUS_NOT_REQUIRED)
+                    <span class="label-miticko label-Neutral">NON NECESSARIA</span>
+                @else
+                    <x-button id="btn-set-invoice" label="Imposta fattura" status="Primary" emphasis="High" leading="fa-file-invoice" class="btn-set-invoice" :dataset="['order-id' => $order->id]" />
+                @endif
             @endif
         </div>
     </div>
@@ -563,7 +572,16 @@
     @include('backoffice.orders._modal-edit-customer', ['order' => $order])
     @include('backoffice.orders._modal-cancel-order', ['order' => $order])
     @if(in_array(auth()->user()->role, ['god', 'admin']))
-        @include('backoffice.orders._modal-emit-invoice', ['order' => $order])
+        {{-- Nuova modale wizard "Imposta fattura" (2 step) --}}
+        @include('backoffice.orders._modal-emit-invoice-wizard')
+
+        {{-- Banner feedback (success/error) usato dalla modale --}}
+        <div id="invoice-feedback" class="d-none" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1200;">
+            <div class="invoice-feedback-banner" data-type="success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span class="invoice-feedback-text"></span>
+            </div>
+        </div>
     @endif
 @endsection
 
@@ -587,6 +605,38 @@
             currentDate: @json($firstOp?->booking_date ? \Carbon\Carbon::parse($firstOp->booking_date)->format('Y-m-d') : null),
             currentTime: @json($firstOp?->booking_time ? substr($firstOp->booking_time, 0, 5) : null),
         };
+
+        window.APP_BANNER = (type, message) => {
+            const $box = $('#invoice-feedback');
+            if (!$box.length) return;
+            $box.find('.invoice-feedback-banner').attr('data-type', type);
+            $box.find('.invoice-feedback-text').text(message);
+            $box.removeClass('d-none');
+            if (type === 'success') setTimeout(() => $box.addClass('d-none'), 4000);
+        };
     </script>
+    <style>
+        .invoice-feedback-banner {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 10px 16px; border-radius: 999px;
+            font-weight: 600; font-size: 14px;
+        }
+        .invoice-feedback-banner[data-type="success"] { background: #1F7D4D; color: #fff; }
+        .invoice-feedback-banner[data-type="error"]   { background: #D93025; color: #fff; }
+
+        .invoice-wizard-step {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 14px; border-radius: 999px; background: #F5F5F5;
+            color: #999; font-weight: 600; font-size: 13px; border: 1px solid transparent;
+        }
+        .invoice-wizard-step.active { background: #FFEBE0; color: #FF8A50; border-color: #FFCDB2; }
+        .invoice-wizard-settings { background: #FAFAFA; border: 1px solid #EEE; border-radius: 10px; padding: 14px; }
+        .invoice-wizard-table { border-collapse: collapse; }
+        .invoice-wizard-table th, .invoice-wizard-table td { padding: 6px 8px; border-bottom: 1px solid #F0F0F0; }
+        .invoice-wizard-table tfoot .totals td { border-bottom: none; }
+        .invoice-mode-btn { font-weight: 600; }
+        .invoice-mode-btn.active { background: #E7F0FF; border-color: #B6D1FF; color: #0D6EFD; }
+    </style>
     <script type="module" src="{{ asset('backoffice/js/orders.js') }}?v={{ filemtime(public_path('backoffice/js/orders.js')) }}"></script>
+    <script src="{{ asset('backoffice/js/invoice-modal.js') }}?v={{ filemtime(public_path('backoffice/js/invoice-modal.js')) }}"></script>
 @endpush

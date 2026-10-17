@@ -38,6 +38,7 @@ class Invoice extends LogsModel
         'recipient_pec',
         'recipient_sdi_code',
         'number',
+        'description',
         'lines',
         'total',
         'currency',

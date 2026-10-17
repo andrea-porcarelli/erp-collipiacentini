@@ -34,9 +34,24 @@ class OrderInvoiceController extends Controller
                 ? $partnerData
                 : $this->calculator->computeForOrder($order, $overrideCustomer);
 
+            $order->loadMissing('orderProducts.product', 'orderProducts.items.variant');
+            $productLabels = $order->orderProducts
+                ->map(fn ($op) => $op->product?->label)
+                ->filter()->unique()->values()->all();
+            $variants = $order->orderProducts
+                ->flatMap(fn ($op) => $op->items->map(fn ($it) => $it->variant?->label))
+                ->filter()->values()->all();
+
             return response()->json([
                 'partner' => $partnerData[Invoice::RECIPIENT_PARTNER],
                 'customer' => $customerData[Invoice::RECIPIENT_CUSTOMER],
+                'order_meta' => [
+                    'product_labels' => $productLabels,
+                    'variants' => $variants,
+                    'payment_method' => $order->card_brand
+                        ? sprintf('%s **** %s', ucfirst($order->card_brand), $order->card_last4 ?: '')
+                        : ($order->stripe_payment_method ?: '—'),
+                ],
                 'provider' => [
                     'name' => $this->provider->name(),
                     'configured' => $this->provider->isConfigured(),
@@ -60,12 +75,14 @@ class OrderInvoiceController extends Controller
             $request->validate([
                 'recipients' => ['required', 'array', 'min:1'],
                 'recipients.*' => ['in:partner,customer'],
+                'description' => ['nullable', 'string', 'max:400'],
             ]);
 
             $recipients = array_values(array_unique($request->input('recipients', [])));
+            $description = (string) $request->input('description', '');
             $issued = [];
 
-            DB::transaction(function () use ($order, $request, $recipients, &$issued) {
+            DB::transaction(function () use ($order, $request, $recipients, $description, &$issued) {
                 foreach ($recipients as $recipient) {
                     $flags = $this->extractFlags($request, $recipient);
                     $computed = $this->calculator->computeForOrder($order, $flags);
@@ -74,6 +91,9 @@ class OrderInvoiceController extends Controller
                     if (empty($bucket['lines'])) {
                         continue;
                     }
+
+                    // Default: cliente privato → SDI convenzionale "0000000".
+                    $sdiCode = $bucket['recipient']['sdi_code'] ?: ($recipient === Invoice::RECIPIENT_CUSTOMER ? '0000000' : null);
 
                     $invoice = Invoice::create([
                         'order_id' => $order->id,
@@ -89,7 +109,8 @@ class OrderInvoiceController extends Controller
                         'recipient_country' => $bucket['recipient']['country'],
                         'recipient_email' => $bucket['recipient']['email'],
                         'recipient_pec' => $bucket['recipient']['pec'],
-                        'recipient_sdi_code' => $bucket['recipient']['sdi_code'],
+                        'recipient_sdi_code' => $sdiCode,
+                        'description' => $description ?: null,
                         'lines' => $bucket['lines'],
                         'total' => $bucket['total'],
                         'currency' => 'EUR',
@@ -103,11 +124,17 @@ class OrderInvoiceController extends Controller
             });
 
             if (empty($issued)) {
-                return $this->error(['message' => 'Nessuna voce da fatturare per i destinatari selezionati.']);
+                return response()->json([
+                    'success' => false,
+                    'error_message' => 'Nessuna voce da fatturare per i destinatari selezionati.',
+                ], 422);
             }
 
+            $hasError = collect($issued)->contains(fn ($i) => in_array($i->status, [Invoice::STATUS_ERROR, Invoice::STATUS_REJECTED], true));
+
             return response()->json([
-                'response' => 'success',
+                'success' => ! $hasError,
+                'error_message' => $hasError ? collect($issued)->firstWhere('status', Invoice::STATUS_ERROR)?->provider_error : null,
                 'invoices' => $issued,
             ]);
         } catch (\Exception $e) {

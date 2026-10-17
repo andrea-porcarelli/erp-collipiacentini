@@ -119,6 +119,8 @@ class FattureInCloudProvider implements InvoiceProvider
                 ],
                 'currency' => ['id' => $invoice->currency ?? 'EUR'],
                 'items_list' => $lines,
+                'description' => (string) ($invoice->description ?? ''),
+                'notes' => (string) ($invoice->description ?? ''),
                 'e_invoice' => true,
             ],
         ];

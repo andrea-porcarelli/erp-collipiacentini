@@ -41,12 +41,23 @@ class Partner extends LogsModel
         'commission_payment',
         'consents_enabled',
         'report_auto_send_enabled',
+        'billing_managed_by',
+        'billing_tool',
     ];
 
     protected $casts = [
         'consents_enabled' => 'boolean',
         'report_auto_send_enabled' => 'boolean',
     ];
+
+    public const BILLING_MANAGED_BY_MITICKO = 'miticko';
+
+    public const BILLING_MANAGED_BY_PARTNER = 'partner';
+
+    public function isBillingManagedByMiticko(): bool
+    {
+        return $this->billing_managed_by === self::BILLING_MANAGED_BY_MITICKO;
+    }
 
     public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno'];
 

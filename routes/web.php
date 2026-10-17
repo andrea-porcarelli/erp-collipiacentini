@@ -129,10 +129,9 @@ Route::get('/{slug}/{page}', [BookingController::class, 'page'])
                 Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
 
                 // Sezione Fatturazione (solo god + admin, controllato nel controller).
+                // Vista order-centric: elenca gli ordini con stato fattura derivato (to_emit/not_required/sent/refunded).
                 Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
                 Route::any('invoices/data', [InvoiceController::class, 'data'])->name('invoices.data');
-                Route::get('invoices/pending', [InvoiceController::class, 'pending'])->name('invoices.pending');
-                Route::any('invoices/pending/data', [InvoiceController::class, 'pendingData'])->name('invoices.pending.data');
                 Route::get('orders/{order}/preview', [OrderController::class, 'preview'])->name('orders.preview');
                 Route::get('orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('orders.receipt');
                 Route::post('orders/{order}/send-email', [OrderController::class, 'sendEmail'])->name('orders.sendEmail');
