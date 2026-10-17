@@ -99,8 +99,8 @@
                                     <h3 class="mb-3" style="font-size:16px">Impostazioni fatturazione</h3>
 
                                     <div class="invoice-mode-switch">
-                                        <x-button label="Impostazioni di default" status="Primary" emphasis="Medium" leading="fa-list" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'default']" />
-                                        <x-button label="Personalizza" status="Neutral" emphasis="Low" leading="fa-pen" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'custom']" />
+                                        <x-button label="Impostazioni di default" status="Primary" emphasis="Medium" leading="fa-lock" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'default']" />
+                                        <x-button label="Personalizza" status="Neutral" emphasis="Low" leading="fa-lock-open" size="Small" class="invoice-mode-btn" :dataset="['mode' => 'custom']" />
                                     </div>
 
                                     <div class="mb-3">
