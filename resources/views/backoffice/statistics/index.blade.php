@@ -22,16 +22,22 @@
 
             @if($isMitickoAdmin)
                 {{-- Selettore Partner (admin Miticko) --}}
+                @php
+                    $partnerSwitcherOptions = $allPartners
+                        ->map(fn ($p) => ['id' => $p->id, 'label' => $p->partner_name])
+                        ->values()
+                        ->all();
+                @endphp
                 <x-card class="mt-spacing-l">
-                    <div class="row g-3 align-items-end">
+                    <div class="row g-4 align-items-end">
                         <div class="col-12 col-md-6">
                             <label class="form-label small text-uppercase text-muted mb-2">Partner</label>
-                            <select id="statistics-partner-switcher" class="input-miticko" style="width: 100%;">
-                                <option value="">Seleziona un partner per visualizzare le statistiche</option>
-                                @foreach($allPartners as $p)
-                                    <option value="{{ $p->id }}" @selected($selectedPartnerId == $p->id)>{{ $p->partner_name }}</option>
-                                @endforeach
-                            </select>
+                            <x-select
+                                name="statistics_partner_switcher"
+                                leading="fa-store"
+                                :options="$partnerSwitcherOptions"
+                                :value="$selectedPartnerId"
+                            />
                         </div>
                         @if($noPartnerContext)
                             <div class="col-12 col-md-6 text-muted small">
@@ -540,7 +546,7 @@
 
             @if($isMitickoAdmin)
             // --- Selettore Partner (admin Miticko): submit al cambio
-            $(document).on('change', '#statistics-partner-switcher', function () {
+            $(document).on('change', 'select[name="statistics_partner_switcher"]', function () {
                 const pid = $(this).val();
                 const url = new URL(window.location.href);
                 if (pid) {
