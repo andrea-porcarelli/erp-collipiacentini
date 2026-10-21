@@ -9,6 +9,12 @@
     let currentStep = 1;
 
     const fmt = (v) => (v === null || v === undefined || isNaN(v)) ? '—' : parseFloat(v).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    // Aliquota IVA → "Esente" se 0, "X%" se > 0, "—" se non impostata.
+    const fmtVat = (v) => {
+        if (v === null || v === undefined || v === '' || isNaN(v)) return '—';
+        const n = parseFloat(v);
+        return n === 0 ? 'Esente' : `${n}%`;
+    };
 
     const openModal = (orderId, orderNumber) => {
         currentOrderId = orderId;
@@ -88,6 +94,7 @@
         $modal().find('[data-slot="row-order-commission-payment"]').toggle(showOrderPayment);
         if (showOrderPayment) {
             $modal().find('[data-slot="rate-order-payment"]').text(String(paymentRate).replace('.', ','));
+            $modal().find('[data-slot="vat-order-payment"]').text(fmtVat(meta.commission_payment_vat));
             $modal().find('[data-slot="amount-order-payment"]').text(fmt(paymentAmount));
         }
 
@@ -97,6 +104,7 @@
         $modal().find('[data-slot="row-order-commission-miticko"]').toggle(showOrderMiticko);
         if (showOrderMiticko) {
             $modal().find('[data-slot="rate-order-miticko"]').text(String(mitickoRate).replace('.', ','));
+            $modal().find('[data-slot="vat-order-miticko"]').text(fmtVat(meta.commission_miticko_vat));
             $modal().find('[data-slot="amount-order-miticko"]').text(fmt(mitickoAmount));
         }
 
@@ -105,6 +113,7 @@
         $modal().find('[data-slot="row-order-presale"]').toggle(showOrderPresale);
         if (showOrderPresale) {
             $modal().find('[data-slot="unit-order-presale"]').text(fmt(presaleUnit));
+            $modal().find('[data-slot="vat-order-presale"]').text(fmtVat(meta.presale_vat));
             $modal().find('[data-slot="amount-order-presale"]').text(fmt(presaleTotal));
         }
 

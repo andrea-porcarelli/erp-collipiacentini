@@ -827,6 +827,14 @@ const initRelated = () => {
 // ---------------------------------------------------------------------------
 // Varianti — lista (edit inline, delete, reorder)
 // ---------------------------------------------------------------------------
+const vatOptionsHtml = (selectedValue = null) => {
+    const opts = window.VAT_OPTIONS || [];
+    return opts.map((o) => {
+        const selected = selectedValue !== null && String(selectedValue) === o.v ? ' selected' : '';
+        return `<option value="${o.v}"${selected}>${o.l}</option>`;
+    }).join('');
+};
+
 const editPriceRowTemplate = () => `
 <div class="edit-price-row d-flex align-items-center gap-2 mb-2">
     <div class="flex-grow-1">
@@ -844,15 +852,11 @@ const editPriceRowTemplate = () => `
             </div>
         </div>
     </div>
-    <div style="width:150px;flex-shrink:0">
+    <div style="width:220px;flex-shrink:0">
         <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
             <div class="text-field-container">
                 <select class="input-miticko" name="price_vat[]">
-                    <option value="0" selected="">Esente</option>
-                    <option value="4">4%</option>
-                    <option value="5">5%</option>
-                    <option value="10">10%</option>
-                    <option value="22">22%</option>
+                    ${vatOptionsHtml('0')}
                 </select>
             </div>
         </div>
@@ -1035,17 +1039,13 @@ const priceRowTemplate = () => `
                 </div>
             </div>
         </div>
-        <div style="width:150px;flex-shrink:0">
+        <div style="width:220px;flex-shrink:0">
             <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                 <label>IVA *</label>
                 <div class="text-field-container">
-                    <select  class="input-miticko" name="price_vat[]">
+                    <select class="input-miticko" name="price_vat[]">
                         <option value="">Scegli</option>
-                        <option value="0">Esente</option>
-                        <option value="4">4%</option>
-                        <option value="5">5%</option>
-                        <option value="10">10%</option>
-                        <option value="22">22%</option>
+                        ${vatOptionsHtml()}
                     </select>
                 </div>
             </div>

@@ -220,13 +220,7 @@
 
     var MONTH_NAMES = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
     var DAY_NAMES_LONG = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
-    var VAT_OPTIONS = [
-        {v:'0',  l:'Esente'},
-        {v:'4',  l:'4%'},
-        {v:'5',  l:'5%'},
-        {v:'10', l:'10%'},
-        {v:'22', l:'22%'},
-    ];
+    var VAT_OPTIONS = window.VAT_OPTIONS || [];
     var pad2 = function(n) { return String(n).padStart(2,'0'); };
 
     /* ── Calendario ──────────────────────────────────────── */
@@ -289,7 +283,7 @@
             '<div style="width:160px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">' +
                 '<input type="number" class="input-miticko ssv-price-value" value="' + (p && p.price ? p.price : '') + '" placeholder="0.00" step="0.01" min="0">' +
             '</div></div></div>' +
-            '<div style="width:130px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium"><div class="text-field-container">' +
+            '<div style="width:220px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium"><div class="text-field-container">' +
                 vatSelect('ssv_price_vat', p && p.vat_rate !== undefined ? p.vat_rate : 0) +
             '</div></div></div>' +
             '<div style="width:36px;flex-shrink:0">' +

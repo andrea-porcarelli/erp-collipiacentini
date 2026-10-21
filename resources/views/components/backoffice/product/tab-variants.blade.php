@@ -105,7 +105,7 @@
                                 <div class="d-flex align-items-center gap-2 mb-2 px-1">
                                     <span class="small fw-semibold text-main flex-grow-1">Servizio *</span>
                                     <span class="small fw-semibold text-main" style="width:180px;flex-shrink:0">Prezzo al pubblico *</span>
-                                    <span class="small fw-semibold text-main" style="width:150px;flex-shrink:0">IVA *</span>
+                                    <span class="small fw-semibold text-main" style="width:220px;flex-shrink:0">IVA *</span>
                                     <span style="width:40px;flex-shrink:0"></span>
                                 </div>
 
@@ -127,18 +127,8 @@
                                                     :value="$price->price"
                                                 />
                                             </div>
-                                            <div style="width:150px;flex-shrink:0">
-                                                <div class="text-field" data-mode="textfieldSize-Medium">
-                                                    <div class="text-field-container">
-                                                        <select class="input-miticko" name="price_vat[]">
-                                                            <option value="0" {{ (int)$price->vat_rate === 0 ? 'selected' : '' }}>Esente</option>
-                                                            <option value="4" {{ (int)$price->vat_rate === 4 ? 'selected' : '' }}>4%</option>
-                                                            <option value="5" {{ (int)$price->vat_rate === 5 ? 'selected' : '' }}>5%</option>
-                                                            <option value="10" {{ (int)$price->vat_rate === 10 ? 'selected' : '' }}>10%</option>
-                                                            <option value="22" {{ (int)$price->vat_rate === 22 ? 'selected' : '' }}>22%</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                            <div style="width:220px;flex-shrink:0">
+                                                <x-vat-select name="price_vat[]" :value="(int) $price->vat_rate" />
                                             </div>
                                             <div style="width:40px;flex-shrink:0">
                                                 <button type="button" class="bt-miticko outlined danger small btn-edit-remove-price">

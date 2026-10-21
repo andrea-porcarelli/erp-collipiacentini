@@ -97,11 +97,10 @@
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div style="width:130px;flex-shrink:0">
-                        <x-select wire:model="variants.{{ $vi }}.prices.{{ $pi }}.vat_rate"
-                                  name="sv_vat_{{ $slot->id }}_{{ $vi }}_{{ $pi }}"
-                                  class="@error('variants.'.$vi.'.prices.'.$pi.'.vat_rate') is-invalid @enderror"
-                                  :options="[['id'=>0,'label'=>'Esente'],['id'=>4,'label'=>'4%'],['id'=>5,'label'=>'5%'],['id'=>10,'label'=>'10%'],['id'=>22,'label'=>'22%']]" />
+                    <div style="width:220px;flex-shrink:0">
+                        <x-vat-select wire:model="variants.{{ $vi }}.prices.{{ $pi }}.vat_rate"
+                                      name="sv_vat_{{ $slot->id }}_{{ $vi }}_{{ $pi }}"
+                                      class="@error('variants.'.$vi.'.prices.'.$pi.'.vat_rate') is-invalid @enderror" />
                         @error('variants.'.$vi.'.prices.'.$pi.'.vat_rate')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -173,7 +172,7 @@
                     <div class="d-flex align-items-center gap-2 mb-2 px-1 mt-spacing-2xl">
                         <span class="small fw-semibold text-secondary flex-grow-1">Servizio *</span>
                         <span class="small fw-semibold text-secondary" style="width:160px;flex-shrink:0">Prezzo al pubblico *</span>
-                        <span class="small fw-semibold text-secondary" style="width:130px;flex-shrink:0">IVA *</span>
+                        <span class="small fw-semibold text-secondary" style="width:220px;flex-shrink:0">IVA *</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <div class="flex-grow-1">
@@ -182,10 +181,8 @@
                         <div style="width:160px;flex-shrink:0">
                             <x-input name="av_price" placeholder="0.00" type="number" extra="EUR"/>
                         </div>
-                        <div style="width:130px;flex-shrink:0">
-                            <x-select name="av_vat"
-                                      :options="[['id'=>0,'label'=>'Esente'],['id'=>4,'label'=>'4%'],['id'=>5,'label'=>'5%'],['id'=>10,'label'=>'10%'],['id'=>22,'label'=>'22%']]"
-                                      :value="22" />
+                        <div style="width:220px;flex-shrink:0">
+                            <x-vat-select name="av_vat" :value="22" />
                         </div>
                     </div>
                     <x-supporting-text message="Potrai inserire altre componenti IVA dopo aver creato la variante" icon="fa-regular fa-circle-info"/>

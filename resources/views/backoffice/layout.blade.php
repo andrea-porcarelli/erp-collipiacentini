@@ -24,6 +24,9 @@
             </main>
         </div>
         <script>
+            window.VAT_OPTIONS = @json(collect(config('vat.rates', []))->map(fn ($r) => ['v' => (string) (int) $r['rate'], 'l' => $r['label']])->values());
+        </script>
+        <script>
             (function () {
                 var toggle = document.getElementById('mobile-sidebar-toggle');
                 var backdrop = document.getElementById('sidebar-backdrop');

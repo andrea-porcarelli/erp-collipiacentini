@@ -103,11 +103,14 @@ class OrderInvoiceController extends Controller
                     // con la logica di InvoiceCalculatorService::computeAmountsForItem().
                     'commission_payment_rate' => (float) ($order->partner?->commission_payment ?? 0),
                     'commission_payment_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
+                    'commission_payment_vat' => $this->normalizeVat($order->partner?->commission_payment_vat),
                     'commission_miticko_rate' => (float) ($order->partner?->commission_miticko_variable ?? 0),
                     'commission_miticko_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
+                    'commission_miticko_vat' => $this->normalizeVat($order->partner?->commission_miticko_vat),
                     'presale_total' => $presaleTotal,
                     'presale_quantity' => $presaleQuantity,
                     'presale_unit' => $presaleUnit,
+                    'presale_vat' => $this->normalizeVat($order->partner?->commission_presale_vat),
                     'payment_method' => $order->card_brand
                         ? sprintf('%s **** %s', ucfirst($order->card_brand), $order->card_last4 ?: '')
                         : ($order->stripe_payment_method ?: '—'),
@@ -200,6 +203,19 @@ class OrderInvoiceController extends Controller
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }
+    }
+
+    /**
+     * Normalizza l'aliquota IVA configurata sul partner (string nullable "0" | "22" | …)
+     * in float, oppure null se non impostata. Lo "0" rappresenta "Esente".
+     */
+    private function normalizeVat(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (float) $value;
     }
 
     /**

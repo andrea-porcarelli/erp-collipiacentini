@@ -1,5 +1,4 @@
 @php
-    $vatOptions = [0 => 'Esente', 4 => '4%', 5 => '5%', 10 => '10%', 22 => '22%'];
     $fullPrice  = $variant->prices->sum('price');
     $priceCount = $variant->prices->count();
     $compLabel  = $priceCount . ($priceCount === 1 ? ' componente' : ' componenti') . ' IVA';
@@ -52,7 +51,7 @@
         <div class="d-flex align-items-center gap-2 mb-2 px-1">
             <span class="small fw-semibold flex-grow-1">Servizio *</span>
             <span class="small fw-semibold" style="width:160px;flex-shrink:0">Prezzo *</span>
-            <span class="small fw-semibold" style="width:130px;flex-shrink:0">IVA *</span>
+            <span class="small fw-semibold" style="width:220px;flex-shrink:0">IVA *</span>
             <span style="width:36px;flex-shrink:0"></span>
         </div>
         <div class="ssv-edit-prices">
@@ -69,13 +68,9 @@
                 <div style="width:160px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting"><div class="text-field-container">
                     <input type="number" class="input-miticko ssv-price-value" value="{{ $price->price }}" placeholder="0.00" step="0.01" min="0">
                 </div></div></div>
-                <div style="width:130px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium"><div class="text-field-container">
-                    <select class="input-miticko" name="ssv_price_vat">
-                        @foreach($vatOptions as $val => $label)
-                            <option value="{{ $val }}" @selected((string)$price->vat_rate === (string)$val)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div></div></div>
+                <div style="width:220px;flex-shrink:0">
+                    <x-vat-select name="ssv_price_vat" :value="(int) $price->vat_rate" />
+                </div>
                 <div style="width:36px;flex-shrink:0">
                     <button type="button" class="bt-miticko outlined danger small btn-ssv-remove-price"><i class="fa-regular fa-trash-can icon"></i></button>
                 </div>
