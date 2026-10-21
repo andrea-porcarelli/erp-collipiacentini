@@ -20,6 +20,23 @@
         }
     };
 
+    // Download JSON client-side via Blob — nessuna call al backend.
+    const downloadJson = (filename, data) => {
+        const blob = new Blob([jsonPretty(data)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    // Cache in-memory dell'ultima response dell'endpoint logs: serve per risolvere i click
+    // sui bottoni "Scarica" (recupera invoice/log via data-attribute).
+    let lastData = null;
+
     const recipientLabel = (type) => type === 'partner' ? 'Fattura al Partner' : type === 'customer' ? 'Fattura al Cliente' : (type || '—');
 
     const statusLabel = (status) => {
@@ -39,6 +56,7 @@
             method: 'GET',
             dataType: 'json',
         }).done((res) => {
+            lastData = res;
             $modal().find('[data-slot="order-number"]').text('#' + (res.order_number || ''));
             render(res);
             $modal().find('#invoice-logs-loading').addClass('d-none');
@@ -80,6 +98,7 @@
                             <span>${escapeHtml(log.created_at || '—')}</span>
                             <span class="text-secondary">· ${escapeHtml(log.user || 'sistema')}</span>
                             <span class="ms-auto inv-log-status ${st.ok ? 'ok' : 'ko'}">${st.text}</span>
+                            ${hasPayload ? `<button type="button" class="btn btn-sm btn-link inv-log-download-attempt p-0 ms-2" title="Scarica payload JSON del tentativo" data-invoice-id="${inv.id}" data-log-id="${log.id}"><i class="fa-regular fa-download"></i></button>` : ''}
                         </div>
                         <div class="inv-log-body">
                             ${hasError ? `<div class="inv-log-error"><b>Eccezione:</b> ${escapeHtml(log.error_message)}</div>` : ''}
@@ -98,7 +117,12 @@
 
             $container.append(`
                 <div class="inv-log-invoice">
-                    <h4>${recipientLabel(inv.recipient_type)} — ${escapeHtml(inv.recipient_name || '—')}</h4>
+                    <div class="d-flex align-items-start justify-content-between gap-2">
+                        <h4>${recipientLabel(inv.recipient_type)} — ${escapeHtml(inv.recipient_name || '—')}</h4>
+                        <button type="button" class="btn btn-sm btn-outline-secondary inv-log-download-invoice" data-invoice-id="${inv.id}" title="Scarica dati fattura (JSON)">
+                            <i class="fa-regular fa-download"></i> dati fattura
+                        </button>
+                    </div>
                     <div class="inv-log-meta">
                         <span><b>Stato:</b> ${status}</span>
                         <span><b>Provider:</b> ${providerName}</span>
@@ -120,8 +144,46 @@
             if (orderId) openModal(orderId);
         });
 
-        $(document).on('click', '#modal-invoice-logs .inv-log-row-header', function () {
+        // Toggle righe tentativi (ignora i click sui bottoni interni allo header).
+        $(document).on('click', '#modal-invoice-logs .inv-log-row-header', function (e) {
+            if ($(e.target).closest('.inv-log-download-attempt').length) return;
             $(this).closest('.inv-log-row').toggleClass('open');
+        });
+
+        // Download dati fattura (lines + metadati) — utile anche per fatture DRAFT.
+        $(document).on('click', '#modal-invoice-logs .inv-log-download-invoice', function (e) {
+            e.stopPropagation();
+            const invoiceId = parseInt($(this).data('invoice-id'), 10);
+            const inv = (lastData?.invoices || []).find((i) => i.id === invoiceId);
+            if (!inv) return;
+            const snapshot = {
+                invoice_id: inv.id,
+                order_number: lastData?.order_number,
+                recipient_type: inv.recipient_type,
+                recipient_name: inv.recipient_name,
+                number: inv.number,
+                status: inv.status,
+                provider: inv.provider,
+                provider_id: inv.provider_id,
+                total: inv.total,
+                currency: inv.currency,
+                description: inv.description,
+                lines: inv.lines,
+                emitted_at: inv.emitted_at,
+                emitted_by: inv.emitted_by,
+            };
+            downloadJson(`fattura-${inv.id}-${inv.recipient_type}.json`, snapshot);
+        });
+
+        // Download payload JSON del singolo tentativo (quello spedito a FIC).
+        $(document).on('click', '#modal-invoice-logs .inv-log-download-attempt', function (e) {
+            e.stopPropagation();
+            const invoiceId = parseInt($(this).data('invoice-id'), 10);
+            const logId = parseInt($(this).data('log-id'), 10);
+            const inv = (lastData?.invoices || []).find((i) => i.id === invoiceId);
+            const log = inv ? (inv.logs || []).find((l) => l.id === logId) : null;
+            if (!log) return;
+            downloadJson(`fattura-${invoiceId}-tentativo-${log.attempt}-payload.json`, log.request_payload);
         });
     });
 

@@ -251,6 +251,12 @@ class OrderInvoiceController extends Controller
                     'provider_error' => $invoice->provider_error,
                     'emitted_at' => $invoice->emitted_at?->format('d/m/Y H:i:s'),
                     'emitted_by' => $invoice->emittedBy?->email,
+                    // Dati fattura "pre-provider" utili per download anche quando è DRAFT
+                    // (non ha mai raggiunto FIC → nessun payload HTTP salvato).
+                    'description' => $invoice->description,
+                    'total' => (float) $invoice->total,
+                    'currency' => $invoice->currency,
+                    'lines' => $invoice->lines,
                     'logs' => $invoice->logs->map(fn ($l) => [
                         'id' => $l->id,
                         'attempt' => $l->attempt,
