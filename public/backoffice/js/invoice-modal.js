@@ -9,10 +9,18 @@
     let currentStep = 1;
 
     const fmt = (v) => (v === null || v === undefined || isNaN(v)) ? '—' : parseFloat(v).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-    // Aliquota IVA → "Esente" se 0, "X%" se > 0, "—" se non impostata.
+    // Aliquota IVA: può essere numerica (0, 4, 10, 22) oppure un codice natura di
+    // fattura elettronica ("N1", "N2.1", "N6.9", ...). Formattazione:
+    //  - stringa che inizia per "N" → mostrata as-is;
+    //  - 0                           → "Esente";
+    //  - numero > 0                  → "X%";
+    //  - null/vuoto/non parsabile    → "—".
     const fmtVat = (v) => {
-        if (v === null || v === undefined || v === '' || isNaN(v)) return '—';
-        const n = parseFloat(v);
+        if (v === null || v === undefined || v === '') return '—';
+        const s = String(v).trim();
+        if (/^N/i.test(s)) return s.toUpperCase();
+        const n = parseFloat(s);
+        if (isNaN(n)) return '—';
         return n === 0 ? 'Esente' : `${n}%`;
     };
 
@@ -172,30 +180,36 @@
             </tr>`);
         });
 
-        // Subtotale = somma imponibili delle righe. Breakdown IVA raggruppato per aliquota.
-        // Totale fattura = subtotale + IVA complessiva (nessuna commissione in questo step).
-        const subtotal = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
+        // IVA sempre INCLUSA nel prezzo biglietto → scorporo:
+        //   iva_riga   = lordo * aliquota / (100 + aliquota)
+        //   imponibile = lordo − iva_riga
+        //   Subtotale (netto) = Σ imponibili, Totale fattura = Σ lordi (invariato).
         const vatBuckets = new Map();
+        let subtotalNet = 0;
         orderItems.forEach((it) => {
+            const gross = parseFloat(it.subtotal) || 0;
             const rate = parseFloat(it.vat_rate);
-            if (isNaN(rate) || rate <= 0) return;
-            const base = parseFloat(it.subtotal) || 0;
-            vatBuckets.set(rate, (vatBuckets.get(rate) || 0) + base * rate / 100);
+            if (isNaN(rate) || rate <= 0) {
+                subtotalNet += gross;
+                return;
+            }
+            const vatAmount = gross * rate / (100 + rate);
+            subtotalNet += gross - vatAmount;
+            vatBuckets.set(rate, (vatBuckets.get(rate) || 0) + vatAmount);
         });
+        const grossTotal = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
 
-        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(subtotal));
+        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(subtotalNet));
         $modal().find('.invoice-vat-row').remove();
         const $totalRow = $modal().find('[data-slot="invoice-total-row"]');
-        let totalVat = 0;
         Array.from(vatBuckets.entries())
             .sort((a, b) => a[0] - b[0])
             .forEach(([rate, amount]) => {
-                totalVat += amount;
                 const rateLabel = Number.isInteger(rate) ? rate : String(rate).replace('.', ',');
                 $(`<tr class="sub invoice-vat-row"><td colspan="5" class="text-end text-secondary">IVA ${rateLabel}%</td><td class="text-end">${fmt(amount)}</td></tr>`)
                     .insertBefore($totalRow);
             });
-        $modal().find('[data-slot="invoice-total"]').text(fmt(subtotal + totalVat));
+        $modal().find('[data-slot="invoice-total"]').text(fmt(grossTotal));
 
         const cust = customer.recipient || {};
         const custHtml = [

@@ -87,9 +87,12 @@ class OrderService
                 'partner_commission_presale_low' => $partner->commission_presale_low,
                 'partner_commission_presale_high' => $partner->commission_presale_high,
                 'partner_commission_presale_threshold' => $partner->commission_presale_threshold,
+                'partner_commission_presale_vat' => $partner->commission_presale_vat,
                 'partner_commission_miticko_fixed' => $partner->commission_miticko_fixed,
                 'partner_commission_miticko_variable' => $partner->commission_miticko_variable,
+                'partner_commission_miticko_vat' => $partner->commission_miticko_vat,
                 'partner_commission_payment' => $partner->commission_payment,
+                'partner_commission_payment_vat' => $partner->commission_payment_vat,
             ] : [];
 
             $billingFlagsSnapshot = ($cart->product ?? Product::find($cart->product_id))?->defaultBillingFlags() ?? [];
@@ -382,9 +385,12 @@ class OrderService
                 'partner_commission_presale_low' => $partner->commission_presale_low,
                 'partner_commission_presale_high' => $partner->commission_presale_high,
                 'partner_commission_presale_threshold' => $partner->commission_presale_threshold,
+                'partner_commission_presale_vat' => $partner->commission_presale_vat,
                 'partner_commission_miticko_fixed' => $partner->commission_miticko_fixed,
                 'partner_commission_miticko_variable' => $partner->commission_miticko_variable,
+                'partner_commission_miticko_vat' => $partner->commission_miticko_vat,
                 'partner_commission_payment' => $partner->commission_payment,
+                'partner_commission_payment_vat' => $partner->commission_payment_vat,
             ] : [];
 
             $billingFlagsSnapshot = $product->defaultBillingFlags();

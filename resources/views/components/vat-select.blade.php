@@ -9,8 +9,10 @@
     'class' => '',
 ])
 @php
+// `rate` è stringa per supportare sia aliquote numeriche ("22", "10", "0") sia nature
+// di esenzione / non imponibilità per fattura elettronica ("N6.9", "N3.2", …).
 $vatOptions = collect(config('vat.rates', []))
-    ->map(fn ($r) => ['id' => (int) $r['rate'], 'label' => $r['label']])
+    ->map(fn ($r) => ['id' => (string) $r['rate'], 'label' => $r['label']])
     ->all();
 @endphp
 <x-select

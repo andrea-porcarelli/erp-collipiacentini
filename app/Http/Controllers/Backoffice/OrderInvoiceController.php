@@ -106,6 +106,13 @@ class OrderInvoiceController extends Controller
             $presaleTotal = round($presaleTotal, 2);
             $presaleUnit = $presaleQuantity > 0 ? round($presaleTotal / $presaleQuantity, 2) : 0.0;
 
+            // Aliquote IVA delle commissioni: snapshot su OPI al momento dell'ordine, con
+            // fallback alla configurazione corrente del partner (per ordini pre-snapshot).
+            $firstItem = $order->orderProducts->flatMap(fn ($op) => $op->items)->first();
+            $presaleVatSnapshot = $firstItem?->partner_commission_presale_vat ?? $order->partner?->commission_presale_vat;
+            $mitickoVatSnapshot = $firstItem?->partner_commission_miticko_vat ?? $order->partner?->commission_miticko_vat;
+            $paymentVatSnapshot = $firstItem?->partner_commission_payment_vat ?? $order->partner?->commission_payment_vat;
+
             return response()->json([
                 'partner' => $partnerData[Invoice::RECIPIENT_PARTNER],
                 'customer' => $customerData[Invoice::RECIPIENT_CUSTOMER],
@@ -120,14 +127,14 @@ class OrderInvoiceController extends Controller
                     // con la logica di InvoiceCalculatorService::computeAmountsForItem().
                     'commission_payment_rate' => (float) ($order->partner?->commission_payment ?? 0),
                     'commission_payment_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
-                    'commission_payment_vat' => $this->normalizeVat($order->partner?->commission_payment_vat),
+                    'commission_payment_vat' => $this->normalizeVat($paymentVatSnapshot),
                     'commission_miticko_rate' => (float) ($order->partner?->commission_miticko_variable ?? 0),
                     'commission_miticko_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
-                    'commission_miticko_vat' => $this->normalizeVat($order->partner?->commission_miticko_vat),
+                    'commission_miticko_vat' => $this->normalizeVat($mitickoVatSnapshot),
                     'presale_total' => $presaleTotal,
                     'presale_quantity' => $presaleQuantity,
                     'presale_unit' => $presaleUnit,
-                    'presale_vat' => $this->normalizeVat($order->partner?->commission_presale_vat),
+                    'presale_vat' => $this->normalizeVat($presaleVatSnapshot),
                     'payment_method' => $order->card_brand
                         ? sprintf('%s **** %s', ucfirst($order->card_brand), $order->card_last4 ?: '')
                         : ($order->stripe_payment_method ?: '—'),
@@ -223,16 +230,24 @@ class OrderInvoiceController extends Controller
     }
 
     /**
-     * Normalizza l'aliquota IVA configurata sul partner (string nullable "0" | "22" | …)
-     * in float, oppure null se non impostata. Lo "0" rappresenta "Esente".
+     * Normalizza l'aliquota IVA configurata sul partner. Il valore può essere:
+     *  - un'aliquota numerica ("0", "4", "10", "22", …) → ritornata come float;
+     *  - un codice natura di fattura elettronica ("N1", "N6.9", …) → ritornato as-is;
+     *  - null / vuoto → ritorna null.
+     * "0" rappresenta "Esente".
      */
-    private function normalizeVat(mixed $value): ?float
+    private function normalizeVat(mixed $value): float|string|null
     {
         if ($value === null || $value === '') {
             return null;
         }
 
-        return (float) $value;
+        $s = (string) $value;
+        if (preg_match('/^N/i', $s)) {
+            return strtoupper($s);
+        }
+
+        return (float) $s;
     }
 
     /**
