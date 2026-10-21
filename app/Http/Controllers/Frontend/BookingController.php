@@ -30,13 +30,13 @@ class BookingController extends Controller
     {
         $partner = $request->partner;
         $products = Product::where('is_active', 1)
-            ->where('partner_id', $partner->id)
+            ->where(fn ($q) => $this->scopeOwnedOrResoldBy($q, $partner))
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->get();
 
         $categories = Category::whereHas('products', fn ($q) => $q
-            ->where('partner_id', $partner->id)
-            ->where('is_active', 1))
+            ->where('is_active', 1)
+            ->where(fn ($qq) => $this->scopeOwnedOrResoldBy($qq, $partner)))
             ->orderBy('label')
             ->get();
 
@@ -52,7 +52,7 @@ class BookingController extends Controller
         $date = $request->get('date'); // Y-m-d or null
 
         $products = Product::where('is_active', 1)
-            ->where('partner_id', $partner->id)
+            ->where(fn ($q) => $this->scopeOwnedOrResoldBy($q, $partner))
             ->with(['partner', 'category', 'contents.language', 'variants.prices', 'availabilities', 'cover', 'gallery'])
             ->when($filter !== 'all', fn ($q) => $q->where('category_id', $filter))
             ->get()
@@ -147,9 +147,25 @@ class BookingController extends Controller
         }
 
         $partner = $request->partner;
+
+        if ($partner && $partner->id !== (int) $product->partner_id
+            && ! $product->resellerPartners()->whereKey($partner->id)->exists()) {
+            abort(404);
+        }
+
         $seo = $this->seoService->forProduct($product);
 
         return view('whitelabel.product', compact('product', 'partner', 'seo'));
+    }
+
+    private function scopeOwnedOrResoldBy($query, ?Partner $partner): void
+    {
+        if (! $partner) {
+            return;
+        }
+
+        $query->where('partner_id', $partner->id)
+            ->orWhereHas('resellerPartners', fn ($q) => $q->where('partners.id', $partner->id));
     }
 
     /**

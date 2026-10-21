@@ -57,7 +57,7 @@ class SitemapController extends Controller
 
     private function buildIndex(Partner $partner): string
     {
-        $products = $partner->active_products()->select('id', 'updated_at')->get();
+        $products = $this->partnerVisibleProducts($partner)->get(['products.id', 'products.updated_at']);
         $productsMod = $this->maxUpdated($products) ?? $partner->updated_at ?? Carbon::now();
         $pagesMod = $partner->updated_at ?? Carbon::now();
 
@@ -83,7 +83,7 @@ class SitemapController extends Controller
 
     private function buildProducts(Partner $partner): string
     {
-        $products = $partner->active_products()
+        $products = $this->partnerVisibleProducts($partner)
             ->with(['cover', 'gallery'])
             ->get();
 
@@ -148,6 +148,16 @@ class SitemapController extends Controller
         $xml .= '</urlset>';
 
         return $xml;
+    }
+
+    private function partnerVisibleProducts(Partner $partner)
+    {
+        return Product::query()
+            ->where('is_active', 1)
+            ->where(function ($q) use ($partner) {
+                $q->where('partner_id', $partner->id)
+                    ->orWhereHas('resellerPartners', fn ($qq) => $qq->where('partners.id', $partner->id));
+            });
     }
 
     private function resolvePartner(Request $request): Partner

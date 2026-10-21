@@ -38,11 +38,12 @@ class OrderService
         ?string $stripePaymentMethod = null
     ): Order {
         return DB::transaction(function () use ($cart, $stripePaymentIntentId, $stripePaymentMethod) {
-            $cart->loadMissing('partner');
-            $orderNumber = $this->generateOrderNumber($cart->partner->partner_code);
+            $cart->loadMissing(['partner', 'product.partner']);
+            $ownerPartner = $cart->product?->partner ?? $cart->partner;
+            $orderNumber = $this->generateOrderNumber($ownerPartner->partner_code);
 
             $order = Order::create(array_merge([
-                'partner_id' => $cart->partner_id,
+                'partner_id' => $ownerPartner->id,
                 'order_number' => $orderNumber,
                 'amount' => $cart->total,
                 'order_status' => OrderStatus::PENDING,
@@ -79,10 +80,10 @@ class OrderService
                 'total' => $cart->total,
             ]);
 
-            // Snapshot delle commissioni del partner sull'item: serve a congelare
-            // le condizioni economiche al momento della prenotazione anche se in
-            // futuro le commissioni del partner verranno modificate.
-            $partner = $cart->partner;
+            // Snapshot delle commissioni del partner proprietario del prodotto:
+            // le condizioni economiche sono quelle di chi eroga il servizio,
+            // non di chi lo rivende sul proprio dominio.
+            $partner = $ownerPartner;
             $commissionSnapshot = (float) $cart->total > 0 && $partner ? $this->partnerCommissionSnapshot($partner) : [];
 
             $billingFlagsSnapshot = ($cart->product ?? Product::find($cart->product_id))?->defaultBillingFlags() ?? [];
