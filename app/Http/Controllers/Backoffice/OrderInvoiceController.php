@@ -46,15 +46,13 @@ class OrderInvoiceController extends Controller
             // Dettaglio righe ordine: una riga per OrderProductItem (variante acquistata)
             // con qty, unit_price, vat_rate (dal ProductVariantPrice matchato per prezzo), subtotal.
             $orderItems = $order->orderProducts->flatMap(function ($op) {
-                $productLabel = $op->product?->label ?? '—';
-
-                return $op->items->map(function ($it) use ($productLabel) {
+                return $op->items->map(function ($it) {
                     $vat = $it->variant?->prices
                         ?->firstWhere(fn ($p) => abs((float) $p->price - (float) $it->unit_price) < 0.01)
                         ?->vat_rate;
 
                     return [
-                        'label' => $productLabel,
+                        'label' => $it->variant?->label ?? '—',
                         'quantity' => (int) $it->quantity,
                         'unit_price' => (float) $it->unit_price,
                         'vat_rate' => is_null($vat) ? null : (float) $vat,
@@ -62,6 +60,29 @@ class OrderInvoiceController extends Controller
                     ];
                 });
             })->values()->all();
+
+            // Prevendita aggregata sull'intero ordine (indipendente dai flag `bill_presale`
+            // dei singoli item): add-on calcolato dal partner — low/high in base alla soglia
+            // sul unit_price del biglietto. Serve per la riga DI CUI nel riepilogo ordine.
+            $partnerModel = $order->partner;
+            $presaleTotal = 0.0;
+            $presaleQuantity = 0;
+            foreach ($order->orderProducts as $op) {
+                foreach ($op->items as $it) {
+                    $threshold = $it->partner_commission_presale_threshold ?? $partnerModel?->commission_presale_threshold;
+                    if (is_null($threshold)) {
+                        continue;
+                    }
+                    $low = (float) ($it->partner_commission_presale_low ?? $partnerModel?->commission_presale_low ?? 0);
+                    $high = (float) ($it->partner_commission_presale_high ?? $partnerModel?->commission_presale_high ?? 0);
+                    $qty = max((int) $it->quantity, 1);
+                    $unit = (float) $it->unit_price < (float) $threshold ? $low : $high;
+                    $presaleTotal += $unit * $qty;
+                    $presaleQuantity += $qty;
+                }
+            }
+            $presaleTotal = round($presaleTotal, 2);
+            $presaleUnit = $presaleQuantity > 0 ? round($presaleTotal / $presaleQuantity, 2) : 0.0;
 
             return response()->json([
                 'partner' => $partnerData[Invoice::RECIPIENT_PARTNER],
@@ -78,6 +99,9 @@ class OrderInvoiceController extends Controller
                     'commission_payment_amount' => round((float) $order->amount * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
                     'commission_miticko_rate' => (float) ($order->partner?->commission_miticko_variable ?? 0),
                     'commission_miticko_amount' => round((float) $order->amount * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
+                    'presale_total' => $presaleTotal,
+                    'presale_quantity' => $presaleQuantity,
+                    'presale_unit' => $presaleUnit,
                     'payment_method' => $order->card_brand
                         ? sprintf('%s **** %s', ucfirst($order->card_brand), $order->card_last4 ?: '')
                         : ($order->stripe_payment_method ?: '—'),

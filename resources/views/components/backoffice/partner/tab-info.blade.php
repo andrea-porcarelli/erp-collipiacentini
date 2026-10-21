@@ -71,6 +71,15 @@
         </div>
     </x-card>
 
+    @php
+        $vatOptions = [
+            ['id' => 0,  'label' => 'Esente'],
+            ['id' => 4,  'label' => '4%'],
+            ['id' => 5,  'label' => '5%'],
+            ['id' => 10, 'label' => '10%'],
+            ['id' => 22, 'label' => '22%'],
+        ];
+    @endphp
     <x-card title="Commissioni partner" class="mt-4 position-relative">
         <form id="form-partner-commissions">
             <div class="row">
@@ -78,7 +87,9 @@
                 <div class="col-12 col-sm-6">
                     <x-input :model="$model" name="commission_presale_threshold" label="Soglia prevendita (€)" />
                 </div>
-                <div class="col-12 col-sm-6"></div>
+                <div class="col-12 col-sm-6">
+                    <x-select :model="$model" name="commission_presale_vat" label="Prevendita IVA" :options="$vatOptions" />
+                </div>
                 <div class="col-12 col-sm-6">
                     <x-input :model="$model" name="commission_presale_low" label="Prevendita sotto soglia" />
                 </div>
@@ -86,14 +97,20 @@
                     <x-input :model="$model" name="commission_presale_high" label="Prevendita sopra soglia" />
                 </div>
                 <div class="col-12 mb-2 mt-4">A carico del Partner</div>
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-sm-4">
                     <x-input :model="$model" name="commission_miticko_fixed" label="Commissione Miticko (fisso)" />
                 </div>
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-sm-4">
                     <x-input :model="$model" name="commission_miticko_variable" label="Commissione Miticko (variabile)" />
+                </div>
+                <div class="col-12 col-sm-4">
+                    <x-select :model="$model" name="commission_miticko_vat" label="Commissione Miticko IVA" :options="$vatOptions" />
                 </div>
                 <div class="col-12 col-sm-6 mt-3">
                     <x-input :model="$model" name="commission_payment" label="Commissione di pagamento" />
+                </div>
+                <div class="col-12 col-sm-6 mt-3">
+                    <x-select :model="$model" name="commission_payment_vat" label="Commissione di pagamento IVA" :options="$vatOptions" />
                 </div>
             </div>
         </form>

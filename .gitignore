@@ -24,3 +24,4 @@ Thumbs.db
 /storage/dbdata
 /storage/erp-api.json
 CLAUDE.md
+/docs/*

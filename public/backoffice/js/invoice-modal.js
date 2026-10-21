@@ -72,10 +72,41 @@
             </tr>`);
         });
 
-        const subtotal = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
-        const orderTotal = parseFloat(preview.order_meta?.order_total ?? subtotal);
+        const meta = preview.order_meta || {};
+        const itemsSum = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
+        const orderTotal = parseFloat(meta.order_total ?? itemsSum);
+        const presaleTotal = parseFloat(meta.presale_total ?? 0) || 0;
+        // La prevendita è un add-on al prezzo biglietto → subtotale = totale - prevendita.
+        const subtotal = Math.max(orderTotal - presaleTotal, 0);
         $modal().find('[data-slot="order-subtotal"]').text(fmt(subtotal));
         $modal().find('[data-slot="order-total"]').text(fmt(orderTotal));
+
+        // DI CUI: commissioni e prevendita dell'ordine, visibili solo se > 0.
+        const paymentRate = parseFloat(meta.commission_payment_rate ?? 0) || 0;
+        const paymentAmount = parseFloat(meta.commission_payment_amount ?? 0) || 0;
+        const showOrderPayment = paymentAmount > 0;
+        $modal().find('[data-slot="row-order-commission-payment"]').toggle(showOrderPayment);
+        if (showOrderPayment) {
+            $modal().find('[data-slot="rate-order-payment"]').text(String(paymentRate).replace('.', ','));
+            $modal().find('[data-slot="amount-order-payment"]').text(fmt(paymentAmount));
+        }
+
+        const mitickoRate = parseFloat(meta.commission_miticko_rate ?? 0) || 0;
+        const mitickoAmount = parseFloat(meta.commission_miticko_amount ?? 0) || 0;
+        const showOrderMiticko = mitickoAmount > 0;
+        $modal().find('[data-slot="row-order-commission-miticko"]').toggle(showOrderMiticko);
+        if (showOrderMiticko) {
+            $modal().find('[data-slot="rate-order-miticko"]').text(String(mitickoRate).replace('.', ','));
+            $modal().find('[data-slot="amount-order-miticko"]').text(fmt(mitickoAmount));
+        }
+
+        const presaleUnit = parseFloat(meta.presale_unit ?? 0) || 0;
+        const showOrderPresale = presaleTotal > 0;
+        $modal().find('[data-slot="row-order-presale"]').toggle(showOrderPresale);
+        if (showOrderPresale) {
+            $modal().find('[data-slot="unit-order-presale"]').text(fmt(presaleUnit));
+            $modal().find('[data-slot="amount-order-presale"]').text(fmt(presaleTotal));
+        }
 
         // Default: imposta checkbox come da default_flags.
         // ticket_base è un flag del CUSTOMER (biglietto emesso nella fattura cliente).
