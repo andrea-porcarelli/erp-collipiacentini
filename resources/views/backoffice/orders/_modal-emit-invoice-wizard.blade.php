@@ -123,7 +123,7 @@
                                     <tbody data-slot="order-items"></tbody>
                                     <tfoot>
                                         <tr class="sub"><td colspan="4" class="text-end">Subtotale</td><td class="text-end" data-slot="order-subtotal">—</td></tr>
-                                        <tr class="di-cui-label"><td colspan="5" class="text-start" style="color:#999;font-size:11px;letter-spacing:.5px">DI CUI</td></tr>
+                                        <tr class="di-cui-label" data-slot="row-order-di-cui-label"><td colspan="5" class="text-start" style="color:#999;font-size:11px;letter-spacing:.5px">DI CUI</td></tr>
                                         <tr class="sub di-cui" data-slot="row-order-commission-payment" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di pagamento (<span data-slot="rate-order-payment">—</span>%)</td><td class="text-end" data-slot="vat-order-payment">—</td><td class="text-end" data-slot="amount-order-payment">—</td></tr>
                                         <tr class="sub di-cui" data-slot="row-order-commission-miticko" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di Miticko (<span data-slot="rate-order-miticko">—</span>%)</td><td class="text-end" data-slot="vat-order-miticko">—</td><td class="text-end" data-slot="amount-order-miticko">—</td></tr>
                                         <tr class="sub di-cui" data-slot="row-order-presale" style="display:none"><td colspan="3" class="text-start text-secondary">Prevendita (<span data-slot="unit-order-presale">—</span> a biglietto)</td><td class="text-end" data-slot="vat-order-presale">—</td><td class="text-end" data-slot="amount-order-presale">—</td></tr>

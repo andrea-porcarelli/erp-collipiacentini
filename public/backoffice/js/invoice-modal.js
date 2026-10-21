@@ -87,36 +87,6 @@
         $modal().find('[data-slot="order-subtotal"]').text(fmt(subtotal));
         $modal().find('[data-slot="order-total"]').text(fmt(orderTotal));
 
-        // DI CUI: commissioni e prevendita dell'ordine, visibili solo se > 0.
-        const paymentRate = parseFloat(meta.commission_payment_rate ?? 0) || 0;
-        const paymentAmount = parseFloat(meta.commission_payment_amount ?? 0) || 0;
-        const showOrderPayment = paymentAmount > 0;
-        $modal().find('[data-slot="row-order-commission-payment"]').toggle(showOrderPayment);
-        if (showOrderPayment) {
-            $modal().find('[data-slot="rate-order-payment"]').text(String(paymentRate).replace('.', ','));
-            $modal().find('[data-slot="vat-order-payment"]').text(fmtVat(meta.commission_payment_vat));
-            $modal().find('[data-slot="amount-order-payment"]').text(fmt(paymentAmount));
-        }
-
-        const mitickoRate = parseFloat(meta.commission_miticko_rate ?? 0) || 0;
-        const mitickoAmount = parseFloat(meta.commission_miticko_amount ?? 0) || 0;
-        const showOrderMiticko = mitickoAmount > 0;
-        $modal().find('[data-slot="row-order-commission-miticko"]').toggle(showOrderMiticko);
-        if (showOrderMiticko) {
-            $modal().find('[data-slot="rate-order-miticko"]').text(String(mitickoRate).replace('.', ','));
-            $modal().find('[data-slot="vat-order-miticko"]').text(fmtVat(meta.commission_miticko_vat));
-            $modal().find('[data-slot="amount-order-miticko"]').text(fmt(mitickoAmount));
-        }
-
-        const presaleUnit = parseFloat(meta.presale_unit ?? 0) || 0;
-        const showOrderPresale = presaleTotal > 0;
-        $modal().find('[data-slot="row-order-presale"]').toggle(showOrderPresale);
-        if (showOrderPresale) {
-            $modal().find('[data-slot="unit-order-presale"]').text(fmt(presaleUnit));
-            $modal().find('[data-slot="vat-order-presale"]').text(fmtVat(meta.presale_vat));
-            $modal().find('[data-slot="amount-order-presale"]').text(fmt(presaleTotal));
-        }
-
         // Default: imposta checkbox come da default_flags.
         // ticket_base è un flag del CUSTOMER (biglietto emesso nella fattura cliente).
         const defaults = {
@@ -132,6 +102,49 @@
         // Se nessun flag → forzatura Personalizza; "Fattura" = Non necessaria
         const anyFlag = Object.values(defaults).some(Boolean);
         $modal().find('select[name="invoice_required"]').val(anyFlag ? '1' : '0');
+
+        // DI CUI dipende dai flag correnti → rendering dopo aver settato i checkbox.
+        renderStep1OrderBreakdown();
+    };
+
+    // DI CUI del Riepilogo ordine: una riga per ciascuna voce accessoria, mostrata solo se
+    // (a) importo > 0 e (b) il relativo flag di fatturazione è selezionato. Richiamata
+    // ad ogni cambio dei checkbox nel pannello "Campi da inserire in fattura".
+    const renderStep1OrderBreakdown = () => {
+        if (!preview) return;
+        const meta = preview.order_meta || {};
+        const flagChecked = (f) => $modal().find(`.invoice-flag[data-flag="${f}"]`).is(':checked');
+
+        const paymentAmount = parseFloat(meta.commission_payment_amount ?? 0) || 0;
+        const showOrderPayment = paymentAmount > 0 && flagChecked('bank_commission');
+        $modal().find('[data-slot="row-order-commission-payment"]').toggle(showOrderPayment);
+        if (showOrderPayment) {
+            $modal().find('[data-slot="rate-order-payment"]').text(String(parseFloat(meta.commission_payment_rate ?? 0) || 0).replace('.', ','));
+            $modal().find('[data-slot="vat-order-payment"]').text(fmtVat(meta.commission_payment_vat));
+            $modal().find('[data-slot="amount-order-payment"]').text(fmt(paymentAmount));
+        }
+
+        const mitickoAmount = parseFloat(meta.commission_miticko_amount ?? 0) || 0;
+        const showOrderMiticko = mitickoAmount > 0 && flagChecked('miticko_commission');
+        $modal().find('[data-slot="row-order-commission-miticko"]').toggle(showOrderMiticko);
+        if (showOrderMiticko) {
+            $modal().find('[data-slot="rate-order-miticko"]').text(String(parseFloat(meta.commission_miticko_rate ?? 0) || 0).replace('.', ','));
+            $modal().find('[data-slot="vat-order-miticko"]').text(fmtVat(meta.commission_miticko_vat));
+            $modal().find('[data-slot="amount-order-miticko"]').text(fmt(mitickoAmount));
+        }
+
+        const presaleTotal = parseFloat(meta.presale_total ?? 0) || 0;
+        const showOrderPresale = presaleTotal > 0 && flagChecked('presale');
+        $modal().find('[data-slot="row-order-presale"]').toggle(showOrderPresale);
+        if (showOrderPresale) {
+            $modal().find('[data-slot="unit-order-presale"]').text(fmt(parseFloat(meta.presale_unit ?? 0) || 0));
+            $modal().find('[data-slot="vat-order-presale"]').text(fmtVat(meta.presale_vat));
+            $modal().find('[data-slot="amount-order-presale"]').text(fmt(presaleTotal));
+        }
+
+        // Nascondi la label "DI CUI" quando nessuna riga sarà visibile.
+        const anyVisible = showOrderPayment || showOrderMiticko || showOrderPresale;
+        $modal().find('[data-slot="row-order-di-cui-label"]').toggle(anyVisible);
     };
 
     const renderStep2 = () => {
@@ -327,9 +340,13 @@
             const val = $(this).val();
             $modal().find('.invoice-flag').prop('disabled', val === '0' || isDefaultMode());
             if (val === '0') $modal().find('.invoice-flag').prop('checked', false);
+            renderStep1OrderBreakdown();
         });
 
         $(document).on('change', '.invoice-flag[data-flag="ticket_base"]', applyTicketBaseRule);
+        // Qualunque cambio sui flag deve riflettersi nel DI CUI del Riepilogo ordine.
+        $(document).on('change', '#modal-set-invoice .invoice-flag', renderStep1OrderBreakdown);
+        // Switch default/custom disabilita i flag ma può lasciarli selezionati: nessun impatto sul DI CUI.
 
         $(document).on('click', '.btn-wizard-next', function () {
             // Ricarica il preview coi flag correnti (Step 2 deve mostrare le righe effettive da fatturare).
