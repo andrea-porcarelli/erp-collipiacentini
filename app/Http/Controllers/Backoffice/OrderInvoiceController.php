@@ -230,6 +230,52 @@ class OrderInvoiceController extends Controller
     }
 
     /**
+     * Ritorna lo storico di tutti i tentativi di invio verso il provider di fatturazione
+     * per ciascuna fattura associata all'ordine (una Order può avere Invoice partner +
+     * Invoice customer, ciascuna con N tentativi).
+     */
+    public function logs(Order $order): JsonResponse
+    {
+        try {
+            $order->loadMissing(['invoices.logs.user', 'invoices.emittedBy']);
+
+            $invoices = $order->invoices->map(function (Invoice $invoice) {
+                return [
+                    'id' => $invoice->id,
+                    'recipient_type' => $invoice->recipient_type,
+                    'recipient_name' => $invoice->recipient_name,
+                    'number' => $invoice->number,
+                    'status' => $invoice->status,
+                    'provider' => $invoice->provider,
+                    'provider_id' => $invoice->provider_id,
+                    'provider_error' => $invoice->provider_error,
+                    'emitted_at' => $invoice->emitted_at?->format('d/m/Y H:i:s'),
+                    'emitted_by' => $invoice->emittedBy?->email,
+                    'logs' => $invoice->logs->map(fn ($l) => [
+                        'id' => $l->id,
+                        'attempt' => $l->attempt,
+                        'provider' => $l->provider,
+                        'request_payload' => $l->request_payload,
+                        'response_status' => $l->response_status,
+                        'response_body' => $l->response_body,
+                        'error_message' => $l->error_message,
+                        'user' => $l->user?->email,
+                        'created_at' => $l->created_at?->format('d/m/Y H:i:s'),
+                    ])->values()->all(),
+                ];
+            })->values()->all();
+
+            return response()->json([
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'invoices' => $invoices,
+            ]);
+        } catch (\Exception $e) {
+            return $this->exception($e, request());
+        }
+    }
+
+    /**
      * Normalizza l'aliquota IVA configurata sul partner. Il valore può essere:
      *  - un'aliquota numerica ("0", "4", "10", "22", …) → ritornata come float;
      *  - un codice natura di fattura elettronica ("N1", "N6.9", …) → ritornato as-is;

@@ -330,7 +330,13 @@
             } else {
                 banner('error', `Fattura ordine #${currentOrderNumber} non inviata, riprova`);
             }
-            if (typeof App !== 'undefined' && App.reloadTable) App.reloadTable();
+            // Ricarica il DataTable (invoices/index o orders/index) senza resettare la pagina
+            // corrente. `App.reloadTable` non è disponibile qui perché App è export default
+            // e questo script è un IIFE classico, non un modulo.
+            const $dt = $('.datatable');
+            if ($dt.length && $.fn.dataTable && $.fn.dataTable.isDataTable($dt)) {
+                $dt.DataTable().ajax.reload(null, false);
+            }
         }).fail(() => {
             banner('error', `Fattura ordine #${currentOrderNumber} non inviata, riprova`);
         }).always(() => $btn.prop('disabled', false));

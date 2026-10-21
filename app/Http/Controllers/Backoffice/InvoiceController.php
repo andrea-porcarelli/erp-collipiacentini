@@ -160,13 +160,20 @@ class InvoiceController extends Controller
     {
         $status = $order->invoiceStatus();
 
+        // "Dettaglio invio": disponibile su qualunque ordine che abbia almeno una Invoice
+        // associata (anche in errore), per ispezionare payload/log del provider.
+        $logsBtn = $order->invoices->isNotEmpty()
+            ? ' <button type="button" class="bt-miticko btn-invoice-logs label-miticko label-InvoiceAction ms-1" data-order-id="'.$order->id.'" title="Dettaglio invio al provider di fatturazione" data-mode="small primary">'
+                .'<i class="fa-regular fa-file-lines"></i></button>'
+            : '';
+
         return match ($status) {
             Order::INVOICE_STATUS_TO_EMIT => '<button type="button" class="bt-miticko btn-set-invoice label-miticko label-InvoiceAction" data-order-id="'.$order->id.'" data-mode="small primary">'
-                .'<i class="fa-regular fa-file-invoice"></i> imposta fattura</button>',
-            Order::INVOICE_STATUS_SENT => '<span class="label-miticko label-Success">INVIATA</span>',
-            Order::INVOICE_STATUS_REFUNDED => '<span class="label-miticko label-Error">RIMBORSATO</span>',
-            Order::INVOICE_STATUS_NOT_REQUIRED => '<span class="label-miticko label-Neutral">NON NECESSARIA</span>',
-            default => '—',
+                .'<i class="fa-regular fa-file-invoice"></i> imposta fattura</button>'.$logsBtn,
+            Order::INVOICE_STATUS_SENT => '<span class="label-miticko label-Success">INVIATA</span>'.$logsBtn,
+            Order::INVOICE_STATUS_REFUNDED => '<span class="label-miticko label-Error">RIMBORSATO</span>'.$logsBtn,
+            Order::INVOICE_STATUS_NOT_REQUIRED => '<span class="label-miticko label-Neutral">NON NECESSARIA</span>'.$logsBtn,
+            default => '—'.$logsBtn,
         };
     }
 

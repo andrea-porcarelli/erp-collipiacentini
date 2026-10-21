@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Invoice extends LogsModel
 {
@@ -71,5 +72,10 @@ class Invoice extends LogsModel
     public function emittedBy(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'emitted_by_user_id');
+    }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(InvoiceLog::class)->orderBy('attempt');
     }
 }

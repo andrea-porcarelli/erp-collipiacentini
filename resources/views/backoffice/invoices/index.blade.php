@@ -82,6 +82,8 @@
 
     {{-- Modale Imposta fattura (2 step) --}}
     @include('backoffice.orders._modal-emit-invoice-wizard')
+    {{-- Modale Dettaglio invio (storico log provider di fatturazione) --}}
+    @include('backoffice.orders._modal-invoice-logs')
 @endsection
 
 @section('custom-css')
@@ -172,4 +174,5 @@
         };
     </script>
     <script src="{{ asset('backoffice/js/invoice-modal.js') }}?v={{ filemtime(public_path('backoffice/js/invoice-modal.js')) }}"></script>
+    <script src="{{ asset('backoffice/js/invoice-logs-modal.js') }}?v={{ filemtime(public_path('backoffice/js/invoice-logs-modal.js')) }}"></script>
 @endsection

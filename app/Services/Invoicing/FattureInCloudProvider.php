@@ -4,6 +4,8 @@ namespace App\Services\Invoicing;
 
 use App\Contracts\InvoiceProvider;
 use App\Models\Invoice;
+use App\Models\InvoiceLog;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -42,10 +44,12 @@ class FattureInCloudProvider implements InvoiceProvider
                 'provider' => $this->name(),
                 'provider_error' => 'FIC access token o company id mancanti.',
             ]);
+            $this->writeLog($invoice, null, null, null, 'FIC access token o company id mancanti.');
 
             return $invoice;
         }
 
+        $payload = null;
         try {
             $payload = $this->buildPayload($invoice);
 
@@ -62,6 +66,7 @@ class FattureInCloudProvider implements InvoiceProvider
                     'provider_error' => sprintf('FIC HTTP %d: %s', $response->status(), $response->body()),
                     'provider_payload' => json_encode($payload),
                 ]);
+                $this->writeLog($invoice, $payload, $response->status(), $response->body(), null);
 
                 return $invoice;
             }
@@ -77,6 +82,7 @@ class FattureInCloudProvider implements InvoiceProvider
                 'provider_payload' => json_encode($payload),
                 'number' => $data['number'] ?? $invoice->number,
             ]);
+            $this->writeLog($invoice, $payload, $response->status(), $response->body(), null);
         } catch (\Throwable $e) {
             Log::error('FattureInCloud send failed', ['invoice_id' => $invoice->id, 'exception' => $e]);
             $invoice->update([
@@ -84,9 +90,50 @@ class FattureInCloudProvider implements InvoiceProvider
                 'provider' => $this->name(),
                 'provider_error' => $e->getMessage(),
             ]);
+            $this->writeLog($invoice, $payload, null, null, $e->getMessage());
         }
 
         return $invoice;
+    }
+
+    /**
+     * Persiste un InvoiceLog con snapshot immutabile del tentativo appena fatto.
+     * Il campo `attempt` viene incrementato in base al numero di log già presenti per
+     * la invoice (coerenza garantita dalla transazione del chiamante).
+     */
+    private function writeLog(Invoice $invoice, ?array $payload, ?int $status, ?string $body, ?string $error): void
+    {
+        $attempt = InvoiceLog::where('invoice_id', $invoice->id)->max('attempt') ?? 0;
+
+        InvoiceLog::create([
+            'invoice_id' => $invoice->id,
+            'attempt' => $attempt + 1,
+            'provider' => $this->name(),
+            'request_payload' => $payload,
+            'response_status' => $status,
+            'response_body' => $this->decodeResponseBody($body),
+            'error_message' => $error,
+            'user_id' => Auth::id(),
+            'created_at' => now(),
+        ]);
+    }
+
+    /**
+     * La risposta può essere JSON (shape FIC) oppure testo libero su errori generici:
+     * provo a decodificare come JSON e, se fallisce, incapsulo il testo in `['raw' => …]`
+     * così il cast `array` sul model non va in errore.
+     */
+    private function decodeResponseBody(?string $body): ?array
+    {
+        if ($body === null || $body === '') {
+            return null;
+        }
+        $decoded = json_decode($body, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        return ['raw' => $body];
     }
 
     private function buildPayload(Invoice $invoice): array
