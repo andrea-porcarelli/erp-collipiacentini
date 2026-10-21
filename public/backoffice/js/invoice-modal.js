@@ -103,6 +103,10 @@
         const anyFlag = Object.values(defaults).some(Boolean);
         $modal().find('select[name="invoice_required"]').val(anyFlag ? '1' : '0');
 
+        // Prevendita obbligatoria se addebitata nell'ordine (dopo il setup dei default,
+        // altrimenti il valore di default la deseleziona).
+        applyPresaleLock();
+
         // DI CUI dipende dai flag correnti → rendering dopo aver settato i checkbox.
         renderStep1OrderBreakdown();
     };
@@ -142,19 +146,19 @@
             $modal().find('[data-slot="amount-order-presale"]').text(fmt(presaleTotal));
         }
 
-        // Nascondi la label "DI CUI" quando nessuna riga sarà visibile.
-        const anyVisible = showOrderPayment || showOrderMiticko || showOrderPresale;
-        $modal().find('[data-slot="row-order-di-cui-label"]').toggle(anyVisible);
+        // Label "DI CUI" visibile solo se c'è almeno una riga di commissioni (payment/miticko).
+        // La Prevendita è scorporata: appare come riga a sé prima del Totale ordine.
+        const anyDiCui = showOrderPayment || showOrderMiticko;
+        $modal().find('[data-slot="row-order-di-cui-label"]').toggle(anyDiCui);
     };
 
     const renderStep2 = () => {
         if (!preview) return;
         const customer = preview.customer || {};
-        const partner = preview.partner || {};
         const meta = preview.order_meta || {};
 
-        // Tabella principale: nello Step 2 (riepilogo fattura) mostriamo il NOME del prodotto,
-        // non quello della variante (che resta nello Step 1).
+        // Tabella principale: Prodotto | Q.tà | Prezzo | Sconto | IVA | Subtotale.
+        // `product_label` è il nome prodotto (vs `label` = variante usato nello Step 1).
         const orderItems = meta.items || [];
         const $items = $modal().find('[data-slot="invoice-items"]').empty();
         orderItems.forEach((it) => {
@@ -162,39 +166,36 @@
                 <td class="fw-semibold">${escapeHtml(it.product_label ?? it.label)}</td>
                 <td class="text-end">${it.quantity}</td>
                 <td class="text-end">${fmt(it.unit_price)}</td>
+                <td class="text-end">0</td>
+                <td class="text-end">${fmtVat(it.vat_rate)}</td>
                 <td class="text-end">${fmt(it.subtotal)}</td>
             </tr>`);
         });
 
-        // Subtotale e totale = order amount (come dettaglio ordine: le commissioni non si sommano).
-        const orderTotal = parseFloat(meta.order_total ?? 0);
-        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(orderTotal));
-        $modal().find('[data-slot="invoice-total"]').text(fmt(orderTotal));
+        // Subtotale = somma imponibili delle righe. Breakdown IVA raggruppato per aliquota.
+        // Totale fattura = subtotale + IVA complessiva (nessuna commissione in questo step).
+        const subtotal = orderItems.reduce((s, it) => s + (parseFloat(it.subtotal) || 0), 0);
+        const vatBuckets = new Map();
+        orderItems.forEach((it) => {
+            const rate = parseFloat(it.vat_rate);
+            if (isNaN(rate) || rate <= 0) return;
+            const base = parseFloat(it.subtotal) || 0;
+            vatBuckets.set(rate, (vatBuckets.get(rate) || 0) + base * rate / 100);
+        });
 
-        // DI CUI: righe condizionali in base ai flag selezionati nello Step 1.
-        const flagChecked = (f) => $modal().find(`.invoice-flag[data-flag="${f}"]`).is(':checked');
-
-        const showPayment = flagChecked('bank_commission');
-        $modal().find('[data-slot="row-commission-payment"]').toggle(showPayment);
-        if (showPayment) {
-            $modal().find('[data-slot="rate-payment"]').text(String(meta.commission_payment_rate ?? 0).replace('.', ','));
-            $modal().find('[data-slot="amount-payment"]').text(fmt(meta.commission_payment_amount));
-        }
-
-        const showMiticko = flagChecked('miticko_commission');
-        $modal().find('[data-slot="row-commission-miticko"]').toggle(showMiticko);
-        if (showMiticko) {
-            $modal().find('[data-slot="rate-miticko"]').text(String(meta.commission_miticko_rate ?? 0).replace('.', ','));
-            $modal().find('[data-slot="amount-miticko"]').text(fmt(meta.commission_miticko_amount));
-        }
-
-        const presaleTotal = (customer.lines || []).filter((l) => l.code === 'presale')
-            .reduce((s, l) => s + (parseFloat(l.total) || 0), 0);
-        const showPresale = flagChecked('presale') && presaleTotal > 0;
-        $modal().find('[data-slot="row-presale"]').toggle(showPresale);
-        if (showPresale) {
-            $modal().find('[data-slot="amount-presale"]').text(fmt(presaleTotal));
-        }
+        $modal().find('[data-slot="invoice-subtotal"]').text(fmt(subtotal));
+        $modal().find('.invoice-vat-row').remove();
+        const $totalRow = $modal().find('[data-slot="invoice-total-row"]');
+        let totalVat = 0;
+        Array.from(vatBuckets.entries())
+            .sort((a, b) => a[0] - b[0])
+            .forEach(([rate, amount]) => {
+                totalVat += amount;
+                const rateLabel = Number.isInteger(rate) ? rate : String(rate).replace('.', ',');
+                $(`<tr class="sub invoice-vat-row"><td colspan="5" class="text-end text-secondary">IVA ${rateLabel}%</td><td class="text-end">${fmt(amount)}</td></tr>`)
+                    .insertBefore($totalRow);
+            });
+        $modal().find('[data-slot="invoice-total"]').text(fmt(subtotal + totalVat));
 
         const cust = customer.recipient || {};
         const custHtml = [
@@ -228,6 +229,17 @@
         $modal().find('.invoice-settings-fields').toggleClass('is-locked', isDefault);
         $modal().find('.invoice-flag').prop('disabled', isDefault);
         $modal().find('select[name="invoice_required"]').prop('disabled', isDefault);
+    };
+
+    // Se l'ordine include una prevendita effettivamente addebitata, il flag "Prevendita
+    // Miticko" dev'essere forzato a selezionato e non modificabile dall'operatore (non
+    // avrebbe senso emettere la fattura al cliente omettendo un importo che ha pagato).
+    const applyPresaleLock = () => {
+        const presaleTotal = parseFloat(preview?.order_meta?.presale_total ?? 0) || 0;
+        if (presaleTotal <= 0) return;
+        $modal().find('.invoice-flag[data-flag="presale"]')
+            .prop('checked', true)
+            .prop('disabled', true);
     };
 
     const applyTicketBaseRule = () => {
@@ -334,12 +346,15 @@
         $(document).on('click', '.invoice-mode-btn', function () {
             applyMode($(this).data('invoice-mode'));
             applyTicketBaseRule();
+            applyPresaleLock();
+            renderStep1OrderBreakdown();
         });
 
         $(document).on('change', '#modal-set-invoice select[name="invoice_required"]', function () {
             const val = $(this).val();
             $modal().find('.invoice-flag').prop('disabled', val === '0' || isDefaultMode());
             if (val === '0') $modal().find('.invoice-flag').prop('checked', false);
+            applyPresaleLock();
             renderStep1OrderBreakdown();
         });
 

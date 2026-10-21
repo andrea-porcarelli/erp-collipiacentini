@@ -126,7 +126,8 @@
                                         <tr class="di-cui-label" data-slot="row-order-di-cui-label"><td colspan="5" class="text-start" style="color:#999;font-size:11px;letter-spacing:.5px">DI CUI</td></tr>
                                         <tr class="sub di-cui" data-slot="row-order-commission-payment" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di pagamento (<span data-slot="rate-order-payment">—</span>%)</td><td class="text-end" data-slot="vat-order-payment">—</td><td class="text-end" data-slot="amount-order-payment">—</td></tr>
                                         <tr class="sub di-cui" data-slot="row-order-commission-miticko" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di Miticko (<span data-slot="rate-order-miticko">—</span>%)</td><td class="text-end" data-slot="vat-order-miticko">—</td><td class="text-end" data-slot="amount-order-miticko">—</td></tr>
-                                        <tr class="sub di-cui" data-slot="row-order-presale" style="display:none"><td colspan="3" class="text-start text-secondary">Prevendita (<span data-slot="unit-order-presale">—</span> a biglietto)</td><td class="text-end" data-slot="vat-order-presale">—</td><td class="text-end" data-slot="amount-order-presale">—</td></tr>
+                                        {{-- Prevendita scorporata dal "DI CUI": è un add-on al prezzo biglietto, non una scomposizione del subtotale. --}}
+                                        <tr class="sub" data-slot="row-order-presale" style="display:none"><td colspan="3" class="text-start text-secondary">Prevendita (<span data-slot="unit-order-presale">—</span> a biglietto)</td><td class="text-end" data-slot="vat-order-presale">—</td><td class="text-end" data-slot="amount-order-presale">—</td></tr>
                                         <tr class="total"><td colspan="4" class="text-end">Totale ordine</td><td class="text-end" data-slot="order-total">—</td></tr>
                                     </tfoot>
                                 </table>
@@ -184,24 +185,22 @@
                     <section class="invoice-wizard-pane d-none" data-step="2">
                         <div class="row g-4">
                             <div class="col-12 col-lg-7">
-                                <h3 class="mb-3" style="font-size:16px">Biglietti</h3>
+                                <h3 class="mb-3" style="font-size:16px">Descrizione</h3>
                                 <table class="invoice-summary-table">
                                     <thead>
                                         <tr>
-                                            <th>Tipo</th>
+                                            <th>Prodotto</th>
                                             <th class="text-end">Q.tà</th>
                                             <th class="text-end">Prezzo</th>
+                                            <th class="text-end">Sconto</th>
+                                            <th class="text-end">IVA</th>
                                             <th class="text-end">Subtotale</th>
                                         </tr>
                                     </thead>
                                     <tbody data-slot="invoice-items"></tbody>
                                     <tfoot>
-                                        <tr class="sub"><td colspan="3" class="text-end">Subtotale</td><td class="text-end" data-slot="invoice-subtotal">—</td></tr>
-                                        <tr class="di-cui-label"><td colspan="4" class="text-start" style="color:#999;font-size:11px;letter-spacing:.5px">DI CUI</td></tr>
-                                        <tr class="sub di-cui" data-slot="row-commission-payment" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di pagamento (<span data-slot="rate-payment">—</span>%)</td><td class="text-end" data-slot="amount-payment">—</td></tr>
-                                        <tr class="sub di-cui" data-slot="row-commission-miticko" style="display:none"><td colspan="3" class="text-start text-secondary">Commissioni di servizio (<span data-slot="rate-miticko">—</span>%)</td><td class="text-end" data-slot="amount-miticko">—</td></tr>
-                                        <tr class="sub di-cui" data-slot="row-presale" style="display:none"><td colspan="3" class="text-start text-secondary">Prevendita</td><td class="text-end" data-slot="amount-presale">—</td></tr>
-                                        <tr class="total"><td colspan="3" class="text-end">Totale ordine</td><td class="text-end" data-slot="invoice-total">—</td></tr>
+                                        <tr class="sub"><td colspan="5" class="text-end">Subtotale</td><td class="text-end" data-slot="invoice-subtotal">—</td></tr>
+                                        <tr class="total" data-slot="invoice-total-row"><td colspan="5" class="text-end">Totale fattura</td><td class="text-end" data-slot="invoice-total">—</td></tr>
                                     </tfoot>
                                 </table>
                             </div>
