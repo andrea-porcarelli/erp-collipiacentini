@@ -44,15 +44,33 @@ class OrderInvoiceController extends Controller
                 ->filter()->values()->all();
 
             // Dettaglio righe ordine: una riga per OrderProductItem (variante acquistata)
-            // con qty, unit_price, vat_rate (dal ProductVariantPrice matchato per prezzo), subtotal.
-            $orderItems = $order->orderProducts->flatMap(function ($op) {
-                return $op->items->map(function ($it) {
-                    $vat = $it->variant?->prices
-                        ?->firstWhere(fn ($p) => abs((float) $p->price - (float) $it->unit_price) < 0.01)
-                        ?->vat_rate;
+            // con qty, unit_price, vat_rate, subtotal.
+            // `label` = nome variante (usato nello Step 1), `product_label` = nome prodotto (usato nello Step 2).
+            // vat_rate: usa lo snapshot su OPI; fallback per ordini legacy a match PVP su prezzo puro
+            // (unit_price − prevendita stimata, perché unit_price include già la prevendita).
+            $partnerModel = $order->partner;
+            $orderItems = $order->orderProducts->flatMap(function ($op) use ($partnerModel) {
+                $productLabel = $op->product?->label;
+
+                return $op->items->map(function ($it) use ($productLabel, $partnerModel) {
+                    $vat = $it->vat_rate;
+                    if (is_null($vat)) {
+                        $threshold = $it->partner_commission_presale_threshold ?? $partnerModel?->commission_presale_threshold;
+                        $high = (float) ($it->partner_commission_presale_high ?? $partnerModel?->commission_presale_high ?? 0);
+                        $low = (float) ($it->partner_commission_presale_low ?? $partnerModel?->commission_presale_low ?? 0);
+                        $presaleUnit = 0.0;
+                        if (! is_null($threshold)) {
+                            $presaleUnit = ((float) $it->unit_price - $high) >= (float) $threshold ? $high : $low;
+                        }
+                        $purePrice = round((float) $it->unit_price - $presaleUnit, 2);
+                        $vat = $it->variant?->prices
+                            ?->firstWhere(fn ($p) => abs((float) $p->price - $purePrice) < 0.01)
+                            ?->vat_rate;
+                    }
 
                     return [
                         'label' => $it->variant?->label ?? '—',
+                        'product_label' => $productLabel ?? '—',
                         'quantity' => (int) $it->quantity,
                         'unit_price' => (float) $it->unit_price,
                         'vat_rate' => is_null($vat) ? null : (float) $vat,
@@ -65,7 +83,6 @@ class OrderInvoiceController extends Controller
             //  - subtotale biglietti "puro" (base per le commissioni %)
             //  - prevendita: add-on partner — low/high in base alla soglia sul unit_price del biglietto.
             // Servono per le righe DI CUI nel riepilogo ordine.
-            $partnerModel = $order->partner;
             $ticketsSubtotal = 0.0;
             $presaleTotal = 0.0;
             $presaleQuantity = 0;

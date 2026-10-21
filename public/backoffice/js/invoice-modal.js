@@ -140,12 +140,13 @@
         const partner = preview.partner || {};
         const meta = preview.order_meta || {};
 
-        // Tabella principale: le varianti dell'ordine (come dettaglio ordine).
+        // Tabella principale: nello Step 2 (riepilogo fattura) mostriamo il NOME del prodotto,
+        // non quello della variante (che resta nello Step 1).
         const orderItems = meta.items || [];
         const $items = $modal().find('[data-slot="invoice-items"]').empty();
         orderItems.forEach((it) => {
             $items.append(`<tr>
-                <td class="fw-semibold">${escapeHtml(it.label)}</td>
+                <td class="fw-semibold">${escapeHtml(it.product_label ?? it.label)}</td>
                 <td class="text-end">${it.quantity}</td>
                 <td class="text-end">${fmt(it.unit_price)}</td>
                 <td class="text-end">${fmt(it.subtotal)}</td>

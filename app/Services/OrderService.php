@@ -14,6 +14,7 @@ use App\Models\OrderProductItem;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\ProductVariantPrice;
 use App\Notifications\NewOrderTelegramNotify;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -99,6 +100,7 @@ class OrderService
                     'product_variant_id' => $item->product_variant_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
+                    'vat_rate' => $this->snapshotVatRate((int) $item->product_variant_id, (float) $item->unit_price, $partner),
                     ...$commissionSnapshot,
                     ...$billingFlagsSnapshot,
                 ]);
@@ -393,6 +395,7 @@ class OrderService
                     'product_variant_id' => $item['variant_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
+                    'vat_rate' => $this->snapshotVatRate((int) $item['variant_id'], (float) $item['unit_price'], $partner),
                     ...$commissionSnapshot,
                     ...$billingFlagsSnapshot,
                 ]);
@@ -516,5 +519,36 @@ class OrderService
             ],
             'variants' => $mapped,
         ];
+    }
+
+    /**
+     * Snapshot dell'aliquota IVA del biglietto al momento della creazione dell'OPI.
+     *
+     * Il `unit_price` dell'item include già la prevendita (vedi BookingController@add),
+     * mentre ProductVariantPrice.price è il prezzo di listino "puro". Per matchare il PVP
+     * giusto devo sottrarre la quota prevendita stimata dal unit_price.
+     *
+     * Ritorna null se non c'è un PVP con prezzo coincidente (es. prezzo fuori listino
+     * o variante con PVP multipli), così il preview può fare fallback.
+     */
+    protected function snapshotVatRate(int $variantId, float $unitPrice, ?Partner $partner): ?float
+    {
+        $threshold = $partner?->commission_presale_threshold;
+        $low = (float) ($partner?->commission_presale_low ?? 0);
+        $high = (float) ($partner?->commission_presale_high ?? 0);
+
+        // Stima quale aliquota di prevendita è stata applicata, invertendo la logica di
+        // Partner::resolvePresaleCommission (`unit_price_puro < threshold` → low, altrimenti → high).
+        $presaleUnit = 0.0;
+        if (! is_null($threshold)) {
+            $presaleUnit = ($unitPrice - $high) >= (float) $threshold ? $high : $low;
+        }
+        $purePrice = round($unitPrice - $presaleUnit, 2);
+
+        $matched = ProductVariantPrice::where('product_variant_id', $variantId)
+            ->whereBetween('price', [$purePrice - 0.01, $purePrice + 0.01])
+            ->first();
+
+        return $matched?->vat_rate === null ? null : (float) $matched->vat_rate;
     }
 }

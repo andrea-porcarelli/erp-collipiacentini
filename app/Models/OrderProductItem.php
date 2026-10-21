@@ -12,6 +12,7 @@ class OrderProductItem extends LogsModel
         'product_variant_id',
         'quantity',
         'unit_price',
+        'vat_rate',
         'partner_commission_presale_low',
         'partner_commission_presale_high',
         'partner_commission_presale_threshold',
@@ -26,6 +27,7 @@ class OrderProductItem extends LogsModel
 
     protected $casts = [
         'unit_price' => 'decimal:2',
+        'vat_rate' => 'decimal:2',
         'partner_commission_presale_low' => 'decimal:2',
         'partner_commission_presale_high' => 'decimal:2',
         'partner_commission_presale_threshold' => 'decimal:2',
