@@ -61,26 +61,31 @@ class OrderInvoiceController extends Controller
                 });
             })->values()->all();
 
-            // Prevendita aggregata sull'intero ordine (indipendente dai flag `bill_presale`
-            // dei singoli item): add-on calcolato dal partner — low/high in base alla soglia
-            // sul unit_price del biglietto. Serve per la riga DI CUI nel riepilogo ordine.
+            // Aggregati sull'intero ordine (indipendenti dai flag `bill_*` dei singoli item):
+            //  - subtotale biglietti "puro" (base per le commissioni %)
+            //  - prevendita: add-on partner — low/high in base alla soglia sul unit_price del biglietto.
+            // Servono per le righe DI CUI nel riepilogo ordine.
             $partnerModel = $order->partner;
+            $ticketsSubtotal = 0.0;
             $presaleTotal = 0.0;
             $presaleQuantity = 0;
             foreach ($order->orderProducts as $op) {
                 foreach ($op->items as $it) {
+                    $qty = max((int) $it->quantity, 1);
+                    $ticketsSubtotal += (float) $it->unit_price * $qty;
+
                     $threshold = $it->partner_commission_presale_threshold ?? $partnerModel?->commission_presale_threshold;
                     if (is_null($threshold)) {
                         continue;
                     }
                     $low = (float) ($it->partner_commission_presale_low ?? $partnerModel?->commission_presale_low ?? 0);
                     $high = (float) ($it->partner_commission_presale_high ?? $partnerModel?->commission_presale_high ?? 0);
-                    $qty = max((int) $it->quantity, 1);
                     $unit = (float) $it->unit_price < (float) $threshold ? $low : $high;
                     $presaleTotal += $unit * $qty;
                     $presaleQuantity += $qty;
                 }
             }
+            $ticketsSubtotal = round($ticketsSubtotal, 2);
             $presaleTotal = round($presaleTotal, 2);
             $presaleUnit = $presaleQuantity > 0 ? round($presaleTotal / $presaleQuantity, 2) : 0.0;
 
@@ -93,12 +98,13 @@ class OrderInvoiceController extends Controller
                     'variants' => $variants,
                     'items' => $orderItems,
                     'order_total' => (float) $order->amount,
-                    // Rate commissioni e importi "DI CUI" calcolati come nel dettaglio ordine
-                    // (OrderController@show): rate presa dal partner corrente, amount = rate * order->amount.
+                    // Rate commissioni e importi "DI CUI": la % viene sempre applicata sul subtotale
+                    // biglietti "puro" (prima di sommare quota fissa Miticko e prevendita), coerente
+                    // con la logica di InvoiceCalculatorService::computeAmountsForItem().
                     'commission_payment_rate' => (float) ($order->partner?->commission_payment ?? 0),
-                    'commission_payment_amount' => round((float) $order->amount * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
+                    'commission_payment_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_payment ?? 0) / 100, 2),
                     'commission_miticko_rate' => (float) ($order->partner?->commission_miticko_variable ?? 0),
-                    'commission_miticko_amount' => round((float) $order->amount * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
+                    'commission_miticko_amount' => round($ticketsSubtotal * (float) ($order->partner?->commission_miticko_variable ?? 0) / 100, 2),
                     'presale_total' => $presaleTotal,
                     'presale_quantity' => $presaleQuantity,
                     'presale_unit' => $presaleUnit,
