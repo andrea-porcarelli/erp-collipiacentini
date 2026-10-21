@@ -137,13 +137,16 @@ class PartnerController extends CrudController
                 'sale' => $this->updateSale($partner, $request),
                 'contatti' => $this->updateContatti($partner, $request),
                 'commissions' => $this->interface->edit($partner, [
-                    'commission_presale_low' => $request->input('commission_presale_low'),
+                    'commission_presale_threshold_high' => $request->input('commission_presale_threshold_high'),
                     'commission_presale_high' => $request->input('commission_presale_high'),
-                    'commission_presale_threshold' => $request->input('commission_presale_threshold'),
-                    'commission_presale_vat' => $request->input('commission_presale_vat'),
+                    'commission_presale_high_vat' => $request->input('commission_presale_high_vat'),
+                    'commission_presale_threshold_low' => $request->input('commission_presale_threshold_low'),
+                    'commission_presale_low' => $request->input('commission_presale_low'),
+                    'commission_presale_low_vat' => $request->input('commission_presale_low_vat'),
                     'commission_miticko_fixed' => $request->input('commission_miticko_fixed'),
+                    'commission_miticko_fixed_vat' => $request->input('commission_miticko_fixed_vat'),
                     'commission_miticko_variable' => $request->input('commission_miticko_variable'),
-                    'commission_miticko_vat' => $request->input('commission_miticko_vat'),
+                    'commission_miticko_variable_vat' => $request->input('commission_miticko_variable_vat'),
                     'commission_payment' => $request->input('commission_payment'),
                     'commission_payment_vat' => $request->input('commission_payment_vat'),
                 ]),
@@ -368,18 +371,18 @@ class PartnerController extends CrudController
                 })
                 ->addColumn('commissions', function ($item) {
                     $rows = [];
-                    $threshold = $item->commission_presale_threshold;
-                    if (! is_null($item->commission_presale_low) || ! is_null($item->commission_presale_high) || ! is_null($threshold)) {
-                        $rows[] = 'Presale: '
-                            .'<span title="sotto soglia">'.self::fmtEuro($item->commission_presale_low).'</span>'
-                            .' / '
-                            .'<span title="sopra soglia">'.self::fmtEuro($item->commission_presale_high).'</span>'
-                            .' <span class="text-secondary small">soglia '.self::fmtEuro($threshold).'</span>';
+                    $thresholdHigh = $item->commission_presale_threshold_high;
+                    $thresholdLow = $item->commission_presale_threshold_low;
+                    if (! is_null($item->commission_presale_high) || ! is_null($thresholdHigh)) {
+                        $rows[] = 'Prevendita > '.self::fmtEuro($thresholdHigh).': '.self::fmtEuro($item->commission_presale_high);
+                    }
+                    if (! is_null($item->commission_presale_low) || ! is_null($thresholdLow)) {
+                        $rows[] = 'Prevendita < '.self::fmtEuro($thresholdLow).': '.self::fmtEuro($item->commission_presale_low);
                     }
                     if (! is_null($item->commission_miticko_fixed) || ! is_null($item->commission_miticko_variable)) {
-                        $rows[] = 'Miticko: '
+                        $rows[] = 'Commissione: '
                             .self::fmtEuro($item->commission_miticko_fixed).' fissa + '
-                            .self::fmtPercent($item->commission_miticko_variable).' var.';
+                            .self::fmtPercent($item->commission_miticko_variable).' %';
                     }
                     if (! is_null($item->commission_payment)) {
                         $rows[] = 'Pagamento: '.self::fmtPercent($item->commission_payment);

@@ -201,13 +201,18 @@ class OrderExportService
         $paymentAmount = round($itemSubtotal * $paymentPct / 100, 2);
         $serviceAmount = round($itemSubtotal * $servicePct / 100, 2);
 
-        // Prevendita €: si applica per partecipante, dipende dal prezzo unitario e dalla soglia.
+        // Prevendita €: si applica per partecipante, dipende dal prezzo unitario e dalle due soglie
+        // (banda morta tra le due: fuori range → prevendita, dentro → 0).
         $presaleLow = (float) ($item?->partner_commission_presale_low ?? 0);
         $presaleHigh = (float) ($item?->partner_commission_presale_high ?? 0);
-        $presaleThreshold = $item?->partner_commission_presale_threshold;
-        $presaleUnit = is_null($presaleThreshold)
-            ? 0.0
-            : ($unitPrice < (float) $presaleThreshold ? $presaleLow : $presaleHigh);
+        $thresholdHigh = $item?->partner_commission_presale_threshold_high;
+        $thresholdLow = $item?->partner_commission_presale_threshold_low;
+        $presaleUnit = 0.0;
+        if (! is_null($thresholdHigh) && $unitPrice > (float) $thresholdHigh) {
+            $presaleUnit = $presaleHigh;
+        } elseif (! is_null($thresholdLow) && $unitPrice < (float) $thresholdLow) {
+            $presaleUnit = $presaleLow;
+        }
 
         $values = [];
 

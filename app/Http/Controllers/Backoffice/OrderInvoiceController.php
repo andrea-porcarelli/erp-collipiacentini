@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Services\InvoiceCalculatorService;
+use App\Services\Invoicing\FatturaPaBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -55,14 +57,18 @@ class OrderInvoiceController extends Controller
                 return $op->items->map(function ($it) use ($productLabel, $partnerModel) {
                     $vat = $it->vat_rate;
                     if (is_null($vat)) {
-                        $threshold = $it->partner_commission_presale_threshold ?? $partnerModel?->commission_presale_threshold;
+                        $thresholdHigh = $it->partner_commission_presale_threshold_high ?? $partnerModel?->commission_presale_threshold_high;
+                        $thresholdLow = $it->partner_commission_presale_threshold_low ?? $partnerModel?->commission_presale_threshold_low;
                         $high = (float) ($it->partner_commission_presale_high ?? $partnerModel?->commission_presale_high ?? 0);
                         $low = (float) ($it->partner_commission_presale_low ?? $partnerModel?->commission_presale_low ?? 0);
+                        $unit = (float) $it->unit_price;
                         $presaleUnit = 0.0;
-                        if (! is_null($threshold)) {
-                            $presaleUnit = ((float) $it->unit_price - $high) >= (float) $threshold ? $high : $low;
+                        if (! is_null($thresholdHigh) && ($unit - $high) > (float) $thresholdHigh) {
+                            $presaleUnit = $high;
+                        } elseif (! is_null($thresholdLow) && ($unit - $low) < (float) $thresholdLow) {
+                            $presaleUnit = $low;
                         }
-                        $purePrice = round((float) $it->unit_price - $presaleUnit, 2);
+                        $purePrice = round($unit - $presaleUnit, 2);
                         $vat = $it->variant?->prices
                             ?->firstWhere(fn ($p) => abs((float) $p->price - $purePrice) < 0.01)
                             ?->vat_rate;
@@ -91,13 +97,20 @@ class OrderInvoiceController extends Controller
                     $qty = max((int) $it->quantity, 1);
                     $ticketsSubtotal += (float) $it->unit_price * $qty;
 
-                    $threshold = $it->partner_commission_presale_threshold ?? $partnerModel?->commission_presale_threshold;
-                    if (is_null($threshold)) {
-                        continue;
-                    }
+                    $thresholdHigh = $it->partner_commission_presale_threshold_high ?? $partnerModel?->commission_presale_threshold_high;
+                    $thresholdLow = $it->partner_commission_presale_threshold_low ?? $partnerModel?->commission_presale_threshold_low;
                     $low = (float) ($it->partner_commission_presale_low ?? $partnerModel?->commission_presale_low ?? 0);
                     $high = (float) ($it->partner_commission_presale_high ?? $partnerModel?->commission_presale_high ?? 0);
-                    $unit = (float) $it->unit_price < (float) $threshold ? $low : $high;
+                    $unitPrice = (float) $it->unit_price;
+                    $unit = 0.0;
+                    if (! is_null($thresholdHigh) && $unitPrice > (float) $thresholdHigh) {
+                        $unit = $high;
+                    } elseif (! is_null($thresholdLow) && $unitPrice < (float) $thresholdLow) {
+                        $unit = $low;
+                    }
+                    if ($unit <= 0) {
+                        continue;
+                    }
                     $presaleTotal += $unit * $qty;
                     $presaleQuantity += $qty;
                 }
@@ -108,9 +121,15 @@ class OrderInvoiceController extends Controller
 
             // Aliquote IVA delle commissioni: snapshot su OPI al momento dell'ordine, con
             // fallback alla configurazione corrente del partner (per ordini pre-snapshot).
+            // Prevendita e Miticko hanno IVA separata per riga: nel modal di anteprima mostriamo
+            // una sola IVA per tipologia, quindi usiamo quella della fascia "high" / variabile come default.
             $firstItem = $order->orderProducts->flatMap(fn ($op) => $op->items)->first();
-            $presaleVatSnapshot = $firstItem?->partner_commission_presale_vat ?? $order->partner?->commission_presale_vat;
-            $mitickoVatSnapshot = $firstItem?->partner_commission_miticko_vat ?? $order->partner?->commission_miticko_vat;
+            $presaleVatSnapshot = $firstItem?->partner_commission_presale_high_vat
+                ?? $firstItem?->partner_commission_presale_low_vat
+                ?? $order->partner?->commission_presale_high_vat
+                ?? $order->partner?->commission_presale_low_vat;
+            $mitickoVatSnapshot = $firstItem?->partner_commission_miticko_variable_vat
+                ?? $order->partner?->commission_miticko_variable_vat;
             $paymentVatSnapshot = $firstItem?->partner_commission_payment_vat ?? $order->partner?->commission_payment_vat;
 
             return response()->json([
@@ -227,6 +246,24 @@ class OrderInvoiceController extends Controller
         } catch (\Exception $e) {
             return $this->exception($e, $request);
         }
+    }
+
+    /**
+     * Scarica l'XML FatturaPA (SdI compliance) per una singola Invoice associata all'ordine.
+     * Costruito on-the-fly dai dati della Invoice via FatturaPaBuilder, quindi disponibile
+     * anche per fatture in stato DRAFT (quando il provider non è configurato).
+     */
+    public function downloadXml(Order $order, Invoice $invoice, FatturaPaBuilder $builder): Response
+    {
+        abort_unless($invoice->order_id === $order->id, 404);
+
+        $xml = $builder->build($invoice);
+        $filename = $builder->filename($invoice);
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 
     /**

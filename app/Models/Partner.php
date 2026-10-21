@@ -34,12 +34,15 @@ class Partner extends LogsModel
         'slug_name',
         'css_style',
         'commission_presale_low',
+        'commission_presale_low_vat',
         'commission_presale_high',
-        'commission_presale_threshold',
-        'commission_presale_vat',
+        'commission_presale_high_vat',
+        'commission_presale_threshold_high',
+        'commission_presale_threshold_low',
         'commission_miticko_fixed',
+        'commission_miticko_fixed_vat',
         'commission_miticko_variable',
-        'commission_miticko_vat',
+        'commission_miticko_variable_vat',
         'commission_payment',
         'commission_payment_vat',
         'consents_enabled',
@@ -177,16 +180,26 @@ class Partner extends LogsModel
         return $this->morphMany(Media::class, 'mediable')->where('media_type', 'gallery');
     }
 
+    /**
+     * Prevendita a due soglie con banda morta:
+     *   - unit > threshold_high  → presale_high
+     *   - unit < threshold_low   → presale_low
+     *   - altrimenti             → 0 (nessuna prevendita)
+     * Se una soglia è NULL, quel ramo è disattivato.
+     */
     public function resolvePresaleCommission(float $unitPrice): float
     {
-        if (is_null($this->commission_presale_threshold)) {
-            return 0.0;
+        $high = $this->commission_presale_threshold_high;
+        $low = $this->commission_presale_threshold_low;
+
+        if (! is_null($high) && $unitPrice > (float) $high) {
+            return (float) ($this->commission_presale_high ?? 0);
         }
 
-        $commission = $unitPrice < (float) $this->commission_presale_threshold
-            ? $this->commission_presale_low
-            : $this->commission_presale_high;
+        if (! is_null($low) && $unitPrice < (float) $low) {
+            return (float) ($this->commission_presale_low ?? 0);
+        }
 
-        return (float) ($commission ?? 0);
+        return 0.0;
     }
 }

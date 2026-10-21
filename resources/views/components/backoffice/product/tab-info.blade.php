@@ -188,6 +188,10 @@
                 </div>
             </x-card>
 
+            @if(auth()->user()?->role === 'god')
+                <x-backoffice.product.resellers :model="$model" />
+            @endif
+
             <x-card title="Fatturazione" sub_title="modifica le impostazioni di default di fatturazione per questo prodotto" class="mt-4 mb-5 position-relative">
                 <form id="form-info-billing">
                     <div class="row">

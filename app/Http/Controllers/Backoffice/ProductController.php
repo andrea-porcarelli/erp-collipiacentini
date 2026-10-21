@@ -171,6 +171,7 @@ class ProductController extends CrudController
                 'features' => $this->updateFeatures($product, $request),
                 'visit' => $this->updateVisit($product, $request),
                 'billing' => $this->updateBilling($product, $request),
+                'resellers' => $this->updateResellers($product, $request),
                 default => throw new \Exception('Sezione non valida'),
             };
 
@@ -310,6 +311,20 @@ class ProductController extends CrudController
             'bill_miticko_commission' => $ticketBase ? true : (bool) $request->input('bill_miticko_commission'),
             'bill_bank_commission' => $ticketBase ? true : (bool) $request->input('bill_bank_commission'),
         ]);
+    }
+
+    private function updateResellers(Product $product, UpdateProductRequest $request): void
+    {
+        abort_unless(Auth::user()?->role === 'god', 403);
+
+        $ids = collect($request->input('reseller_partner_ids', []))
+            ->map(fn ($v) => (int) $v)
+            ->filter(fn ($id) => $id > 0 && $id !== (int) $product->partner_id)
+            ->unique()
+            ->values()
+            ->all();
+
+        $product->resellerPartners()->sync($ids);
     }
 
     public function getVisitInfoTranslations(int $id): JsonResponse

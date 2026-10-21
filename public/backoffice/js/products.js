@@ -126,6 +126,18 @@ const formConfigs = {
             return errors;
         },
     },
+    'form-info-resellers': {
+        endpoint: () => `/products/${window.PRODUCT_ID}`,
+        method: 'put',
+        section: 'resellers',
+        successMessage: 'Partner rivenditori aggiornati con successo',
+        validate: () => ({}),
+        collect: () => ({
+            reseller_partner_ids: $('#form-info-resellers input[name="reseller_partner_ids"]:checked')
+                .map(function () { return $(this).val(); })
+                .get(),
+        }),
+    },
     'form-info-billing': {
         endpoint: () => `/products/${window.PRODUCT_ID}`,
         method: 'put',

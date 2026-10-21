@@ -146,17 +146,22 @@ class InvoiceCalculatorService
         $subtotal = round($unitPrice * $qty, 2);
 
         // Snapshot NULL → fallback ai valori correnti del partner (per ordini pre-migrazione snapshot).
-        $presaleThreshold = $item->partner_commission_presale_threshold ?? $partner?->commission_presale_threshold;
+        $thresholdHigh = $item->partner_commission_presale_threshold_high ?? $partner?->commission_presale_threshold_high;
+        $thresholdLow = $item->partner_commission_presale_threshold_low ?? $partner?->commission_presale_threshold_low;
         $presaleLow = (float) ($item->partner_commission_presale_low ?? $partner?->commission_presale_low ?? 0);
         $presaleHigh = (float) ($item->partner_commission_presale_high ?? $partner?->commission_presale_high ?? 0);
         $mitickoFixed = (float) ($item->partner_commission_miticko_fixed ?? $partner?->commission_miticko_fixed ?? 0);
         $mitickoVarPct = (float) ($item->partner_commission_miticko_variable ?? $partner?->commission_miticko_variable ?? 0);
         $bankPct = (float) ($item->partner_commission_payment ?? $partner?->commission_payment ?? 0);
 
-        // Prevendita: importo per partecipante, dipende dalla soglia sul unit_price.
-        $presaleUnit = is_null($presaleThreshold)
-            ? 0.0
-            : ($unitPrice < (float) $presaleThreshold ? $presaleLow : $presaleHigh);
+        // Prevendita a due soglie con banda morta:
+        //   unit > threshold_high → presale_high, unit < threshold_low → presale_low, altrimenti 0.
+        $presaleUnit = 0.0;
+        if (! is_null($thresholdHigh) && $unitPrice > (float) $thresholdHigh) {
+            $presaleUnit = $presaleHigh;
+        } elseif (! is_null($thresholdLow) && $unitPrice < (float) $thresholdLow) {
+            $presaleUnit = $presaleLow;
+        }
         $presaleTotal = round($presaleUnit * $qty, 2);
 
         // Miticko = fisso per biglietto + variabile % sul subtotal.

@@ -59,6 +59,10 @@ class UpdateProductRequest extends FormRequest
                 'bill_miticko_commission' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
                 'bill_bank_commission' => ['nullable', Rule::in(['0', '1', 0, 1, true, false])],
             ],
+            'resellers' => [
+                'reseller_partner_ids' => ['nullable', 'array'],
+                'reseller_partner_ids.*' => ['integer', 'exists:partners,id'],
+            ],
             default => [],
         };
     }

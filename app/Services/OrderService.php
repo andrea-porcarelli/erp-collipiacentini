@@ -83,17 +83,7 @@ class OrderService
             // le condizioni economiche al momento della prenotazione anche se in
             // futuro le commissioni del partner verranno modificate.
             $partner = $cart->partner;
-            $commissionSnapshot = (float) $cart->total > 0 && $partner ? [
-                'partner_commission_presale_low' => $partner->commission_presale_low,
-                'partner_commission_presale_high' => $partner->commission_presale_high,
-                'partner_commission_presale_threshold' => $partner->commission_presale_threshold,
-                'partner_commission_presale_vat' => $partner->commission_presale_vat,
-                'partner_commission_miticko_fixed' => $partner->commission_miticko_fixed,
-                'partner_commission_miticko_variable' => $partner->commission_miticko_variable,
-                'partner_commission_miticko_vat' => $partner->commission_miticko_vat,
-                'partner_commission_payment' => $partner->commission_payment,
-                'partner_commission_payment_vat' => $partner->commission_payment_vat,
-            ] : [];
+            $commissionSnapshot = (float) $cart->total > 0 && $partner ? $this->partnerCommissionSnapshot($partner) : [];
 
             $billingFlagsSnapshot = ($cart->product ?? Product::find($cart->product_id))?->defaultBillingFlags() ?? [];
 
@@ -381,17 +371,7 @@ class OrderService
                 'total' => $total,
             ]);
 
-            $commissionSnapshot = $total > 0 ? [
-                'partner_commission_presale_low' => $partner->commission_presale_low,
-                'partner_commission_presale_high' => $partner->commission_presale_high,
-                'partner_commission_presale_threshold' => $partner->commission_presale_threshold,
-                'partner_commission_presale_vat' => $partner->commission_presale_vat,
-                'partner_commission_miticko_fixed' => $partner->commission_miticko_fixed,
-                'partner_commission_miticko_variable' => $partner->commission_miticko_variable,
-                'partner_commission_miticko_vat' => $partner->commission_miticko_vat,
-                'partner_commission_payment' => $partner->commission_payment,
-                'partner_commission_payment_vat' => $partner->commission_payment_vat,
-            ] : [];
+            $commissionSnapshot = $total > 0 ? $this->partnerCommissionSnapshot($partner) : [];
 
             $billingFlagsSnapshot = $product->defaultBillingFlags();
 
@@ -539,15 +519,18 @@ class OrderService
      */
     protected function snapshotVatRate(int $variantId, float $unitPrice, ?Partner $partner): ?float
     {
-        $threshold = $partner?->commission_presale_threshold;
+        $thresholdHigh = $partner?->commission_presale_threshold_high;
+        $thresholdLow = $partner?->commission_presale_threshold_low;
         $low = (float) ($partner?->commission_presale_low ?? 0);
         $high = (float) ($partner?->commission_presale_high ?? 0);
 
-        // Stima quale aliquota di prevendita è stata applicata, invertendo la logica di
-        // Partner::resolvePresaleCommission (`unit_price_puro < threshold` → low, altrimenti → high).
+        // Inverte la logica banda morta di Partner::resolvePresaleCommission per stimare
+        // la quota prevendita inclusa nel unit_price e isolare il prezzo "puro" del PVP.
         $presaleUnit = 0.0;
-        if (! is_null($threshold)) {
-            $presaleUnit = ($unitPrice - $high) >= (float) $threshold ? $high : $low;
+        if (! is_null($thresholdHigh) && ($unitPrice - $high) > (float) $thresholdHigh) {
+            $presaleUnit = $high;
+        } elseif (! is_null($thresholdLow) && ($unitPrice - $low) < (float) $thresholdLow) {
+            $presaleUnit = $low;
         }
         $purePrice = round($unitPrice - $presaleUnit, 2);
 
@@ -556,5 +539,23 @@ class OrderService
             ->first();
 
         return $matched?->vat_rate === null ? null : (float) $matched->vat_rate;
+    }
+
+    protected function partnerCommissionSnapshot(Partner $partner): array
+    {
+        return [
+            'partner_commission_presale_low' => $partner->commission_presale_low,
+            'partner_commission_presale_low_vat' => $partner->commission_presale_low_vat,
+            'partner_commission_presale_high' => $partner->commission_presale_high,
+            'partner_commission_presale_high_vat' => $partner->commission_presale_high_vat,
+            'partner_commission_presale_threshold_high' => $partner->commission_presale_threshold_high,
+            'partner_commission_presale_threshold_low' => $partner->commission_presale_threshold_low,
+            'partner_commission_miticko_fixed' => $partner->commission_miticko_fixed,
+            'partner_commission_miticko_fixed_vat' => $partner->commission_miticko_fixed_vat,
+            'partner_commission_miticko_variable' => $partner->commission_miticko_variable,
+            'partner_commission_miticko_variable_vat' => $partner->commission_miticko_variable_vat,
+            'partner_commission_payment' => $partner->commission_payment,
+            'partner_commission_payment_vat' => $partner->commission_payment_vat,
+        ];
     }
 }

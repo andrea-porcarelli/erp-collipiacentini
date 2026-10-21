@@ -124,6 +124,7 @@ Route::domain("admin.miticko.com")
             Route::get('orders/{order}/invoice/preview', [OrderInvoiceController::class, 'preview'])->name('orders.invoice.preview');
             Route::post('orders/{order}/invoice', [OrderInvoiceController::class, 'store'])->name('orders.invoice.store');
             Route::get('orders/{order}/invoices/logs', [OrderInvoiceController::class, 'logs'])->name('orders.invoices.logs');
+            Route::get('orders/{order}/invoices/{invoice}/fatturapa.xml', [OrderInvoiceController::class, 'downloadXml'])->name('orders.invoices.xml');
 
             // Sezione Fatturazione (solo god + admin, controllato nel controller).
             // Vista order-centric: elenca gli ordini con stato fattura derivato (to_emit/not_required/sent/refunded).

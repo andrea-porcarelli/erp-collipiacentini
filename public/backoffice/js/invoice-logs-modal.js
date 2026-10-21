@@ -115,13 +115,14 @@
                 `;
             }).join('') || '<div class="inv-log-empty">Nessun tentativo registrato.</div>';
 
+            const xmlUrl = `/orders/${data.order_id}/invoices/${inv.id}/fatturapa.xml`;
             $container.append(`
                 <div class="inv-log-invoice">
                     <div class="d-flex align-items-start justify-content-between gap-2">
                         <h4>${recipientLabel(inv.recipient_type)} — ${escapeHtml(inv.recipient_name || '—')}</h4>
-                        <button type="button" class="btn btn-sm btn-outline-secondary inv-log-download-invoice" data-invoice-id="${inv.id}" title="Scarica dati fattura (JSON)">
-                            <i class="fa-regular fa-download"></i> dati fattura
-                        </button>
+                        <a href="${xmlUrl}" class="btn btn-sm btn-outline-secondary" title="Scarica XML FatturaPA (SdI compliance)">
+                            <i class="fa-regular fa-download"></i> XML FatturaPA
+                        </a>
                     </div>
                     <div class="inv-log-meta">
                         <span><b>Stato:</b> ${status}</span>
@@ -148,31 +149,6 @@
         $(document).on('click', '#modal-invoice-logs .inv-log-row-header', function (e) {
             if ($(e.target).closest('.inv-log-download-attempt').length) return;
             $(this).closest('.inv-log-row').toggleClass('open');
-        });
-
-        // Download dati fattura (lines + metadati) — utile anche per fatture DRAFT.
-        $(document).on('click', '#modal-invoice-logs .inv-log-download-invoice', function (e) {
-            e.stopPropagation();
-            const invoiceId = parseInt($(this).data('invoice-id'), 10);
-            const inv = (lastData?.invoices || []).find((i) => i.id === invoiceId);
-            if (!inv) return;
-            const snapshot = {
-                invoice_id: inv.id,
-                order_number: lastData?.order_number,
-                recipient_type: inv.recipient_type,
-                recipient_name: inv.recipient_name,
-                number: inv.number,
-                status: inv.status,
-                provider: inv.provider,
-                provider_id: inv.provider_id,
-                total: inv.total,
-                currency: inv.currency,
-                description: inv.description,
-                lines: inv.lines,
-                emitted_at: inv.emitted_at,
-                emitted_by: inv.emitted_by,
-            };
-            downloadJson(`fattura-${inv.id}-${inv.recipient_type}.json`, snapshot);
         });
 
         // Download payload JSON del singolo tentativo (quello spedito a FIC).
