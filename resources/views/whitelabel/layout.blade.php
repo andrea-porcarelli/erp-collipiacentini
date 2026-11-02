@@ -37,7 +37,7 @@
     @endif
 </head>
 
-<body data-mode="{{ ($partner ?? null)?->css_style ?: 'Miticko' }} Light Desktop White">
+<body data-mode="{{ ($partner ?? null)?->css_style ?: 'Miticko' }} {{ ucfirst(($partner ?? null)?->default_layout_mode ?: 'light') }} Desktop White">
     <x-whitelabel.header />
     @yield('content')
     <x-whitelabel.footer />

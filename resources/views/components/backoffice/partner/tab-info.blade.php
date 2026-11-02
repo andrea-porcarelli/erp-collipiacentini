@@ -64,6 +64,14 @@
                               :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
                               :model="$model" />
                 </div>
+                <div class="col-12 col-sm-4 mt-3">
+                    <x-select name="default_layout_mode" label="Layout di default"
+                              :options="[
+                                  ['id' => 'light', 'label' => 'Chiaro'],
+                                  ['id' => 'dark',  'label' => 'Scuro'],
+                              ]"
+                              :model="$model" />
+                </div>
             </div>
         </form>
         <div class="button-card-absolute">

@@ -228,15 +228,18 @@ class PartnerController extends CrudController
                 Rule::unique('partners', 'domain_name')->ignore($partner->id),
             ],
             'css_style' => ['nullable', Rule::in(Partner::CSS_STYLES)],
+            'default_layout_mode' => ['nullable', Rule::in(Partner::LAYOUT_MODES)],
         ], [
             'domain_name.unique' => 'Il dominio inserito è già associato a un altro partner',
             'css_style.in' => 'Stile CSS non valido',
+            'default_layout_mode.in' => 'Layout di default non valido',
         ]);
 
         $this->interface->edit($partner, [
             'sale_method' => $request->input('sale_method'),
             'domain_name' => $request->input('domain_name') ?: null,
             'css_style' => $request->input('css_style') ?: 'Miticko',
+            'default_layout_mode' => $request->input('default_layout_mode') ?: 'light',
         ]);
     }
 

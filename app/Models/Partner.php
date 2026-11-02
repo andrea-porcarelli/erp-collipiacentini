@@ -33,6 +33,7 @@ class Partner extends LogsModel
         'domain_name',
         'slug_name',
         'css_style',
+        'default_layout_mode',
         'commission_presale_low',
         'commission_presale_low_vat',
         'commission_presale_high',
@@ -65,7 +66,9 @@ class Partner extends LogsModel
         return $this->billing_managed_by === self::BILLING_MANAGED_BY_MITICKO;
     }
 
-    public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno'];
+    public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno', 'Tocqueville'];
+
+    public const LAYOUT_MODES = ['light', 'dark'];
 
     public const PAGES = [
         'contatti' => ['field' => 'contacts_content', 'title' => 'Contatti'],
