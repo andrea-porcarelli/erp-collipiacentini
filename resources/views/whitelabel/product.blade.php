@@ -422,10 +422,9 @@
         min-width: 40px;
         text-align: center;
         color: var(--text-main, #0D0D0D);
-        text-align: center;
 
         /* Title */
-        font-family: var(--typography-web-title-font, "DM Sans");
+        font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
         font-size: var(--size, 24px);
         font-style: normal;
         font-weight: var(--weight, 600);
