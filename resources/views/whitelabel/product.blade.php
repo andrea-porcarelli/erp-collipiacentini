@@ -421,7 +421,7 @@
         justify-content: center;
         cursor: pointer;
         transition: all 0.2s ease;
-        color: #2A3493 !important   ;
+        fill: var(--button-resting-foreground, #EDF7FF);
     }
 
     .quantity-control .btn-quantity:hover:not(:disabled) {
