@@ -423,26 +423,16 @@
         text-align: center;
         font-weight: 700;
         font-size:  var(--typography-title-size-large, 28px);
+        color: var(--text-main, #0D0D0D);
     }
-
-    .quantity-control .description {
-        color: var(--text-secondary, #666);
-        /* bodySmall */
-        font-family: var(--font-font-2, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-small, 14px);
-        font-style: normal;
-        font-weight: var(--typography-body-weight-small, 300);
-        line-height: var(--typography-body-lineheight-small, 16px);
-    }
-
     .quantity-control .price {
         color: var(--text-secondary, #666);
         /* bodySmall */
-        font-family: var(--font-font-2, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-small, 14px);
+        font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
+        font-size: var(--size, 14px);
         font-style: normal;
-        font-weight: var(--typography-body-weight-small, 300);
-        line-height: var(--typography-body-lineheight-small, 16px);
+        font-weight: var(--weight, 300);
+        line-height: var(--line-height, 16px);
     }
 
     .max-tickets-hint {
@@ -457,25 +447,33 @@
     .total-info {
         margin-top: 16px;
         padding: 16px;
-        background-color: var(--neutral-grey-2, #F5F5F5);
-        border-radius: var(--border-radius-m, 8px);
+        border-radius: var(--corner-radius-m, 12px);
+        background: var(--background-global-paper2, #FAFAFA);
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
     .total-info .label {
-        font-weight: var(--typography-title-weight-large, 600);
-        line-height: var(--typography-title-lineheight-large, 34px);
-        font-size: var(--typography-title-size-large, 18px);
         color: var(--text-secondary, #666);
+
+        /* Title */
+        font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+        font-size: var(--size, 24px);
+        font-style: normal;
+        font-weight: var(--weight, 600);
+        line-height: var(--line-height, 30px); /* 125% */
     }
 
     .total-info .amount {
-        font-weight: var(--typography-title-weight-large, 600);
-        line-height: var(--typography-title-lineheight-large, 34px);
-        font-size: var(--typography-title-size-large, 18px);
         color: var(--text-secondary, #666);
+
+        /* Title */
+        font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+        font-size: var(--size, 24px);
+        font-style: normal;
+        font-weight: var(--weight, 600);
+        line-height: var(--line-height, 30px); /* 125% */
     }
 
     /* Banner "prodotto non prenotabile" */
