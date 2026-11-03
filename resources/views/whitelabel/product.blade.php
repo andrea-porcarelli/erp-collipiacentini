@@ -839,11 +839,11 @@
                         <div>
                             <div class="price">€ ${parseFloat(v.price).toFixed(2)}</div>
                         </div>
-                        <button class="btn-quantity btn-decrease-variant" type="button" data-variant-id="${v.id}" disabled>
+                        <button class="btn-quantity btn-decrease-variant" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Secondary" type="button" data-variant-id="${v.id}" disabled>
                             <i class="fa-solid fa-minus"></i>
                         </button>
                         <span class="quantity-value" id="qty-variant-${v.id}">0</span>
-                        <button class="btn-quantity btn-increase-variant" type="button" data-variant-id="${v.id}">
+                        <button class="btn-quantity btn-increase-variant" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Secondary" type="button" data-variant-id="${v.id}">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
