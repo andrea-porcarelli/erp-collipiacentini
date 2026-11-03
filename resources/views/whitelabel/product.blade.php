@@ -271,7 +271,7 @@
     .button-progress .progress-connector {
         width: 8px;
         height: 1px;
-        background-color: var(--neutral-grey-10, #E6E6E6);
+        background-color: var(--card-background, #E6E6E6);
         justify-self: stretch;
     }
 
