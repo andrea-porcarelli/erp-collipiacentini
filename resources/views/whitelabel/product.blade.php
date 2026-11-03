@@ -396,8 +396,9 @@
     .quantity-control .btn-quantity {
         width: 40px;
         height: 40px;
-        border-radius: var(--border-radius, 8px);
-        border: var(--button-color-primary-light-borderwidth, 0) solid var(--light-bordercolor, rgba(255, 255, 255, 0.00));
+        border-radius: var(--corner-radius, 12px);
+        border: var(--button-resting-border-width, 0) solid var(--button-resting-border-color, rgba(255, 255, 255, 0.00));
+        background: var(--button-resting-background, #EAEEFA);
         display: flex;
         align-items: center;
         justify-content: center;
