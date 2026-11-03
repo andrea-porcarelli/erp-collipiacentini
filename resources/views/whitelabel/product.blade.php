@@ -343,9 +343,14 @@
     }
 
     .time-slot .time {
-        font-weight: 700;
-        font-size: 14px;
-        margin-bottom: 4px;
+        color: var(--text-main, #FFF);
+
+        /* Title */
+        font-family: var(--typography-web-title-font, Montserrat), sans-serif;
+        font-size: var(--size, 16px);
+        font-style: normal;
+        font-weight: var(--weight, 600);
+        line-height: var(--line-height, 20px); /* 125% */
     }
 
     .time-slot .availability {
