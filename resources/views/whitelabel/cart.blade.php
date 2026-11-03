@@ -539,7 +539,8 @@
 
     .form-group input[type="text"],
     .form-group input[type="email"],
-    .form-group input[type="tel"] {
+    .form-group input[type="tel"],
+    .form-group input[type="date"] {
         padding: 12px 16px;
         border: 1px solid var(--neutral-grey-10, #E6E6E6);
         border-radius: var(--border-radius-s, 8px);
@@ -550,9 +551,20 @@
 
     .form-group input[type="text"]:focus,
     .form-group input[type="email"]:focus,
-    .form-group input[type="tel"]:focus {
+    .form-group input[type="tel"]:focus,
+    .form-group input[type="date"]:focus {
         outline: none;
         border-color: var(--secondary-brand, #2A3493);
+    }
+
+    .form-group input[type="date"] {
+        background-color: #fff;
+        color: var(--text-main, #0D0D0D);
+        font-family: var(--font-font-2, "DM Sans"), sans-serif;
+    }
+
+    .form-group input[type="date"]:not(:focus):invalid {
+        color: var(--text-secondary, #666);
     }
 
     .form-group input.error {
