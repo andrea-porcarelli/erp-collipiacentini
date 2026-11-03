@@ -597,6 +597,9 @@
         font-weight: var(--weight, 700);
         line-height: var(--line-height, 18px); /* 128.571% */
     }
+    .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
+        fill: var(--button-resting-foreground, #FFF);
+    }
 
 </style>
 <script>
