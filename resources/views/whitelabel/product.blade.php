@@ -237,13 +237,15 @@
     /* Stile per date non disponibili (escluso il giorno corrente) */
     .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today),
     .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today):hover {
-        color: var(--text-disabled, #999) !important;
-        text-align: center !important;
-        font-family: var(--font-font-2, "DM Sans"), sans-serif !important;
-        font-size: var(--typography-body-size-medium, 16px) !important;
-        font-style: normal !important;
-        font-weight: var(--typography-body-weight-medium, 400) !important;
-        text-decoration-line: line-through !important;
+        color: var(--text-main, #FFF);
+        text-align: center;
+
+        /* Title */
+        font-family: var(--typography-web-title-font, Montserrat), sans-serif;
+        font-size: var(--size, 14px);
+        font-style: normal;
+        font-weight: var(--weight, 700);
+        line-height: var(--line-height, 18px); /* 128.571% */
         cursor: not-allowed !important;
     }
 
@@ -570,6 +572,22 @@
             justify-content: center;
         }
     }
+
+    .flatpickr-calendar {
+        background: var(--button-resting-background, rgba(255, 255, 255, 0.00)) !important;
+    }
+    .flatpickr-calendar .flatpickr-day {
+        color: var(--text-main, #FFF);
+        text-align: center;
+
+        /* Title */
+        font-family: var(--typography-web-title-font, Montserrat), sans-serif;
+        font-size: var(--size, 14px);
+        font-style: normal;
+        font-weight: var(--weight, 700);
+        line-height: var(--line-height, 18px); /* 128.571% */
+    }
+
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

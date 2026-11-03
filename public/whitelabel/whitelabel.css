@@ -703,6 +703,3 @@ body {
 .mr-spacing-4xl {
     margin-right: var(--spacing-4xl, 16px);
 }
-.flatpickr-calendar {
-    background: var(--button-resting-background, rgba(255, 255, 255, 0.00)) !important;
-}
