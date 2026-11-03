@@ -569,11 +569,6 @@
         border-color: var(--secondary-brand, #2A3493);
     }
 
-    .form-group input[type="date"] {
-        background-color: #fff;
-        color: var(--text-main, #0D0D0D);
-        font-family: var(--font-font-2, "DM Sans"), sans-serif;
-    }
 
     .form-group input[type="date"]:not(:focus):invalid {
         color: var(--text-secondary, #666);
