@@ -541,12 +541,24 @@
     .form-group input[type="email"],
     .form-group input[type="tel"],
     .form-group input[type="date"] {
-        padding: 12px 16px;
-        border: 1px solid var(--neutral-grey-10, #E6E6E6);
-        border-radius: var(--border-radius-s, 8px);
-        font-family: var(--font-font-2, "DM Sans"), sans-serif;
-        font-size: var(--typography-body-size-medium, 16px);
-        transition: border-color 0.2s ease;
+        display: flex;
+        padding: var(--text-field-paddingvertical, 12px) var(--text-field-paddinghorizontal, 12px);
+        align-items: center;
+        gap: var(--text-field-spacing, 4px);
+        align-self: stretch;
+        border-radius: var(--text-field-borderradius, 0);
+        border: var(--text-field-empty-borderwidth, 1px) solid var(--text-field-empty-border, #4D4D4D);
+        background: var(--text-field-empty-background, #0D0D0D);
+        overflow: hidden;
+        color: var(--dropdown-empty-iconaction, #FFF);
+        text-overflow: ellipsis;
+
+        /* Body */
+        font-family: var(--typography-web-body-font, Montserrat);
+        font-size: var(--size, 16px);
+        font-style: normal;
+        font-weight: var(--weight, 400);
+        line-height: var(--line-height, 22px); /* 137.5% */
     }
 
     .form-group input[type="text"]:focus,
