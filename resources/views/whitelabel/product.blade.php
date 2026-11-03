@@ -421,9 +421,15 @@
     .quantity-control .quantity-value {
         min-width: 40px;
         text-align: center;
-        font-weight: 700;
-        font-size:  var(--typography-title-size-large, 28px);
         color: var(--text-main, #0D0D0D);
+        text-align: center;
+
+        /* Title */
+        font-family: var(--typography-web-title-font, "DM Sans");
+        font-size: var(--size, 24px);
+        font-style: normal;
+        font-weight: var(--weight, 600);
+        line-height: var(--line-height, 30px); /* 125% */
     }
     .quantity-control .price {
         color: var(--text-secondary, #666);
