@@ -569,6 +569,9 @@
         border-color: var(--secondary-brand, #2A3493);
     }
 
+    .form-group input[type="date"] {
+        display: block;
+    }
 
     .form-group input[type="date"]:not(:focus):invalid {
         color: var(--text-secondary, #666);
