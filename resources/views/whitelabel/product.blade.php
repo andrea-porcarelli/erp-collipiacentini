@@ -232,6 +232,15 @@
     .flatpickr-calendar .flatpickr-weekday {
         flex: 0 0 14.28% !important;
         max-width: 14.28% !important;
+        color: var(--text-secondary, #B2B2B2);
+        text-align: center;
+
+        /* Body */
+        font-family: var(--typography-web-body-font, Montserrat), sans-serif !important;
+        font-size: var(--size, 14px);
+        font-style: normal;
+        font-weight: var(--weight, 300);
+        line-height: var(--line-height, 16px); /* 114.286% */
     }
 
     /* Stile per date non disponibili (escluso il giorno corrente) */
