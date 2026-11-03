@@ -178,13 +178,15 @@ body {
 }
 .utils li a{
     overflow: hidden;
-    color: var(--secondary-brand, #2A3493);
+    color: var(--color, #46B1FD);
     text-overflow: ellipsis;
-    font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
-    font-size: var(--typography-body-size-medium, 16px);
+
+    /* Body */
+    font-family: var(--typography-web-body-font, Montserrat);
+    font-size: var(--size, 16px);
     font-style: normal;
-    font-weight: var(--typography-body-weight-medium, 400);
-    line-height: var(--typography-body-lineheight-medium, 22px); /* 137.5% */
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
     text-decoration: none;
 }
 
