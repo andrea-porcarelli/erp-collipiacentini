@@ -237,15 +237,16 @@
     /* Stile per date non disponibili (escluso il giorno corrente) */
     .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today),
     .flatpickr-calendar .flatpickr-day.flatpickr-disabled:not(.today):hover {
-        color: var(--text-main, #FFF);
+        color: var(--text-disabled, #808080);
         text-align: center;
 
-        /* Title */
-        font-family: var(--typography-web-title-font, Montserrat), sans-serif;
-        font-size: var(--size, 14px);
+        /* ❌ bodyMedium */
+        font-family: var(--font-font-2, "DM Sans"), sans-serif !important;
+        font-size: var(--typography-body-size-medium, 16px);
         font-style: normal;
-        font-weight: var(--weight, 700);
-        line-height: var(--line-height, 18px); /* 128.571% */
+        font-weight: var(--typography-body-weight-medium, 400);
+        line-height: var(--typography-body-line-height-medium, 22px); /* 137.5% */
+        text-decoration-line: line-through;
         cursor: not-allowed !important;
     }
 
