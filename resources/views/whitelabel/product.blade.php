@@ -75,7 +75,7 @@
                     </x-card>
                 @endif
                 @if($product->relatedProducts->count() > 0)
-                    <x-card title="Altri prodotti" class="product-card" h2="true" leading="fa-shield-check">
+                    <x-card title="Prodotti correlati" class="product-card" h2="true" leading="fa-shield-check">
                         <ul class="list-unstyled mb-0">
                             @foreach($product->relatedProducts as $related)
                                 <li class="border-bottom py-2">
