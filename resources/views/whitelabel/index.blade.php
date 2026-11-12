@@ -31,8 +31,8 @@
                 </div>
 
                 <div class="d-block d-sm-none">
-                    <x-card :title="__('whitelabel.sidebar.castle_title')" :sub_title="__('whitelabel.sidebar.know_date_subtitle')" class="card-spacing">
-
+                    <x-card :title="$partner->partner_name"  class="card-spacing">
+                        {!!   $partner->contentField('description_short') !!}
                     </x-card>
 
                     <x-card :title="__('whitelabel.sidebar.useful_links_title')" class="card-spacing">

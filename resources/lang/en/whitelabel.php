@@ -3,6 +3,7 @@
 return [
     // Header
     'menu' => [
+        'toggle' => 'Open menu',
         'contacts' => 'Contacts',
         'privacy_policy' => 'Privacy Policy',
         'cookie_policy' => 'Cookie Policy',

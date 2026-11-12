@@ -1,29 +1,20 @@
 @php($menuPartner = $partner ?? session('partner'))
-<nav class="navbar navbar-expand-lg mt-3">
+<nav class="navbar mt-3">
     <div class="container">
         <div class="navbar-container d-flex justify-content-between w-100 align-items-center">
-            <div class="menu">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+            <div class="menu dropdown">
+                <button class="btn btn-link nav-link p-0" type="button" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ __('whitelabel.menu.toggle') }}">
+                    <i class="fa-solid fa-bars"></i>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarMenu">
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-bars"></i>
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                @if($menuPartner)
-                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('contatti') }}">{{ __('whitelabel.menu.contacts') }}</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('privacy-policy') }}">{{ __('whitelabel.menu.privacy_policy') }}</a></li>
-                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('cookie-policy') }}">{{ __('whitelabel.menu.cookie_policy') }}</a></li>
-                                    <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('termini-condizioni') }}">{{ __('whitelabel.menu.terms_conditions') }}</a></li>
-                                @endif
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    @if($menuPartner)
+                        <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('contatti') }}">{{ __('whitelabel.menu.contacts') }}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('privacy-policy') }}">{{ __('whitelabel.menu.privacy_policy') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('cookie-policy') }}">{{ __('whitelabel.menu.cookie_policy') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ $menuPartner->pageUrl('termini-condizioni') }}">{{ __('whitelabel.menu.terms_conditions') }}</a></li>
+                    @endif
+                </ul>
             </div>
             <div class="logo">
                 <a href="{{ route('booking.index') }}">
