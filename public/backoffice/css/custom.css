@@ -533,7 +533,7 @@ a.text-small {
     background: var(--heading-background-color, #FAFAFA);
 }
 .table-miticko > tbody > tr > th, .table-miticko > tbody > tr > td {
-    padding: var(--spacing-l) var(--spacing-m) !important;
+    padding: var(--content-padding-vertical, 24px) var(--spacing-m, 12px) !important;
 }
 .table-miticko > tbody > tr > td {
     color: var(--text-main, #0D0D0D);
@@ -986,17 +986,12 @@ span.flatpickr-weekday{
 }
 
 /* Customer field item — checked state */
-.customer-field-item:has(.customer-field-enabled:checked) label {
-    color: #E87722;
-}
-.customer-field-item .customer-field-enabled:checked,
-.customer-field-item .customer-field-required:checked {
+.customer-field-item .customer-field-enabled:checked {
     background-color: #E87722;
     border-color: #E87722;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
 }
-.customer-field-item .customer-field-enabled:focus,
-.customer-field-item .customer-field-required:focus {
+.customer-field-item .customer-field-enabled:focus {
     box-shadow: 0 0 0 0.25rem rgba(232, 119, 34, 0.25);
 }
 .switchery {
@@ -1050,6 +1045,8 @@ span.flatpickr-weekday{
     min-width: var(--min-width, 32px);
     min-height: var(--min-height, 32px);
     color: var(--button-resting-foreground, #AF3800);
+    cursor: pointer;
+
 }
 
 .icon-button-miticko:hover {
@@ -1197,13 +1194,12 @@ span.flatpickr-weekday{
 }
 .price-variation-item {
     color: var(--text-main, #0D0D0D);
-    border: 1px solid var(--border-color, #E6E6E6);
     background: #fff;
     margin-bottom: 8px;
     overflow: hidden;
-    border-radius: var(--borderradius, 24px);
-    border: var(--borderwidth, 1px) solid var(--bordercolorresting, #F2F2F2);
-    background: var(--background, #FAFAFA);
+    border-radius: var(--border-radius-xl, 24px);
+    border: 1px solid var(--border-light, #F2F2F2);
+    background: var(--background-global-paper2, #FAFAFA);
     padding: var(--paddingtop, 16px) var(--paddingright, 16px) var(--paddingbottom, 16px) var(--paddingleft, 16px);
     align-items: center;
     gap: var(--spacing, 12px);
@@ -2014,9 +2010,155 @@ table.order-detail-tickets tbody tr:last-child td {
     color: var(--text-main, #0D0D0D);
 
     /* Title */
-    font-family: var(--typography-web-title-font, "DM Sans");
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
     font-size: var(--size, 18px);
     font-style: normal;
     font-weight: var(--weight, 700);
     line-height: var(--line-height, 24px); /* 133.333% */
+}
+
+.feature-title {
+    color: var(--text-main, #0D0D0D);
+
+    /* Title */
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 18px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px); /* 133.333% */
+}
+
+.feature-text {
+    color: var(--text-main, #0D0D0D);
+
+    /* Title */
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 16px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 133.333% */
+}
+
+#form-info-features input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--text-field-empty-border, #CCC);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    margin: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#form-info-features input[type="checkbox"]:checked {
+    background: var(--brand-primary-brand);
+    border-color: var(--brand-primary-brand);
+}
+
+#form-info-features input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid #FFF;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.text-field .text-field-container .category-select-toggle {
+    background: transparent;
+    border: none;
+    padding: var(--text-field-paddingvertical, 12px) 0;
+    font-family: var(--typography-web-body-font, "DM Sans");
+    font-size: var(--size, 16px);
+    font-weight: var(--weight, 400);
+    color: var(--text-field-empty-label, #0D0D0D);
+    text-align: left;
+    cursor: pointer;
+}
+
+.text-field .text-field-container .category-select-toggle:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.category-select .dropdown-menu {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: var(--spacing-xs, 4px) 0;
+    border-radius: var(--corner-radius-m, 12px);
+}
+
+.category-select .dropdown-menu .dropdown-item {
+    padding: var(--spacing-s, 8px) var(--spacing-l, 12px);
+    font-family: var(--typography-web-body-font, "DM Sans");
+    font-size: var(--size, 16px);
+    color: var(--text-main, #0D0D0D);
+}
+
+.category-select .dropdown-menu .dropdown-item i {
+    width: 18px;
+    text-align: center;
+    color: var(--text-secondary, #666);
+}
+.ck.ck-editor__editable_inline>:last-child,
+.ck.ck-editor__editable_inline>:first-child  {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+#form-customer-fields .row>*,
+#form-info-resellers .row>*{
+    margin-top: 0 !important;
+    margin-bottom: var(--spacing-s, 8px);
+}
+.form-check-label {
+    color: var(--text-main, #0D0D0D);
+
+    /* Body */
+    font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 16px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
+}
+#form-info-resellers label {
+    margin-bottom: var(--spacing-s, 8px);
+    padding-left: var(--spacing-xs, 4px);;
+
+}
+.pre-title-resellers {
+    color: var(--text-main, #0D0D0D);
+
+    /* Title */
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 14px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 18px); /* 128.571% */
+}
+.price-variation-item b  {
+    color: var(--text-main, #0D0D0D);
+    /* Title */
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 18px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px); /* 133.333% */
+    margin-right: var(--spacing-xl, 24px);;
+}
+.iva-variant-label {
+    color: var(--text-secondary, #666);
+
+    /* Body */
+    font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 16px);
+    font-style: normal;
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 137.5% */
 }

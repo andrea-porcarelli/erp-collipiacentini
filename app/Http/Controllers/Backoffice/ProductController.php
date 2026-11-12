@@ -474,7 +474,7 @@ class ProductController extends CrudController
                 'prices' => 'required|array|min:1',
                 'prices.*.label' => 'required|string|max:255',
                 'prices.*.price' => 'required|numeric|min:0',
-                'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+                'prices.*.vat_rate_id' => 'required|integer|exists:vat_rates,id',
             ]);
 
             $maxOrder = $product->variants()->max('sort_order') ?? 0;
@@ -490,7 +490,7 @@ class ProductController extends CrudController
                 $variant->prices()->create([
                     'label' => $row['label'],
                     'price' => $row['price'],
-                    'vat_rate' => $row['vat_rate'],
+                    'vat_rate_id' => $row['vat_rate_id'],
                 ]);
             }
 
@@ -514,7 +514,7 @@ class ProductController extends CrudController
                 'prices.*.id' => 'nullable|integer',
                 'prices.*.label' => 'required|string|max:255',
                 'prices.*.price' => 'required|numeric|min:0',
-                'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+                'prices.*.vat_rate_id' => 'required|integer|exists:vat_rates,id',
             ]);
 
             $variant = ProductVariant::where('product_id', $id)->findOrFail($variantId);
@@ -533,14 +533,14 @@ class ProductController extends CrudController
                     ProductVariantPrice::where('id', $row['id'])->update([
                         'label' => $row['label'],
                         'price' => $row['price'],
-                        'vat_rate' => $row['vat_rate'],
+                        'vat_rate_id' => $row['vat_rate_id'],
                     ]);
                     $savedPrices[] = ['id' => (int) $row['id']];
                 } else {
                     $newPrice = $variant->prices()->create([
                         'label' => $row['label'],
                         'price' => $row['price'],
-                        'vat_rate' => $row['vat_rate'],
+                        'vat_rate_id' => $row['vat_rate_id'],
                     ]);
                     $savedPrices[] = ['id' => $newPrice->id];
                 }

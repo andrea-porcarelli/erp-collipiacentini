@@ -22,7 +22,7 @@
                 <h2 class="mt-2">{{ $product->contentField('short_title') }}</h2>
                 <div class=" d-none d-sm-block">
                     <div class="details">
-                        <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->category->label" />
+                        <x-supporting-text :icon="$product->category->icon ?: 'fa-regular fa-flag-swallowtail'" :message="$product->category->label" />
                         <x-supporting-text icon="fa-regular fa-clock-three" :message="$product->duration . ' min'" />
                     </div>
                 </div>
@@ -47,7 +47,7 @@
     <div class="d-block d-sm-none">
         <div class="details-price">
             <div class="details">
-                <x-supporting-text icon="fa-regular fa-flag-swallowtail" :message="$product->type" />
+                <x-supporting-text :icon="$product->category->icon ?: 'fa-regular fa-flag-swallowtail'" :message="$product->category->label" />
                 <x-supporting-text icon="fa-regular fa-clock-three" :message="$product->duration . ' min'" />
             </div>
             <div class="price">

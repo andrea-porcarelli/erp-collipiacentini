@@ -10,7 +10,7 @@
     'brelative' => null
 ])
 
-<div class="card-miticko {{ $class }}" data-mode="cardSize-{{ $size }} cardAppearance-{{ $mode }}">
+<div class="card-miticko {{ $class }}" data-mode="cardTitle-Medium cardSize-{{ $size }} cardAppearance-{{ $mode }}">
     @if(isset($title) or isset($sub_title) or isset($pre_title))
         <div class="card-header">
             @isset($pre_title)

@@ -1,4 +1,4 @@
-@extends('backoffice.layout', ['title' => 'Modifica prodotto', 'active' => $path])
+ @extends('backoffice.layout', ['title' => 'Modifica prodotto', 'active' => $path])
 
 @section('main-content')
     <div class="d-flex justify-content-between">
@@ -368,7 +368,7 @@
             }
         });
     </script>
-    <script src="{{ asset('backoffice/js/products.js') }}?v=1.5" type="module"></script>
+    <script src="{{ asset('backoffice/js/products.js') }}?v=1.9" type="module"></script>
     <script>
         document.addEventListener('variants-notify', (e) => {
             toastr[e.detail.type]?.(e.detail.message);

@@ -23,8 +23,15 @@
                 @yield('main-content')
             </main>
         </div>
+        @php
+            $vatOptionsJs = \App\Models\VatRate::where('is_active', 1)
+                ->orderBy('sort_order')
+                ->get()
+                ->map(fn ($r) => ['v' => (string) $r->id, 'l' => $r->label, 'numeric' => $r->nature === null])
+                ->values();
+        @endphp
         <script>
-            window.VAT_OPTIONS = @json(collect(config('vat.rates', []))->map(fn ($r) => ['v' => (string) (int) $r['rate'], 'l' => $r['label']])->values());
+            window.VAT_OPTIONS = @json($vatOptionsJs);
         </script>
         <script>
             (function () {

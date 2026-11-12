@@ -98,10 +98,11 @@
                         @enderror
                     </div>
                     <div style="width:220px;flex-shrink:0">
-                        <x-vat-select wire:model="variants.{{ $vi }}.prices.{{ $pi }}.vat_rate"
+                        <x-vat-select wire:model="variants.{{ $vi }}.prices.{{ $pi }}.vat_rate_id"
+                                      :only_numeric="true"
                                       name="sv_vat_{{ $slot->id }}_{{ $vi }}_{{ $pi }}"
-                                      class="@error('variants.'.$vi.'.prices.'.$pi.'.vat_rate') is-invalid @enderror" />
-                        @error('variants.'.$vi.'.prices.'.$pi.'.vat_rate')
+                                      class="@error('variants.'.$vi.'.prices.'.$pi.'.vat_rate_id') is-invalid @enderror" />
+                        @error('variants.'.$vi.'.prices.'.$pi.'.vat_rate_id')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
                     </div>
@@ -182,7 +183,7 @@
                             <x-input name="av_price" placeholder="0.00" type="number" extra="EUR"/>
                         </div>
                         <div style="width:220px;flex-shrink:0">
-                            <x-vat-select name="av_vat" :value="22" />
+                            <x-vat-select name="av_vat" :only_numeric="true" />
                         </div>
                     </div>
                     <x-supporting-text message="Potrai inserire altre componenti IVA dopo aver creato la variante" icon="fa-regular fa-circle-info"/>
@@ -230,7 +231,7 @@
             _$modal.find('[name="av_max"]').val('');
             _$modal.find('[name="av_price_label"]').val('');
             _$modal.find('[name="av_price"]').val('');
-            _$modal.find('[name="av_vat"]').val('22');
+            _$modal.find('[name="av_vat"]').find('option:first').prop('selected', true);
         });
 
         _$modal.find('.btn-av-create').on('click', async function () {
@@ -239,10 +240,10 @@
             const maxQty     = _$modal.find('[name="av_max"]').val().trim();
             const priceLabel = _$modal.find('[name="av_price_label"]').val().trim();
             const price      = _$modal.find('[name="av_price"]').val().trim();
-            const vatRate    = parseInt(_$modal.find('[name="av_vat"]').val()) || 0;
+            const vatRateId  = parseInt(_$modal.find('[name="av_vat"]').val(), 10) || 0;
 
             this.disabled = true;
-            const ok = await $wire.createVariant(label, desc, maxQty, priceLabel, price, vatRate);
+            const ok = await $wire.createVariant(label, desc, maxQty, priceLabel, price, vatRateId);
             this.disabled = false;
             if (ok) _$modal.modal('hide');
         });

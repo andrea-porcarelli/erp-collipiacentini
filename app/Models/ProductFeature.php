@@ -13,8 +13,8 @@ class ProductFeature extends Model
     public const CATEGORIES = [
         'accessibility' => 'Accessibilità',
         'pets' => 'Animali',
-        'services' => 'Servizi disponibili',
         'suitability' => 'Adatto per',
+        'services' => 'Servizi disponibili',
     ];
 
     public $fillable = [

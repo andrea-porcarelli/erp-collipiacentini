@@ -34,7 +34,6 @@
             <div class="col-12 col-sm-1 text-end">
                 <x-icon-button
                     icon="fa-trash"
-                    title="Traduci nelle altre lingue"
                     appearance="Disabled"
                     emphasis="Medium"/>
             </div>

@@ -13,6 +13,7 @@ class OrderProductItem extends LogsModel
         'quantity',
         'unit_price',
         'vat_rate',
+        'vat_nature',
         'partner_commission_presale_low',
         'partner_commission_presale_low_vat',
         'partner_commission_presale_high',

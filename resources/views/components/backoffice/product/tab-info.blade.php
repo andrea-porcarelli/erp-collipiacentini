@@ -10,15 +10,15 @@
                             <x-input :model="$model" name="label" label="Nome prodotto interno" required message="Questo campo è solo per uso interno e non visibile al pubblico" icon="fa-regular fa-circle-info"/>
                         </div>
                         <div class="col-12 col-sm-6">
-                            <x-input :value="$model->product_code" name="name" label="Codice prodotto" disabled required message="Il codice prodotto è assegnato automaticamente dal sistema." icon="fa-regular fa-circle-info" />
+                            <x-input :value="$model->product_code" name="name" label="Codice prodotto" disabled message="Il codice prodotto è assegnato automaticamente dal sistema." icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-12 col-sm-6">
-                            <x-select :model="$model"  name="is_active" label="Stato prodotto" required :options="[['id' => 1, 'label' => 'Pubblicato'],['id' => 0, 'label' => 'Non Pubblicato']]" icon="fa-regular fa-circle-info" />
+                            <x-select :model="$model"  name="is_active" label="Stato prodotto" required :options="[['id' => 1, 'label' => 'Pubblicato'],['id' => 0, 'label' => 'Non Pubblicato']]" :leading="((bool) $model->is_active) ? 'fa-lock-open' : 'fa-lock'" leading_style="solid" data-lock-icon icon="fa-regular fa-circle-info" />
                         </div>
                         <div class="col-12 col-sm-6">
-                            <x-input :value="$model->public_url" name="slug" label="URL" disabled required message="L'URL è assegnato dal sistema e non può essere modificato" icon="fa-regular fa-circle-info" />
+                            <x-input :value="$model->public_url" name="slug" label="URL" disabled message="L'URL è assegnato dal sistema e non può essere modificato" icon="fa-regular fa-circle-info" />
                         </div>
                     </div>
                 </form>
@@ -73,7 +73,41 @@
                 <form id="form-info-categories">
                     <div class="row">
                         <div class="col-12">
-                            <x-select name="category_id" label="Seleziona Categoria" message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio 'visite' e 'degustazioni'" required :options="$categories" icon="fa-regular fa-circle-info" />
+                            @php
+                                $selectedCategory = collect($categories)->firstWhere('id', $model->category_id);
+                            @endphp
+                            <div class="text-field" data-mode="textfieldSize-Medium">
+                                <label>Seleziona Categoria</label>
+                                <div class="text-field-container dropdown category-select">
+                                    <button type="button" class="input-miticko category-select-toggle d-flex align-items-center justify-content-between w-100" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="category-select-label d-flex align-items-center gap-2">
+                                            @if($selectedCategory)
+                                                @if(!empty($selectedCategory['icon']))
+                                                    <i class="{{ $selectedCategory['icon'] }}"></i>
+                                                @endif
+                                                <span>{{ $selectedCategory['label'] }}</span>
+                                            @else
+                                                <span class="text-muted">Scegli</span>
+                                            @endif
+                                        </span>
+                                        <i class="fa-regular fa-chevron-down ms-2"></i>
+                                    </button>
+                                    <ul class="dropdown-menu w-100">
+                                        @foreach($categories as $cat)
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-id="{{ $cat['id'] }}" data-icon="{{ $cat['icon'] ?? '' }}" data-label="{{ $cat['label'] }}">
+                                                    @if(!empty($cat['icon']))
+                                                        <i class="{{ $cat['icon'] }}"></i>
+                                                    @endif
+                                                    <span>{{ $cat['label'] }}</span>
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                    <input type="hidden" name="category_id" id="category_id" value="{{ $model->category_id }}">
+                                </div>
+                                <x-supporting-text message="La categoria aiuta gli utenti a filtrare per tipologia di esperienze, ad esempio 'visite' e 'degustazioni'" icon="fa-regular fa-circle-info" />
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -89,7 +123,7 @@
 
                             <div class="d-flex align-items-start gap-2 mt-4">
                                 <div class="flex-grow-1">
-                                    <x-input :model="$model" name="meta_keywords" label="Keywords" placeholder="es. visite guidate, degustazioni, vino" message="Parole chiave separate da virgola" icon="fa-regular fa-circle-info" />
+                                    <x-input :model="$model" name="meta_keywords" label="Keyword" placeholder="es. visite guidate, degustazioni, vino" message="Il campo keyword serve solo come nota interna, non ha efficacia sul posizionamento" icon="fa-regular fa-circle-info" />
                                 </div>
                                 <button type="button" data-mode="buttonSize-Medium buttonEmphasis-Medium buttonAppearance-Neutral" data-field="meta_keywords" class="bt-miticko btn-public-meta-translations mt-spacing-2xl"><i class="fa-regular fa-language icon"></i></button>
                             </div>
@@ -126,7 +160,7 @@
                     <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
                 </div>
             </x-card>
-            <x-card title="Personalizza informazioni per la visita inviate via Email in formato PDF" class="mt-4 mb-5 position-relative" sub_title="Le informazioni che inserisci qui verranno visualizzate nel PDF di riepilogo per l'accesso all'esperienza che i clienti ricevono via email">
+            <x-card title="Personalizza informazioni inviate via Email in formato PDF" class="mt-4 mb-5 position-relative" sub_title="Le informazioni che inserisci qui verranno visualizzate nel PDF di riepilogo per l'accesso all'esperienza che i clienti ricevono via email">
                 <form id="form-info-visit">
                     <div class="row">
                         <div class="col-12">
@@ -137,7 +171,7 @@
                                         :value="$model->contentField('visit_info') ?? ''"
                                         maxlength="600"
                                         rows="3"
-                                        label="Informazioni importanti sulla visita"
+                                        label="Informazioni importanti"
                                         placeholder="Inserisci le informazioni più importanti per l'accesso all'esperienza es. &quot;presentati 15 minuti prima in biglietteria, il parcheggio si trova dietro&quot;"
                                     />
                                 </div>
@@ -170,7 +204,7 @@
                 </div>
             </x-card>
 
-            <x-card title="Altri prodotti" class="mt-4 mb-5 position-relative" sub_title="Seleziona fino a 5 tuoi prodotti disponibili da mostrare come suggerimento">
+            <x-card title="Prodotti correlati" class="mt-4 mb-5 position-relative" sub_title="Seleziona fino a 5 tuoi prodotti disponibili da mostrare come suggerimento">
                 <div class="row">
                     <div class="col-3">
                         <x-backoffice.product.related :model="$model" />
@@ -209,28 +243,52 @@
                     </div>
 
                     <div id="billing-flags-wrapper" class="mt-4 @if(! $model->invoice_required) d-none @endif">
-                        <div class="small fw-semibold mb-2">Valori di default includere nelle fatture</div>
-                        <div class="d-flex flex-column gap-2">
-                            <label class="d-inline-flex align-items-center gap-2">
-                                <input type="hidden" name="bill_ticket_base" value="0">
-                                <input type="checkbox" class="form-check-input bill-flag" name="bill_ticket_base" id="bill_ticket_base" value="1" @checked((bool) $model->bill_ticket_base)>
-                                <span>Biglietto base (non include le eventuali commissioni miticko)</span>
-                            </label>
-                            <label class="d-inline-flex align-items-center gap-2">
-                                <input type="hidden" name="bill_miticko_commission" value="0">
-                                <input type="checkbox" class="form-check-input bill-flag" name="bill_miticko_commission" id="bill_miticko_commission" value="1" @checked((bool) $model->bill_miticko_commission)>
-                                <span>Commissioni Miticko</span>
-                            </label>
-                            <label class="d-inline-flex align-items-center gap-2">
-                                <input type="hidden" name="bill_presale" value="0">
-                                <input type="checkbox" class="form-check-input bill-flag" name="bill_presale" id="bill_presale" value="1" @checked((bool) $model->bill_presale)>
-                                <span>Prevendita Miticko</span>
-                            </label>
-                            <label class="d-inline-flex align-items-center gap-2">
-                                <input type="hidden" name="bill_bank_commission" value="0">
-                                <input type="checkbox" class="form-check-input bill-flag" name="bill_bank_commission" id="bill_bank_commission" value="1" @checked((bool) $model->bill_bank_commission)>
-                                <span>Commissioni gateway di pagamento</span>
-                            </label>
+                        <h6 class="pre-title-resellers">Valori di default includere nelle fatture</h6>
+                        <div class="row g-3" data-mode="typoBody-Small">
+                            <div class="col-12">
+                                <div class="customer-field-item d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="bill_ticket_base" value="0">
+                                        <input type="checkbox" class="form-check-input customer-field-enabled bill-flag mt-0" name="bill_ticket_base" id="bill_ticket_base" value="1" @checked((bool) $model->bill_ticket_base)>
+                                        <label class="form-check-label mb-0" for="bill_ticket_base">
+                                            Biglietto base (non include le eventuali commissioni miticko)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="customer-field-item d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="bill_miticko_commission" value="0">
+                                        <input type="checkbox" class="form-check-input customer-field-enabled bill-flag mt-0" name="bill_miticko_commission" id="bill_miticko_commission" value="1" @checked((bool) $model->bill_miticko_commission)>
+                                        <label class="form-check-label mb-0" for="bill_miticko_commission">
+                                            Commissioni Miticko
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="customer-field-item d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="bill_presale" value="0">
+                                        <input type="checkbox" class="form-check-input customer-field-enabled bill-flag mt-0" name="bill_presale" id="bill_presale" value="1" @checked((bool) $model->bill_presale)>
+                                        <label class="form-check-label mb-0" for="bill_presale">
+                                            Prevendita Miticko
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="customer-field-item d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="bill_bank_commission" value="0">
+                                        <input type="checkbox" class="form-check-input customer-field-enabled bill-flag mt-0" name="bill_bank_commission" id="bill_bank_commission" value="1" @checked((bool) $model->bill_bank_commission)>
+                                        <label class="form-check-label mb-0" for="bill_bank_commission">
+                                            Commissioni gateway di pagamento
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>

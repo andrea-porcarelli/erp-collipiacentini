@@ -62,6 +62,7 @@
                                 <div class="row g-3  align-items-start">
                                     <div class="col-12 col-sm-4">
                                         <x-input
+                                            label="Nome variante *"
                                             name="edit_label"
                                              placeholder="es. Intero"
                                              :value="$variant->label"
@@ -71,6 +72,7 @@
                                     </div>
                                     <div class="col-12 col-sm-6">
                                         <x-input
+                                            label="Descrizione variante *"
                                             name="edit_description"
                                              placeholder="es. Biglietto intero per adulti"
                                              :value="$variant->description"
@@ -80,6 +82,7 @@
                                     </div>
                                     <div class="col-12 col-sm-2 d-flex gap-2">
                                         <x-input
+                                            label="Massimi consentiti"
                                             name="edit_max_quantity"
                                             placeholder="es. 25"
                                             :value="$variant->max_quantity"
@@ -127,8 +130,8 @@
                                                     :value="$price->price"
                                                 />
                                             </div>
-                                            <div style="width:220px;flex-shrink:0">
-                                                <x-vat-select name="price_vat[]" :value="(int) $price->vat_rate" />
+                                            <div style="width:330px;flex-shrink:0">
+                                                <x-vat-select name="price_vat[]" :only_numeric="true" :value="$price->vat_rate_id" />
                                             </div>
                                             <div style="width:40px;flex-shrink:0">
                                                 <button type="button" class="bt-miticko outlined danger small btn-edit-remove-price">
@@ -142,7 +145,7 @@
                                 <div class="mt-2">
                                     <x-button class="btn-edit-add-price"
                                               emphasis="Low"
-                                              status="Primary"
+                                              status="Secondary"
                                               size="Small"
                                               label="+ Aggiungi componente IVA" />
                                 </div>
@@ -173,21 +176,21 @@
                              data-direction="{{ $variation->direction }}"
                              data-value="{{ $variation->value }}"
                              data-unit="{{ $variation->unit }}">
-                            <div class="d-flex gap-3">
-                                <b>
-                                    {{ $variation->date_from->locale('it')->isoFormat('D MMMM YYYY') }} → {{ $variation->date_to->locale('it')->isoFormat('D MMMM YYYY') }}
-                                </b>
-                                <span>
-                                {{ $variation->direction_label }} {{ number_format($variation->value, 2) }} {{ $variation->unit_label }}
-                            </span>
+                            <div class="d-flex">
+                                <span data-mode="typoTitle-Medium">
+                                    <b>
+                                        {{ $variation->date_from->locale('it')->isoFormat('D MMMM YYYY') }} → {{ $variation->date_to->locale('it')->isoFormat('D MMMM YYYY') }}
+                                    </b>
+                                </span>
+                                <span data-mode="typoBody-Medium">
+                                    <span class="iva-variant-label">
+                                    {{ $variation->direction_label }} {{ number_format($variation->value, 2) }} {{ $variation->unit_label }}
+                                    </span>
+                                </span>
                             </div>
-                            <div class="d-flex gap-4">
-                                <button type="button" class="bt-miticko outlined danger small btn-edit-price-variation ms-auto">
-                                    <i class="fa-regular fa-pen  icon"></i>
-                                </button>
-                                <button type="button" class="bt-miticko outlined danger small btn-delete-price-variation ms-auto">
-                                    <i class="fa-regular fa-trash-can  icon"></i>
-                                </button>
+                            <div class="d-flex ms-auto">
+                                <x-icon-button class="btn-edit-price-variation" icon="fa-pen" appearance="Neutral" emphasis="Low" />
+                                <x-icon-button class="btn-delete-price-variation" icon="fa-trash-can" appearance="Neutral" emphasis="Low" />
                             </div>
                         </div>
                     @empty

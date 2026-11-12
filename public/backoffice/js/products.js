@@ -403,14 +403,14 @@ const renderLinkRow = (link) => {
     <div class="link-item py-1" data-id="${link.id}">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-sm-4">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <input class="input-miticko" name="label" value="${label}">
+                        <input class="input-miticko" name="label" value="${label}" maxlength="50">
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-7">
-                <div class="text-field" data-mode="medium">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         <input class="input-miticko" name="link" value="${url}">
                     </div>
@@ -434,6 +434,17 @@ const updateSaveLinksButton = () => {
     }
 };
 
+const firstBackendError = (err, fallback) => {
+    const errors = err?.responseJSON?.errors;
+    if (errors && typeof errors === 'object') {
+        const firstKey = Object.keys(errors)[0];
+        const first = firstKey ? errors[firstKey] : null;
+        if (Array.isArray(first) && first.length) return first[0];
+        if (typeof first === 'string') return first;
+    }
+    return err?.responseJSON?.message || fallback;
+};
+
 const addLink = () => {
     const $form = $('#form-link-new');
     const data = {
@@ -441,7 +452,7 @@ const addLink = () => {
         link:  $form.find('input[name="link"]').val(),
     };
     if (!data.label || !data.link) {
-        toastr.warning('Label e URL sono obbligatori');
+        toastr.warning('Nome e URL sono obbligatori');
         return;
     }
     App.ajax({ path: `/products/${window.PRODUCT_ID}/links`, method: 'post', data })
@@ -451,7 +462,7 @@ const addLink = () => {
             $form[0].reset();
             toastr.success('Link aggiunto');
         })
-        .catch(() => toastr.error('Errore durante il salvataggio'));
+        .catch((err) => toastr.error(firstBackendError(err, 'Errore durante il salvataggio')));
 };
 
 const initLinks = () => {
@@ -469,7 +480,7 @@ const initLinks = () => {
 
         setLoading($btn, true);
         let pending = $dirtyItems.length;
-        let hasError = false;
+        let errorMessage = null;
 
         $dirtyItems.each(function () {
             const $item = $(this);
@@ -482,13 +493,15 @@ const initLinks = () => {
                 .then(() => {
                     $item.removeAttr('data-dirty');
                 })
-                .catch(() => { hasError = true; })
+                .catch((err) => {
+                    errorMessage = firstBackendError(err, 'Alcuni link non sono stati salvati. Riprova.');
+                })
                 .finally(() => {
                     pending--;
                     if (pending === 0) {
                         setLoading($btn, false);
-                        if (hasError) {
-                            toastr.error('Alcuni link non sono stati salvati. Riprova.');
+                        if (errorMessage) {
+                            toastr.error(errorMessage);
                         } else {
                             toastr.success('Link aggiornati con successo');
                         }
@@ -573,12 +586,22 @@ const initFaqEditor = async (key, textarea) => {
     }
     const editor = await ClassicEditor.create(textarea, faqEditorConfig);
     faqEditors.set(key, editor);
-    if (key !== 'new') {
-        editor.model.document.on('change:data', () => {
+
+    const counterEl = editor.sourceElement?.closest('.text-field')?.querySelector('.char-count-answer');
+    const updateAnswerCounter = () => {
+        if (!counterEl) return;
+        const remaining = 300 - faqPlainTextLength(editor.getData());
+        counterEl.textContent = `${remaining} / 300 caratteri rimanenti`;
+    };
+    updateAnswerCounter();
+
+    editor.model.document.on('change:data', () => {
+        updateAnswerCounter();
+        if (key !== 'new') {
             $(`#faqs-list .faq-item[data-id="${key}"]`).attr('data-dirty', '1');
             updateSaveFaqsButton();
-        });
-    }
+        }
+    });
     return editor;
 };
 
@@ -596,28 +619,61 @@ const initAllFaqEditors = () => {
 // ---------------------------------------------------------------------------
 // FAQ
 // ---------------------------------------------------------------------------
+const faqPlainTextLength = (html) => {
+    const text = (html ?? '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .trim();
+    return [...text].length;
+};
+
 const renderFaqRow = (faq) => {
     const question = escapeHtml(faq.question);
     const answer   = escapeHtml(faq.answer);
+    const langLabel = escapeHtml(faq.language_label ?? '');
+    const qRemaining = 50 - [...(faq.question ?? '')].length;
+    const aRemaining = 300 - faqPlainTextLength(faq.answer);
     return `
     <div class="faq-item py-1" data-id="${faq.id}">
         <div class="row g-2 align-items-start">
             <div class="col-12 col-sm-4">
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <input class="input-miticko" name="question" value="${question}">
+                        <input class="input-miticko" name="question" value="${question}" maxlength="50"
+                               oninput="this.closest('.text-field').querySelector('.char-count').textContent = (50 - [...this.value].length) + ' / 50 caratteri rimanenti'">
+                    </div>
+                    <div data-mode="SupptextAppearance-Default">
+                        <div class="supporting-text char-count">${qRemaining} / 50 caratteri rimanenti</div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                        <div class="text-field-container">
+                            <i class="fa-regular fa-language icon"></i>
+                            <select class="input-miticko" disabled>
+                                <option selected>${langLabel}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-7">
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <textarea class="input-miticko" name="answer" rows="2">${answer}</textarea>
+                        <textarea class="input-miticko" name="answer" rows="2" data-maxlength="300">${answer}</textarea>
+                    </div>
+                    <div data-mode="SupptextAppearance-Default">
+                        <div class="supporting-text char-count-answer">${aRemaining} / 300 caratteri rimanenti</div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-1 d-flex gap-1 align-items-end justify-content-end pb-1">
-                <button type="button" data-mode="medium primary" class="bt-miticko btn-faq-delete bt-m-text-only"><i class="fa-regular fa-trash icon"></i></button>
+            <div class="col-12 col-sm-1 d-flex gap-1 align-items-center justify-content-end align-self-stretch">
+                <div class="icon-button-miticko btn-faq-delete" data-mode="iconButtonSize-Medium buttonAppearance-Neutral buttonEmphasis-Medium"><i class="fa-regular fa-trash icon"></i></div>
             </div>
         </div>
     </div>`;
@@ -644,13 +700,16 @@ const addFaq = () => {
         toastr.warning('Domanda e risposta sono obbligatorie');
         return;
     }
+    const langLabel = $('#faq-language-select option:selected').text().trim();
     App.ajax({ path: `/products/${window.PRODUCT_ID}/faqs`, method: 'post', data })
         .then((faq) => {
             $('#faqs-empty').remove();
-            $('#faqs-list').append(renderFaqRow(faq));
+            $('#faqs-list').append(renderFaqRow({ ...faq, language_label: langLabel }));
             const newItem = document.querySelector(`#faqs-list .faq-item[data-id="${faq.id}"]`);
             if (newItem) initFaqEditor(String(faq.id), newItem.querySelector('textarea[name="answer"]'));
             $form.find('input[name="question"]').val('');
+            const qCounter = $form.find('input[name="question"]').closest('.text-field').find('.char-count')[0];
+            if (qCounter) qCounter.textContent = '50 / 50 caratteri rimanenti';
             faqEditors.get('new')?.setData('');
             toastr.success('FAQ aggiunta');
         })
@@ -765,16 +824,6 @@ const initFaqs = () => {
 // Campi cliente
 // ---------------------------------------------------------------------------
 const initCustomerFields = () => {
-    $(document).on('change', '.customer-field-enabled', function () {
-        const $wrap = $(this).closest('.customer-field-item').find('.customer-field-required-wrap');
-        if ($(this).is(':checked')) {
-            $wrap.css({ opacity: 1, 'pointer-events': 'auto' });
-        } else {
-            $wrap.css({ opacity: 0.35, 'pointer-events': 'none' });
-            $wrap.find('.customer-field-required').prop('checked', false);
-        }
-    });
-
     $(document).on('click', '.btn-save-customer-fields', function () {
         const btn = $(this);
         const fields = [];
@@ -786,7 +835,7 @@ const initCustomerFields = () => {
             if (enabled) {
                 fields.push({
                     customer_field_type_id: fieldId,
-                    is_required: $item.find('.customer-field-required').is(':checked') ? 1 : 0,
+                    is_required: 1,
                 });
             }
         });
@@ -839,8 +888,8 @@ const initRelated = () => {
 // ---------------------------------------------------------------------------
 // Varianti — lista (edit inline, delete, reorder)
 // ---------------------------------------------------------------------------
-const vatOptionsHtml = (selectedValue = null) => {
-    const opts = window.VAT_OPTIONS || [];
+const vatOptionsHtml = (selectedValue = null, onlyNumeric = false) => {
+    const opts = (window.VAT_OPTIONS || []).filter((o) => !onlyNumeric || o.numeric);
     return opts.map((o) => {
         const selected = selectedValue !== null && String(selectedValue) === o.v ? ' selected' : '';
         return `<option value="${o.v}"${selected}>${o.l}</option>`;
@@ -868,7 +917,7 @@ const editPriceRowTemplate = () => `
         <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
             <div class="text-field-container">
                 <select class="input-miticko" name="price_vat[]">
-                    ${vatOptionsHtml('0')}
+                    ${vatOptionsHtml(null, true)}
                 </select>
             </div>
         </div>
@@ -990,7 +1039,7 @@ const initVariants = () => {
                 ...(priceId && { id: priceId }),
                 label: priceLabel,
                 price: parseFloat(price),
-                vat_rate: parseFloat($(this).find('[name="price_vat[]"]').val()),
+                vat_rate_id: parseInt($(this).find('[name="price_vat[]"]').val(), 10) || null,
             });
         });
 
@@ -1057,7 +1106,7 @@ const priceRowTemplate = () => `
                 <div class="text-field-container">
                     <select class="input-miticko" name="price_vat[]">
                         <option value="">Scegli</option>
-                        ${vatOptionsHtml()}
+                        ${vatOptionsHtml(null, true)}
                     </select>
                 </div>
             </div>
@@ -1112,7 +1161,7 @@ const initVariantModal = () => {
                 valid = false;
                 return false;
             }
-            prices.push({ label: priceLabel, price: parseFloat(price), vat_rate: parseFloat(vatRate) });
+            prices.push({ label: priceLabel, price: parseFloat(price), vat_rate_id: parseInt(vatRate, 10) || null });
         });
 
         if (!valid) {
@@ -1152,6 +1201,20 @@ const initCategorySelect = () => {
     if (initialCategoryId) {
         $('#category_id').val(initialCategoryId);
     }
+
+    $(document).on('click', '.category-select .dropdown-item', function (e) {
+        e.preventDefault();
+        const $item = $(this);
+        const $wrapper = $item.closest('.category-select');
+        const id = $item.data('id');
+        const icon = $item.data('icon');
+        const label = $item.data('label');
+
+        $wrapper.find('input[name="category_id"]').val(id).trigger('change');
+
+        const iconHtml = icon ? `<i class="${icon}"></i>` : '';
+        $wrapper.find('.category-select-label').html(`${iconHtml}<span>${label}</span>`);
+    });
 };
 
 // ---------------------------------------------------------------------------
@@ -1373,6 +1436,19 @@ const init = () => {
     initMediaGallery();
     initLongDescription();
     initBillingFlags();
+    initLockIcon();
+};
+
+const initLockIcon = () => {
+    const sync = ($el) => {
+        const on = $el.val() === '1' || $el.val() === 1;
+        $el.closest('.text-field-container').children('i.icon').first()
+            .removeClass('fa-lock fa-lock-open')
+            .addClass(on ? 'fa-lock-open' : 'fa-lock');
+    };
+
+    $('select[data-lock-icon]').each(function () { sync($(this)); });
+    $(document).on('change', 'select[data-lock-icon]', function () { sync($(this)); });
 };
 
 // Fattura "Non necessaria" → nasconde i checkbox dei flag.
@@ -1425,12 +1501,10 @@ const renderPriceVariationRow = (v) => `
          data-unit="${v.unit}">
         <b>${v.date_from} → ${v.date_to}</b>
         <span>${v.direction_label} ${parseFloat(v.value).toFixed(2)} ${v.unit_label}</span>
-        <button type="button" class="bt-miticko outlined Primary small btn-edit-price-variation ms-auto">
-            <i class="fa-regular fa-pen icon"></i>
-        </button>
-        <button type="button" class="bt-miticko outlined danger small btn-delete-price-variation">
-            <i class="fa-regular fa-trash-can icon"></i>
-        </button>
+        <div class="d-flex gap-5 ms-auto">
+            <div class="icon-button-miticko btn-edit-price-variation" data-mode="iconButtonSize-Medium buttonAppearance-Neutral buttonEmphasis-Medium"><i class="fa-regular fa-pen icon"></i></div>
+            <div class="icon-button-miticko btn-delete-price-variation" data-mode="iconButtonSize-Medium buttonAppearance-Neutral buttonEmphasis-Medium"><i class="fa-regular fa-trash-can icon"></i></div>
+        </div>
     </div>`;
 
 const initPriceVariations = () => {

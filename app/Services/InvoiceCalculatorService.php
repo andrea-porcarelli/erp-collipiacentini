@@ -70,12 +70,16 @@ class InvoiceCalculatorService
                 // Biglietto base: emesso come riga nella fattura al cliente a prezzo pieno dell'item.
                 if ($flags[self::LINE_TICKET_BASE] && $amounts[self::LINE_TICKET_BASE] > 0) {
                     $variantLabel = $item->variant?->label ?? 'Biglietto';
+                    // Preferisce la natura (es. "N3.4") al valore numerico quando presente,
+                    // così FatturaPaBuilder applica correttamente il mapping SdI.
+                    $vatForLine = $item->vat_nature ?: ($item->vat_rate === null ? null : (float) $item->vat_rate);
                     $customerLines[] = [
                         'code' => self::LINE_TICKET_BASE,
                         'label' => $variantLabel,
                         'quantity' => (int) $item->quantity,
                         'unit_amount' => $amounts[self::LINE_TICKET_BASE.'_unit'],
                         'total' => $amounts[self::LINE_TICKET_BASE],
+                        'vat_rate' => $vatForLine,
                     ];
                 }
             }

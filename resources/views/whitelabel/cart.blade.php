@@ -57,7 +57,7 @@
                                             <span>{{ \Carbon\Carbon::parse($cart->time)->format('H:i') }}</span>
                                         </div>
                                         <div class="meta-item">
-                                            <i class="fa-regular fa-flag-swallowtail"></i>
+                                            <i class="{{ $cart->product->category->icon ?: 'fa-regular fa-flag-swallowtail' }}"></i>
                                             <span>{{ $cart->product->category->label }}</span>
                                         </div>
                                     </div>

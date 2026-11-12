@@ -81,7 +81,12 @@ class Utils
     public static function map_collection($items): array
     {
         return $items->get()->map(function ($item) {
-            return ['id' => $item->id, 'label' => $item->custom_label ?? $item->label];
+            $row = ['id' => $item->id, 'label' => $item->custom_label ?? $item->label];
+            if (isset($item->icon)) {
+                $row['icon'] = $item->icon;
+            }
+
+            return $row;
         })->values()->toArray();
     }
 

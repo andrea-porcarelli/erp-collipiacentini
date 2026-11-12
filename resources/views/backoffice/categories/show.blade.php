@@ -34,6 +34,13 @@
                             <div class="col-12 col-sm-6">
                                 <x-input :model="$model" name="iva" type="number" label="IVA (%)" />
                             </div>
+                            <div class="col-12 col-sm-6">
+                                <x-input :model="$model" name="icon" label="Icona (classe Font Awesome)" placeholder="es. fa-regular fa-wine-glass" message="Inserisci la classe completa dell'icona Font Awesome" icon="fa-regular fa-circle-info" />
+                                <div class="mt-2 d-flex align-items-center gap-2">
+                                    <span class="supporting-text">Anteprima:</span>
+                                    <i id="category-icon-preview" class="{{ $model->icon }}" style="font-size: 20px;"></i>
+                                </div>
+                            </div>
                         </div>
                     </x-card>
                 </div>
@@ -49,11 +56,16 @@
                 window.history.back();
             });
 
+            $(document).on('input', `#update-category-form input[name='icon']`, function () {
+                $('#category-icon-preview').attr('class', $(this).val());
+            });
+
             $(document).on('click', '.btn-save-category', function () {
                 const data = {
                     label:         $(`#update-category-form input[name='label']`).val(),
                     category_code: $(`#update-category-form input[name='category_code']`).val(),
                     iva:           $(`#update-category-form input[name='iva']`).val(),
+                    icon:          $(`#update-category-form input[name='icon']`).val(),
                     _method:       'PUT',
                 };
 

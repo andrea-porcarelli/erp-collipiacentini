@@ -18,6 +18,7 @@ class StoreCategoryRequest extends FormRequest
             'label' => ['required', 'string', 'max:255'],
             'category_code' => ['required', 'string', 'max:100'],
             'iva' => ['nullable', 'numeric'],
+            'icon' => ['nullable', 'string', 'max:100'],
         ];
     }
 

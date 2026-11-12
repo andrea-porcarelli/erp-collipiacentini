@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductAvailability;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
+use App\Models\VatRate;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Carbon;
 
@@ -66,11 +67,12 @@ abstract class TestCase extends BaseTestCase
             'sort_order' => 1,
         ]);
 
+        $vatRate22 = VatRate::firstWhere('code', '22');
         ProductVariantPrice::create([
             'product_variant_id' => $variant->id,
             'label' => 'Prezzo intero',
             'price' => 10.00,
-            'vat_rate' => 22,
+            'vat_rate_id' => $vatRate22?->id,
         ]);
 
         ProductAvailability::create([

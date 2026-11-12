@@ -41,6 +41,12 @@ class ProductLinkController extends CrudController
             $request->validate([
                 'label' => 'required|string|max:255',
                 'link' => 'required|url|max:255',
+            ], [
+                'label.required' => 'Il nome del link è obbligatorio.',
+                'label.max' => 'Il nome del link non può superare i :max caratteri.',
+                'link.required' => "L'URL è obbligatorio.",
+                'link.url' => "L'URL deve essere completo e iniziare con http:// o https:// (es. https://www.esempio.it).",
+                'link.max' => "L'URL non può superare i :max caratteri.",
             ]);
 
             $link = $this->interface->store([
@@ -64,7 +70,13 @@ class ProductLinkController extends CrudController
         try {
             $request->validate([
                 'label' => 'required|string|max:255',
-                'link' => 'required|string|max:255',
+                'link' => 'required|url|max:255',
+            ], [
+                'label.required' => 'Il nome del link è obbligatorio.',
+                'label.max' => 'Il nome del link non può superare i :max caratteri.',
+                'link.required' => "L'URL è obbligatorio.",
+                'link.url' => "L'URL deve essere completo e iniziare con http:// o https:// (es. https://www.esempio.it).",
+                'link.max' => "L'URL non può superare i :max caratteri.",
             ]);
 
             $link = $this->interface->find($linkId);

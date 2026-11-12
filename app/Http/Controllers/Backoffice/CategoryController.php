@@ -39,6 +39,7 @@ class CategoryController extends CrudController
             'label' => $request->get('label'),
             'category_code' => $request->get('category_code'),
             'iva' => $request->get('iva'),
+            'icon' => $request->get('icon'),
         ];
 
         $category = $this->interface->store($data);
@@ -54,6 +55,7 @@ class CategoryController extends CrudController
                 'label' => $request->get('label'),
                 'category_code' => $request->get('category_code'),
                 'iva' => $request->get('iva'),
+                'icon' => $request->get('icon'),
             ]);
 
             return $this->success();
@@ -74,7 +76,11 @@ class CategoryController extends CrudController
                     return Utils::data_long($item->created_at);
                 })
                 ->addColumn('category', function ($item) {
-                    return $item->label;
+                    $icon = $item->icon
+                        ? '<i class="'.e($item->icon).' me-2"></i>'
+                        : '';
+
+                    return $icon.e($item->label);
                 })
                 ->addColumn('products', function ($item) {
                     return $item->products()->count();
@@ -82,7 +88,7 @@ class CategoryController extends CrudController
                 ->addColumn('options', function ($item) {
                     return ' > ';
                 })
-                ->rawColumns(['status'])
+                ->rawColumns(['status', 'category'])
                 ->toJson();
         } catch (\Exception $e) {
             return $this->exception($e);

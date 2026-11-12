@@ -3,12 +3,12 @@
     $selectedIds = $model->features->pluck('id')->all();
 @endphp
 
-<x-card title="Caratteristiche del prodotto" sub_title="Seleziona le caratteristiche che descrivono il prodotto, verranno mostrate all'utente nella pagina di dettaglio" class="mt-4 position-relative">
+<x-card title="Servizi disponibili" sub_title="seleziona tutti i servizi diponibili, verranno visualizzati nella pagina prodotto" class="mt-4 position-relative">
     <form id="form-info-features">
         <div class="row">
             @foreach($features as $category => $items)
-                <div class="col-12 col-sm-6 mb-3">
-                    <h6 class="text-uppercase small text-secondary mb-2">
+                <div class="col-12 mb-3">
+                    <h6 class="mb-2 fw-bold feature-title">
                         {{ \App\Models\ProductFeature::CATEGORIES[$category] ?? $category }}
                     </h6>
                     @foreach($items as $feature)
@@ -19,10 +19,7 @@
                                 value="{{ $feature->id }}"
                                 @checked(in_array($feature->id, $selectedIds))
                             >
-                            @if($feature->icon)
-                                <i class="fa-regular {{ $feature->icon }} text-secondary"></i>
-                            @endif
-                            <span>{{ $feature->translated_label }}</span>
+                            <span class="feature-text" data-mode="typoBody-Medium">{{ $feature->translated_label }}</span>
                         </label>
                     @endforeach
                 </div>

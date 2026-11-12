@@ -28,7 +28,7 @@ class SlotVariants extends Component
         string $maxQuantity,
         string $priceLabel,
         string $price,
-        int $vatRate
+        int $vatRateId
     ): bool {
         if (trim($label) === '') {
             $this->notify('error', 'Il nome variante è obbligatorio');
@@ -58,7 +58,7 @@ class SlotVariants extends Component
         $newPrice = $variant->prices()->create([
             'label' => trim($priceLabel),
             'price' => (float) $price,
-            'vat_rate' => $vatRate,
+            'vat_rate_id' => $vatRateId,
         ]);
 
         $this->variants[] = [
@@ -70,7 +70,7 @@ class SlotVariants extends Component
                 'id' => $newPrice->id,
                 'label' => $newPrice->label,
                 'price' => $newPrice->price,
-                'vat_rate' => (int) $newPrice->vat_rate,
+                'vat_rate_id' => (int) $newPrice->vat_rate_id,
             ]],
         ];
 
@@ -122,10 +122,10 @@ class SlotVariants extends Component
         foreach ($this->variants[$vi]['prices'] as $pi => $row) {
             $rules["variants.{$vi}.prices.{$pi}.label"] = 'required|string|max:255';
             $rules["variants.{$vi}.prices.{$pi}.price"] = 'required|numeric|min:0';
-            $rules["variants.{$vi}.prices.{$pi}.vat_rate"] = 'required|numeric|min:0|max:100';
+            $rules["variants.{$vi}.prices.{$pi}.vat_rate_id"] = 'required|integer|exists:vat_rates,id';
             $attributes["variants.{$vi}.prices.{$pi}.label"] = 'servizio';
             $attributes["variants.{$vi}.prices.{$pi}.price"] = 'prezzo';
-            $attributes["variants.{$vi}.prices.{$pi}.vat_rate"] = 'IVA';
+            $attributes["variants.{$vi}.prices.{$pi}.vat_rate_id"] = 'IVA';
         }
 
         $this->validate($rules, [], $attributes);
@@ -161,13 +161,13 @@ class SlotVariants extends Component
                 ProductVariantPrice::where('id', $row['id'])->update([
                     'label' => $row['label'],
                     'price' => $row['price'],
-                    'vat_rate' => $row['vat_rate'],
+                    'vat_rate_id' => $row['vat_rate_id'],
                 ]);
             } else {
                 $newPrice = $variant->prices()->create([
                     'label' => $row['label'],
                     'price' => $row['price'],
-                    'vat_rate' => $row['vat_rate'],
+                    'vat_rate_id' => $row['vat_rate_id'],
                 ]);
                 $this->variants[$vi]['prices'][$pi]['id'] = $newPrice->id;
             }
@@ -180,7 +180,8 @@ class SlotVariants extends Component
 
     public function addPriceRow(int $vi): void
     {
-        $this->variants[$vi]['prices'][] = ['id' => null, 'label' => '', 'price' => '', 'vat_rate' => 22];
+        $defaultVatId = \App\Models\VatRate::whereNull('nature')->orderBy('sort_order')->value('id');
+        $this->variants[$vi]['prices'][] = ['id' => null, 'label' => '', 'price' => '', 'vat_rate_id' => $defaultVatId];
     }
 
     public function removePriceRow(int $vi, int $pi): void
@@ -206,7 +207,7 @@ class SlotVariants extends Component
                     'id' => $p->id,
                     'label' => $p->label,
                     'price' => $p->price,
-                    'vat_rate' => (int) $p->vat_rate,
+                    'vat_rate_id' => (int) $p->vat_rate_id,
                 ])->toArray(),
             ])
             ->toArray();

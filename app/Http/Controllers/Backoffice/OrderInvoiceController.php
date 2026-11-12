@@ -56,6 +56,7 @@ class OrderInvoiceController extends Controller
 
                 return $op->items->map(function ($it) use ($productLabel, $partnerModel) {
                     $vat = $it->vat_rate;
+                    $nature = $it->vat_nature;
                     if (is_null($vat)) {
                         $thresholdHigh = $it->partner_commission_presale_threshold_high ?? $partnerModel?->commission_presale_threshold_high;
                         $thresholdLow = $it->partner_commission_presale_threshold_low ?? $partnerModel?->commission_presale_threshold_low;
@@ -69,9 +70,10 @@ class OrderInvoiceController extends Controller
                             $presaleUnit = $low;
                         }
                         $purePrice = round($unit - $presaleUnit, 2);
-                        $vat = $it->variant?->prices
-                            ?->firstWhere(fn ($p) => abs((float) $p->price - $purePrice) < 0.01)
-                            ?->vat_rate;
+                        $matchedPrice = $it->variant?->prices
+                            ?->firstWhere(fn ($p) => abs((float) $p->price - $purePrice) < 0.01);
+                        $vat = $matchedPrice?->vatRate?->rate;
+                        $nature = $matchedPrice?->vatRate?->nature;
                     }
 
                     return [
@@ -80,6 +82,7 @@ class OrderInvoiceController extends Controller
                         'quantity' => (int) $it->quantity,
                         'unit_price' => (float) $it->unit_price,
                         'vat_rate' => is_null($vat) ? null : (float) $vat,
+                        'vat_nature' => $nature,
                         'subtotal' => round((float) $it->unit_price * (int) $it->quantity, 2),
                     ];
                 });

@@ -21,16 +21,20 @@ class ProductVariantPrice extends LogsModel
         'product_variant_id',
         'label',
         'price',
-        'vat_rate',
+        'vat_rate_id',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'vat_rate' => 'decimal:2',
     ];
 
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    public function vatRate(): BelongsTo
+    {
+        return $this->belongsTo(VatRate::class, 'vat_rate_id');
     }
 }

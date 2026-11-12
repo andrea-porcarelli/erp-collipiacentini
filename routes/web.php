@@ -23,6 +23,7 @@ use App\Http\Controllers\Backoffice\ProductMediaController;
 use App\Http\Controllers\Backoffice\ProductPriceVariationController;
 use App\Http\Controllers\Backoffice\ProductRelatedController;
 use App\Http\Controllers\Backoffice\ProductSpecialScheduleController;
+use App\Http\Controllers\Backoffice\SettingsController;
 use App\Http\Controllers\Backoffice\StatisticsController;
 use App\Http\Controllers\Backoffice\TicketScannerController;
 use App\Http\Controllers\Backoffice\UserController;
@@ -95,6 +96,13 @@ Route::domain("admin.miticko.com")
 
             // Impostazioni partner (utente con ruolo "partner"): rende la show del proprio partner.
             Route::get('/settings', [PartnerController::class, 'settings'])->name('settings');
+
+            // Impostazioni Miticko (god): tab Generali (dati fiscali) + Gestione Aliquote IVA.
+            Route::get('/admin-settings', [SettingsController::class, 'index'])->name('admin.settings');
+            Route::post('/vat-rates', [SettingsController::class, 'storeVatRate'])->name('vat-rates.store');
+            Route::put('/vat-rates/{vatRate}', [SettingsController::class, 'updateVatRate'])->name('vat-rates.update');
+            Route::delete('/vat-rates/{vatRate}', [SettingsController::class, 'destroyVatRate'])->name('vat-rates.destroy');
+            Route::post('/vat-rates/reorder', [SettingsController::class, 'reorderVatRates'])->name('vat-rates.reorder');
 
             // Ticket scanner (FAB)
             Route::get('tickets/scan/{code}', [TicketScannerController::class, 'scan'])->name('tickets.scan')->where('code', '[A-Za-z0-9]+');

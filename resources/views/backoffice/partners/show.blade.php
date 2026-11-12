@@ -116,6 +116,18 @@
         #partner-report-panel .switch-cell .text-field { margin: 0; padding: 0; }
         #partner-report-panel .switch-cell .supporting-text { display: none; }
 
+        /* Nelle tabelle Report rimetto lo switchery nel flusso normale così .align-middle del <td> lo centra verticalmente */
+        #partner-report-panel table .switch-cell {
+            width: auto;
+            height: auto;
+            position: static;
+            line-height: 0;
+        }
+        #partner-report-panel table .switch-cell .switchery {
+            position: relative !important;
+            right: auto;
+        }
+
         /* Tabella Report: header con sfondo grigio chiaro come da design */
         #partner-report-panel table.table-miticko thead th {
             background: var(--Footer-Background-color, #FAFAFA);

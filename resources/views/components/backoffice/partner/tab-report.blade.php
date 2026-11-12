@@ -57,14 +57,14 @@
 
         @if($isGod)
             <div class="fw-semibold mb-2">Account Miticko</div>
-            <div class="table-responsive mb-4">
+            <div class="table-responsive mb-4" data-mode="table-Default">
                 <table id="dt-report-subscribers-miticko"
                        class="table table-miticko align-middle w-100"
                        data-url="{{ route('partners.report.data.subscribers-miticko', $model->id) }}">
                     <thead>
                         <tr>
-                            <th data-name="email">Utente</th>
-                            <th data-name="role">Ruolo</th>
+                            <th data-name="email" data-mode="typoTitle-Small">Utente</th>
+                            <th data-name="role" data-mode="typoBody-Small">Ruolo</th>
                             <th data-name="toggle" class="text-end">Invio automatico</th>
                         </tr>
                     </thead>
@@ -74,14 +74,14 @@
         @endif
 
         <div class="fw-semibold mb-2">Account Partner</div>
-        <div class="table-responsive">
+        <div class="table-responsive" data-mode="table-Default">
             <table id="dt-report-subscribers-partner"
                    class="table table-miticko align-middle w-100"
                    data-url="{{ route('partners.report.data.subscribers-partner', $model->id) }}">
                 <thead>
                     <tr>
-                        <th data-name="email">Utente</th>
-                        <th data-name="role">Ruolo</th>
+                        <th data-name="email" data-mode="typoTitle-Small">Utente</th>
+                        <th data-name="role" data-mode="typoBody-Small">Ruolo</th>
                         <th data-name="toggle" class="text-end">Invio automatico</th>
                     </tr>
                 </thead>

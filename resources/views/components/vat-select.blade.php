@@ -7,13 +7,16 @@
     'required' => false,
     'placeholder' => null,
     'class' => '',
+    'only_numeric' => false,
 ])
 @php
-// `rate` è stringa per supportare sia aliquote numeriche ("22", "10", "0") sia nature
-// di esenzione / non imponibilità per fattura elettronica ("N6.9", "N3.2", …).
-$vatOptions = collect(config('vat.rates', []))
-    ->map(fn ($r) => ['id' => (string) $r['rate'], 'label' => $r['label']])
-    ->all();
+    $query = \App\Models\VatRate::where('is_active', 1)->orderBy('sort_order');
+    if ($only_numeric) {
+        $query->whereNull('nature');
+    }
+    $vatOptions = $query->get()
+        ->map(fn ($r) => ['id' => $r->id, 'label' => $r->label])
+        ->all();
 @endphp
 <x-select
     :model="$model"

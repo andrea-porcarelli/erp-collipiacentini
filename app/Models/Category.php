@@ -11,6 +11,7 @@ class Category extends LogsModel
         'iva',
         'category_code',
         'label',
+        'icon',
     ];
 
     public function products(): HasMany

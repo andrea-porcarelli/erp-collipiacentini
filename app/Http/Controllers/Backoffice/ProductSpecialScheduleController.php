@@ -215,7 +215,7 @@ class ProductSpecialScheduleController extends Controller
                         $newPrice = $newVariant->prices()->create([
                             'label' => $price->label,
                             'price' => $price->price,
-                            'vat_rate' => $price->vat_rate,
+                            'vat_rate_id' => $price->vat_rate_id,
                         ]);
                         $pricesMap[] = ['template_id' => $price->id, 'id' => $newPrice->id];
                     }
@@ -363,7 +363,7 @@ class ProductSpecialScheduleController extends Controller
             'prices' => 'required|array|min:1',
             'prices.*.label' => 'required|string|max:255',
             'prices.*.price' => 'required|numeric|min:0',
-            'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+            'prices.*.vat_rate_id' => 'required|integer|exists:vat_rates,id',
         ]);
 
         $maxOrder = ProductVariant::where('special_schedule_id', $slot->id)->max('sort_order') ?? 0;
@@ -381,7 +381,7 @@ class ProductSpecialScheduleController extends Controller
             $variant->prices()->create([
                 'label' => $row['label'],
                 'price' => $row['price'],
-                'vat_rate' => $row['vat_rate'],
+                'vat_rate_id' => $row['vat_rate_id'],
             ]);
         }
 
@@ -405,7 +405,7 @@ class ProductSpecialScheduleController extends Controller
             'prices.*.id' => 'nullable|integer',
             'prices.*.label' => 'required|string|max:255',
             'prices.*.price' => 'required|numeric|min:0',
-            'prices.*.vat_rate' => 'required|numeric|min:0|max:100',
+            'prices.*.vat_rate_id' => 'required|integer|exists:vat_rates,id',
         ]);
 
         $variant->update([
@@ -422,13 +422,13 @@ class ProductSpecialScheduleController extends Controller
                 ProductVariantPrice::where('id', $row['id'])->update([
                     'label' => $row['label'],
                     'price' => $row['price'],
-                    'vat_rate' => $row['vat_rate'],
+                    'vat_rate_id' => $row['vat_rate_id'],
                 ]);
             } else {
                 $variant->prices()->create([
                     'label' => $row['label'],
                     'price' => $row['price'],
-                    'vat_rate' => $row['vat_rate'],
+                    'vat_rate_id' => $row['vat_rate_id'],
                 ]);
             }
         }

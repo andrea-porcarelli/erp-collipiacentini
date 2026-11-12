@@ -268,7 +268,7 @@
     /* ── VAT select helper ───────────────────────────────── */
     function vatSelect(name, selectedVal) {
         return '<select class="input-miticko" name="' + name + '">' +
-            VAT_OPTIONS.map(function(o) {
+            VAT_OPTIONS.filter(function(o) { return o.numeric; }).map(function(o) {
                 return '<option value="' + o.v + '"' + (String(selectedVal) === o.v ? ' selected' : '') + '>' + o.l + '</option>';
             }).join('') +
         '</select>';
@@ -284,7 +284,7 @@
                 '<input type="number" class="input-miticko ssv-price-value" value="' + (p && p.price ? p.price : '') + '" placeholder="0.00" step="0.01" min="0">' +
             '</div></div></div>' +
             '<div style="width:220px;flex-shrink:0"><div class="text-field" data-mode="textfieldSize-Medium"><div class="text-field-container">' +
-                vatSelect('ssv_price_vat', p && p.vat_rate !== undefined ? p.vat_rate : 0) +
+                vatSelect('ssv_price_vat', p && p.vat_rate_id !== undefined ? p.vat_rate_id : null) +
             '</div></div></div>' +
             '<div style="width:36px;flex-shrink:0">' +
                 '<button type="button" class="bt-miticko outlined danger small btn-ssv-remove-price"><i class="fa-regular fa-trash-can icon"></i></button>' +
@@ -687,9 +687,9 @@
         var prices = [];
         $('#ssv-prices-list .ssv-modal-price-row').each(function () {
             prices.push({
-                label:    $(this).find('.ssv-modal-price-label').val(),
-                price:    parseFloat($(this).find('.ssv-modal-price-value').val()) || 0,
-                vat_rate: parseFloat($(this).find('[name="ssv_modal_vat"]').val()) || 0,
+                label:       $(this).find('.ssv-modal-price-label').val(),
+                price:       parseFloat($(this).find('.ssv-modal-price-value').val()) || 0,
+                vat_rate_id: parseInt($(this).find('[name="ssv_modal_vat"]').val(), 10) || null,
             });
         });
         if (!$('[name="ssv_label"]').val()) { toastr.warning('Inserisci il nome della variante'); return; }
@@ -767,10 +767,10 @@
             $v.find('.ssv-edit-prices .ss-edit-price-row').each(function () {
                 var pid = $(this).attr('data-price-id');
                 prices.push({
-                    id:       pid ? parseInt(pid) : null,
-                    label:    $(this).find('.ssv-price-label').val(),
-                    price:    parseFloat($(this).find('.ssv-price-value').val()) || 0,
-                    vat_rate: parseFloat($(this).find('[name="ssv_price_vat"]').val()) || 0,
+                    id:          pid ? parseInt(pid) : null,
+                    label:       $(this).find('.ssv-price-label').val(),
+                    price:       parseFloat($(this).find('.ssv-price-value').val()) || 0,
+                    vat_rate_id: parseInt($(this).find('[name="ssv_price_vat"]').val(), 10) || null,
                 });
             });
 

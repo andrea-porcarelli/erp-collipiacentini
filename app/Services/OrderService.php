@@ -89,12 +89,14 @@ class OrderService
             $billingFlagsSnapshot = ($cart->product ?? Product::find($cart->product_id))?->defaultBillingFlags() ?? [];
 
             foreach ($cart->items as $item) {
+                $vatSnap = $this->snapshotVatRate((int) $item->product_variant_id, (float) $item->unit_price, $partner);
                 $opi = OrderProductItem::create([
                     'order_product_id' => $orderProduct->id,
                     'product_variant_id' => $item->product_variant_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
-                    'vat_rate' => $this->snapshotVatRate((int) $item->product_variant_id, (float) $item->unit_price, $partner),
+                    'vat_rate' => $vatSnap['rate'],
+                    'vat_nature' => $vatSnap['nature'],
                     ...$commissionSnapshot,
                     ...$billingFlagsSnapshot,
                 ]);
@@ -377,12 +379,14 @@ class OrderService
             $billingFlagsSnapshot = $product->defaultBillingFlags();
 
             foreach ($itemsResolved as $item) {
+                $vatSnap = $this->snapshotVatRate((int) $item['variant_id'], (float) $item['unit_price'], $partner);
                 $opi = OrderProductItem::create([
                     'order_product_id' => $orderProduct->id,
                     'product_variant_id' => $item['variant_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
-                    'vat_rate' => $this->snapshotVatRate((int) $item['variant_id'], (float) $item['unit_price'], $partner),
+                    'vat_rate' => $vatSnap['rate'],
+                    'vat_nature' => $vatSnap['nature'],
                     ...$commissionSnapshot,
                     ...$billingFlagsSnapshot,
                 ]);
@@ -509,24 +513,24 @@ class OrderService
     }
 
     /**
-     * Snapshot dell'aliquota IVA del biglietto al momento della creazione dell'OPI.
+     * Snapshot dell'aliquota IVA + natura del biglietto al momento della creazione dell'OPI.
      *
      * Il `unit_price` dell'item include già la prevendita (vedi BookingController@add),
      * mentre ProductVariantPrice.price è il prezzo di listino "puro". Per matchare il PVP
      * giusto devo sottrarre la quota prevendita stimata dal unit_price.
      *
-     * Ritorna null se non c'è un PVP con prezzo coincidente (es. prezzo fuori listino
-     * o variante con PVP multipli), così il preview può fare fallback.
+     * Ritorna ['rate' => null, 'nature' => null] se non c'è un PVP coincidente, così il preview
+     * può fare fallback.
+     *
+     * @return array{rate: ?float, nature: ?string}
      */
-    protected function snapshotVatRate(int $variantId, float $unitPrice, ?Partner $partner): ?float
+    protected function snapshotVatRate(int $variantId, float $unitPrice, ?Partner $partner): array
     {
         $thresholdHigh = $partner?->commission_presale_threshold_high;
         $thresholdLow = $partner?->commission_presale_threshold_low;
         $low = (float) ($partner?->commission_presale_low ?? 0);
         $high = (float) ($partner?->commission_presale_high ?? 0);
 
-        // Inverte la logica banda morta di Partner::resolvePresaleCommission per stimare
-        // la quota prevendita inclusa nel unit_price e isolare il prezzo "puro" del PVP.
         $presaleUnit = 0.0;
         if (! is_null($thresholdHigh) && ($unitPrice - $high) > (float) $thresholdHigh) {
             $presaleUnit = $high;
@@ -535,11 +539,15 @@ class OrderService
         }
         $purePrice = round($unitPrice - $presaleUnit, 2);
 
-        $matched = ProductVariantPrice::where('product_variant_id', $variantId)
+        $matched = ProductVariantPrice::with('vatRate')
+            ->where('product_variant_id', $variantId)
             ->whereBetween('price', [$purePrice - 0.01, $purePrice + 0.01])
             ->first();
 
-        return $matched?->vat_rate === null ? null : (float) $matched->vat_rate;
+        return [
+            'rate' => $matched?->vatRate?->rate === null ? null : (float) $matched->vatRate->rate,
+            'nature' => $matched?->vatRate?->nature,
+        ];
     }
 
     protected function partnerCommissionSnapshot(Partner $partner): array

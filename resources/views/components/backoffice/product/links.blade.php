@@ -16,12 +16,13 @@
     <form id="form-link-new">
         <div class="row g-2 align-items-center d-flex justify-content-between">
             <div class="col-12 col-sm-4">
-                <x-input name="label" placeholder="es. Prenota ora" />
+                <x-input name="label" placeholder="es. Prenota ora" maxlength="50" />
             </div>
             <div class="col-12 col-sm-7" >
-                <x-input name="link" placeholder="https://..." />
+                <x-input name="link" placeholder="https://www.esempio.it" message="L'URL deve iniziare con http:// o https://" icon="fa-regular fa-circle-info" />
             </div>
             <div class="col-12 col-sm-1 text-end">
+                <x-button class="btn-user-delete" size="medium" emphasis="text-only" leading="fa-regular fa-trash icon" />
                 <x-button size="medium" status="disabled" emphasis="light" leading="fa-regular fa-language icon" disabled="true" />
                 <x-button size="medium" status="disabled" emphasis="text-only" leading="fa-regular fa-trash icon" disabled="true" />
             </div>
@@ -35,14 +36,14 @@
         <div class="link-item py-1" data-id="{{ $link->id }}">
             <div class="row g-2 align-items-center ">
                 <div class="col-12 col-sm-4">
-                    <div class="text-field" data-mode="medium">
+                    <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                         <div class="text-field-container">
-                            <input class="input-miticko" name="label" value="{{ $link->label }}">
+                            <input class="input-miticko" name="label" value="{{ $link->label }}" maxlength="50">
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-sm-7">
-                    <div class="text-field" data-mode="medium">
+                    <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                         <div class="text-field-container">
                             <input class="input-miticko" name="link" value="{{ $link->link }}">
                         </div>

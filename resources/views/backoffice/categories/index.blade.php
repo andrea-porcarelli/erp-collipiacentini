@@ -38,6 +38,7 @@
                     <x-input name="label" label="Nome categoria" placeholder="Inserisci il nome della categoria" required />
                     <x-input name="category_code" label="Codice categoria" placeholder="Inserisci il codice categoria" required />
                     <x-input name="iva" type="number" label="IVA (%)" placeholder="Inserisci l'aliquota IVA" />
+                    <x-input name="icon" label="Icona (classe Font Awesome)" placeholder="es. fa-regular fa-wine-glass" />
                 </div>
             </form>
         </div>
@@ -99,6 +100,7 @@
                     label:         $(`#create-category input[name='label']`).val(),
                     category_code: $(`#create-category input[name='category_code']`).val(),
                     iva:           $(`#create-category input[name='iva']`).val(),
+                    icon:          $(`#create-category input[name='icon']`).val(),
                 };
 
                 $(document).trigger('fetch', [{

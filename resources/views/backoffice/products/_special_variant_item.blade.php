@@ -69,7 +69,7 @@
                     <input type="number" class="input-miticko ssv-price-value" value="{{ $price->price }}" placeholder="0.00" step="0.01" min="0">
                 </div></div></div>
                 <div style="width:220px;flex-shrink:0">
-                    <x-vat-select name="ssv_price_vat" :value="(int) $price->vat_rate" />
+                    <x-vat-select name="ssv_price_vat" :only_numeric="true" :value="$price->vat_rate_id" />
                 </div>
                 <div style="width:36px;flex-shrink:0">
                     <button type="button" class="bt-miticko outlined danger small btn-ssv-remove-price"><i class="fa-regular fa-trash-can icon"></i></button>

@@ -27,7 +27,7 @@
             <x-navigation-item label="Fatturazione" icon="fa fa-file-invoice" route="invoices.index" :is_active="$active === 'invoices'" />
         @endif
         @if(Auth::user()->role == 'god')
-            <x-navigation-item label="Impostazioni" icon="fa fa-gear" />
+            <x-navigation-item label="Impostazioni" icon="fa fa-gear" route="admin.settings" :is_active="$active === 'admin-settings'" />
         @elseif(Auth::user()->role == 'partner' && Auth::user()->partner_id)
             <x-navigation-item label="Impostazioni" icon="fa fa-gear" route="settings" :is_active="$active === 'settings'" />
         @endif
