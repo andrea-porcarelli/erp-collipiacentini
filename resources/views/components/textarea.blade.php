@@ -5,6 +5,7 @@
     'class_container' => null,
     'supporting_text' => '',
     'name' => '',
+    'id' => null,
     'value' => null,
     'size' => 'medium',
     'required' => false,
@@ -31,9 +32,10 @@ $remaining = isset($maxlength) ? ($maxlength - mb_strlen($default ?? '')) : null
     @endisset
     <div class="text-field-container">
         <textarea
+            {{ $attributes->except(['class']) }}
             class="input-miticko {{ $class }}"
             name="{{ $name }}"
-            id="{{ $name }}"
+            id="{{ $id ?? $name }}"
             @if($required)
                 required
             @endif

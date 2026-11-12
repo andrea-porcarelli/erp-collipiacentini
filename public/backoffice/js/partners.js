@@ -208,49 +208,85 @@ const renderRoleSelect = (selected) => {
     return `<select class="input-miticko" name="role">${options}</select>`;
 };
 
+const statusOptions = [
+    { value: 1, label: 'Abilitato' },
+    { value: 0, label: 'Disabilitato' },
+];
+
+const renderStatusSelect = (selected) => {
+    const sel = Number(selected);
+    const options = statusOptions.map(o =>
+        `<option value="${o.value}" ${o.value === sel ? 'selected' : ''}>${o.label}</option>`
+    ).join('');
+    return `
+        <i class="fa-regular fa-lock-open icon"></i>
+        <select class="input-miticko" name="is_active">${options}</select>
+    `;
+};
+
+// Ripulisce i messaggi che il backend Controller::exception() restituisce con suffissi tipo
+// "(and 1 more error) in /app/vendor/... at line 123" (debug trace + Laravel ValidationException).
+const cleanBackendMessage = (msg) => {
+    if (!msg || typeof msg !== 'string') return '';
+    return msg
+        .replace(/\s*\(and \d+ more errors?\)/i, '')
+        .replace(/\s+in\s+\/[^\s]+(?:\s+at\s+line\s+\d+)?/i, '')
+        .trim();
+};
+
 const showFormErrors = ($container, errors) => {
+    // pulisce eventuali stati di errore precedenti dal container
+    $container.find('.text-field-container.is-invalid').removeClass('is-invalid');
+    $container.find('.supporting-text.danger-dynamic').remove();
+    $container.find('.supporting-text.danger').removeClass('danger').html('');
+
     for (const [field, messages] of Object.entries(errors)) {
         const message = Array.isArray(messages) ? messages[0] : messages;
-        $container.find(`[name="${field}"]`)
-            .closest('.text-field-container')
-            .addClass('is-invalid')
-            .parent()
-            .find('.supporting-text')
-            .show()
-            .addClass('danger')
-            .html(message);
+        const $input = $container.find(`[name="${field}"]`).first();
+        if (!$input.length) continue;
+
+        const $textField = $input.closest('.text-field');
+        $textField.find('.text-field-container').addClass('is-invalid');
+
+        let $support = $textField.find('.supporting-text').first();
+        if (!$support.length) {
+            // nessun supporting-text nativo (il campo non ha message/maxlength):
+            // ne creo uno solo per l'errore, marchiato per essere rimosso al prossimo reset.
+            $support = $('<div class="supporting-text danger-dynamic"></div>').appendTo($textField);
+        }
+        $support.show().addClass('danger').html(message);
     }
+
     setTimeout(() => {
-        $container.find('.supporting-text').removeClass('danger').html('');
-        $container.find('.text-field-container').removeClass('is-invalid');
+        $container.find('.text-field-container.is-invalid').removeClass('is-invalid');
+        $container.find('.supporting-text.danger').removeClass('danger');
+        $container.find('.supporting-text.danger-dynamic').remove();
+        $container.find('.supporting-text:not(.char-count)').filter(function () {
+            return $(this).html() === '' && !$(this).hasClass('char-count');
+        });
     }, 8000);
 };
 
 const renderUserRow = (user) => {
-    const name  = escapeHtml(user.name);
-    const email = escapeHtml(user.email);
-    const role  = user.role ?? 'partner';
+    const email    = escapeHtml(user.email);
+    const role     = user.role ?? 'partner';
+    const isActive = user.is_active ?? 1;
     return `
     <div class="user-item py-1" data-id="${user.id}">
         <div class="row g-2 align-items-center">
             <div class="col-12 col-sm-3">
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <input class="input-miticko" name="name" value="${name}">
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-3">
-                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
-                    <div class="text-field-container">
                         <input class="input-miticko" name="email" type="email" value="${email}">
+                        <i class="fa-regular fa-envelope icon"></i>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-3">
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
-                        <input class="input-miticko" name="password" type="password" placeholder="Nuova password...">
+                        <input class="input-miticko" name="password" type="password" placeholder="Inserisci nuova password">
+                        <i class="fa-regular fa-lock icon"></i>
                     </div>
                 </div>
             </div>
@@ -258,6 +294,13 @@ const renderUserRow = (user) => {
                 <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                     <div class="text-field-container">
                         ${renderRoleSelect(role)}
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-3">
+                <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
+                    <div class="text-field-container">
+                        ${renderStatusSelect(isActive)}
                     </div>
                 </div>
             </div>
@@ -280,14 +323,14 @@ const updateSaveUsersButton = () => {
 const addUser = () => {
     const $form = $('#form-user-new');
     const data = {
-        name:     $form.find('input[name="name"]').val(),
-        email:    $form.find('input[name="email"]').val(),
-        password: $form.find('input[name="password"]').val(),
-        role:     $form.find('select[name="role"]').val(),
+        email:     $form.find('input[name="email"]').val(),
+        password:  $form.find('input[name="password"]').val(),
+        role:      $form.find('select[name="role"]').val(),
+        is_active: $form.find('select[name="is_active"]').val() ?? 1,
     };
 
-    if (!data.name || !data.email || !data.password || !data.role) {
-        toastr.warning('Nome, email, ruolo e password sono obbligatori');
+    if (!data.email || !data.password || !data.role) {
+        toastr.warning('Email, password e ruolo sono obbligatori');
         return;
     }
 
@@ -299,8 +342,12 @@ const addUser = () => {
             toastr.success('Account aggiunto con successo');
         })
         .catch((err) => {
-            if (err.responseJSON?.errors) {
+            const backendMsg = cleanBackendMessage(err?.responseJSON?.message);
+            if (err?.responseJSON?.errors) {
                 showFormErrors($form, err.responseJSON.errors);
+                toastr.error(backendMsg || 'Controlla i dati inseriti');
+            } else if (backendMsg) {
+                toastr.error(backendMsg);
             } else {
                 toastr.error('Errore durante la creazione dell\'account');
             }
@@ -308,7 +355,7 @@ const addUser = () => {
 };
 
 const initUsers = () => {
-    $(document).on('input', '.user-item input', function () {
+    $(document).on('input change', '.user-item input, .user-item select', function () {
         $(this).closest('.user-item').attr('data-dirty', '1');
         updateSaveUsersButton();
     });
@@ -326,8 +373,9 @@ const initUsers = () => {
             const $item = $(this);
             const id = $item.data('id');
             const data = {
-                name:  $item.find('input[name="name"]').val(),
-                email: $item.find('input[name="email"]').val(),
+                email:     $item.find('input[name="email"]').val(),
+                role:      $item.find('select[name="role"]').val(),
+                is_active: $item.find('select[name="is_active"]').val(),
             };
             const password = $item.find('input[name="password"]').val();
             if (password) data.password = password;
@@ -337,7 +385,15 @@ const initUsers = () => {
                     $item.removeAttr('data-dirty');
                     $item.find('input[name="password"]').val('');
                 })
-                .catch(() => { hasError = true; })
+                .catch((err) => {
+                    hasError = true;
+                    const backendMsg = cleanBackendMessage(err?.responseJSON?.message);
+                    if (err?.responseJSON?.errors) {
+                        showFormErrors($item, err.responseJSON.errors);
+                    } else if (backendMsg) {
+                        toastr.error(backendMsg);
+                    }
+                })
                 .finally(() => {
                     pending--;
                     if (pending === 0) {
@@ -486,11 +542,16 @@ const richEditorConfig = {
 
 const fieldLabels = {
     description_short: 'Breve descrizione',
+    hero_title:        'Titolo E-commerce',
+    hero_subtitle:     'Sottotitolo E-commerce',
     contacts_content:  'Pagina contatti',
     privacy_policy:    'Privacy Policy',
     cookie_policy:     'Cookie Policy',
     terms_conditions:  'Termini e Condizioni',
 };
+
+// Campi tradotti come plain-text (input), senza rich editor.
+const plainTextFields = new Set(['hero_title', 'hero_subtitle']);
 
 const initRichEditors = async () => {
     // Editor per documenti legali e pagina contatti
@@ -514,9 +575,20 @@ const initRichEditors = async () => {
 const mountRichEditor = async (el, field, initialValue = '') => {
     const editor = await ClassicEditor.create(el, richEditorConfig);
     editor.setData(initialValue);
+    const maxlength = parseInt(el.getAttribute('maxlength'), 10) || null;
+    const charCountEl = el.closest('.text-field')?.querySelector('.char-count');
+    const updateCount = () => {
+        if (!maxlength || !charCountEl) return;
+        const text = new DOMParser()
+            .parseFromString(editor.getData(), 'text/html')
+            .body.textContent || '';
+        charCountEl.textContent = (maxlength - [...text].length) + ' / ' + maxlength + ' caratteri rimanenti';
+    };
+    updateCount();
     editor.model.document.on('change:data', () => {
         $(el).closest('.card-miticko').find('.btn-save-card')
             .attr('data-mode', 'buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary');
+        updateCount();
     });
     richEditors.set(field, editor);
 };
@@ -536,7 +608,7 @@ const destroyTranslationEditors = async () => {
     translationEditors.clear();
 };
 
-const renderTranslationBody = (data) => {
+const renderTranslationBody = (data, { plain = false } = {}) => {
     if (!data || data.length === 0) {
         return '<p class="text-secondary small mb-0">Nessuna lingua disponibile nel sistema.</p>';
     }
@@ -549,11 +621,13 @@ const renderTranslationBody = (data) => {
             </div>
             <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
                 <div class="text-field-container">
-                    <textarea class="input-miticko translation-editor"
+                    ${plain
+                        ? `<input type="text" class="input-miticko translation-input" data-language-id="${lang.language_id}" name="value" value="${escapeHtml(lang.value || '')}" />`
+                        : `<textarea class="input-miticko translation-editor"
                               data-language-id="${lang.language_id}"
                               data-initial="${escapeHtml(lang.value || '')}"
                               name="value"
-                              rows="6"></textarea>
+                              rows="6"></textarea>`}
                 </div>
             </div>
         </div>
@@ -573,6 +647,7 @@ const openTranslationsModal = async (field) => {
     const $modal = $('#modal-translations');
     const path = `/partners/${window.PARTNER_ID}/translations/${field}`;
     const label = fieldLabels[field] || 'Campo';
+    const plain = plainTextFields.has(field);
 
     await destroyTranslationEditors();
 
@@ -583,8 +658,10 @@ const openTranslationsModal = async (field) => {
 
     App.ajax({ path, method: 'get' })
         .then(async (res) => {
-            $('#modal-trans-body').html(renderTranslationBody(res.data));
-            await mountTranslationEditors();
+            $('#modal-trans-body').html(renderTranslationBody(res.data, { plain }));
+            if (!plain) {
+                await mountTranslationEditors();
+            }
         })
         .catch(() => {
             $('#modal-trans-body').html('<p class="text-danger small">Errore nel caricamento delle traduzioni.</p>');
@@ -624,6 +701,12 @@ const initTranslations = () => {
     // Pulsante globo accanto all'editor della Breve descrizione
     $(document).on('click', '.btn-description-translations', function () {
         openTranslationsModal('description_short');
+    });
+
+    // Pulsante globo accanto agli input hero (titolo/sottotitolo E-commerce)
+    $(document).on('click', '.btn-hero-translations', function () {
+        const field = $(this).data('field');
+        if (field) openTranslationsModal(field);
     });
 
     $(document).on('click', '#modal-translations .btn-save-translations', saveTranslations);
@@ -774,6 +857,7 @@ const buildConsentPayload = ($item) => {
         state.translations[state.currentLang] = state.editor.getData();
     }
     return {
+        name:          $item.find('input.consent-name').val() ?? '',
         is_required:   $item.find('.consent-required-input').val() === '1' ? 1 : 0,
         expiry_days:   parseInt($item.find('.consent-expiry-days').val() || 0, 10),
         expiry_months: parseInt($item.find('.consent-expiry-months').val() || 0, 10),
@@ -937,6 +1021,9 @@ const initConsents = () => {
         const $item = $(this).closest('.consent-item');
         setConsentDirty($item, true);
     });
+    $(document).on('input', '.consent-item input.consent-name', function () {
+        setConsentDirty($(this).closest('.consent-item'), true);
+    });
     $(document).on('click', '.consent-item .consent-required-wrap:not(.disabled)', function () {
         const $wrap  = $(this);
         const $input = $wrap.find('.consent-required-input');
@@ -1008,7 +1095,7 @@ const initReportTables = () => {
             // Reinit Switchery sui nuovi toggle
             $(document).trigger('loadSwitchTrigger', [{
                 container: '#partner-report-panel',
-                options: { secondaryColor: '#cccccc', color: '#3B82F6' },
+                options: { secondaryColor: '#cccccc', color: 'var(--toggle-on-background, #3948D3)' },
             }]);
         },
     });

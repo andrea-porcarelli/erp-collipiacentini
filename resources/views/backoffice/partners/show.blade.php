@@ -99,9 +99,6 @@
             background: var(--text-field-empty-background, #FFF);
             color: var(--text-main);
             font-family: var(--font-font-1), serif;
-            font-size: var(--typography-body-size-medium);
-            font-weight: var(--typography-body-weight-medium);
-            line-height: var(--typography-body-lineheight-medium);
             padding: var(--text-field-paddingvertical) var(--text-field-paddinghorizontal);
             min-height: 180px;
         }
@@ -125,6 +122,12 @@
             font-weight: 600;
             color: #666;
             border-bottom: none;
+        }
+
+        /* Report iscritti: solo la colonna "Utente" (1a) in bold, il resto normale */
+        #dt-report-subscribers-miticko tbody td:not(:first-child),
+        #dt-report-subscribers-partner tbody td:not(:first-child) {
+            font-weight: 400 !important;
         }
 
         /* Footer DataTables: riga full-width con sfondo grigio + length menu allineato a destra */
@@ -219,16 +222,40 @@
         window.PARTNER_ID = {{ $model->id }};
 
         $(function () {
-            @if($model->sale_method === 'whitelabel_no_domain')
-                $('#domain-name-container label').first().text('Slug identificativo partner');
-            @endif
+            function applySaleMethod(val) {
+                $('#sale-fields-whitelabel').toggle(val !== 'none');
+                $('#sale-fields-plugin').toggle(val === 'none');
+                const label = val === 'whitelabel_no_domain' ? 'Link identificativo' : 'Nome dominio';
+                const placeholder = val === 'whitelabel_no_domain' ? "parte finale URL" : 'es. prenota.veleiaromana.it';
+                $('#domain-name-container label').first().text(label);
+                $('#domain-name-container input[name="domain_name"]').attr('placeholder', placeholder);
+            }
+
+            applySaleMethod($('select[name="sale_method"]').val());
 
             $(document).on('change', 'select[name="sale_method"]', function () {
-                const val = $(this).val();
-                $('#domain-name-container').toggle(val !== 'none');
-                $('#domain-name-container label').first().text(
-                    val === 'whitelabel_no_domain' ? 'Slug identificativo partner' : 'Nome dominio'
-                );
+                applySaleMethod($(this).val());
+            });
+
+            $(document).on('click', '.btn-generate-partner-token', function (e) {
+                e.preventDefault();
+                $(document).trigger('sweetConfirmTrigger', [{
+                    text: 'Confermi la generazione di un nuovo token?',
+                    title: 'Il token attuale verrà sostituito',
+                    callback: () => {
+                        $(document).trigger('fetch', [{
+                            path: `/partners/${window.PARTNER_ID}/generate-token`,
+                            method: 'post',
+                            then: (response) => {
+                                $('#sale-fields-plugin input[name="token"]').val(response.token);
+                                toastr.success('Token generato con successo');
+                            },
+                            catch: () => {
+                                toastr.error('Errore durante la generazione del token');
+                            },
+                        }]);
+                    }
+                }]);
             });
 
             // Tabs navigation
@@ -243,7 +270,7 @@
                 if (active) {
                     active.classList.add('show', 'active');
                     // Lazy init Switchery per switches diventati visibili ora
-                    $(document).trigger('loadSwitchTrigger', [{ container: target, options: {secondaryColor: '#cccccc', color: '#3B82F6'}}]);
+                    $(document).trigger('loadSwitchTrigger', [{ container: target, options: {secondaryColor: '#cccccc', color: 'var(--toggle-on-background, #3948D3)'}}]);
                 }
             }
 
@@ -258,9 +285,9 @@
             });
 
             setTimeout(() => {
-                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: '#3B82F6'}}]);
+                $(document).trigger('loadSwitchTrigger', [{ container: '.switch-container', options: {secondaryColor: '#cccccc', color: 'var(--toggle-on-background, #3948D3)'}}]);
             }, 250);
         });
     </script>
-    <script src="{{ asset('backoffice/js/partners.js') }}?v=1.1" type="module"></script>
+    <script src="{{ asset('backoffice/js/partners.js') }}?v=1.9" type="module"></script>
 @endsection

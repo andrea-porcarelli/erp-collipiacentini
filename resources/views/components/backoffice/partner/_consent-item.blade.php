@@ -7,6 +7,7 @@
     $expiryYears  = $consent ? (int) $consent->expiry_years : 0;
     $contentIt    = $consent ? ($consent->contentField('content', 'it') ?? '') : '';
     $consentId    = $consent ? (string) $consent->id : '';
+    $consentName  = $consent?->name ?? '';
     $titleLabel   = $isLocked ? 'Checkbox (obbligatorio)' : 'Checkbox';
     $disAttr      = $isLocked ? 'disabled' : '';
     $hasCustomers = $consent ? (($consent->order_consents_count ?? null) !== null
@@ -20,10 +21,14 @@
      data-consent-id="{{ $consentId }}"
      data-is-locked="{{ $isLocked ? '1' : '0' }}"
      data-is-active="{{ $isActive ? '1' : '0' }}">
-<x-card :title="$titleLabel" class="position-relative">
-    <div class="consent-handle-wrap d-flex align-items-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2 mb-3">
         <i class="fa-regular fa-grip-lines text-secondary consent-handle" style="cursor: grab" title="Trascina per ordinare"></i>
+        <h2 class="mb-0 consent-title">{{ $titleLabel }}</h2>
         <span class="badge bg-secondary consent-disabled-badge" style="display: {{ $isActive ? 'none' : 'inline-block' }}">Disabilitato</span>
+    </div>
+
+    <div class="mb-3">
+        <x-input name="name" label="Nome consenso" placeholder="es. Marketing, Newsletter, ..." :value="$consentName" class="consent-name" />
     </div>
 
     <div class="mb-3">
@@ -124,5 +129,4 @@
     <div class="button-card-absolute">
         <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
     </div>
-</x-card>
 </div>

@@ -210,6 +210,7 @@ Route::domain("admin.miticko.com")
             Route::get('products/{product}/long-description', [ProductMediaController::class, 'getLongDescription'])->name('products.long-description.get');
             Route::resource('categories', CategoryController::class);
             Route::resource('partners', PartnerController::class);
+            Route::post('partners/{partner}/generate-token', [PartnerController::class, 'generateToken'])->name('partners.generate-token');
             Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
             Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
             Route::put('partners/{partner}/report/settings', [PartnerReportController::class, 'updateSettings'])->name('partners.report.settings.update');
@@ -221,10 +222,10 @@ Route::domain("admin.miticko.com")
             Route::post('partners/{partner}/logo', [PartnerController::class, 'uploadLogo'])->name('partners.logo.store');
             Route::delete('partners/{partner}/logo', [PartnerController::class, 'deleteLogo'])->name('partners.logo.destroy');
             Route::get('partners/{partner}/translations/{field}', [PartnerController::class, 'getFieldTranslations'])
-                ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+                ->whereIn('field', ['description_short', 'hero_title', 'hero_subtitle', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
                 ->name('partners.translations.get');
             Route::put('partners/{partner}/translations/{field}', [PartnerController::class, 'saveFieldTranslations'])
-                ->whereIn('field', ['description_short', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
+                ->whereIn('field', ['description_short', 'hero_title', 'hero_subtitle', 'contacts_content', 'privacy_policy', 'cookie_policy', 'terms_conditions'])
                 ->name('partners.translations.save');
             Route::post('partners/{partner}/users', [PartnerUserController::class, 'store'])->name('partners.users.store');
             Route::put('partners/{partner}/users/{user}', [PartnerUserController::class, 'update'])->name('partners.users.update');

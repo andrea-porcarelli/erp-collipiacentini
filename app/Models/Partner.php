@@ -32,6 +32,7 @@ class Partner extends LogsModel
         'sale_method',
         'domain_name',
         'slug_name',
+        'token',
         'css_style',
         'default_layout_mode',
         'commission_presale_low',

@@ -26,6 +26,7 @@ class User extends Authenticatable
         'role',
         'company_id',
         'partner_id',
+        'is_active',
     ];
 
     /**
@@ -51,6 +52,7 @@ class User extends Authenticatable
             'birth_date' => 'date',
             'privacy_accepted' => 'boolean',
             'newsletter' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 

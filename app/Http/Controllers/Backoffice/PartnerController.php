@@ -219,6 +219,19 @@ class PartnerController extends CrudController
         );
     }
 
+    public function generateToken(int $id): JsonResponse
+    {
+        try {
+            $partner = $this->interface->find($id);
+            $token = Str::random(64);
+            $this->interface->edit($partner, ['token' => $token]);
+
+            return $this->success(['token' => $token]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
+
     private function updateSale(Partner $partner, Request $request): void
     {
         $this->validate($request, [

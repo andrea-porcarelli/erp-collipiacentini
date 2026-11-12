@@ -69,10 +69,15 @@
             <i class="extra">{{ $extra }}</i>
         @endisset
     </div>
-    @if($maxlength)
+    @if($maxlength && !isset($message))
         <x-supporting-text extra_class="char-count" :message="$remaining . ' / ' . $maxlength . ' caratteri rimanenti'"/>
     @endif
-    @isset($message)
-    <x-supporting-text :message="$message" :icon="$icon"/>
+    @if($message && !isset($maxlength))
+        <x-supporting-text :message="$message" :icon="$icon"/>
+    @endisset
+    @if($message && $maxlength)
+        <div class="d-flex">
+            <x-supporting-text extra_class="char-count" :message="$remaining . ' / ' . $maxlength . ' caratteri rimanenti '"/>&nbsp;<x-supporting-text :message="$message" :icon="$icon"/>
+        </div>
     @endisset
 </div>

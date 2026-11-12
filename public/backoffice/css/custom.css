@@ -179,6 +179,10 @@ a.text-small {
 .text-field .text-field-container.is-invalid {
     border: 1px solid var(--border-error);
 }
+.supporting-text.danger,
+.supporting-text.danger i {
+    color: var(--border-error, #D32F2F);
+}
 .text-field .text-field-container:has(input:disabled) {
     background: var(--text-field-backgrounddisabled, #F2F2F2);
 }
@@ -903,21 +907,21 @@ span.flatpickr-weekday{
 }
 .swal-modal .swal-title {
     color: var(--text-main);
-    font-family: var(--typography-title-font), sans-serif;
-    font-size: var(--typography-title-size-medium);
+    font-family: var(--typography-web-title-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 18px);
     font-style: normal;
-    font-weight: var(--typography-title-weight-medium);
-    line-height: var(--typography-title-lineheight-medium); /* 133.333% */
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px); /* 133.333% */
     text-align: left;
     padding: 0;
 }
 .swal-modal .swal-text {
     color: var(--text-secondary);
-    font-family: var(--font-font-2), sans-serif;
-    font-size: var(--typography-body-size-medium);
+    font-family: var(--typography-web-body-font, "DM Sans"), sans-serif;
+    font-size: var(--size, 16px);
     font-style: normal;
-    font-weight: var(--typography-body-weight-medium);
-    line-height: var(--typography-body-lineheight-medium); /* 114.286% */
+    font-weight: var(--weight, 400);
+    line-height: var(--line-height, 22px); /* 133.333% */
     padding: 0;
 }
 .swal-modal .swal-button--confirm {
@@ -2006,3 +2010,13 @@ table.order-detail-tickets tbody tr:last-child td {
     margin-top: var(--spacing-xs);
 }
 
+.consent-title {
+    color: var(--text-main, #0D0D0D);
+
+    /* Title */
+    font-family: var(--typography-web-title-font, "DM Sans");
+    font-size: var(--size, 18px);
+    font-style: normal;
+    font-weight: var(--weight, 700);
+    line-height: var(--line-height, 24px); /* 133.333% */
+}

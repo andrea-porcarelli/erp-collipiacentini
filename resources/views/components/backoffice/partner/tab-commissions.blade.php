@@ -1,7 +1,7 @@
 @props(['model'])
 
 <div class="tab-pane fade" id="partner-commissions-panel" role="tabpanel">
-    <x-card title="Commissioni" class="position-relative">
+    <x-card title="Commissioni" sub_title="Le commissioni sono gestite da Miticko in base agli accordi contrattuali" class="position-relative">
         <form id="form-partner-commissions">
             <div class="row g-3">
                 <div class="col-12 text-secondary small">A carico del cliente (prevendita)</div>
@@ -32,21 +32,21 @@
                     <x-input :model="$model" name="commission_miticko_fixed" label="Commissione (fissa)" extra="EUR" />
                 </div>
                 <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_miticko_fixed_vat" label="IVA" />
+                    <x-vat-select :model="$model" name="commission_miticko_fixed_vat" label="IVA commissione (fissa)" />
                 </div>
 
                 <div class="col-12 col-md-6">
-                    <x-input :model="$model" name="commission_miticko_variable" label="Commissione (percentuale)" extra="%" />
+                    <x-input :model="$model" name="commission_miticko_variable" label="Commissione (variabile)" extra="%" />
                 </div>
                 <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_miticko_variable_vat" label="IVA" />
+                    <x-vat-select :model="$model" name="commission_miticko_variable_vat" label="IVA commissione (variabile)" />
                 </div>
 
                 <div class="col-12 col-md-6">
                     <x-input :model="$model" name="commission_payment" label="Commissione pagamento" extra="%" />
                 </div>
                 <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_payment_vat" label="IVA" />
+                    <x-vat-select :model="$model" name="commission_payment_vat" label="IVA commissione pagamento" />
                 </div>
             </div>
         </form>

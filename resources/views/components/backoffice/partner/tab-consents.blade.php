@@ -14,14 +14,13 @@
 
 <div class="tab-pane fade" id="partner-consents-panel" role="tabpanel">
     @if(! $isEnabled)
-        <x-card title="Consensi utente" sub_title="Checkbox di consenso che il cliente accetta in fase di acquisto" class="position-relative">
-            <div class="text-center py-5">
-                <i class="fa-regular fa-shield-check fa-2x text-secondary mb-3 d-block"></i>
-                <p class="text-secondary mb-3">La sezione è disabilitata.</p>
-                <x-button class="btn-consents-enable" label="Abilita consensi" leading="fa-toggle-on" emphasis="High" />
+        <x-card title="Consensi utente" class="position-relative">
+            <div class="text-left py-1">
+                <x-button class="btn-consents-enable" label="Abilita consensi utente"  emphasis="High" />
             </div>
         </x-card>
     @else
+        <x-card title="Consensi utente" class="position-relative">
         <div id="consents-list" data-partner-id="{{ $model->id }}">
             @foreach($consents as $c)
                 @include('components.backoffice.partner._consent-item', [
@@ -49,5 +48,6 @@
                 'langOpts'   => $langOpts,
             ])
         </template>
+        </x-card>
     @endif
 </div>

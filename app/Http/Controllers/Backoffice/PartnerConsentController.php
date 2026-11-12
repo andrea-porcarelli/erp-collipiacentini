@@ -78,6 +78,7 @@ class PartnerConsentController extends CrudController
 
             $consent = $this->interface->store([
                 'partner_id' => $partner->id,
+                'name' => $data['name'],
                 'is_required' => $data['is_required'],
                 'is_locked' => false,
                 'expiry_days' => $data['expiry_days'],
@@ -102,16 +103,14 @@ class PartnerConsentController extends CrudController
                 ->findOrFail($consentId);
             $data = $this->validatedPayload($request);
 
-            $update = [];
+            $update = ['name' => $data['name']];
             if (! $consent->is_locked) {
                 $update['is_required'] = $data['is_required'];
                 $update['expiry_days'] = $data['expiry_days'];
                 $update['expiry_months'] = $data['expiry_months'];
                 $update['expiry_years'] = $data['expiry_years'];
             }
-            if (! empty($update)) {
-                $this->interface->edit($consent, $update);
-            }
+            $this->interface->edit($consent, $update);
 
             $textChanged = $this->contentChanged($consent, $data['content_translations']);
 
@@ -122,6 +121,7 @@ class PartnerConsentController extends CrudController
                     $new = PartnerConsent::create([
                         'partner_id' => $consent->partner_id,
                         'code' => $consent->code,
+                        'name' => $data['name'],
                         'version' => (int) $consent->version + 1,
                         'is_required' => $consent->is_required,
                         'is_locked' => $consent->is_locked,
@@ -262,6 +262,7 @@ class PartnerConsentController extends CrudController
     private function validatedPayload(Request $request): array
     {
         $request->validate([
+            'name' => 'nullable|string|max:255',
             'is_required' => 'required|boolean',
             'expiry_days' => 'required|integer|min:0',
             'expiry_months' => 'required|integer|min:0',
@@ -270,6 +271,7 @@ class PartnerConsentController extends CrudController
         ]);
 
         return [
+            'name' => $request->input('name') !== null ? (string) $request->input('name') : null,
             'is_required' => (bool) $request->input('is_required'),
             'expiry_days' => (int) $request->input('expiry_days'),
             'expiry_months' => (int) $request->input('expiry_months'),
@@ -296,6 +298,7 @@ class PartnerConsentController extends CrudController
         return [
             'id' => $c->id,
             'code' => $c->code,
+            'name' => $c->name,
             'version' => (int) $c->version,
             'is_required' => (bool) $c->is_required,
             'is_locked' => (bool) $c->is_locked,

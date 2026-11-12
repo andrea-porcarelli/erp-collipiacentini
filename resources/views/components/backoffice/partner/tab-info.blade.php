@@ -4,6 +4,40 @@
     $billing = $model->billing ?? new \App\Models\PartnerBilling();
     $managedBy = $model->billing_managed_by ?? \App\Models\Partner::BILLING_MANAGED_BY_PARTNER;
     $mitickoLegalName = config('invoicing.miticko_legal_name', 'Colli Italiani SNC');
+
+    $countryOptions = collect([
+        ['name' => 'Italia',          'flag' => '🇮🇹'],
+        ['name' => 'Austria',         'flag' => '🇦🇹'],
+        ['name' => 'Belgio',          'flag' => '🇧🇪'],
+        ['name' => 'Bulgaria',        'flag' => '🇧🇬'],
+        ['name' => 'Cipro',           'flag' => '🇨🇾'],
+        ['name' => 'Croazia',         'flag' => '🇭🇷'],
+        ['name' => 'Danimarca',       'flag' => '🇩🇰'],
+        ['name' => 'Estonia',         'flag' => '🇪🇪'],
+        ['name' => 'Finlandia',       'flag' => '🇫🇮'],
+        ['name' => 'Francia',         'flag' => '🇫🇷'],
+        ['name' => 'Germania',        'flag' => '🇩🇪'],
+        ['name' => 'Grecia',          'flag' => '🇬🇷'],
+        ['name' => 'Irlanda',         'flag' => '🇮🇪'],
+        ['name' => 'Lettonia',        'flag' => '🇱🇻'],
+        ['name' => 'Lituania',        'flag' => '🇱🇹'],
+        ['name' => 'Lussemburgo',     'flag' => '🇱🇺'],
+        ['name' => 'Malta',           'flag' => '🇲🇹'],
+        ['name' => 'Paesi Bassi',     'flag' => '🇳🇱'],
+        ['name' => 'Polonia',         'flag' => '🇵🇱'],
+        ['name' => 'Portogallo',      'flag' => '🇵🇹'],
+        ['name' => 'Regno Unito',     'flag' => '🇬🇧'],
+        ['name' => 'Repubblica Ceca', 'flag' => '🇨🇿'],
+        ['name' => 'Romania',         'flag' => '🇷🇴'],
+        ['name' => 'San Marino',      'flag' => '🇸🇲'],
+        ['name' => 'Slovacchia',      'flag' => '🇸🇰'],
+        ['name' => 'Slovenia',        'flag' => '🇸🇮'],
+        ['name' => 'Spagna',          'flag' => '🇪🇸'],
+        ['name' => 'Stati Uniti',     'flag' => '🇺🇸'],
+        ['name' => 'Svezia',          'flag' => '🇸🇪'],
+        ['name' => 'Svizzera',        'flag' => '🇨🇭'],
+        ['name' => 'Ungheria',        'flag' => '🇭🇺'],
+    ])->map(fn ($c) => ['id' => $c['name'], 'label' => $c['flag'].' '.$c['name']])->all();
 @endphp
 
 <div class="tab-pane fade show active" id="partner-info-panel" role="tabpanel">
@@ -39,8 +73,8 @@
             </div>
             <div class="d-flex gap-2">
                 <input type="file" id="partner-logo-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="d-none">
-                <x-button class="btn-logo-upload" label="Carica logo" leading="fa-upload" emphasis="Medium" size="Medium" status="Secondary" />
-                <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash" emphasis="Low" status="Neutral" size="Medium" :style="$model->logo ? '' : 'display:none'" />
+                <x-button class="btn-logo-upload" label="Carica logo" leading="fa-arrow-up-from-bracket" emphasis="Medium" size="Medium" status="Secondary" />
+                <x-button class="btn-logo-delete" label="Rimuovi logo" leading="fa-trash-can " emphasis="Low" status="Neutral" size="Medium" :style="$model->logo ? '' : 'display:none'" />
             </div>
             <p class="text-secondary small mb-0">Formato consigliato orizzontale. Altezza massima di visualizzazione: 80px. Max 2MB.</p>
         </div>
@@ -50,73 +84,73 @@
         </div>
     </x-card>
 
-    <x-card title="Configurazione vendita" class="mt-4 position-relative">
-        <form id="form-partner-sale">
-            <div class="row">
-                <div class="col-12 col-sm-4">
-                    <x-select name="sale_method" label="Metodo di vendita"
-                              :options="[
-                                  ['id' => 'none',                  'label' => 'Plugin esterno'],
-                                  ['id' => 'whitelabel_domain',     'label' => 'Dominio dedicato'],
-                                  ['id' => 'whitelabel_no_domain',  'label' => 'Miticko.com'],
-                              ]"
-                              :model="$model" />
-                </div>
-                <div class="col-12 col-sm-4" id="domain-name-container" style="{{ $model->sale_method !== 'none' ? '' : 'display:none' }}">
-                    <x-input :model="$model" name="domain_name" label="Nome dominio" placeholder="es. www.esempio.it" />
-                </div>
-                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                    <x-select name="css_style" label="Stile CSS"
-                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
-                              :model="$model" />
-                </div>
-                <div class="col-12 col-sm-4 mt-3">
-                    <x-select name="default_layout_mode" label="Layout di default"
-                              :options="[
-                                  ['id' => 'light', 'label' => 'Chiaro'],
-                                  ['id' => 'dark',  'label' => 'Scuro'],
-                              ]"
-                              :model="$model" />
-                </div>
-            </div>
-        </form>
-        <div class="button-card-absolute">
-            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-        </div>
-    </x-card>
-
-    <x-card title="Breve descrizione della tua attività"
-            sub_title="Verrà mostrata nella home website del partner (testata) della sua pagina prodotto e ogni prodotto che ha in vendita."
+    <x-card title="Testi pagina principale dell’E-commerce "
+            sub_title="I testi verranno mostrati sulla pagina principale dell’ecommerce e serviranno anche per la SEO"
             class="mt-4 position-relative">
         <form id="form-partner-description">
             <div class="row mb-3">
-                <div class="col-12 col-sm-6">
-                    <x-input name="hero_title"
-                             label="Hero – Titolo"
-                             placeholder="Titolo mostrato nella testata della home"
-                             :value="$model->contentField('hero_title', 'it') ?? ''" />
-                </div>
-                <div class="col-12 col-sm-6">
-                    <x-input name="hero_subtitle"
-                             label="Hero – Sottotitolo"
-                             placeholder="Sottotitolo mostrato sotto il titolo della testata"
-                             :value="$model->contentField('hero_subtitle', 'it') ?? ''" />
-                </div>
-            </div>
-            <div class="text-field" data-mode="textfieldSize-Medium textfieldAppearance-Resting">
-                <label>Descrizione</label>
-                <div class="text-field-container position-relative">
-                    <textarea id="partner-description-editor"
-                              name="description_short"
-                              rows="6"
-                              data-it="{{ $model->contentField('description_short', 'it') ?? '' }}"></textarea>
-                    <button type="button"
-                            class="btn-description-translations bt-miticko bt-m-light position-absolute"
-                            data-mode="medium primary"
+                <div class="col-12">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="flex-grow-1">
+                            <x-input name="hero_title"
+                                     label="Titolo E-commerce"
+                                     placeholder="inserisci titolo"
+                                     maxlength="70"
+                                     message="(deve includere il nome della tua struttura)"
+                                     :value="$model->contentField('hero_title', 'it') ?? ''" />
+                        </div>
+                        <x-icon-button
+                            icon="fa-language"
+                            class="btn-hero-translations flex-shrink-0"
+                            data-field="hero_title"
+                            appearance="Neutral"
+                            emphasis="Medium"
                             title="Traduci nelle altre lingue"
-                            style="top:8px;right:8px;z-index:5;">
-                        <i class="fa-regular fa-language icon"></i>
-                    </button>
+                            style="margin-top: 26px;" />
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="flex-grow-1">
+                            <x-input name="hero_subtitle"
+                                     label="Sottotitolo E-commerce"
+                                     maxlength="70"
+                                     message="(deve includere quello che offri sinteticamente)"
+                                     placeholder="inserisci sottotitolo"
+                                     :value="$model->contentField('hero_subtitle', 'it') ?? ''" />
+                        </div>
+                        <x-icon-button
+                            icon="fa-language"
+                            class="btn-hero-translations flex-shrink-0"
+                            data-field="hero_subtitle"
+                            appearance="Neutral"
+                            emphasis="Medium"
+                            title="Traduci nelle altre lingue"
+                            style="margin-top: 26px;" />
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="flex-grow-1">
+                            <x-textarea
+                                name="description_short"
+                                size="textfieldSize-Medium"
+                                id="partner-description-editor"
+                                label="Descrizione attività in poche righe"
+                                rows="6"
+                                maxlength="300"
+                                :value="$model->contentField('description_short', 'it') ?? ''"
+                                data-it="{{ $model->contentField('description_short', 'it') ?? '' }}"
+                            />
+                        </div>
+                        <x-icon-button
+                            icon="fa-language"
+                            class="btn-description-translations"
+                            title="Traduci nelle altre lingue"
+                            appearance="Neutral"
+                            emphasis="Medium"
+                            style="margin-top: 26px;" />
+                    </div>
                 </div>
             </div>
         </form>
@@ -128,8 +162,9 @@
 
     <x-card title="Gestione utenti" class="mt-4 position-relative">
         <x-backoffice.partner.users :model="$model" />
+
+        <x-button class="btn-user-add" status="Secondary" emphasis="Medium" size="Medium" label="Aggiungi account" leading="fa-plus" />
         <div class="button-card-absolute">
-            <x-button class="btn-user-add" status="Secondary" emphasis="MediumLow" label="Aggiungi account" leading="fa-plus" />
             <x-button class="btn-save-users" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
@@ -182,7 +217,8 @@
                         <x-input :model="$billing" name="province" label="Provincia" placeholder="Placeholder" />
                     </div>
                     <div class="col-12 col-sm-4 mt-3">
-                        <x-input :model="$billing" name="country" label="Paese" placeholder="Italia" />
+                        <x-select :model="$billing" name="country" label="Paese" placeholder="Seleziona paese"
+                                  :options="$countryOptions" />
                     </div>
 
                     <div class="col-12 mb-2 mt-4">Dati di contatto</div>
@@ -195,6 +231,65 @@
                     <div class="col-12 col-sm-4">
                         <x-input :model="$model" name="phone_number" label="Numero di telefono" placeholder="Placeholder" />
                     </div>
+                </div>
+            </div>
+        </form>
+        <div class="button-card-absolute">
+            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
+        </div>
+    </x-card>
+
+    <x-card title="Configurazione vendita" class="mt-4 position-relative">
+        <form id="form-partner-sale">
+            <div class="row">
+                <div class="col-12 col-sm-4">
+                    <x-select name="sale_method" label="Metodo di vendita"
+                              :options="[
+                                  ['id' => 'none',                  'label' => 'Plugin Wordpress'],
+                                  ['id' => 'whitelabel_domain',     'label' => 'Dominio dedicato'],
+                                  ['id' => 'whitelabel_no_domain',  'label' => 'Miticko.com'],
+                              ]"
+                              :model="$model" />
+                </div>
+            </div>
+
+            {{-- Plugin WordPress: token di accesso --}}
+            <div id="sale-fields-plugin" class="mt-4" style="{{ $model->sale_method === 'none' ? '' : 'display:none' }}">
+                <label>Token di accesso</label>
+                <div class="d-flex align-items-center gap-3 mt-2">
+                    <div class="flex-grow-1">
+                        <x-input name="token" :value="$model->token" disabled />
+                    </div>
+                    <div>
+                        <x-button label="Genera nuovo token" status="Neutral" emphasis="Low" size="Medium" leading="fa-rotate" class="btn-generate-partner-token" />
+                    </div>
+                </div>
+                @if($model->token)
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Attenzione: generare un nuovo token invaliderà quello attuale" />
+                @else
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Nessun token generato. Clicca il pulsante per crearne uno." />
+                @endif
+            </div>
+
+            {{-- Dominio dedicato / Miticko.com: dominio o slug + stile + layout --}}
+            <div id="sale-fields-whitelabel" class="row mt-3" style="{{ $model->sale_method !== 'none' ? '' : 'display:none' }}">
+                <div class="col-12 col-sm-4" id="domain-name-container">
+                    <x-input :model="$model" name="domain_name"
+                             :label="$model->sale_method === 'whitelabel_no_domain' ? 'Link identificativo' : 'Nome dominio'"
+                             :placeholder="$model->sale_method === 'whitelabel_no_domain' ? 'parte finale URL' : 'es. prenota.veleiaromana.it'" />
+                </div>
+                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                    <x-select name="css_style" label="Brand"
+                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
+                              :model="$model" />
+                </div>
+                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                    <x-select name="default_layout_mode" label="Layout di default"
+                              :options="[
+                                  ['id' => 'light', 'label' => 'Chiaro'],
+                                  ['id' => 'dark',  'label' => 'Scuro'],
+                              ]"
+                              :model="$model" />
                 </div>
             </div>
         </form>

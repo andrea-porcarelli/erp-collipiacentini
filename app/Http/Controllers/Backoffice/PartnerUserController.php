@@ -23,12 +23,12 @@ class PartnerUserController extends CrudController
     {
         try {
             $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'nullable|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8',
                 'role' => 'required|string|'.Rule::in(['partner', 'admin']),
+                'is_active' => 'nullable|boolean',
             ], [
-                'name.required' => 'Il nome è obbligatorio',
                 'email.required' => 'L\'email è obbligatoria',
                 'email.email' => 'Inserisci un indirizzo email valido',
                 'email.unique' => 'Questa email è già in uso',
@@ -42,6 +42,7 @@ class PartnerUserController extends CrudController
                 'email' => $request->input('email'),
                 'password' => $request->input('password'),
                 'role' => $request->input('role'),
+                'is_active' => (int) $request->input('is_active', 1),
                 'partner_id' => $partnerId,
             ]);
 
@@ -50,6 +51,7 @@ class PartnerUserController extends CrudController
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'is_active' => (int) $user->is_active,
             ]);
         } catch (\Exception $e) {
             return $this->exception($e, $request);
@@ -60,11 +62,11 @@ class PartnerUserController extends CrudController
     {
         try {
             $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'nullable|string|max:255',
                 'email' => 'required|email|unique:users,email,'.$userId,
                 'password' => 'nullable|string|min:8',
+                'is_active' => 'nullable|boolean',
             ], [
-                'name.required' => 'Il nome è obbligatorio',
                 'email.required' => 'L\'email è obbligatoria',
                 'email.email' => 'Inserisci un indirizzo email valido',
                 'email.unique' => 'Questa email è già in uso',
@@ -77,6 +79,10 @@ class PartnerUserController extends CrudController
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
             ];
+
+            if ($request->has('is_active')) {
+                $data['is_active'] = (int) $request->input('is_active');
+            }
 
             if ($request->filled('password')) {
                 $data['password'] = Hash::make($request->input('password'));

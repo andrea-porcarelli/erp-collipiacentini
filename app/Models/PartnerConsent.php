@@ -16,6 +16,7 @@ class PartnerConsent extends LogsModel
     public $fillable = [
         'partner_id',
         'code',
+        'name',
         'version',
         'is_required',
         'is_locked',

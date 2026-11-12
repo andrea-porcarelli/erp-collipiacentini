@@ -1,12 +1,13 @@
 @props([
     'icon' => null,
     'class' => null,
-    'status' => 'Primary',
+    'appearance' => 'Primary',
     'emphasis' => 'Medium',
     'size' => 'Medium',
 ])
 <div
-    data-mode="iconButtonSize-{{ $size }}"
+    {{ $attributes->except(['class', 'data-mode']) }}
+    data-mode="iconButtonSize-{{ $size }} buttonAppearance-{{ ucfirst($appearance) }} buttonEmphasis-{{ ucfirst($emphasis) }}"
     class="icon-button-miticko {{ $class }}"
 >
     @isset($icon)

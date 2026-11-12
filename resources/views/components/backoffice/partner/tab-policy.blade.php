@@ -31,7 +31,7 @@
                     :value="$model->contentField($field, 'it') ?? ''"
                     :name="$field"
                     rows="12"
-                    label="Testo"
+                    :label="'Orari ' . $model->partner_name "
                     :maxlength="$type === 'contatti' ? 600 : null"
                 />
                 <button type="button"
@@ -47,13 +47,13 @@
             @if($type === 'contatti')
                 <div class="row mt-spacing-l">
                     <div class="col-12">
-                        <x-input :model="$model" leading="fa-envelope" name="email_notify" label="Email notifiche" />
+                        <x-input :model="$model" leading="fa-envelope" name="email_notify" label="Email" />
                     </div>
                     <div class="col-12">
                         <x-input :model="$model" leading="fa-phone" name="phone_number" label="Numero di telefono" />
                     </div>
                     <div class="col-12">
-                        <x-input :model="$model" leading="fa-map-pin" name="structure_address" label="Indirizzo struttura" />
+                        <x-input :model="$model" leading="fa-map-pin" name="structure_address" label="Indirizzo" />
                     </div>
                 </div>
             @endif
