@@ -21,8 +21,8 @@
             <x-chip label="Informazioni" :dataset="['tab-target' => '#partner-info-panel']" />
             @if($isGod)
                 <x-chip label="Commissioni" appearance="Resting" :dataset="['tab-target' => '#partner-commissions-panel']" />
-                <x-chip label="Legal"           appearance="Resting" :dataset="['tab-target' => '#partner-legal-panel']" />
                 <x-chip label="Consensi utente" appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
+                <x-chip label="Legal"           appearance="Resting" :dataset="['tab-target' => '#partner-legal-panel']" />
             @endif
             <x-chip label="Report" appearance="Resting" :dataset="['tab-target' => '#partner-report-panel']" />
             <x-chip label="Contatti" appearance="Resting" :dataset="['tab-target' => '#partner-contacts-panel']" />
