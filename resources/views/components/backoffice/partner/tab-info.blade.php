@@ -1,5 +1,11 @@
 @props(['model', 'hasOrders' => false])
 
+@php
+    $billing = $model->billing ?? new \App\Models\PartnerBilling();
+    $managedBy = $model->billing_managed_by ?? \App\Models\Partner::BILLING_MANAGED_BY_PARTNER;
+    $mitickoLegalName = config('invoicing.miticko_legal_name', 'Colli Italiani SNC');
+@endphp
+
 <div class="tab-pane fade show active" id="partner-info-panel" role="tabpanel">
     <x-card title="Informazioni generali" sub_title="Dati principali del partner" class="position-relative">
         <form id="form-partner-info">
@@ -79,60 +85,6 @@
         </div>
     </x-card>
 
-    <x-card title="Commissioni" class="mt-4 position-relative">
-        <form id="form-partner-commissions">
-            <div class="row g-3">
-                <div class="col-12 text-secondary small">A carico del cliente (prevendita)</div>
-
-                <div class="col-12 col-md-4">
-                    <x-input :model="$model" name="commission_presale_threshold_high" label="Per importi superiori a" leading="fa-greater-than" extra="EUR" />
-                </div>
-                <div class="col-12 col-md-4">
-                    <x-input :model="$model" name="commission_presale_high" label="Prevendita applicata" extra="EUR" />
-                </div>
-                <div class="col-12 col-md-4">
-                    <x-vat-select :model="$model" name="commission_presale_high_vat" label="IVA prevendita" />
-                </div>
-
-                <div class="col-12 col-md-4">
-                    <x-input :model="$model" name="commission_presale_threshold_low" label="Per importi minori di" leading="fa-less-than" extra="EUR" />
-                </div>
-                <div class="col-12 col-md-4">
-                    <x-input :model="$model" name="commission_presale_low" label="Prevendita applicata" extra="EUR" />
-                </div>
-                <div class="col-12 col-md-4">
-                    <x-vat-select :model="$model" name="commission_presale_low_vat" label="IVA prevendita" />
-                </div>
-
-                <div class="col-12 text-secondary small mt-3">A carico del Partner (commissioni)</div>
-
-                <div class="col-12 col-md-6">
-                    <x-input :model="$model" name="commission_miticko_fixed" label="Commissione (fissa)" extra="EUR" />
-                </div>
-                <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_miticko_fixed_vat" label="IVA" />
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <x-input :model="$model" name="commission_miticko_variable" label="Commissione (percentuale)" extra="%" />
-                </div>
-                <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_miticko_variable_vat" label="IVA" />
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <x-input :model="$model" name="commission_payment" label="Commissione pagamento" extra="%" />
-                </div>
-                <div class="col-12 col-md-6">
-                    <x-vat-select :model="$model" name="commission_payment_vat" label="IVA" />
-                </div>
-            </div>
-        </form>
-        <div class="button-card-absolute">
-            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
-        </div>
-    </x-card>
-
     <x-card title="Breve descrizione della tua attività"
             sub_title="Verrà mostrata nella home website del partner (testata) della sua pagina prodotto e ogni prodotto che ha in vendita."
             class="mt-4 position-relative">
@@ -179,6 +131,75 @@
         <div class="button-card-absolute">
             <x-button class="btn-user-add" status="Secondary" emphasis="MediumLow" label="Aggiungi account" leading="fa-plus" />
             <x-button class="btn-save-users" label="Salva modifiche" leading="fa-save" status="Disabled" />
+        </div>
+    </x-card>
+
+    <x-card title="Fatturazione" sub_title="I campi di fatturazione sono relativi al Partner" class="mt-4 position-relative">
+        <form id="form-partner-billing">
+            <div class="row">
+                <div class="col-12">
+                    <div class="small fw-semibold mb-2">Gestione della fatturazione degli ordini</div>
+                    <div class="d-flex flex-column gap-2">
+                        <label class="d-inline-flex align-items-center gap-2">
+                            <input type="radio" name="billing_managed_by" class="form-check-input billing-managed-by" value="miticko" @checked($managedBy === \App\Models\Partner::BILLING_MANAGED_BY_MITICKO)>
+                            <span>gestita da Miticko ({{ $mitickoLegalName }})</span>
+                        </label>
+                        <label class="d-inline-flex align-items-center gap-2">
+                            <input type="radio" name="billing_managed_by" class="form-check-input billing-managed-by" value="partner" @checked($managedBy === \App\Models\Partner::BILLING_MANAGED_BY_PARTNER)>
+                            <span>gestita dal Partner (dati aziendali del partner)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="partner-billing-data" class="mt-4 @if($managedBy === \App\Models\Partner::BILLING_MANAGED_BY_MITICKO) opacity-50 pe-none @endif">
+                <div class="row">
+                    <div class="col-12 mb-2">Dati fiscali</div>
+                    <div class="col-12">
+                        <x-input :model="$billing" name="legal_name" label="Ragione sociale" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="vat_number" label="Partita IVA" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="tax_code" label="Codice Fiscale" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="sdi_code" label="Codice SDI" placeholder="Placeholder" />
+                    </div>
+
+                    <div class="col-12 mb-2 mt-4">Indirizzo</div>
+                    <div class="col-12 col-sm-9">
+                        <x-input :model="$billing" name="street_address" label="Indirizzo" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-3">
+                        <x-input :model="$billing" name="postal_code" label="CAP" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="city" label="Comune" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="province" label="Provincia" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4 mt-3">
+                        <x-input :model="$billing" name="country" label="Paese" placeholder="Italia" />
+                    </div>
+
+                    <div class="col-12 mb-2 mt-4">Dati di contatto</div>
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$model" name="email_notify" label="Email principale" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$billing" name="pec_email" label="PEC" placeholder="Placeholder" />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <x-input :model="$model" name="phone_number" label="Numero di telefono" placeholder="Placeholder" />
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="button-card-absolute">
+            <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
 

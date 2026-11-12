@@ -1,9 +1,11 @@
-@props(['model', 'type', 'field', 'label', 'slug', 'panelId'])
+@props(['model', 'type', 'field', 'label', 'slug', 'panelId' => null, 'inline' => false, 'cardClass' => ''])
 
 @php($pageUrl = $model->pageUrl($slug))
 
+@if(! $inline)
 <div class="tab-pane fade" id="{{ $panelId }}" role="tabpanel">
-    <x-card :title="$label"  class="position-relative">
+@endif
+    <x-card :title="$label" :class="trim('position-relative ' . $cardClass)">
         <div class="row mb-spacing-m">
             <div class="col-12">
                 <div class="partner-url-copy" data-url="{{ $pageUrl }}">
@@ -60,4 +62,6 @@
             <x-button class="btn-save-card" label="Salva modifiche" leading="fa-save" status="Disabled" />
         </div>
     </x-card>
+@if(! $inline)
 </div>
+@endif

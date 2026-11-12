@@ -19,26 +19,22 @@
         {{-- Tabs Navigation --}}
         <div class="d-flex gap-2 product-tabs-scroll" id="partnerTabs" role="tablist">
             <x-chip label="Informazioni" :dataset="['tab-target' => '#partner-info-panel']" />
-            <x-chip label="Fatturazione" appearance="Resting" :dataset="['tab-target' => '#partner-business-panel']" />
-            <x-chip label="Contatti" appearance="Resting" :dataset="['tab-target' => '#partner-contacts-panel']" />
             @if($isGod)
-                <x-chip label="Privacy Policy"        appearance="Resting" :dataset="['tab-target' => '#partner-privacy-panel']" />
-                <x-chip label="Cookie Policy"         appearance="Resting" :dataset="['tab-target' => '#partner-cookie-panel']" />
-                <x-chip label="Termini e Condizioni"  appearance="Resting" :dataset="['tab-target' => '#partner-terms-panel']" />
-                <x-chip label="Consensi utente"           appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
+                <x-chip label="Commissioni" appearance="Resting" :dataset="['tab-target' => '#partner-commissions-panel']" />
+                <x-chip label="Legal"           appearance="Resting" :dataset="['tab-target' => '#partner-legal-panel']" />
+                <x-chip label="Consensi utente" appearance="Resting" :dataset="['tab-target' => '#partner-consents-panel']" />
             @endif
             <x-chip label="Report" appearance="Resting" :dataset="['tab-target' => '#partner-report-panel']" />
+            <x-chip label="Contatti" appearance="Resting" :dataset="['tab-target' => '#partner-contacts-panel']" />
         </div>
 
         {{-- Tabs Content --}}
         <div class="tab-content mt-spacing-xl" id="partnerTabsContent">
-            <x-backoffice.partner.tab-info     :model="$model" :hasOrders="$hasOrders" />
-            <x-backoffice.partner.tab-business :model="$model" />
+            <x-backoffice.partner.tab-info        :model="$model" :hasOrders="$hasOrders" />
+            <x-backoffice.partner.tab-commissions :model="$model" />
             <x-backoffice.partner.tab-policy :model="$model" type="contatti" field="contacts_content" label="Contatti" slug="contatti" panelId="partner-contacts-panel" />
             @if($isGod)
-                <x-backoffice.partner.tab-policy :model="$model" type="privacy-policy"     field="privacy_policy"   label="Privacy Policy"        slug="privacy-policy"     panelId="partner-privacy-panel" />
-                <x-backoffice.partner.tab-policy :model="$model" type="cookie-policy"      field="cookie_policy"    label="Cookie Policy"         slug="cookie-policy"      panelId="partner-cookie-panel" />
-                <x-backoffice.partner.tab-policy :model="$model" type="termini-condizioni" field="terms_conditions" label="Termini e Condizioni"  slug="termini-condizioni" panelId="partner-terms-panel" />
+                <x-backoffice.partner.tab-legal :model="$model" />
                 <x-backoffice.partner.tab-consents :model="$model" />
             @endif
             <x-backoffice.partner.tab-report :model="$model" />
