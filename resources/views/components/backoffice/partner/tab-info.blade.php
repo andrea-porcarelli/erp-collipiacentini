@@ -253,22 +253,41 @@
                 </div>
             </div>
 
-            {{-- Plugin WordPress: token di accesso --}}
+            {{-- Plugin WordPress: token, webhook secret ed endpoint --}}
             <div id="sale-fields-plugin" class="mt-4" style="{{ $model->sale_method === 'none' ? '' : 'display:none' }}">
-                <label>Token di accesso</label>
+                <label>Chiave API</label>
                 <div class="d-flex align-items-center gap-3 mt-2">
                     <div class="flex-grow-1">
                         <x-input name="token" :value="$model->token" disabled />
                     </div>
                     <div>
-                        <x-button label="Genera nuovo token" status="Neutral" emphasis="Low" size="Medium" leading="fa-rotate" class="btn-generate-partner-token" />
+                        <x-button label="Genera nuova chiave" status="Neutral" emphasis="Low" size="Medium" leading="fa-rotate" class="btn-generate-partner-token" />
                     </div>
                 </div>
                 @if($model->token)
-                    <x-supporting-text icon="fa-regular fa-circle-info" message="Attenzione: generare un nuovo token invaliderà quello attuale" />
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Il partner la copia nel plugin WordPress. Generare una nuova chiave invaliderà quella attuale." />
                 @else
-                    <x-supporting-text icon="fa-regular fa-circle-info" message="Nessun token generato. Clicca il pulsante per crearne uno." />
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Nessuna chiave generata. Clicca il pulsante per crearne una." />
                 @endif
+
+                <label class="mt-4">Chiave segreta webhook</label>
+                <div class="d-flex align-items-center gap-3 mt-2">
+                    <div class="flex-grow-1">
+                        <x-input name="wordpress_webhook_secret" :value="$model->wordpress_webhook_secret" disabled />
+                    </div>
+                    <div>
+                        <x-button label="Genera nuova chiave" status="Neutral" emphasis="Low" size="Medium" leading="fa-rotate" class="btn-generate-webhook-secret" />
+                    </div>
+                </div>
+                @if($model->wordpress_webhook_secret)
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Usata per firmare le notifiche inviate al sito WordPress. Il partner la copia nel plugin." />
+                @else
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Nessuna chiave generata. Clicca il pulsante per crearne una." />
+                @endif
+
+                <div class="mt-4">
+                    <x-input :model="$model" name="wordpress_endpoint" label="URL sito WordPress" placeholder="https://www.sitodelpartner.it" message="Dominio del sito WordPress su cui è installato il plugin. Usato come destinazione dei webhook di sincronizzazione." icon="fa-regular fa-circle-info" />
+                </div>
             </div>
 
             {{-- Dominio dedicato / Miticko.com: dominio o slug + stile + layout --}}

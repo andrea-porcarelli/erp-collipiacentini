@@ -33,6 +33,9 @@ class Partner extends LogsModel
         'domain_name',
         'slug_name',
         'token',
+        'wordpress_endpoint',
+        'wordpress_webhook_secret',
+        'wordpress_enabled',
         'css_style',
         'default_layout_mode',
         'commission_presale_low',
@@ -56,6 +59,7 @@ class Partner extends LogsModel
     protected $casts = [
         'consents_enabled' => 'boolean',
         'report_auto_send_enabled' => 'boolean',
+        'wordpress_enabled' => 'boolean',
     ];
 
     public const BILLING_MANAGED_BY_MITICKO = 'miticko';

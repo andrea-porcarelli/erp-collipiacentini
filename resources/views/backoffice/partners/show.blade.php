@@ -252,18 +252,39 @@
             $(document).on('click', '.btn-generate-partner-token', function (e) {
                 e.preventDefault();
                 $(document).trigger('sweetConfirmTrigger', [{
-                    text: 'Confermi la generazione di un nuovo token?',
-                    title: 'Il token attuale verrà sostituito',
+                    text: 'Confermi la generazione di una nuova chiave API?',
+                    title: 'La chiave API attuale verrà sostituita',
                     callback: () => {
                         $(document).trigger('fetch', [{
                             path: `/partners/${window.PARTNER_ID}/generate-token`,
                             method: 'post',
                             then: (response) => {
                                 $('#sale-fields-plugin input[name="token"]').val(response.token);
-                                toastr.success('Token generato con successo');
+                                toastr.success('Chiave API generata con successo');
                             },
                             catch: () => {
-                                toastr.error('Errore durante la generazione del token');
+                                toastr.error('Errore durante la generazione della chiave API');
+                            },
+                        }]);
+                    }
+                }]);
+            });
+
+            $(document).on('click', '.btn-generate-webhook-secret', function (e) {
+                e.preventDefault();
+                $(document).trigger('sweetConfirmTrigger', [{
+                    text: 'Confermi la generazione di una nuova chiave segreta webhook?',
+                    title: 'La chiave segreta attuale verrà sostituita',
+                    callback: () => {
+                        $(document).trigger('fetch', [{
+                            path: `/partners/${window.PARTNER_ID}/generate-webhook-secret`,
+                            method: 'post',
+                            then: (response) => {
+                                $('#sale-fields-plugin input[name="wordpress_webhook_secret"]').val(response.wordpress_webhook_secret);
+                                toastr.success('Chiave segreta generata con successo');
+                            },
+                            catch: () => {
+                                toastr.error('Errore durante la generazione della chiave segreta');
                             },
                         }]);
                     }

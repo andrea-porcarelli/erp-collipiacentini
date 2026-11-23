@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Contracts\InvoiceProvider;
 use App\Facades\ResourceRegistrar;
+use App\Models\Product;
+use App\Observers\ProductObserver;
 use App\Services\Invoicing\FattureInCloudProvider;
 use App\Services\Invoicing\NullInvoiceProvider;
 use Illuminate\Support\ServiceProvider;
@@ -38,5 +40,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('Illuminate\Routing\ResourceRegistrar', function () use ($registrar) {
             return $registrar;
         });
+
+        Product::observe(ProductObserver::class);
     }
 }

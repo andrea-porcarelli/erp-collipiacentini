@@ -242,10 +242,12 @@ class PartnerController extends CrudController
             ],
             'css_style' => ['nullable', Rule::in(Partner::CSS_STYLES)],
             'default_layout_mode' => ['nullable', Rule::in(Partner::LAYOUT_MODES)],
+            'wordpress_endpoint' => ['nullable', 'url', 'max:255'],
         ], [
             'domain_name.unique' => 'Il dominio inserito è già associato a un altro partner',
             'css_style.in' => 'Stile CSS non valido',
             'default_layout_mode.in' => 'Layout di default non valido',
+            'wordpress_endpoint.url' => 'L\'URL del sito WordPress non è valido',
         ]);
 
         $this->interface->edit($partner, [
@@ -253,7 +255,21 @@ class PartnerController extends CrudController
             'domain_name' => $request->input('domain_name') ?: null,
             'css_style' => $request->input('css_style') ?: 'Miticko',
             'default_layout_mode' => $request->input('default_layout_mode') ?: 'light',
+            'wordpress_endpoint' => $request->input('wordpress_endpoint') ?: null,
         ]);
+    }
+
+    public function generateWebhookSecret(int $id): JsonResponse
+    {
+        try {
+            $partner = $this->interface->find($id);
+            $secret = Str::random(64);
+            $this->interface->edit($partner, ['wordpress_webhook_secret' => $secret]);
+
+            return $this->success(['wordpress_webhook_secret' => $secret]);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
     }
 
     /**

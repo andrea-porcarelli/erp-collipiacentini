@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Company;
+use App\Models\Partner;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -19,12 +20,27 @@ class ApiToken
             ], 401);
         }
 
+        $partner = Partner::where('token', $token)->first();
+
+        if ($partner) {
+            if (! $partner->is_active) {
+                return response()->json([
+                    'error' => 'Accesso non consentito',
+                    'message' => 'Il partner non è attivo',
+                ], 403);
+            }
+
+            $request->merge(['partner' => $partner]);
+
+            return $next($request);
+        }
+
         $company = Company::where('token', $token)->first();
 
         if (! $company) {
             return response()->json([
                 'error' => 'Token non valido',
-                'message' => 'Nessuna azienda trovata con questo token',
+                'message' => 'Nessun partner o azienda trovati con questo token',
             ], 401);
         }
 
