@@ -4,26 +4,21 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductAvailability;
+use App\Services\ProductAvailabilityService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AvailabilityController extends Controller
 {
+    public function __construct(private ProductAvailabilityService $service) {}
+
     public function index(Request $request, string $id): JsonResponse
     {
-        $company = $request->get('company');
-        $numericId = $this->extractNumericId($id);
-
-        $product = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })->find($numericId);
+        $product = Product::find($this->extractNumericId($id));
 
         if (! $product) {
-            return response()->json([
-                'error' => 'not_found',
-                'message' => 'Prodotto non trovato',
-            ], 404);
+            return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
         }
 
         $startDate = $request->query('start_date');
@@ -36,53 +31,42 @@ class AvailabilityController extends Controller
             ], 422);
         }
 
-        $availabilities = ProductAvailability::where('product_id', $product->id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->orderBy('date')
-            ->orderBy('time')
-            ->get();
+        try {
+            $start = Carbon::parse($startDate)->startOfDay();
+            $end = Carbon::parse($endDate)->endOfDay();
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'validation_error', 'message' => 'Date non valide'], 422);
+        }
 
-        $price = $product->prices()->first();
-        $priceValue = $price ? (float) $price->price : null;
-
-        $grouped = $availabilities->groupBy('date');
+        $priceValue = (float) $product->lowest_price ?: null;
         $availability = [];
 
-        foreach ($grouped as $date => $dateAvailabilities) {
-            $hasTimeSlots = $dateAvailabilities->whereNotNull('time')->where('time', '!=', '')->isNotEmpty();
+        $cursor = $start->copy()->startOfMonth();
+        while ($cursor->lessThanOrEqualTo($end)) {
+            $days = $this->service->getAvailableDaysForMonth($product, $cursor->year, $cursor->month);
+            foreach ($days as $date) {
+                if ($date < $start->toDateString() || $date > $end->toDateString()) {
+                    continue;
+                }
+                $slots = $this->service->getSlotsForDate($product, $date);
+                $timeSlots = $slots->map(fn ($s) => [
+                    'start' => $s['time'],
+                    'available_slots' => is_null($s['availability']) ? null : (int) $s['availability'],
+                    'slot_type' => $s['slot_type'],
+                    'slot_id' => $s['slot_id'],
+                ])->values()->all();
 
-            if ($hasTimeSlots) {
-                $timeSlots = $dateAvailabilities
-                    ->whereNotNull('time')
-                    ->where('time', '!=', '')
-                    ->map(fn ($avail) => [
-                        'start' => $avail->time,
-                        'available_slots' => (int) $avail->availability,
-                        'max_capacity' => (int) $avail->availability,
-                    ])
-                    ->values()
-                    ->toArray();
-
-                $anyAvailable = $dateAvailabilities->sum('availability') > 0;
+                $anyAvailable = $slots->contains(fn ($s) => is_null($s['availability']) || $s['availability'] > 0);
+                $totalAvailable = $slots->sum(fn ($s) => is_null($s['availability']) ? PHP_INT_MAX : (int) $s['availability']);
 
                 $availability[$date] = [
                     'available' => $anyAvailable,
-                    'available_slots' => (int) $dateAvailabilities->sum('availability'),
-                    'max_capacity' => (int) $dateAvailabilities->sum('availability'),
+                    'available_slots' => $totalAvailable === PHP_INT_MAX ? null : $totalAvailable,
                     'price' => $priceValue,
                     'time_slots' => $timeSlots,
                 ];
-            } else {
-                $totalAvailability = (int) $dateAvailabilities->sum('availability');
-
-                $availability[$date] = [
-                    'available' => $totalAvailability > 0,
-                    'available_slots' => $totalAvailability,
-                    'max_capacity' => $totalAvailability,
-                    'price' => $priceValue,
-                    'time_slots' => [],
-                ];
             }
+            $cursor->addMonth();
         }
 
         return response()->json([
@@ -93,49 +77,32 @@ class AvailabilityController extends Controller
 
     public function check(Request $request, string $id): JsonResponse
     {
-        $company = $request->get('company');
-        $numericId = $this->extractNumericId($id);
-
-        $product = Product::whereHas('partner', function ($q) use ($company) {
-            $q->where('company_id', $company->id);
-        })->find($numericId);
+        $product = Product::find($this->extractNumericId($id));
 
         if (! $product) {
-            return response()->json([
-                'error' => 'not_found',
-                'message' => 'Prodotto non trovato',
-            ], 404);
+            return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
         }
 
         $date = $request->input('date');
-        $quantity = (int) $request->input('quantity', 1);
+        $quantity = max(1, (int) $request->input('quantity', 1));
         $timeSlot = $request->input('time_slot');
 
         if (! $date) {
-            return response()->json([
-                'error' => 'validation_error',
-                'message' => 'Il parametro date è obbligatorio',
-            ], 422);
+            return response()->json(['error' => 'validation_error', 'message' => 'Il parametro date è obbligatorio'], 422);
         }
 
-        $query = ProductAvailability::where('product_id', $product->id)
-            ->where('date', $date);
-
+        $slots = $this->service->getSlotsForDate($product, $date);
         if ($timeSlot) {
-            $query->where('time', $timeSlot);
+            $slots = $slots->filter(fn ($s) => $s['time'] === substr($timeSlot, 0, 5));
         }
 
-        $availabilities = $query->get();
-        $totalAvailable = (int) $availabilities->sum('availability');
-        $isAvailable = $totalAvailable >= $quantity;
-
-        $price = $product->prices()->first();
+        $totalAvailable = $slots->sum(fn ($s) => is_null($s['availability']) ? PHP_INT_MAX : (int) $s['availability']);
+        $isAvailable = $totalAvailable === PHP_INT_MAX || $totalAvailable >= $quantity;
 
         return response()->json([
             'available' => $isAvailable,
-            'available_slots' => $totalAvailable,
-            'max_capacity' => $totalAvailable,
-            'price' => $price ? (float) $price->price : null,
+            'available_slots' => $totalAvailable === PHP_INT_MAX ? null : $totalAvailable,
+            'price' => (float) $product->lowest_price ?: null,
             'message' => $isAvailable ? null : 'Disponibilità insufficiente per la quantità richiesta',
         ]);
     }

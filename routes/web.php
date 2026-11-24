@@ -91,6 +91,19 @@ Route::domain($adminDomain)
         Route::get('/login', [LoginController::class, 'index'])->name('login');
         Route::post('/login', [LoginController::class, 'login']);
 
+        // Widget di prenotazione embeddabile (pubblico, caricato in iframe dai siti partner WP).
+        Route::get('/widget/booking/{productCode}', function (string $productCode) {
+            $product = \App\Models\Product::where('id', (int) preg_replace('/\D/', '', $productCode))->first();
+            abort_if(! $product, 404);
+
+            $widgetToken = \App\Http\Middleware\WidgetToken::issue($product);
+
+            return view('widget.booking', [
+                'product' => $product,
+                'widgetToken' => $widgetToken,
+            ]);
+        })->name('widget.booking');
+
         Route::group(['middleware' => ['auth']], function () {
             Route::impersonate();
             Route::get('/index', [DashboardController::class, 'index'])->name('dashboard');
@@ -222,14 +235,6 @@ Route::domain($adminDomain)
             Route::resource('partners', PartnerController::class);
             Route::post('partners/{partner}/generate-token', [PartnerController::class, 'generateToken'])->name('partners.generate-token');
             Route::post('partners/{partner}/generate-webhook-secret', [PartnerController::class, 'generateWebhookSecret'])->name('partners.generate-webhook-secret');
-
-            Route::get('/widget/booking/{productCode}', function (string $productCode) {
-                $product = \App\Models\Product::whereRaw('CONCAT(?, LPAD(id, 5, "0")) = ?', ['', $productCode])->first()
-                    ?? \App\Models\Product::find((int) preg_replace('/\D/', '', $productCode));
-                abort_if(! $product, 404);
-
-                return view('widget.booking', ['product' => $product]);
-            })->name('widget.booking');
             Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
             Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
             Route::put('partners/{partner}/report/settings', [PartnerReportController::class, 'updateSettings'])->name('partners.report.settings.update');

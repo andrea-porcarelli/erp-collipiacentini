@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
-use App\Models\Partner;
+use App\Models\CartItem;
+use App\Models\PartnerConsent;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\OrderService;
+use App\Services\ProductAvailabilityService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -17,46 +21,102 @@ class OrderController extends Controller
     public function __construct(
         private StripePaymentService $stripe,
         private OrderService $orderService,
+        private ProductAvailabilityService $availability,
     ) {}
 
     public function store(Request $request): JsonResponse
     {
+        $product = $request->get('widget_product');
+        if (! $product instanceof Product) {
+            return response()->json(['error' => 'unauthorized'], 403);
+        }
+
         $data = $request->validate([
-            'product_id' => ['required', 'string'],
             'date' => ['required', 'date_format:Y-m-d'],
-            'time' => ['nullable', 'string'],
-            'quantity' => ['required', 'integer', 'min:1'],
-            'variants' => ['nullable', 'array'],
+            'time' => ['required', 'string'],
+            'slot_type' => ['required', 'in:weekly,special'],
+            'slot_id' => ['nullable', 'integer'],
+            'variants' => ['required', 'array', 'min:1'],
+            'variants.*.variant_id' => ['required', 'integer'],
+            'variants.*.quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $productId = $this->extractNumericId($data['product_id']);
-        $product = Product::with('partner')->find($productId);
-
-        if (! $product) {
-            return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
+        $slot = $this->availability->getSlot($product, $data['date'], $data['time']);
+        if (! $slot) {
+            return response()->json(['error' => 'slot_unavailable', 'message' => 'Slot non disponibile'], 422);
         }
 
-        $partner = $this->tenantPartner($request, $product);
-        if (! $partner) {
-            return response()->json(['error' => 'forbidden', 'message' => 'Prodotto non associato al partner richiedente'], 403);
+        $requestedQty = collect($data['variants'])->sum('quantity');
+        if (! is_null($slot['availability']) && $slot['availability'] < $requestedQty) {
+            return response()->json([
+                'error' => 'insufficient_capacity',
+                'message' => 'Posti insufficienti per la quantità richiesta',
+                'available' => $slot['availability'],
+            ], 422);
         }
 
-        // TODO: validate availability + slot and compute total using ProductAvailabilityService.
-        $cart = Cart::create([
-            'session_id' => (string) Str::uuid(),
-            'partner_id' => $partner->id,
-            'product_id' => $product->id,
-            'date' => $data['date'],
-            'time' => $data['time'] ?? null,
-            'total' => 0,
-        ]);
+        if ($product->max_tickets_per_session && $requestedQty > $product->max_tickets_per_session) {
+            return response()->json([
+                'error' => 'max_tickets_exceeded',
+                'message' => 'Superato il massimo di biglietti per prenotazione: '.$product->max_tickets_per_session,
+            ], 422);
+        }
 
-        return response()->json($this->serializeCart($cart), 201);
+        $variantIds = collect($data['variants'])->pluck('variant_id')->unique();
+        $variants = ProductVariant::whereIn('id', $variantIds)
+            ->where('product_id', $product->id)
+            ->get()->keyBy('id');
+
+        foreach ($data['variants'] as $v) {
+            if (! $variants->has($v['variant_id'])) {
+                return response()->json(['error' => 'invalid_variant', 'variant_id' => $v['variant_id']], 422);
+            }
+        }
+
+        $priceVariation = $this->availability->getApplicablePriceVariation($product, $data['date']);
+
+        $total = 0.0;
+        $itemsSpec = [];
+        foreach ($data['variants'] as $v) {
+            $variant = $variants[$v['variant_id']];
+            $basePrice = (float) $variant->full_price;
+            $unitPrice = $priceVariation
+                ? $this->availability->applyPriceVariation($basePrice, $priceVariation)
+                : $basePrice;
+            $total += $unitPrice * $v['quantity'];
+            $itemsSpec[] = [
+                'product_variant_id' => $variant->id,
+                'quantity' => $v['quantity'],
+                'unit_price' => round($unitPrice, 2),
+            ];
+        }
+
+        $cart = DB::transaction(function () use ($product, $data, $slot, $total, $itemsSpec, $priceVariation) {
+            $cart = Cart::create([
+                'session_id' => (string) Str::uuid(),
+                'partner_id' => $product->partner_id,
+                'product_id' => $product->id,
+                'date' => $data['date'],
+                'time' => $data['time'],
+                'slot_type' => $slot['slot_type'],
+                'slot_id' => $slot['slot_id'],
+                'applied_price_variation_id' => $priceVariation?->id,
+                'total' => round($total, 2),
+            ]);
+
+            foreach ($itemsSpec as $item) {
+                CartItem::create(array_merge(['cart_id' => $cart->id], $item));
+            }
+
+            return $cart;
+        });
+
+        return response()->json($this->serializeCart($cart->fresh('items')), 201);
     }
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $cart = Cart::find($id);
+        $cart = $this->findCartForWidget($request, $id);
         if (! $cart) {
             return response()->json(['error' => 'not_found'], 404);
         }
@@ -66,7 +126,7 @@ class OrderController extends Controller
 
     public function customer(Request $request, int $id): JsonResponse
     {
-        $cart = Cart::find($id);
+        $cart = $this->findCartForWidget($request, $id);
         if (! $cart) {
             return response()->json(['error' => 'not_found'], 404);
         }
@@ -81,10 +141,29 @@ class OrderController extends Controller
             'city' => ['nullable', 'string', 'max:120'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'fiscal_code' => ['nullable', 'string', 'max:30'],
-            'privacy_accepted' => ['required', 'boolean'],
+            'privacy_accepted' => ['required', 'accepted'],
             'newsletter' => ['nullable', 'boolean'],
             'consents_payload' => ['nullable', 'array'],
         ]);
+
+        // Verifica consensi richiesti configurati sul partner.
+        $requiredConsents = PartnerConsent::where('partner_id', $cart->partner_id)
+            ->current()
+            ->where('is_active', true)
+            ->where('is_required', true)
+            ->pluck('code')
+            ->all();
+
+        $payload = $data['consents_payload'] ?? [];
+        foreach ($requiredConsents as $code) {
+            if (empty($payload[$code])) {
+                return response()->json([
+                    'error' => 'missing_required_consent',
+                    'message' => "Consenso obbligatorio mancante: $code",
+                    'code' => $code,
+                ], 422);
+            }
+        }
 
         $cart->fill($data)->save();
 
@@ -93,9 +172,9 @@ class OrderController extends Controller
 
     public function paymentIntent(Request $request, int $id): JsonResponse
     {
-        $cart = Cart::find($id);
+        $cart = $this->findCartForWidget($request, $id);
         if (! $cart || ! $cart->email) {
-            return response()->json(['error' => 'missing_customer', 'message' => 'Compilare prima i dati cliente'], 400);
+            return response()->json(['error' => 'missing_customer', 'message' => 'Compila prima i dati cliente'], 400);
         }
 
         try {
@@ -104,6 +183,7 @@ class OrderController extends Controller
             return response()->json([
                 'client_secret' => $intent->client_secret,
                 'payment_intent_id' => $intent->id,
+                'publishable_key' => config('services.stripe.key'),
             ]);
         } catch (\Throwable $e) {
             report($e);
@@ -114,7 +194,7 @@ class OrderController extends Controller
 
     public function confirm(Request $request, int $id): JsonResponse
     {
-        $cart = Cart::find($id);
+        $cart = $this->findCartForWidget($request, $id);
         if (! $cart) {
             return response()->json(['error' => 'not_found'], 404);
         }
@@ -123,56 +203,71 @@ class OrderController extends Controller
             'payment_intent_id' => ['required', 'string'],
         ]);
 
-        $intent = $this->stripe->retrievePaymentIntent($data['payment_intent_id']);
+        try {
+            $intent = $this->stripe->retrievePaymentIntent($data['payment_intent_id']);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'stripe_error', 'message' => $e->getMessage()], 500);
+        }
+
         if ($intent->status !== 'succeeded') {
             return response()->json(['error' => 'not_paid', 'status' => $intent->status], 400);
         }
 
         $order = $this->orderService->findByPaymentIntent($intent->id)
-            ?? $this->orderService->createOrderFromCart($cart, $intent->id);
+            ?? $this->orderService->createOrderFromCart($cart, $intent->id, $intent->payment_method ?? null);
 
         $cart->delete();
 
         return response()->json([
             'order_number' => $order->order_number,
             'status' => $order->order_status,
+            'success_url' => route('widget.booking', ['productCode' => $order->order_number], false),
         ]);
+    }
+
+    private function findCartForWidget(Request $request, int $id): ?Cart
+    {
+        $cart = Cart::find($id);
+        if (! $cart) {
+            return null;
+        }
+
+        // Il token widget è vincolato a un product_id: l'ordine deve matchare.
+        $product = $request->get('widget_product');
+        if ($product instanceof Product && $cart->product_id !== $product->id) {
+            return null;
+        }
+
+        return $cart;
     }
 
     private function serializeCart(Cart $cart): array
     {
+        $cart->loadMissing('items.variant');
+
         return [
             'id' => $cart->id,
             'product_id' => 'ERP-PROD-'.$cart->product_id,
             'partner_id' => $cart->partner_id,
             'date' => $cart->date?->format('Y-m-d'),
             'time' => $cart->time,
+            'slot_type' => $cart->slot_type,
+            'slot_id' => $cart->slot_id,
             'total' => (float) $cart->total,
+            'items' => $cart->items->map(fn ($i) => [
+                'variant_id' => $i->product_variant_id,
+                'label' => $i->variant?->label,
+                'quantity' => $i->quantity,
+                'unit_price' => (float) $i->unit_price,
+                'subtotal' => (float) $i->subtotal,
+            ])->all(),
             'customer' => $cart->email ? [
                 'name' => $cart->name,
                 'surname' => $cart->surname,
                 'email' => $cart->email,
+                'phone' => $cart->phone,
+                'fiscal_code' => $cart->fiscal_code,
             ] : null,
         ];
-    }
-
-    private function tenantPartner(Request $request, Product $product): ?Partner
-    {
-        $partner = $request->get('partner');
-        if ($partner instanceof Partner) {
-            return $product->partner_id === $partner->id ? $partner : null;
-        }
-
-        // Legacy fallback: Company-level token. In pratica il widget nasce come Partner-only.
-        return $product->partner;
-    }
-
-    private function extractNumericId(string $id): int
-    {
-        if (str_starts_with($id, 'ERP-PROD-')) {
-            return (int) substr($id, 9);
-        }
-
-        return (int) $id;
     }
 }
