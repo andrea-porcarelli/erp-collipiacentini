@@ -4,6 +4,7 @@ use App\Http\Middleware\ApiToken;
 use App\Http\Middleware\CaptureAttribution;
 use App\Http\Middleware\CartExists;
 use App\Http\Middleware\Token;
+use App\Http\Middleware\WidgetCors;
 use App\Http\Middleware\WidgetToken;
 use App\Notifications\ErrorTelegramNotify;
 use Illuminate\Foundation\Application;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'token' => Token::class,
             'api.token' => ApiToken::class,
             'api.widget_token' => WidgetToken::class,
+            'widget.cors' => WidgetCors::class,
             'cart.exists' => CartExists::class,
             'attribution' => CaptureAttribution::class,
         ]);

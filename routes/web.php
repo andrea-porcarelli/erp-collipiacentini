@@ -91,17 +91,13 @@ Route::domain($adminDomain)
         Route::get('/login', [LoginController::class, 'index'])->name('login');
         Route::post('/login', [LoginController::class, 'login']);
 
-        // Widget di prenotazione embeddabile (pubblico, caricato in iframe dai siti partner WP).
+        // Pagina di test del widget stand-alone (debug). In produzione il widget è iniettato
+        // dal plugin WordPress via <script src="widget.js"> + <div data-miticko-widget>.
         Route::get('/widget/booking/{productCode}', function (string $productCode) {
             $product = \App\Models\Product::where('id', (int) preg_replace('/\D/', '', $productCode))->first();
             abort_if(! $product, 404);
 
-            $widgetToken = \App\Http\Middleware\WidgetToken::issue($product);
-
-            return view('widget.booking', [
-                'product' => $product,
-                'widgetToken' => $widgetToken,
-            ]);
+            return view('widget.booking', ['product' => $product]);
         })->name('widget.booking');
 
         Route::group(['middleware' => ['auth']], function () {
