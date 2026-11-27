@@ -301,6 +301,23 @@
                 <div class="mt-4">
                     <x-input :model="$model" name="wordpress_endpoint" label="URL sito WordPress" placeholder="https://www.sitodelpartner.it" message="Dominio del sito WordPress su cui è installato il plugin. Usato come destinazione dei webhook di sincronizzazione." icon="fa-regular fa-circle-info" />
                 </div>
+
+                <hr class="my-4">
+
+                <div class="mb-2 fw-semibold">Plugin WordPress</div>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('partners.plugin-download', $model) }}"
+                       class="bt-miticko"
+                       data-mode="buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary"
+                       @if(empty($model->token) || empty($model->wordpress_webhook_secret)) aria-disabled="true" style="pointer-events:none;opacity:.55" @endif>
+                        <i class="fa-regular fa-download"></i> Scarica plugin WordPress
+                    </a>
+                </div>
+                @if(empty($model->token) || empty($model->wordpress_webhook_secret))
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Genera prima la Chiave API e la Chiave segreta webhook: verranno iniettate nel plugin." />
+                @else
+                    <x-supporting-text icon="fa-regular fa-circle-info" message="Scarica lo zip già preconfigurato con le chiavi del partner. Da caricare su WordPress → Plugin → Aggiungi nuovo → Carica plugin." />
+                @endif
             </div>
 
             {{-- Dominio dedicato / Miticko.com: dominio o slug --}}

@@ -273,6 +273,97 @@ class PartnerController extends CrudController
     }
 
     /**
+     * Streama al partner lo zip del plugin WordPress gia' preconfigurato con
+     * le sue credenziali: apre `storage/app/wp-plugin/miticko-latest.zip` (shipped
+     * nel repo), inietta `miticko/includes/miticko-partner-config.php` con i
+     * define MITICKO_PREINSTALLED_* (api_key, webhook_secret) + il default
+     * MITICKO_API_BASE produzione, e serve lo zip risultante come download.
+     *
+     * Il partner installa su WordPress: all'attivazione il plugin popola le
+     * wp_options vuote leggendo quelle costanti (vedi class-miticko-preconfig.php).
+     */
+    public function downloadPlugin(int $id)
+    {
+        $partner = $this->interface->find($id);
+
+        if (empty($partner->token) || empty($partner->wordpress_webhook_secret)) {
+            abort(422, 'Genera prima la chiave API e la chiave segreta webhook');
+        }
+
+        $sourcePath = storage_path('app/wp-plugin/miticko-latest.zip');
+        if (! is_file($sourcePath)) {
+            abort(500, 'Plugin WordPress non disponibile sul server');
+        }
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'miticko-plugin-').'.zip';
+        if (! copy($sourcePath, $tmpPath)) {
+            abort(500, 'Impossibile preparare il plugin');
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($tmpPath) !== true) {
+            @unlink($tmpPath);
+            abort(500, 'Archivio plugin corrotto');
+        }
+
+        $config = $this->buildPartnerPluginConfig($partner);
+        $zip->addFromString('miticko/includes/miticko-partner-config.php', $config);
+        $zip->close();
+
+        $downloadName = sprintf(
+            'miticko-%s.zip',
+            Str::slug($partner->partner_code ?? $partner->partner_name ?? ('partner-'.$partner->id))
+        );
+
+        return response()->download($tmpPath, $downloadName, [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
+    }
+
+    private function buildPartnerPluginConfig(Partner $partner): string
+    {
+        // Esporto come var_export: nessun escaping manuale, gestisce in automatico
+        // apici e caratteri speciali. Produce stringa PHP sintatticamente valida.
+        $apiKey        = var_export((string) $partner->token, true);
+        $webhookSecret = var_export((string) $partner->wordpress_webhook_secret, true);
+        $apiBase       = var_export(rtrim(config('app.url'), '/').'/api/v1', true);
+        $partnerName   = var_export((string) $partner->partner_name, true);
+        $generatedAt   = now()->toIso8601String();
+
+        return <<<PHP
+<?php
+/**
+ * Preconfigurazione per: {$partner->partner_name}
+ * Generato da Miticko ERP il {$generatedAt}
+ *
+ * Questo file viene iniettato nello zip del plugin al momento del download
+ * dal backoffice. Il plugin lo carica all'avvio (vedi miticko.php) e lo usa
+ * per impostare le credenziali del partner senza doverle inserire a mano.
+ *
+ * Non modificare: viene rigenerato ad ogni download.
+ */
+
+if (! defined('ABSPATH')) {
+    exit;
+}
+
+// Default API base produzione. Il partner puo' sovrascrivere definendo
+// MITICKO_API_BASE in wp-config.php prima dell'attivazione del plugin
+// (first-wins): utile in ambienti dev/staging.
+if (! defined('MITICKO_API_BASE')) {
+    define('MITICKO_API_BASE', {$apiBase});
+}
+
+// Credenziali per-partner trasferite in wp_options da Miticko_Preconfig::apply_options()
+// su register_activation_hook. Non sovrascrivono valori gia' presenti nelle options.
+define('MITICKO_PREINSTALLED_API_KEY', {$apiKey});
+define('MITICKO_PREINSTALLED_WEBHOOK_SECRET', {$webhookSecret});
+define('MITICKO_PREINSTALLED_PARTNER_NAME', {$partnerName});
+define('MITICKO_PREINSTALLED_AUTO_ENABLE', true);
+PHP;
+    }
+
+    /**
      * Salva i contenuti italiani dei campi traducibili presenti nel request
      * (description_short, privacy_policy, cookie_policy, terms_conditions).
      * I 3 campi legali richiedono ruolo `god`.

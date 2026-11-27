@@ -231,6 +231,7 @@ Route::domain($adminDomain)
             Route::resource('partners', PartnerController::class);
             Route::post('partners/{partner}/generate-token', [PartnerController::class, 'generateToken'])->name('partners.generate-token');
             Route::post('partners/{partner}/generate-webhook-secret', [PartnerController::class, 'generateWebhookSecret'])->name('partners.generate-webhook-secret');
+            Route::get('partners/{partner}/plugin', [PartnerController::class, 'downloadPlugin'])->name('partners.plugin-download');
             Route::get('partners/{partner}/report', [PartnerReportController::class, 'show'])->name('partners.report');
             Route::get('partners/{partner}/report/pdf', [PartnerReportController::class, 'pdf'])->name('partners.report.pdf');
             Route::put('partners/{partner}/report/settings', [PartnerReportController::class, 'updateSettings'])->name('partners.report.settings.update');
