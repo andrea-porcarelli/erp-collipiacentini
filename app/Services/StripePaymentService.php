@@ -13,6 +13,13 @@ use Stripe\Webhook;
 
 class StripePaymentService
 {
+    /**
+     * Marcatore iniettato nei metadata dei PaymentIntent/CheckoutSession creati da noi.
+     * Il webhook usa questo flag per distinguere eventi Miticko da eventi di altre app
+     * che condividono lo stesso account Stripe.
+     */
+    public const APP_MARKER = 'miticko';
+
     public function __construct()
     {
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -32,6 +39,7 @@ class StripePaymentService
                 'enabled' => true,
             ],
             'metadata' => [
+                'app' => self::APP_MARKER,
                 'cart_id' => $cart->id,
                 'product_id' => $cart->product_id,
                 'partner_id' => $cart->partner_id,
@@ -120,11 +128,13 @@ class StripePaymentService
             'success_url' => $successUrl,
             'cancel_url' => $cancelUrl,
             'metadata' => [
+                'app' => self::APP_MARKER,
                 'order_id' => (string) $order->id,
                 'order_number' => (string) $order->order_number,
             ],
             'payment_intent_data' => [
                 'metadata' => [
+                    'app' => self::APP_MARKER,
                     'order_id' => (string) $order->id,
                     'order_number' => (string) $order->order_number,
                 ],

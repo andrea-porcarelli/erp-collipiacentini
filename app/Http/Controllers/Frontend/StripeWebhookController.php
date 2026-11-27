@@ -189,4 +189,36 @@ class StripeWebhookController extends Controller
             ]);
         }
     }
+
+    /**
+     * Verifica se l'evento Stripe è destinato a Miticko.
+     * L'account Stripe è condiviso con altre app: ogni app marca i suoi PaymentIntent/Charge
+     * con metadata.app = <marcatore>. Senza marcatore o con marcatore diverso, ignoriamo.
+     * Legacy fallback: PaymentIntent pre-marcatore avevano cart_id/order_id → li accettiamo.
+     */
+    protected function isMitickoEvent($event): bool
+    {
+        $obj = $event->data->object ?? null;
+        if (! $obj) {
+            return false;
+        }
+
+        $metadata = $obj->metadata ?? null;
+        if (! $metadata) {
+            return false;
+        }
+
+        $meta = is_array($metadata) ? $metadata : $metadata->toArray();
+
+        if (($meta['app'] ?? null) === StripePaymentService::APP_MARKER) {
+            return true;
+        }
+
+        // Legacy: PaymentIntent creati prima dell'introduzione del marcatore.
+        if (! empty($meta['cart_id']) || ! empty($meta['order_id'])) {
+            return true;
+        }
+
+        return false;
+    }
 }

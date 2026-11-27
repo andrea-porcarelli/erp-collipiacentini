@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Product extends LogsModel
@@ -20,11 +21,32 @@ class Product extends LogsModel
         return [$this->id];
     }
 
+    /**
+     * Risolve un identificatore prodotto accettando:
+     *  - ID numerico (es. "17")
+     *  - ID canonico ERP (es. "ERP-PROD-17")
+     *  - codice articolo / product_code (es. "VISGU-AGAZZ00019")
+     *
+     * Ritorna una query Builder già filtrata — il chiamante aggiunge with() e first().
+     */
+    public static function queryByIdentifier(string $identifier): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = static::query();
+        if (str_starts_with($identifier, 'ERP-PROD-')) {
+            return $query->whereKey((int) substr($identifier, 9));
+        }
+        if (ctype_digit($identifier)) {
+            return $query->whereKey((int) $identifier);
+        }
+        return $query->where('product_code', $identifier);
+    }
+
     public $fillable = [
         'partner_id',
         'category_id',
         'is_active',
         'label',
+        'product_code',
         'duration',
         'duration_days',
         'duration_hours',
@@ -183,11 +205,50 @@ class Product extends LogsModel
 
     public function getProductCodeAttribute(): string
     {
+        if (! empty($this->attributes['product_code'])) {
+            return $this->attributes['product_code'];
+        }
+
         if (! isset($this->category)) {
             return ' #---- ';
         }
 
         return isset($this->partner) ? sprintf('%s-%s%s', $this->category->category_code, $this->partner->partner_code, str_pad($this->id, 5, '0', STR_PAD_LEFT)) : ' - ';
+    }
+
+    public static function composeProductCode(int $id, ?string $categoryCode, ?string $partnerCode): ?string
+    {
+        if (! $categoryCode || ! $partnerCode || $id <= 0) {
+            return null;
+        }
+
+        return sprintf('%s-%s%s', $categoryCode, $partnerCode, str_pad((string) $id, 5, '0', STR_PAD_LEFT));
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (self $product) {
+            if (! empty($product->attributes['product_code'])) {
+                return;
+            }
+
+            if (! $product->category_id || ! $product->partner_id) {
+                return;
+            }
+
+            $code = self::composeProductCode(
+                $product->id,
+                $product->category?->category_code,
+                $product->partner?->partner_code,
+            );
+
+            if (! $code) {
+                return;
+            }
+
+            $product->attributes['product_code'] = $code;
+            DB::table('products')->where('id', $product->id)->update(['product_code' => $code]);
+        });
     }
 
     public function getLowestPriceAttribute(): string

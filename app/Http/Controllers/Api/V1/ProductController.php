@@ -13,10 +13,10 @@ class ProductController extends Controller
     public function show(Request $request, string $id): JsonResponse
     {
         $company = $request->get('company');
-        $numericId = $this->extractNumericId($id);
 
-        $product = Product::with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
-            ->find($numericId);
+        $product = Product::queryByIdentifier($id)
+            ->with(['category', 'prices', 'contents.language', 'cover', 'gallery', 'availabilities', 'partner'])
+            ->first();
 
         if (! $product) {
             return response()->json([

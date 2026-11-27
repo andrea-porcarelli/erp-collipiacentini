@@ -20,11 +20,7 @@ class WidgetAuthController extends Controller
             'product_id' => ['required', 'string'],
         ]);
 
-        $numericId = str_starts_with($data['product_id'], 'ERP-PROD-')
-            ? (int) substr($data['product_id'], 9)
-            : (int) $data['product_id'];
-
-        $product = Product::find($numericId);
+        $product = Product::queryByIdentifier($data['product_id'])->first();
         if (! $product) {
             return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
         }

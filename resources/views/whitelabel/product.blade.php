@@ -277,7 +277,8 @@
 
     .button-progress > button,
     .button-progress > a {
-        justify-self: center;
+        justify-self: stretch;
+        width: 100%;
     }
 
     .button-progress .progress-connector {

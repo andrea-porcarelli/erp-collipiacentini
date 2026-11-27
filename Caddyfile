@@ -12,3 +12,8 @@ grazzano-visconti.miticko.com {
     tls internal
     reverse_proxy erp_panel:8000
 }
+
+castello-di-agazzano.miticko.com {
+    tls internal
+    reverse_proxy erp_panel:8000
+}

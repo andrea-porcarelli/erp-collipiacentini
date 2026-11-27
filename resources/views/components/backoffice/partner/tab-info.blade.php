@@ -251,6 +251,19 @@
                               ]"
                               :model="$model" />
                 </div>
+                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                    <x-select name="css_style" label="Brand"
+                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
+                              :model="$model" />
+                </div>
+                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
+                    <x-select name="default_layout_mode" label="Layout di default"
+                              :options="[
+                                  ['id' => 'light', 'label' => 'Chiaro'],
+                                  ['id' => 'dark',  'label' => 'Scuro'],
+                              ]"
+                              :model="$model" />
+                </div>
             </div>
 
             {{-- Plugin WordPress: token, webhook secret ed endpoint --}}
@@ -290,25 +303,12 @@
                 </div>
             </div>
 
-            {{-- Dominio dedicato / Miticko.com: dominio o slug + stile + layout --}}
+            {{-- Dominio dedicato / Miticko.com: dominio o slug --}}
             <div id="sale-fields-whitelabel" class="row mt-3" style="{{ $model->sale_method !== 'none' ? '' : 'display:none' }}">
                 <div class="col-12 col-sm-4" id="domain-name-container">
                     <x-input :model="$model" name="domain_name"
                              :label="$model->sale_method === 'whitelabel_no_domain' ? 'Link identificativo' : 'Nome dominio'"
                              :placeholder="$model->sale_method === 'whitelabel_no_domain' ? 'parte finale URL' : 'es. prenota.veleiaromana.it'" />
-                </div>
-                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                    <x-select name="css_style" label="Brand"
-                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
-                              :model="$model" />
-                </div>
-                <div class="col-12 col-sm-4 mt-3 mt-sm-0">
-                    <x-select name="default_layout_mode" label="Layout di default"
-                              :options="[
-                                  ['id' => 'light', 'label' => 'Chiaro'],
-                                  ['id' => 'dark',  'label' => 'Scuro'],
-                              ]"
-                              :model="$model" />
                 </div>
             </div>
         </form>

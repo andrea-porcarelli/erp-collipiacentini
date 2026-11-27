@@ -31,6 +31,7 @@ Route::prefix('v1')->middleware('api.token')->group(function () {
 
     Route::get('/catalog', [CatalogController::class, 'index']);
     Route::get('/catalog/info', [CatalogController::class, 'info']);
+    Route::get('/catalog/available', [CatalogController::class, 'available']);
 
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::post('/products/batch', [ProductController::class, 'batch']);

@@ -15,7 +15,7 @@ class AvailabilityController extends Controller
 
     public function index(Request $request, string $id): JsonResponse
     {
-        $product = Product::find($this->extractNumericId($id));
+        $product = Product::queryByIdentifier($id)->first();
 
         if (! $product) {
             return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
@@ -77,7 +77,7 @@ class AvailabilityController extends Controller
 
     public function check(Request $request, string $id): JsonResponse
     {
-        $product = Product::find($this->extractNumericId($id));
+        $product = Product::queryByIdentifier($id)->first();
 
         if (! $product) {
             return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
@@ -107,12 +107,4 @@ class AvailabilityController extends Controller
         ]);
     }
 
-    private function extractNumericId(string $id): int
-    {
-        if (str_starts_with($id, 'ERP-PROD-')) {
-            return (int) substr($id, 9);
-        }
-
-        return (int) $id;
-    }
 }

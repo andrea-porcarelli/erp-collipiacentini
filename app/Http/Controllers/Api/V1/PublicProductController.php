@@ -14,13 +14,14 @@ class PublicProductController extends Controller
 
     public function show(Request $request, string $id): JsonResponse
     {
-        $product = Product::with([
-            'category', 'cover', 'gallery', 'partner.consents' => function ($q) {
-                $q->where('is_active', true)->current()->orderBy('position');
-            },
-            'customerFields.fieldType',
-            'variants.prices',
-        ])->find($this->extractNumericId($id));
+        $product = Product::queryByIdentifier($id)
+            ->with([
+                'category', 'cover', 'gallery', 'partner.consents' => function ($q) {
+                    $q->where('is_active', true)->current()->orderBy('position');
+                },
+                'customerFields.fieldType',
+                'variants.prices',
+            ])->first();
 
         if (! $product) {
             return response()->json(['error' => 'not_found', 'message' => 'Prodotto non trovato'], 404);
@@ -81,16 +82,10 @@ class PublicProductController extends Controller
                 'id' => $product->partner->id,
                 'name' => $product->partner->partner_name,
                 'brand' => $product->partner->brand,
+                'css_style' => $product->partner->css_style,
+                'default_layout_mode' => $product->partner->default_layout_mode,
             ] : null,
         ]);
     }
 
-    private function extractNumericId(string $id): int
-    {
-        if (str_starts_with($id, 'ERP-PROD-')) {
-            return (int) substr($id, 9);
-        }
-
-        return (int) $id;
-    }
 }

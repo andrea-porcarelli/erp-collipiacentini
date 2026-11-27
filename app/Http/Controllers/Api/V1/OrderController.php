@@ -213,6 +213,10 @@ class OrderController extends Controller
             return response()->json(['error' => 'not_paid', 'status' => $intent->status], 400);
         }
 
+        // L'ordine viene creato in PENDING; la transizione a PAID è autorità esclusiva
+        // del webhook payment_intent.succeeded (necessario per gestire correttamente
+        // i metodi asincroni come SEPA/Klarna dove il confirm può essere succeeded ma
+        // il pagamento poi fallire).
         $order = $this->orderService->findByPaymentIntent($intent->id)
             ?? $this->orderService->createOrderFromCart($cart, $intent->id, $intent->payment_method ?? null);
 
