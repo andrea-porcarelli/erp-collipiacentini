@@ -306,12 +306,14 @@
 
                 <div class="mb-2 fw-semibold">Plugin WordPress</div>
                 <div class="d-flex align-items-center gap-3">
-                    <a href="{{ route('partners.plugin-download', $model) }}"
-                       class="bt-miticko"
-                       data-mode="buttonSize-Medium buttonEmphasis-High buttonAppearance-Primary"
-                       @if(empty($model->token) || empty($model->wordpress_webhook_secret)) aria-disabled="true" style="pointer-events:none;opacity:.55" @endif>
-                        <i class="fa-regular fa-download"></i> Scarica plugin WordPress
-                    </a>
+                    <x-button
+                        :href="route('partners.plugin-download', $model)"
+                        label="Scarica plugin WordPress"
+                        leading="fa-download"
+                        emphasis="Medium"
+                        size="Medium"
+                        status="Secondary"
+                        :disabled="empty($model->token) || empty($model->wordpress_webhook_secret)" />
                 </div>
                 @if(empty($model->token) || empty($model->wordpress_webhook_secret))
                     <x-supporting-text icon="fa-regular fa-circle-info" message="Genera prima la Chiave API e la Chiave segreta webhook: verranno iniettate nel plugin." />
