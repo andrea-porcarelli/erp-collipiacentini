@@ -253,7 +253,7 @@
                 </div>
                 <div class="col-12 col-sm-4 mt-3 mt-sm-0">
                     <x-select name="css_style" label="Brand"
-                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($s) => ['id' => $s, 'label' => $s])->all()"
+                              :options="collect(\App\Models\Partner::CSS_STYLES)->map(fn($label, $code) => ['id' => $code, 'label' => $label])->values()->all()"
                               :model="$model" />
                 </div>
                 <div class="col-12 col-sm-4 mt-3 mt-sm-0">

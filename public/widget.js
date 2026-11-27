@@ -511,7 +511,8 @@
             // Whitelist: il design system accetta solo questi brand (vedi Partner::CSS_STYLES).
             // Qualunque valore fuori lista (incluso un payload API manipolato) cade su Miticko,
             // evitando di iniettare stringhe arbitrarie nell'attributo data-mode.
-            const ALLOWED_BRANDS = ['Miticko', 'Veleia', 'Vigoleno', 'Tocqueville'];
+            // Tenere allineato con la mappa CSS_STYLES del modello Partner.
+            const ALLOWED_BRANDS = ['Miticko', 'Veleia', 'Vigoleno', 'Tocqueville', 'CP', 'CS', 'CPA', 'CPI', 'CB'];
             const brandCamel = ALLOWED_BRANDS.includes(partner.css_style) ? partner.css_style : 'Miticko';
             const layoutMode = (partner.default_layout_mode === 'dark') ? 'Dark' : 'Light';
 

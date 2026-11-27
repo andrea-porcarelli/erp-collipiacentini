@@ -71,7 +71,24 @@ class Partner extends LogsModel
         return $this->billing_managed_by === self::BILLING_MANAGED_BY_MITICKO;
     }
 
-    public const CSS_STYLES = ['Miticko', 'Veleia', 'Vigoleno', 'Tocqueville'];
+    /**
+     * Mappa code => label dei brand supportati.
+     * - code: valore salvato in `partners.css_style` e usato nell'attributo
+     *   `data-mode="<code> ..."` per attivare il blocco CSS corrispondente in
+     *   `public/backoffice/css/Miticko.css`. Non cambiarlo senza allineare il CSS.
+     * - label: testo mostrato nella UI del backoffice.
+     */
+    public const CSS_STYLES = [
+        'Miticko'     => 'Miticko',
+        'Veleia'      => 'Veleia Romana',
+        'Vigoleno'    => 'Castello di Vigoleno',
+        'Tocqueville' => 'Tocqueville',
+        'CP' => 'Colli Piacentini',
+        'CS' => 'Colli Siena',
+        'CPA' => 'Colli Parma',
+        'CPI' => 'Colli Piemonte',
+        'CB' => 'Colli Bologna',
+    ];
 
     public const LAYOUT_MODES = ['light', 'dark'];
 
@@ -158,9 +175,15 @@ class Partner extends LogsModel
         $candidate = strtolower(trim((string) ($this->css_style ?? '')));
         $brands = array_keys(config('design.brands', []));
 
-        return $candidate !== '' && in_array($candidate, $brands, true)
-            ? $candidate
-            : $default;
+        if ($candidate === '' || ! in_array($candidate, $brands, true)) {
+            return $default;
+        }
+
+        // Il candidate deve anche essere presente tra i code supportati
+        // (case-insensitive: in DB il code e' PascalCase, in config/design e' lowercase).
+        $allowedCodes = array_map('strtolower', array_keys(self::CSS_STYLES));
+
+        return in_array($candidate, $allowedCodes, true) ? $candidate : $default;
     }
 
     public function active_products(): HasMany

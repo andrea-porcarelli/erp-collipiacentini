@@ -240,7 +240,7 @@ class PartnerController extends CrudController
                 'string',
                 Rule::unique('partners', 'domain_name')->ignore($partner->id),
             ],
-            'css_style' => ['nullable', Rule::in(Partner::CSS_STYLES)],
+            'css_style' => ['nullable', Rule::in(array_keys(Partner::CSS_STYLES))],
             'default_layout_mode' => ['nullable', Rule::in(Partner::LAYOUT_MODES)],
             'wordpress_endpoint' => ['nullable', 'url', 'max:255'],
         ], [
