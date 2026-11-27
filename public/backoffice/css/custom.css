@@ -59,6 +59,17 @@ a.text-small {
     color: var(--button-hover-foreground);
 }
 
+/* La regola globale `a { color: var(--color) !important }` sopra sovrascriverebbe
+   il color del bottone quando <x-button href="..."> renderizza come <a>. Qui
+   lo riallineo con il token del design system, cosi' <a.bt-miticko> e
+   <button.bt-miticko> appaiono identici a parita' di data-mode. */
+a.bt-miticko {
+    color: var(--button-resting-foreground) !important;
+}
+a.bt-miticko:hover {
+    color: var(--button-hover-foreground) !important;
+}
+
 .bt-miticko.bt-m-default {
     background: var(--button-resting-background, #D24600);
     color: var(--button-resting-foreground);
